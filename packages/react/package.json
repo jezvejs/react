@@ -1,0 +1,36 @@
+{
+    "name": "@jezvejs/react",
+    "version": "0.1.0",
+    "type": "module",
+    "files": [
+        "src"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+        "preview": "vite preview",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "exports": {
+        ".": "./src/index.js",
+        "./package.json": "./package.json",
+        "./*": "./src/Components/*/*.js",
+        "./style/*": "./src/Components/*/*.scss",
+        "./style": "./src/common.scss"
+    },
+    "main": "./dist/jezvejs-react.umd.js",
+    "module": "./dist/jezvejs-react.es.js",
+    "publishConfig": {
+        "access": "public"
+    }
+}
