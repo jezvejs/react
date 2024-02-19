@@ -44,7 +44,7 @@ Button.propTypes = {
     className: PropTypes.string,
     type: PropTypes.oneOf(['button', 'link', 'static']),
     iconAlign: PropTypes.oneOf(['left', 'right']),
-    enabled: PropTypes.bool,
+    disabled: PropTypes.bool,
     onClick: PropTypes.func,
     url: PropTypes.string,
     title: PropTypes.string,
@@ -54,7 +54,7 @@ Button.propTypes = {
 
 Button.defaultProps = {
     type: 'button', // button, link or static
-    enabled: true,
+    disabled: false,
     iconAlign: 'left', // available value: 'left', 'right'
     onClick: null,
 };
