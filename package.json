@@ -16,7 +16,8 @@
         "lint-style": "npx stylelint packages/**/*.scss stories/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
         "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build",
+        "build": "storybook build",
+        "all": "npm-run-all lint build",
         "deploy": "node ./scripts/deploy.js",
         "commit-version": "node ./scripts/commit-version.js",
         "release": "node ./scripts/release.js"
@@ -69,6 +70,6 @@
         "vite-plugin-svgr": "^4.2.0"
     },
     "dependencies": {
-        "@jezvejs/react": "^0.1.0"
+        "@jezvejs/react": "^0.2.0"
     }
 }
