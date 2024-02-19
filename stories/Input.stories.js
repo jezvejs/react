@@ -1,5 +1,5 @@
 import { Input } from '@jezvejs/react';
-import './Input.stories.css';
+import './Input.stories.scss';
 
 export default {
     title: 'Components/Input',

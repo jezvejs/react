@@ -5,7 +5,7 @@ import EditIcon from './assets/icons/edit.svg';
 import DeleteIcon from './assets/icons/del.svg';
 import CalendarIcon from './assets/icons/calendar.svg';
 
-import './Button.stories.css';
+import './Button.stories.scss';
 
 export default {
     title: 'Components/Button',

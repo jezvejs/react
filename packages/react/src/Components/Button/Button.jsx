@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-import './Button.css';
+import './Button.scss';
 
 const buttonTypes = ['button', 'submit', 'reset'];
 

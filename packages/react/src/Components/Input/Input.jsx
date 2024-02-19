@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import './Input.css';
+import './Input.scss';
 
 /**
  * Input component

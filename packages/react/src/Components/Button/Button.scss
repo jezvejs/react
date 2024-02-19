@@ -104,10 +104,10 @@
   border-color: var(--btn-focus-border-color);
   box-shadow: var(--btn-focus-shadow);
   outline: var(--btn-focus-outline);
-}
 
-.btn:focus-visible .btn__icon {
-  fill: var(--btn-focus-icon-color);
+  .btn__icon {
+    fill: var(--btn-focus-icon-color);
+  }
 }
 
 /* Active state */
@@ -115,10 +115,10 @@
   color: var(--btn-active-title-color);
   border-color: var(--btn-active-border-color);
   background: var(--btn-active-background);
-}
 
-.btn:active .btn__icon {
-  fill: var(--btn-active-icon-color);
+  .btn__icon {
+    fill: var(--btn-active-icon-color);
+  }
 }
 
 /* Disabled state */
@@ -129,10 +129,10 @@
   opacity: var(--btn-disabled-opacity);
   pointer-events: none;
   cursor: default;
-}
 
-.btn[disabled] .btn__icon {
-  fill: var(--btn-disabled-icon-color);
+  .btn__icon {
+    fill: var(--btn-disabled-icon-color);
+  }
 }
 
 @media (hover: hover) {
@@ -140,23 +140,23 @@
     color: var(--btn-hover-title-color);
     border-color: var(--btn-hover-border-color);
     background: var(--btn-hover-background);
-  }
 
-  .btn:hover .btn__icon {
-    fill: var(--btn-hover-icon-color);
-  }
+    .btn__icon {
+      fill: var(--btn-hover-icon-color);
+    }
 
-  .btn:hover .btn__content {
-    color: var(--btn-hover-title-color);
+    .btn__content {
+      color: var(--btn-hover-title-color);
+    }
   }
 
   .btn:active:hover {
     color: var(--btn-active-title-color);
     border-color: var(--btn-active-border-color);
     background: var(--btn-active-background);
-  }
 
-  .btn:active:hover .btn__icon {
-    fill: var(--btn-active-icon-color);
+    .btn__icon {
+      fill: var(--btn-active-icon-color);
+    }
   }
 }
