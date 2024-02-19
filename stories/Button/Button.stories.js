@@ -1,9 +1,9 @@
 import { Button } from '@jezvejs/react/Button';
 
-import PlusIcon from './assets/icons/plus.svg';
-import EditIcon from './assets/icons/edit.svg';
-import DeleteIcon from './assets/icons/del.svg';
-import CalendarIcon from './assets/icons/calendar.svg';
+import PlusIcon from '../assets/icons/plus.svg';
+import EditIcon from '../assets/icons/edit.svg';
+import DeleteIcon from '../assets/icons/del.svg';
+import CalendarIcon from '../assets/icons/calendar.svg';
 
 import './Button.stories.scss';
 
