@@ -24,11 +24,9 @@
   },
   "homepage": "https://github.com/jezvejs/react#readme",
   "workspaces": [
-    "packages/*",
-    "docs"
+    "packages/*"
   ],
   "devDependencies": {
-    "@babel/eslint-parser": "^7.23.10",
     "@storybook/addon-essentials": "^7.6.16",
     "@storybook/addon-interactions": "^7.6.16",
     "@storybook/addon-links": "^7.6.16",
@@ -37,6 +35,7 @@
     "@storybook/react": "^7.6.16",
     "@storybook/react-vite": "^7.6.16",
     "@storybook/test": "^7.6.16",
+    "@vitejs/plugin-react": "^4.2.1",
     "browserslist": "^4.23.0",
     "commonjs-variables-for-esmodules": "^1.1.0",
     "eslint": "^8.56.0",
@@ -49,7 +48,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.70.0",
+    "sass": "^1.71.0",
     "storybook": "^7.6.16",
     "stylelint": "^16.2.1",
     "stylelint-config-prettier-scss": "^1.0.0",
