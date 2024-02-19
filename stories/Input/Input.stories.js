@@ -1,3 +1,4 @@
+import '@jezvejs/react/style';
 import { Input } from '@jezvejs/react/Input';
 import './Input.stories.scss';
 
