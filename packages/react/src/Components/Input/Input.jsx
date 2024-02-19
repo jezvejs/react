@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -12,10 +13,18 @@ export const Input = (props) => {
         ...inputProps
     } = props;
 
+    const [value, setValue] = useState(props.value ?? '');
+
+    const onInput = (e) => {
+        setValue(e.target.value);
+    };
+
     return (
         <input
             className={classNames('input', className)}
             {...inputProps}
+            onInput={onInput}
+            value={value}
         />
     );
 };
