@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import './Button.scss';
 
@@ -19,12 +20,16 @@ export function Button({
     const IconComponent = icon;
     const iconContent = (icon) ? (<IconComponent className="btn__icon" />) : null;
 
-    const content = (iconAlign === 'left')
-        ? [iconContent, titleContainer]
-        : [titleContainer, iconContent];
+    const content = (
+        <>
+            {(iconAlign === 'left') ? iconContent : null}
+            {titleContainer}
+            {(iconAlign !== 'left') ? iconContent : null}
+        </>
+    );
 
     const commonProps = {
-        className: ['btn', props.className].join(' '),
+        className: classNames('btn', props.className),
     };
 
     if (type === 'link') {
@@ -49,7 +54,10 @@ Button.propTypes = {
     url: PropTypes.string,
     title: PropTypes.string,
     tooltip: PropTypes.string,
-    icon: PropTypes.elementType,
+    icon: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
 };
 
 Button.defaultProps = {
