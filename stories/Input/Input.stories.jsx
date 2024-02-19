@@ -1,5 +1,6 @@
+// eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { Input } from '@jezvejs/react/Input';
+import { Input } from '@jezvejs/react';
 import './Input.stories.scss';
 
 export default {

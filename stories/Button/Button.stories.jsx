@@ -1,5 +1,6 @@
+// eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { Button } from '@jezvejs/react/Button';
+import { Button } from '@jezvejs/react';
 
 import PlusIcon from '../assets/icons/plus.svg';
 import EditIcon from '../assets/icons/edit.svg';
