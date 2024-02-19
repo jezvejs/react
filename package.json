@@ -1,62 +1,74 @@
 {
-  "name": "jezvejs-react",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "description": "JavaScript utility and components library",
-  "module": "index.js",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./stories/",
-    "lint-style": "npx stylelint packages/**/*.scss stories/**/*.scss",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jezvejs/react.git"
-  },
-  "author": "Ilya Makarov",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/jezvejs/react/issues"
-  },
-  "homepage": "https://github.com/jezvejs/react#readme",
-  "workspaces": [
-    "packages/*"
-  ],
-  "devDependencies": {
-    "@storybook/addon-essentials": "^7.6.16",
-    "@storybook/addon-interactions": "^7.6.16",
-    "@storybook/addon-links": "^7.6.16",
-    "@storybook/blocks": "^7.6.16",
-    "@storybook/builder-vite": "^7.6.16",
-    "@storybook/react": "^7.6.16",
-    "@storybook/react-vite": "^7.6.16",
-    "@storybook/test": "^7.6.16",
-    "@vitejs/plugin-react": "^4.2.1",
-    "browserslist": "^4.23.0",
-    "commonjs-variables-for-esmodules": "^1.1.0",
-    "eslint": "^8.56.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "eslint-plugin-storybook": "^0.8.0",
-    "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "sass": "^1.71.0",
-    "storybook": "^7.6.16",
-    "stylelint": "^16.2.1",
-    "stylelint-config-prettier-scss": "^1.0.0",
-    "stylelint-config-standard-scss": "^13.0.0",
-    "vite": "^5.1.3",
-    "vite-plugin-svgr": "^4.2.0"
-  },
-  "dependencies": {
-    "@jezvejs/react": "^0.1.0"
-  }
+    "name": "jezvejs-react",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "description": "JavaScript utility and components library",
+    "module": "index.js",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "p-install": "npm install",
+        "p-update": "npm update",
+        "p-publish": "npm publish",
+        "p-version": "npm version",
+        "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./stories/",
+        "lint-style": "npx stylelint packages/**/*.scss stories/**/*.scss",
+        "lint": "npm-run-all --parallel lint-src lint-style",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build",
+        "deploy": "node ./scripts/deploy.js",
+        "commit-version": "node ./scripts/commit-version.js",
+        "release": "node ./scripts/release.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jezvejs/react.git"
+    },
+    "author": "Ilya Makarov",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/jezvejs/react/issues"
+    },
+    "homepage": "https://github.com/jezvejs/react#readme",
+    "workspaces": [
+        "packages/*"
+    ],
+    "devDependencies": {
+        "@storybook/addon-essentials": "^7.6.16",
+        "@storybook/addon-interactions": "^7.6.16",
+        "@storybook/addon-links": "^7.6.16",
+        "@storybook/blocks": "^7.6.16",
+        "@storybook/builder-vite": "^7.6.16",
+        "@storybook/react": "^7.6.16",
+        "@storybook/react-vite": "^7.6.16",
+        "@storybook/test": "^7.6.16",
+        "@vitejs/plugin-react": "^4.2.1",
+        "browserslist": "^4.23.0",
+        "commonjs-variables-for-esmodules": "^1.1.0",
+        "dotenv": "^16.4.4",
+        "eslint": "^8.56.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-plugin-react": "^7.33.2",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-react-refresh": "^0.4.5",
+        "eslint-plugin-storybook": "^0.8.0",
+        "npm-run-all": "^4.1.5",
+        "prop-types": "^15.8.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "sass": "^1.71.0",
+        "shelljs": "^0.8.5",
+        "ssh2-sftp-client": "^10.0.3",
+        "storybook": "^7.6.16",
+        "stylelint": "^16.2.1",
+        "stylelint-config-prettier-scss": "^1.0.0",
+        "stylelint-config-standard-scss": "^13.0.0",
+        "vite": "^5.1.3",
+        "vite-plugin-svgr": "^4.2.0"
+    },
+    "dependencies": {
+        "@jezvejs/react": "^0.1.0"
+    }
 }
