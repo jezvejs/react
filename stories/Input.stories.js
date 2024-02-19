@@ -1,4 +1,4 @@
-import { Input } from '@jezvejs/react';
+import { Input } from '@jezvejs/react/Input';
 import './Input.stories.scss';
 
 export default {

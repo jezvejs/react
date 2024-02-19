@@ -1,4 +1,4 @@
-import { Button } from '@jezvejs/react';
+import { Button } from '@jezvejs/react/Button';
 
 import PlusIcon from './assets/icons/plus.svg';
 import EditIcon from './assets/icons/edit.svg';

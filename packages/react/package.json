@@ -26,7 +26,7 @@
     "exports": {
         ".": "./src/index.js",
         "./package.json": "./package.json",
-        "./*": "./src/Components/*/*.js",
+        "./*": "./src/Components/*/*.jsx",
         "./style/*": "./src/Components/*/*.scss",
         "./style": "./src/common.scss"
     },
