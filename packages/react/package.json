@@ -3,8 +3,20 @@
     "version": "0.1.0",
     "type": "module",
     "files": [
-        "src"
+        "src",
+        "package.json"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jezvejs/react.git",
+        "directory": "packages/react"
+    },
+    "author": "Ilya Makarov",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/jezvejs/react/issues"
+    },
+    "homepage": "https://github.com/jezvejs/react#readme",
     "scripts": {
         "dev": "vite",
         "build": "vite build",
@@ -26,12 +38,10 @@
     "exports": {
         ".": "./src/index.js",
         "./package.json": "./package.json",
-        "./*": "./src/Components/*/*.jsx",
-        "./style/*": "./src/Components/*/*.scss",
         "./style": "./src/common.scss"
     },
-    "main": "./dist/jezvejs-react.umd.js",
-    "module": "./dist/jezvejs-react.es.js",
+    "main": "./src/index.js",
+    "module": "./src/index.js",
     "publishConfig": {
         "access": "public"
     }
