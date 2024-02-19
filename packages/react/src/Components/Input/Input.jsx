@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -15,7 +14,7 @@ export const Input = (props) => {
 
     return (
         <input
-            className={classNames('input', props.className)}
+            className={classNames('input', className)}
             {...inputProps}
         />
     );
