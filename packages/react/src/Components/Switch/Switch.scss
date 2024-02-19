@@ -1,0 +1,137 @@
+.switch {
+  --switch-width: 2.6rem;
+  --switch-height: 1.5rem;
+  --switch-slider-padding: 2px;
+  --switch-gap: 0.5rem;
+  --switch-bg: #555555;
+  --switch-slider-color: #f0f0f0;
+  --switch-padding: 0;
+
+  /* Label */
+  --switch-label-order: 1;
+  --switch-font-size: 1rem;
+  --switch-font-weight: 400;
+  --switch-text-color: #000000;
+
+  /* Checked state */
+  --switch-checked-bg: #0d9c00;
+  --switch-checked-hover-bg: #10c200;
+
+  /* Focused state */
+  --switch-focus-outline-color: #aee5ff;
+
+  /* Hover state */
+  --switch-hover-bg: #707070;
+  --switch-hover-slider: #ffffff;
+
+  /* Disabled state */
+  --switch-disabled-bg: #dddddd;
+  --switch-disabled-slider-color: #f0f0f0;
+  --switch-disabled-text-color: #888888;
+  --switch-disabled-opacity: 0.8;
+
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+  padding: var(--switch-padding);
+  gap: var(--switch-gap);
+
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+}
+
+/* Slider container */
+.switch-slider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  background-color: var(--switch-bg);
+  border-radius: 100vh;
+  cursor: pointer;
+  position: relative;
+
+  /* Sliding disc */
+  &::before {
+    content: "";
+    top: 0;
+    left: 0;
+    position: absolute;
+    margin: var(--switch-slider-padding);
+    width: calc(var(--switch-height) - var(--switch-slider-padding) * 2);
+    height: calc(var(--switch-height) - var(--switch-slider-padding) * 2);
+    background-color: var(--switch-slider-color);
+    border-radius: 100vh;
+  }
+}
+
+/* Label */
+.switch__label {
+  font-size: var(--switch-font-size);
+  font-weight: var(--switch-font-weight);
+  color: var(--switch-text-color);
+  min-height: var(--switch-height);
+  line-height: var(--switch-height);
+  order: var(--switch-label-order);
+}
+
+/* Animated only focused */
+.switch input:focus + .switch-slider::before {
+  transition: left 0.2s;
+}
+
+/* Focused state */
+.switch input:focus-visible + .switch-slider {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: var(--switch-focus-outline-color);
+  outline-offset: 0.1rem;
+}
+
+/* Checked state */
+.switch input:checked + .switch-slider {
+  background-color: var(--switch-checked-bg);
+
+  &::before {
+    left: calc(100% - var(--switch-height));
+  }
+}
+
+/* Disabled state */
+.switch input[disabled] + .switch-slider {
+  pointer-events: none;
+  opacity: var(--switch-disabled-opacity);
+  background-color: var(--switch-disabled-bg);
+
+  &::before {
+    background-color: var(--switch-disabled-slider-color);
+  }
+}
+
+.switch input[disabled] ~ .switch__label {
+  pointer-events: none;
+  color: var(--switch-disabled-text-color);
+}
+
+@media (hover: hover) {
+  .switch-slider:hover {
+    background-color: var(--switch-hover-bg);
+  }
+
+  .switch-slider:hover::before {
+    background-color: var(--switch-hover-slider);
+  }
+
+  /* Checked state */
+  .switch input:checked + .switch-slider:hover {
+    background-color: var(--switch-checked-hover-bg);
+  }
+}

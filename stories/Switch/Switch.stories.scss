@@ -1,0 +1,17 @@
+/* Gray switch */
+.switch.blue-switch {
+  --switch-label-order: -1;
+  --switch-checked-bg: #006bcf;
+  --switch-checked-hover-bg: #1788f1;
+
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Large */
+.switch.large-switch {
+  --switch-width: 68px;
+  --switch-height: 40px;
+  --switch-padding: 4px;
+}
