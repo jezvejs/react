@@ -48,6 +48,14 @@ const removeIfExists = async (path) => {
     return removeByType(path, type);
 };
 
+const isExists = async (path) => {
+    try {
+        return await client.exists(path);
+    } catch {
+        return false;
+    }
+};
+
 let res = 1;
 let progress = null;
 let backupPath = null;
@@ -102,7 +110,7 @@ try {
     });
 
     // Rename current app directory to backup if available
-    const appDirType = await client.exists(appPath);
+    const appDirType = await isExists(appPath);
     if (appDirType === 'd') {
         backupPath = destPath(BACKUP_DIR);
         await removeIfExists(backupPath);
