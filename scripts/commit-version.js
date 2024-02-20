@@ -23,6 +23,9 @@ const versionFiles = [
     'packages/react/package.json',
 ];
 
+const RELEASE_BRANCH = 'release';
+const MAIN_BRANCH = 'main';
+
 if (!shell.which('git')) {
     shell.echo('Sorry, this script requires git');
     shell.exit(1);
@@ -42,15 +45,15 @@ if (gitDir.toLowerCase() !== currentDir.toLowerCase()) {
     });
 }
 
-const version = getPackageVersion('./packages/jezvejs/package.json');
+const version = getPackageVersion('./packages/react/package.json');
 
 shell.pushd('-q', gitDir);
 
 shell.exec(`git commit -a -m "Updated version to ${version}"`);
-shell.exec('git checkout release --');
-shell.exec('git pull -v --no-rebase "origin"');
-shell.exec(`git merge --no-ff -m "Version ${version}" master`);
+shell.exec(`git checkout ${RELEASE_BRANCH} --`);
+shell.exec(`git pull -v --no-rebase "origin/${RELEASE_BRANCH}"`);
+shell.exec(`git merge --no-ff -m "Version ${version}" ${MAIN_BRANCH}`);
 shell.exec(`git tag -a v.${version} -m "Version ${version}"`);
-shell.exec('git checkout master --');
+shell.exec(`git checkout ${MAIN_BRANCH} --`);
 
 shell.popd('-q');
