@@ -73,6 +73,6 @@
         "vite-plugin-svgr": "^4.2.0"
     },
     "dependencies": {
-        "@jezvejs/react": "^0.2.0"
+        "@jezvejs/react": "^0.2.1"
     }
 }
