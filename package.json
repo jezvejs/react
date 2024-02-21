@@ -38,7 +38,7 @@
         "packages/*"
     ],
     "devDependencies": {
-        "@jezvejs/release-tools": "^0.2.1",
+        "@jezvejs/release-tools": "^0.2.2",
         "@storybook/addon-essentials": "^7.6.17",
         "@storybook/addon-interactions": "^7.6.17",
         "@storybook/addon-links": "^7.6.17",
