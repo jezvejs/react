@@ -23,6 +23,7 @@ export default {
     docs: {
         autodocs: 'tag',
     },
+    staticDirs: ['./public'],
 };
 
 export const framework = '@storybook/react';
