@@ -1,5 +1,5 @@
 import { create } from '@storybook/theming/create';
-import logo from '../stories/assets/images/jezvejs.svg';
+import logo from '../stories/assets/images/jezvejs-react.svg';
 
 export default create({
     base: 'dark',
