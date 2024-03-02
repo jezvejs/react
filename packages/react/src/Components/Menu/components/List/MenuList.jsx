@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './MenuList.scss';
+import { getClosestItemElement } from '../../helpers.js';
 
 /**
  * MenuList component
@@ -9,15 +10,11 @@ import './MenuList.scss';
 export const MenuList = (props) => {
     const { ListItem, Separator, ListPlaceholder } = props.components;
 
-    const getClosestItemElement = (elem) => (
-        elem?.closest?.(props.itemSelector) ?? null
-    );
-
     const handleClick = (e) => {
         e?.stopPropagation();
 
         const elem = e?.target;
-        const closestElem = getClosestItemElement(elem);
+        const closestElem = getClosestItemElement(elem, props);
         const itemId = closestElem?.dataset?.id ?? null;
         if (itemId === null) {
             return;
@@ -26,9 +23,13 @@ export const MenuList = (props) => {
         props.onItemClick(itemId, e);
     };
 
+    const handleTouchStart = (e) => {
+        props.onTouchStart(e);
+    };
+
     const handleMouseEnter = (e) => {
         const elem = e?.target;
-        const closestElem = getClosestItemElement(elem);
+        const closestElem = getClosestItemElement(elem, props);
         const itemId = closestElem?.dataset?.id ?? null;
 
         props.onMouseEnter?.(itemId, e);
@@ -37,7 +38,7 @@ export const MenuList = (props) => {
     const handleMouseLeave = (e) => {
         const elem = e?.relatedTarget;
 
-        const closestElem = getClosestItemElement(elem);
+        const closestElem = getClosestItemElement(elem, props);
         const itemId = closestElem?.dataset?.id ?? null;
 
         props.onMouseLeave?.(itemId, e);
@@ -60,6 +61,7 @@ export const MenuList = (props) => {
                 props.className,
             )}
             onClick={handleClick}
+            onTouchStart={handleTouchStart}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onMouseOver={handleMouseEnter}
@@ -91,6 +93,7 @@ MenuList.propTypes = {
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     beforeContent: PropTypes.bool,
     afterContent: PropTypes.bool,
+    onTouchStart: PropTypes.func,
     onItemClick: PropTypes.func,
     onMouseEnter: PropTypes.func,
     onMouseLeave: PropTypes.func,

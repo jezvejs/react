@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -9,6 +9,7 @@ import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
 
 import {
     forItems,
+    getClosestItemElement,
     getItemById,
     isCheckbox,
     mapItems,
@@ -23,33 +24,54 @@ export const Menu = (props) => {
         ...Menu.defaultProps,
         ...props,
         activeItem: null,
+        ignoreTouch: false,
         components: {
             ...Menu.defaultProps.components,
             ...(props.components ?? {}),
         },
     });
 
-    const handleItemClick = (itemId, e) => {
-        const clickedItem = getItemById(itemId, state.items);
+    const ref = useRef(null);
 
-        if (isCheckbox(clickedItem)) {
-            setState({
-                ...state,
-                items: mapItems(state.items, (item) => ({
-                    ...item,
-                    selected: (
-                        (item.id === itemId)
-                            ? (!item.selected)
-                            : item.selected
-                    ),
-                })),
-            });
+    const handleFocus = (e) => {
+        const closestElem = getClosestItemElement(e?.target, state);
+        const itemId = closestElem?.dataset?.id ?? null;
+
+        if (state.activeItem === itemId) {
+            return;
         }
 
-        props.onItemClick?.(clickedItem, e);
+        setState({
+            ...state,
+            activeItem: itemId,
+        });
+    };
+
+    const handleBlur = (e) => {
+        if (e?.relatedTarget && ref.current.contains(e.relatedTarget)) {
+            return;
+        }
+
+        setState({
+            ...state,
+            activeItem: null,
+        });
+    };
+
+    const handleTouchStart = (e) => {
+        if (e.touches) {
+            setState({
+                ...state,
+                ignoreTouch: true,
+            });
+        }
     };
 
     const handleMouseEnter = (itemId) => {
+        if (state.ignoreTouch) {
+            return;
+        }
+
         if (itemId === null || itemId === state.activeItem) {
             return;
         }
@@ -72,6 +94,40 @@ export const Menu = (props) => {
             ...state,
             activeItem: null,
         });
+
+        const focused = document.activeElement;
+        if (ref.current.contains(focused)) {
+            ref.current.focus({ preventScroll: true });
+        }
+    };
+
+    const handleItemClick = (itemId, e) => {
+        const clickedItem = getItemById(itemId, state.items);
+
+        setState({
+            ...state,
+            activeItem: itemId,
+        });
+
+        if (isCheckbox(clickedItem)) {
+            setState({
+                ...state,
+                items: mapItems(state.items, (item) => ({
+                    ...item,
+                    selected: (
+                        (item.id === itemId)
+                            ? (!item.selected)
+                            : item.selected
+                    ),
+                })),
+            });
+        }
+
+        props.onItemClick?.(clickedItem, e);
+
+        if (state.ignoreTouch) {
+            setTimeout(() => handleMouseLeave(), 70);
+        }
     };
 
     const handleScroll = () => {
@@ -105,6 +161,7 @@ export const Menu = (props) => {
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
+        onTouchStart: handleTouchStart,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
     };
@@ -118,7 +175,11 @@ export const Menu = (props) => {
         <div
             id={props.id}
             className={classNames('menu', props.className)}
+            tabIndex={-1}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onScroll={handleScroll}
+            ref={ref}
         >
             {menuHeader}
             {menuList}
