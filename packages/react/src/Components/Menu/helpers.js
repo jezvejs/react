@@ -186,3 +186,7 @@ export const mapItems = (items, callback, options = {}) => {
 
     return res;
 };
+
+export const getClosestItemElement = (elem, props) => (
+    elem?.closest?.(props?.itemSelector ?? props?.components?.ListItem?.selector) ?? null
+);
