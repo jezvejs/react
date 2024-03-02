@@ -22,6 +22,7 @@ export const Menu = (props) => {
     const [state, setState] = useState({
         ...Menu.defaultProps,
         ...props,
+        activeItem: null,
         components: {
             ...Menu.defaultProps.components,
             ...(props.components ?? {}),
@@ -46,6 +47,31 @@ export const Menu = (props) => {
         }
 
         props.onItemClick?.(clickedItem, e);
+    };
+
+    const handleMouseEnter = (itemId) => {
+        if (itemId === null || itemId === state.activeItem) {
+            return;
+        }
+
+        setState({
+            ...state,
+            activeItem: itemId,
+        });
+    };
+
+    const handleMouseLeave = (relItemId) => {
+        if (
+            state.activeItem === null
+            || (state.activeItem === relItemId)
+        ) {
+            return;
+        }
+
+        setState({
+            ...state,
+            activeItem: null,
+        });
     };
 
     const handleScroll = () => {
@@ -79,6 +105,8 @@ export const Menu = (props) => {
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
     };
 
     listProps.itemSelector = listProps.components.ListItem.selector;

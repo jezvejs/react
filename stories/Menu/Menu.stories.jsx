@@ -7,9 +7,9 @@ import SearchIcon from '../assets/icons/search.svg';
 
 import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.jsx';
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx';
+import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
 
 import './Menu.stories.scss';
-import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
 
 const getDefaultItems = () => ([{
     id: 'selectBtnItem',
@@ -59,7 +59,6 @@ const initItems = (title, count, startFrom = 1) => {
 
     return res;
 };
-
 
 export default {
     title: 'Components/Menu',
@@ -142,5 +141,12 @@ export const Placeholder = {
         components: {
             ListPlaceholder: LoadingPlaceholder,
         },
+    },
+};
+
+export const Scroll = {
+    args: {
+        items: initItems('Menu item', 30),
+        className: 'scroll-menu',
     },
 };
