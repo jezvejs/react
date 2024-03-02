@@ -19,7 +19,14 @@ import './Menu.scss';
  * Menu component
  */
 export const Menu = (props) => {
-    const [state, setState] = useState(props);
+    const [state, setState] = useState({
+        ...Menu.defaultProps,
+        ...props,
+        components: {
+            ...Menu.defaultProps.components,
+            ...(props.components ?? {}),
+        },
+    });
 
     const handleItemClick = (itemId, e) => {
         const clickedItem = getItemById(itemId, state.items);
@@ -64,8 +71,8 @@ export const Menu = (props) => {
         }
     });
 
-    const { Header, Footer, List } = props.components;
-    const menuHeader = Header && <Header {...(state.header ?? {})} />;
+    const { Header, Footer, List } = state.components;
+    const menuHeader = Header && <Header {...(state.header ?? {})} components={state.components} />;
 
     const listProps = {
         ...state,
@@ -76,8 +83,8 @@ export const Menu = (props) => {
 
     listProps.itemSelector = listProps.components.ListItem.selector;
 
-    const menuList = List && <List {...listProps} components={props.components} />;
-    const menuFooter = Footer && <Footer {...(state.footer ?? {})} />;
+    const menuList = List && <List {...listProps} components={state.components} />;
+    const menuFooter = Footer && <Footer {...(state.footer ?? {})} components={state.components} />;
 
     return (
         <div
