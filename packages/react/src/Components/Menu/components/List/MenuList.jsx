@@ -7,7 +7,7 @@ import './MenuList.scss';
  * MenuList component
  */
 export const MenuList = (props) => {
-    const { ListItem, Separator } = props.components;
+    const { ListItem, Separator, ListPlaceholder } = props.components;
 
     const handleClick = (e) => {
         e?.stopPropagation();
@@ -40,16 +40,19 @@ export const MenuList = (props) => {
             )}
             onClick={handleClick}
         >
-            {props.items.map((item) => (
-                itemElement({
-                    ...ListItem.defaultProps,
-                    ...item,
-                    iconAlign: item.iconAlign || props.iconAlign,
-                    checkboxSide: item.checkboxSide || props.checkboxSide,
-                    key: item.id,
-                    components: props.components,
-                })
-            ))}
+            {(props.items.length > 0)
+                ? props.items.map((item) => (
+                    itemElement({
+                        ...ListItem.defaultProps,
+                        ...item,
+                        iconAlign: item.iconAlign || props.iconAlign,
+                        checkboxSide: item.checkboxSide || props.checkboxSide,
+                        key: item.id,
+                        components: props.components,
+                    })
+                ))
+                : (ListPlaceholder && <ListPlaceholder {...props} />)
+            }
         </div>
     );
 };
@@ -69,6 +72,7 @@ MenuList.propTypes = {
     components: PropTypes.shape({
         List: PropTypes.func,
         ListItem: PropTypes.func,
+        ListPlaceholder: PropTypes.func,
         Check: PropTypes.func,
         Separator: PropTypes.func,
     }),

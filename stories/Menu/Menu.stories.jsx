@@ -9,6 +9,7 @@ import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.jsx
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx';
 
 import './Menu.stories.scss';
+import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
 
 const getDefaultItems = () => ([{
     id: 'selectBtnItem',
@@ -131,6 +132,15 @@ export const HeaderFooter = {
         components: {
             Header: CustomMenuHeader,
             Footer: CustomMenuFooter,
+        },
+    },
+};
+
+export const Placeholder = {
+    args: {
+        items: [],
+        components: {
+            ListPlaceholder: LoadingPlaceholder,
         },
     },
 };
