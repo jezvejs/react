@@ -12,16 +12,20 @@ if (!process.env.SFTP_SERVER) {
     process.exit(0);
 }
 
-const processRes = await deploy({
-    clientConfig: {
-        host: process.env.SFTP_SERVER,
-        username: process.env.SFTP_USER,
-        password: process.env.SFTP_PASSWORD,
-        port: process.env.SFTP_PORT,
-    },
-    sourceDir: join(currentDir, '..', process.env.SOURCE_DIR),
-    destDir: process.env.DEPLOY_PATH,
-    appDir: process.env.APP_DIR,
-});
+const run = async () => {
+    const processRes = await deploy({
+        clientConfig: {
+            host: process.env.SFTP_SERVER,
+            username: process.env.SFTP_USER,
+            password: process.env.SFTP_PASSWORD,
+            port: process.env.SFTP_PORT,
+        },
+        sourceDir: join(currentDir, '..', process.env.SOURCE_DIR),
+        destDir: process.env.DEPLOY_PATH,
+        appDir: process.env.APP_DIR,
+    });
 
-process.exit(processRes);
+    process.exit(processRes);
+};
+
+run();

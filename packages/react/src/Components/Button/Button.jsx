@@ -5,6 +5,10 @@ import './Button.scss';
 
 const buttonTypes = ['button', 'submit', 'reset'];
 
+const ButtonContent = (title) => (
+    title && <div className="btn__content">{title}</div>
+);
+
 export function Button({
     title,
     type,
@@ -14,7 +18,7 @@ export function Button({
     ...props
 }) {
     const titleContainer = (icon)
-        ? (<div className="btn__content">{title}</div>)
+        ? ButtonContent(title)
         : title;
 
     const IconComponent = icon;
