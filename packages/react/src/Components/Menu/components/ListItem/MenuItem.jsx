@@ -15,6 +15,7 @@ export const MenuItem = (props) => {
         url,
         iconAlign,
         checkboxSide,
+        activeItem,
         ...rest
     } = props;
 
@@ -30,6 +31,7 @@ export const MenuItem = (props) => {
                 'link-menu-item': isLink,
                 'checkbox-menu-item': isCheckbox,
                 'menu-item_selected': !!props.selected,
+                'menu-item_active': (activeItem && props.id === activeItem),
             },
             className,
         ),
@@ -93,6 +95,10 @@ MenuItem.propTypes = {
     className: PropTypes.string,
     title: PropTypes.string,
     selected: PropTypes.bool,
+    activeItem: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.oneOf([null]),
+    ]),
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     icon: PropTypes.oneOfType([

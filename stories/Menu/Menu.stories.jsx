@@ -5,6 +5,10 @@ import { Menu } from '@jezvejs/react';
 import SelectIcon from '../assets/icons/select.svg';
 import SearchIcon from '../assets/icons/search.svg';
 
+import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.jsx';
+import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx';
+import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
+
 import './Menu.stories.scss';
 
 const getDefaultItems = () => ([{
@@ -29,6 +33,32 @@ const getDefaultItems = () => ([{
     title: 'Checkbox item',
     selected: true,
 }]);
+
+const getHorizontalItems = () => ([{
+    id: 'selectBtnItem',
+    title: 'Button item',
+}, {
+    id: 'separator1',
+    type: 'separator',
+}, {
+    id: 'linkItem',
+    type: 'link',
+    title: 'Link item',
+    url: '#123',
+}, {
+    id: 'noIconItem',
+    title: 'Item 3',
+}]);
+
+const initItems = (title, count, startFrom = 1) => {
+    const res = [];
+
+    for (let ind = startFrom; ind < startFrom + count; ind += 1) {
+        res.push({ id: ind.toString(), title: `${title} ${ind}` });
+    }
+
+    return res;
+};
 
 export default {
     title: 'Components/Menu',
@@ -71,5 +101,52 @@ export const CheckboxSide = {
         onItemClick: (_, e) => {
             e?.preventDefault();
         },
+    },
+};
+
+export const Horizontal = {
+    args: {
+        items: getHorizontalItems(),
+        className: 'horizontal-menu',
+        onItemClick: (_, e) => {
+            e?.preventDefault();
+        },
+    },
+};
+
+export const HeaderFooter = {
+    args: {
+        id: 'headerFooterMenu',
+        className: 'scroll-menu',
+        items: initItems('Menu item', 5),
+        onItemClick: (_, e) => {
+            e?.preventDefault();
+        },
+        header: {
+            title: 'Custom header',
+        },
+        footer: {
+            title: 'Custom footer',
+        },
+        components: {
+            Header: CustomMenuHeader,
+            Footer: CustomMenuFooter,
+        },
+    },
+};
+
+export const Placeholder = {
+    args: {
+        items: [],
+        components: {
+            ListPlaceholder: LoadingPlaceholder,
+        },
+    },
+};
+
+export const Scroll = {
+    args: {
+        items: initItems('Menu item', 30),
+        className: 'scroll-menu',
     },
 };

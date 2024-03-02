@@ -19,7 +19,15 @@ import './Menu.scss';
  * Menu component
  */
 export const Menu = (props) => {
-    const [state, setState] = useState(props);
+    const [state, setState] = useState({
+        ...Menu.defaultProps,
+        ...props,
+        activeItem: null,
+        components: {
+            ...Menu.defaultProps.components,
+            ...(props.components ?? {}),
+        },
+    });
 
     const handleItemClick = (itemId, e) => {
         const clickedItem = getItemById(itemId, state.items);
@@ -39,6 +47,31 @@ export const Menu = (props) => {
         }
 
         props.onItemClick?.(clickedItem, e);
+    };
+
+    const handleMouseEnter = (itemId) => {
+        if (itemId === null || itemId === state.activeItem) {
+            return;
+        }
+
+        setState({
+            ...state,
+            activeItem: itemId,
+        });
+    };
+
+    const handleMouseLeave = (relItemId) => {
+        if (
+            state.activeItem === null
+            || (state.activeItem === relItemId)
+        ) {
+            return;
+        }
+
+        setState({
+            ...state,
+            activeItem: null,
+        });
     };
 
     const handleScroll = () => {
@@ -64,20 +97,22 @@ export const Menu = (props) => {
         }
     });
 
-    const { Header, Footer, List } = props.components;
-    const menuHeader = Header && <Header {...(state.header ?? {})} />;
+    const { Header, Footer, List } = state.components;
+    const menuHeader = Header && <Header {...(state.header ?? {})} components={state.components} />;
 
     const listProps = {
         ...state,
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
     };
 
     listProps.itemSelector = listProps.components.ListItem.selector;
 
-    const menuList = List && <List {...listProps} components={props.components} />;
-    const menuFooter = Footer && <Footer {...(state.footer ?? {})} />;
+    const menuList = List && <List {...listProps} components={state.components} />;
+    const menuFooter = Footer && <Footer {...(state.footer ?? {})} components={state.components} />;
 
     return (
         <div
@@ -114,6 +149,7 @@ Menu.propTypes = {
         Header: PropTypes.func,
         List: PropTypes.func,
         ListItem: PropTypes.func,
+        ListPlaceholder: PropTypes.func,
         Check: PropTypes.func,
         Separator: PropTypes.func,
         Footer: PropTypes.func,
@@ -131,6 +167,7 @@ Menu.defaultProps = {
         Header: null,
         List: MenuList,
         ListItem: MenuItem,
+        ListPlaceholder: null,
         Check: MenuCheckbox,
         Separator: MenuSeparator,
         Footer: null,
