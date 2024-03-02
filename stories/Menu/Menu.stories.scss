@@ -1,0 +1,63 @@
+.block {
+  display: block;
+  width: 100px;
+  height: 100px;
+  background-color: #0065bd;
+}
+
+.nav-header__content {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  width: 100%;
+  overflow: hidden;
+  margin-right: 9px;
+}
+
+.nav-header__content .menu-btn {
+  --btn-icon-color: #ffffff;
+
+  width: var(--btn-size);
+}
+
+/* Horizontal menu */
+.menu.horizontal-menu {
+  --menu-item-padding: 0.5rem 1rem;
+
+  flex-flow: row wrap;
+
+  .menu-list {
+    flex-flow: row wrap;
+  }
+
+  .menu-separator {
+    width: auto;
+    border: 0 none;
+    border-right-width: var(--menu-separator-size, 1px);
+    border-right-style: solid;
+    border-right-color: var(--menu-separator-color);
+  }
+}
+
+/* List placeholder menu */
+.menu.placeholder-menu {
+  max-width: 300px;
+  width: 100%;
+}
+
+/* Scrolling menu */
+.menu.scroll-menu {
+  max-height: 400px;
+  max-width: 300px;
+  width: 100%;
+
+  > .menu-list {
+    overflow: auto;
+  }
+}
+
+/* Collapbile groups */
+.collapsible-groups-menu {
+  max-width: 300px;
+  width: 100%;
+}
