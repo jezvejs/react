@@ -1,0 +1,34 @@
+.full-width {
+  width: calc(100% - 2rem);
+  margin: 1rem;
+}
+
+[data-name="Default"] {
+  padding-bottom: 5rem;
+}
+
+.header {
+  position: static;
+
+  .btn.header-menu-btn {
+    --btn-border-radius: 100vh;
+    --btn-padding: 4px;
+    --btn-icon-color: #dddddd;
+    --btn-active-background: #4e4e4e;
+    --btn-hover-background: #646464;
+
+    margin: 9px;
+    flex: 0 0 auto;
+  }
+}
+
+/* Header logo */
+.nav-header__logo,
+.nav-header__logo:visited {
+  --btn-title-color: #dddddd;
+  --btn-font-size: 1.1rem;
+  --btn-hover-title-color: #ffffff;
+  --btn-size: 50px;
+
+  white-space: nowrap;
+}
