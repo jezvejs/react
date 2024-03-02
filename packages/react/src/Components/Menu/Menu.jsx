@@ -7,7 +7,12 @@ import { MenuList } from './components/List/MenuList.jsx';
 import { MenuItem } from './components/ListItem/MenuItem.jsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
 
-import { forItems, getItemById, isCheckbox, mapItems } from './helpers.js';
+import {
+    forItems,
+    getItemById,
+    isCheckbox,
+    mapItems,
+} from './helpers.js';
 import './Menu.scss';
 
 /**
@@ -17,24 +22,26 @@ export const Menu = (props) => {
     const [state, setState] = useState(props);
 
     const handleItemClick = (itemId, e) => {
-        const item = getItemById(itemId, state.items);
+        const clickedItem = getItemById(itemId, state.items);
 
-        if (isCheckbox(item)) {
+        if (isCheckbox(clickedItem)) {
             setState({
                 ...state,
                 items: mapItems(state.items, (item) => ({
                     ...item,
-                    selected: (item.id === itemId)
-                        ? (!item.selected)
-                        : item.selected
+                    selected: (
+                        (item.id === itemId)
+                            ? (!item.selected)
+                            : item.selected
+                    ),
                 })),
             });
         }
 
-        props.onItemClick?.(item, e);
+        props.onItemClick?.(clickedItem, e);
     };
 
-    const handleScroll = (e) => {
+    const handleScroll = () => {
     };
 
     // Prepare alignment before and after item content

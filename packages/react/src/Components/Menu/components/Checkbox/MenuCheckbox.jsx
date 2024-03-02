@@ -9,4 +9,3 @@ export const MenuCheckbox = () => (
         <CheckIcon className='menu-checkbox__icon' />
     </div>
 );
-
