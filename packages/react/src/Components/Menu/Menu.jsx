@@ -80,6 +80,11 @@ export const Menu = (props) => {
             ...state,
             activeItem: itemId,
         });
+
+        const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
+        if (itemEl) {
+            itemEl.focus({ preventScroll: true });
+        }
     };
 
     const handleMouseLeave = (relItemId) => {
