@@ -8,10 +8,6 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "p-install": "npm install",
-        "p-update": "npm update",
-        "p-publish": "npm publish",
-        "p-version": "npm version",
         "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./stories/",
         "lint-style": "npx stylelint packages/**/*.scss stories/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
@@ -38,7 +34,7 @@
         "packages/*"
     ],
     "devDependencies": {
-        "@jezvejs/release-tools": "^0.2.2",
+        "@jezvejs/release-tools": "^0.5.1",
         "@storybook/addon-essentials": "^7.6.17",
         "@storybook/addon-interactions": "^7.6.17",
         "@storybook/addon-links": "^7.6.17",
@@ -74,7 +70,7 @@
         "vite-plugin-svgr": "^4.2.0"
     },
     "dependencies": {
-        "@jezvejs/react": "^0.4.2",
+        "@jezvejs/react": "^0.4.3",
         "prop-types": "^15.8.1"
     }
 }
