@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import './MenuList.scss';
 import { getClosestItemElement } from '../../helpers.js';
+import './MenuList.scss';
 
 /**
  * MenuList component
