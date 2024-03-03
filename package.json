@@ -70,7 +70,7 @@
         "vite-plugin-svgr": "^4.2.0"
     },
     "dependencies": {
-        "@jezvejs/react": "^0.4.2",
+        "@jezvejs/react": "^0.4.3",
         "prop-types": "^15.8.1"
     }
 }
