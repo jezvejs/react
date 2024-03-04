@@ -41,10 +41,10 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: itemId,
-        });
+        }));
     };
 
     const handleBlur = (e) => {
@@ -52,18 +52,18 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: null,
-        });
+        }));
     };
 
     const handleTouchStart = (e) => {
         if (e.touches) {
-            setState({
-                ...state,
+            setState((prev) => ({
+                ...prev,
                 ignoreTouch: true,
-            });
+            }));
         }
     };
 
@@ -76,10 +76,10 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: itemId,
-        });
+        }));
 
         const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
         if (itemEl) {
@@ -95,10 +95,10 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: null,
-        });
+        }));
 
         const focused = document.activeElement;
         if (ref.current.contains(focused)) {
@@ -109,14 +109,14 @@ export const Menu = (props) => {
     const handleItemClick = (itemId, e) => {
         const clickedItem = getItemById(itemId, state.items);
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: itemId,
-        });
+        }));
 
         if (isCheckbox(clickedItem)) {
-            setState({
-                ...state,
+            setState((prev) => ({
+                ...prev,
                 items: mapItems(state.items, (item) => ({
                     ...item,
                     selected: (
@@ -125,7 +125,7 @@ export const Menu = (props) => {
                             : item.selected
                     ),
                 })),
-            });
+            }));
         }
 
         props.onItemClick?.(clickedItem, e);
