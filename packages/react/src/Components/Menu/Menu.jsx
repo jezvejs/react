@@ -34,6 +34,10 @@ export const Menu = (props) => {
     const ref = useRef(null);
 
     const handleFocus = (e) => {
+        if (ref.current === e?.target) {
+            return;
+        }
+
         const closestElem = getClosestItemElement(e?.target, state);
         const itemId = closestElem?.dataset?.id ?? null;
 
@@ -107,12 +111,20 @@ export const Menu = (props) => {
     };
 
     const handleItemClick = (itemId, e) => {
+        e?.stopPropagation();
+
         const clickedItem = getItemById(itemId, state.items);
 
-        setState((prev) => ({
-            ...prev,
-            activeItem: itemId,
-        }));
+        if (
+            state.activeItem
+            && state.activeItem !== itemId
+            && !state.ignoreTouch
+        ) {
+            setState((prev) => ({
+                ...prev,
+                activeItem: itemId,
+            }));
+        }
 
         if (isCheckbox(clickedItem)) {
             setState((prev) => ({
@@ -131,8 +143,13 @@ export const Menu = (props) => {
         props.onItemClick?.(clickedItem, e);
 
         if (state.ignoreTouch) {
-            setTimeout(() => handleMouseLeave(), 70);
+            setTimeout(() => handleMouseLeave());
         }
+
+        setState((prev) => ({
+            ...prev,
+            ignoreTouch: false,
+        }));
     };
 
     const handleScroll = () => {
