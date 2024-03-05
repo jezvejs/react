@@ -152,6 +152,9 @@ export const Menu = (props) => {
         }));
     };
 
+    const handleKey = () => {
+    };
+
     const handleScroll = () => {
     };
 
@@ -198,9 +201,11 @@ export const Menu = (props) => {
             id={props.id}
             className={classNames('menu', props.className)}
             tabIndex={-1}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onScroll={handleScroll}
+            onFocusCapture={handleFocus}
+            onBlurCapture={handleBlur}
+            onTouchStartCapture={handleTouchStart}
+            onKeyDownCapture={handleKey}
+            onScrollCapture={handleScroll}
             ref={ref}
         >
             {menuHeader}

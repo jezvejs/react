@@ -23,10 +23,6 @@ export const MenuList = (props) => {
         props.onItemClick(itemId, e);
     };
 
-    const handleTouchStart = (e) => {
-        props.onTouchStart(e);
-    };
-
     const handleMouseEnter = (e) => {
         const elem = e?.target;
         const closestElem = getClosestItemElement(elem, props);
@@ -61,7 +57,6 @@ export const MenuList = (props) => {
                 props.className,
             )}
             onClick={handleClick}
-            onTouchStart={handleTouchStart}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onMouseOver={handleMouseEnter}
@@ -93,7 +88,6 @@ MenuList.propTypes = {
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     beforeContent: PropTypes.bool,
     afterContent: PropTypes.bool,
-    onTouchStart: PropTypes.func,
     onItemClick: PropTypes.func,
     onMouseEnter: PropTypes.func,
     onMouseLeave: PropTypes.func,
