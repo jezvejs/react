@@ -8,9 +8,14 @@ import { MenuItem } from './components/ListItem/MenuItem.jsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
 
 import {
+    findLastMenuItem,
+    findMenuItem,
     forItems,
+    getActiveItem,
     getClosestItemElement,
     getItemById,
+    getNextItem,
+    getPreviousItem,
     isCheckbox,
     mapItems,
 } from './helpers.js';
@@ -34,6 +39,10 @@ export const Menu = (props) => {
     const ref = useRef(null);
 
     const handleFocus = (e) => {
+        if (ref.current === e?.target) {
+            return;
+        }
+
         const closestElem = getClosestItemElement(e?.target, state);
         const itemId = closestElem?.dataset?.id ?? null;
 
@@ -41,10 +50,10 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: itemId,
-        });
+        }));
     };
 
     const handleBlur = (e) => {
@@ -52,19 +61,40 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: null,
-        });
+        }));
     };
 
     const handleTouchStart = (e) => {
         if (e.touches) {
-            setState({
-                ...state,
+            setState((prev) => ({
+                ...prev,
                 ignoreTouch: true,
-            });
+            }));
         }
+    };
+
+    const activateItem = (itemId) => {
+        const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
+        if (itemEl) {
+            itemEl.focus({ preventScroll: true });
+        }
+    };
+
+    const toggleSelectItem = (itemId) => {
+        setState((prev) => ({
+            ...prev,
+            items: mapItems(state.items, (item) => ({
+                ...item,
+                selected: (
+                    (item.id === itemId)
+                        ? (!item.selected)
+                        : item.selected
+                ),
+            })),
+        }));
     };
 
     const handleMouseEnter = (itemId) => {
@@ -76,15 +106,12 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: itemId,
-        });
+        }));
 
-        const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
-        if (itemEl) {
-            itemEl.focus({ preventScroll: true });
-        }
+        activateItem(itemId);
     };
 
     const handleMouseLeave = (relItemId) => {
@@ -95,10 +122,10 @@ export const Menu = (props) => {
             return;
         }
 
-        setState({
-            ...state,
+        setState((prev) => ({
+            ...prev,
             activeItem: null,
-        });
+        }));
 
         const focused = document.activeElement;
         if (ref.current.contains(focused)) {
@@ -107,31 +134,93 @@ export const Menu = (props) => {
     };
 
     const handleItemClick = (itemId, e) => {
+        e?.stopPropagation();
+
         const clickedItem = getItemById(itemId, state.items);
 
-        setState({
-            ...state,
-            activeItem: itemId,
-        });
+        if (
+            state.activeItem
+            && state.activeItem !== itemId
+            && !state.ignoreTouch
+        ) {
+            setState((prev) => ({
+                ...prev,
+                activeItem: itemId,
+            }));
+        }
 
         if (isCheckbox(clickedItem)) {
-            setState({
-                ...state,
-                items: mapItems(state.items, (item) => ({
-                    ...item,
-                    selected: (
-                        (item.id === itemId)
-                            ? (!item.selected)
-                            : item.selected
-                    ),
-                })),
-            });
+            toggleSelectItem(itemId);
         }
 
         props.onItemClick?.(clickedItem, e);
 
         if (state.ignoreTouch) {
-            setTimeout(() => handleMouseLeave(), 70);
+            setTimeout(() => handleMouseLeave());
+        }
+
+        setState((prev) => ({
+            ...prev,
+            ignoreTouch: false,
+        }));
+    };
+
+    const isAvailableItem = (item) => (
+        item
+        && !item.hidden
+        && !item.disabled
+        && item.type !== 'separator'
+    );
+
+    const handleKey = (e) => {
+        const availCallback = (item) => isAvailableItem(item, state);
+        const options = {};
+
+        if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+            const activeItem = getActiveItem(state);
+            let nextItem = (activeItem)
+                ? getNextItem(activeItem.id, state.items, availCallback, options)
+                : findMenuItem(state.items, availCallback);
+
+            if (state.loopNavigation && activeItem && !nextItem) {
+                nextItem = findMenuItem(state.items, availCallback);
+            }
+
+            if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
+                activateItem(nextItem.id);
+
+                e.preventDefault();
+            }
+
+            return;
+        }
+
+        if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+            const activeItem = getActiveItem(state);
+            let nextItem = (activeItem)
+                ? getPreviousItem(activeItem.id, state.items, availCallback, options)
+                : findLastMenuItem(state.items, availCallback);
+
+            if (state.loopNavigation && activeItem && !nextItem) {
+                nextItem = findLastMenuItem(state.items, availCallback);
+            }
+
+            if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
+                activateItem(nextItem.id);
+
+                e.preventDefault();
+            }
+
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            const activeItem = getActiveItem(state);
+            if (activeItem) {
+                toggleSelectItem(activeItem.id);
+            }
+
+            e.preventDefault();
         }
     };
 
@@ -166,7 +255,6 @@ export const Menu = (props) => {
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
-        onTouchStart: handleTouchStart,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
     };
@@ -181,9 +269,11 @@ export const Menu = (props) => {
             id={props.id}
             className={classNames('menu', props.className)}
             tabIndex={-1}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onScroll={handleScroll}
+            onFocusCapture={handleFocus}
+            onBlurCapture={handleBlur}
+            onTouchStartCapture={handleTouchStart}
+            onKeyDownCapture={handleKey}
+            onScrollCapture={handleScroll}
             ref={ref}
         >
             {menuHeader}
@@ -198,6 +288,7 @@ Menu.propTypes = {
     className: PropTypes.string,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
+    loopNavigation: PropTypes.bool,
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
@@ -225,6 +316,7 @@ Menu.propTypes = {
 Menu.defaultProps = {
     iconAlign: 'left',
     checkboxSide: 'left',
+    loopNavigation: true,
     header: null,
     footer: null,
     onItemClick: null,
