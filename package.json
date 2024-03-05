@@ -15,7 +15,7 @@
         "build": "npm run build -w @jezvejs/react",
         "build-storybook": "storybook build",
         "build-all": "npm-run-all build build-storybook",
-        "all": "npm-run-all lint build",
+        "all": "npm-run-all lint build-all",
         "deploy": "node ./scripts/deploy.js",
         "commit-version": "node ./scripts/commit-version.js",
         "release": "node ./scripts/release.js"
