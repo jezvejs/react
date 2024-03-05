@@ -215,9 +215,8 @@ export const Menu = (props) => {
         }
 
         if (e.key === 'Enter') {
-            const activeItem = getActiveItem(state);
-            if (activeItem) {
-                toggleSelectItem(activeItem.id);
+            if (state.activeItem) {
+                handleItemClick(state.activeItem, e);
             }
 
             e.preventDefault();
