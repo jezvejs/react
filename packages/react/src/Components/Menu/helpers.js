@@ -119,6 +119,15 @@ export const getItemById = (id, items) => {
 };
 
 /**
+ * Returns active menu item
+ *
+ * @param {Array} items array of items to search in
+ */
+export const getActiveItem = (state) => (
+    getItemById(state.activeItem, state.items)
+);
+
+/**
  * Iterates list of menu items with callback function
  * @param {Array} items menu items array
  * @param {Function} callback
@@ -185,6 +194,78 @@ export const mapItems = (items, callback, options = {}) => {
     }
 
     return res;
+};
+
+/**
+ * Returns closest item before specified that satisfies filter
+ *
+ * @param {String} id identifier of item to start from
+ * @param {Array} items array of menu list items
+ * @param {Function|null} filterCallback optional callback function to verify
+ * @param {Object} options
+ * @returns
+ */
+export const getPreviousItem = (id, items, filterCallback = null, options = {}) => {
+    const strId = id?.toString() ?? null;
+    if (strId === null) {
+        return null;
+    }
+
+    const flatList = toFlatList(items, options);
+    let startItem = null;
+    const callback = isFunction(filterCallback) ? filterCallback : null;
+
+    for (let index = flatList.length - 1; index >= 0; index -= 1) {
+        const item = flatList[index];
+        if (item.id?.toString() === strId) {
+            startItem = item;
+            continue;
+        }
+
+        if (startItem) {
+            if (callback === null || callback(item)) {
+                return item;
+            }
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Returns closest item after specified that satisfies filter
+ *
+ * @param {String} id identifier of item to start from
+ * @param {Array} items array of menu list items
+ * @param {Function|null} filterCallback optional callback function to filter returned item
+ * @param {Object} options
+ * @returns
+ */
+export const getNextItem = (id, items, filterCallback = null, options = {}) => {
+    const strId = id?.toString() ?? null;
+    if (strId === null) {
+        return null;
+    }
+
+    const flatList = toFlatList(items, options);
+    let startItem = null;
+    const callback = isFunction(filterCallback) ? filterCallback : null;
+
+    for (let index = 0; index < flatList.length; index += 1) {
+        const item = flatList[index];
+        if (item.id?.toString() === strId) {
+            startItem = item;
+            continue;
+        }
+
+        if (startItem) {
+            if (callback === null || callback(item)) {
+                return item;
+            }
+        }
+    }
+
+    return null;
 };
 
 export const getClosestItemElement = (elem, props) => (

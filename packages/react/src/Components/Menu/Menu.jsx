@@ -8,9 +8,14 @@ import { MenuItem } from './components/ListItem/MenuItem.jsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
 
 import {
+    findLastMenuItem,
+    findMenuItem,
     forItems,
+    getActiveItem,
     getClosestItemElement,
     getItemById,
+    getNextItem,
+    getPreviousItem,
     isCheckbox,
     mapItems,
 } from './helpers.js';
@@ -71,6 +76,27 @@ export const Menu = (props) => {
         }
     };
 
+    const activateItem = (itemId) => {
+        const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
+        if (itemEl) {
+            itemEl.focus({ preventScroll: true });
+        }
+    };
+
+    const toggleSelectItem = (itemId) => {
+        setState((prev) => ({
+            ...prev,
+            items: mapItems(state.items, (item) => ({
+                ...item,
+                selected: (
+                    (item.id === itemId)
+                        ? (!item.selected)
+                        : item.selected
+                ),
+            })),
+        }));
+    };
+
     const handleMouseEnter = (itemId) => {
         if (state.ignoreTouch) {
             return;
@@ -85,10 +111,7 @@ export const Menu = (props) => {
             activeItem: itemId,
         }));
 
-        const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
-        if (itemEl) {
-            itemEl.focus({ preventScroll: true });
-        }
+        activateItem(itemId);
     };
 
     const handleMouseLeave = (relItemId) => {
@@ -127,17 +150,7 @@ export const Menu = (props) => {
         }
 
         if (isCheckbox(clickedItem)) {
-            setState((prev) => ({
-                ...prev,
-                items: mapItems(state.items, (item) => ({
-                    ...item,
-                    selected: (
-                        (item.id === itemId)
-                            ? (!item.selected)
-                            : item.selected
-                    ),
-                })),
-            }));
+            toggleSelectItem(itemId);
         }
 
         props.onItemClick?.(clickedItem, e);
@@ -152,7 +165,63 @@ export const Menu = (props) => {
         }));
     };
 
-    const handleKey = () => {
+    const isAvailableItem = (item) => (
+        item
+        && !item.hidden
+        && !item.disabled
+        && item.type !== 'separator'
+    );
+
+    const handleKey = (e) => {
+        const availCallback = (item) => isAvailableItem(item, state);
+        const options = {};
+
+        if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+            const activeItem = getActiveItem(state);
+            let nextItem = (activeItem)
+                ? getNextItem(activeItem.id, state.items, availCallback, options)
+                : findMenuItem(state.items, availCallback);
+
+            if (state.loopNavigation && activeItem && !nextItem) {
+                nextItem = findMenuItem(state.items, availCallback);
+            }
+
+            if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
+                activateItem(nextItem.id);
+
+                e.preventDefault();
+            }
+
+            return;
+        }
+
+        if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+            const activeItem = getActiveItem(state);
+            let nextItem = (activeItem)
+                ? getPreviousItem(activeItem.id, state.items, availCallback, options)
+                : findLastMenuItem(state.items, availCallback);
+
+            if (state.loopNavigation && activeItem && !nextItem) {
+                nextItem = findLastMenuItem(state.items, availCallback);
+            }
+
+            if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
+                activateItem(nextItem.id);
+
+                e.preventDefault();
+            }
+
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            const activeItem = getActiveItem(state);
+            if (activeItem) {
+                toggleSelectItem(activeItem.id);
+            }
+
+            e.preventDefault();
+        }
     };
 
     const handleScroll = () => {
@@ -186,7 +255,6 @@ export const Menu = (props) => {
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
-        onTouchStart: handleTouchStart,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
     };
@@ -220,6 +288,7 @@ Menu.propTypes = {
     className: PropTypes.string,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
+    loopNavigation: PropTypes.bool,
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
@@ -247,6 +316,7 @@ Menu.propTypes = {
 Menu.defaultProps = {
     iconAlign: 'left',
     checkboxSide: 'left',
+    loopNavigation: true,
     header: null,
     footer: null,
     onItemClick: null,
