@@ -249,8 +249,9 @@ export const Menu = (props) => {
     const { Header, Footer, List } = state.components;
     const menuHeader = Header && <Header {...(state.header ?? {})} components={state.components} />;
 
+    const { className, ...rest } = state;
     const listProps = {
-        ...state,
+        ...rest,
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
@@ -266,7 +267,7 @@ export const Menu = (props) => {
     return (
         <div
             id={props.id}
-            className={classNames('menu', props.className)}
+            className={classNames('menu', className)}
             tabIndex={-1}
             onFocusCapture={handleFocus}
             onBlurCapture={handleBlur}
