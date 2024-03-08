@@ -1,0 +1,39 @@
+.collapsible {
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 1 1 auto;
+}
+
+.collapsible-header {
+  display: flex;
+  flex-flow: column nowrap;
+  border: 0 none;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+
+.collapsible-content {
+  display: flex;
+  height: 0;
+  overflow: hidden;
+  visibility: collapse;
+  opacity: 0;
+}
+
+.collapsible__expanded > .collapsible-content {
+  visibility: visible;
+  opacity: 1;
+  height: auto;
+}
+
+.collapsible_animated > .collapsible-content {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}
+
+.collapse__content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
