@@ -1,0 +1,134 @@
+.simple .collapsible-header {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.styled {
+  display: inline-flex;
+  min-width: 200px;
+
+  .collapsible-header {
+    display: flex;
+    font-size: 16px;
+    padding: 8px 8px 8px 8px;
+    border-width: 1px;
+    border-style: solid;
+    cursor: pointer;
+    color: #dddddd;
+    background-color: #202020;
+    border-color: #202020;
+  }
+
+  .collapsible-content {
+    flex-flow: column nowrap;
+    margin: 0 1px;
+    border: 0 none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    color: #bbbbbb;
+    border-color: #303030;
+    background-color: #252525;
+  }
+}
+
+.collapsible-content-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  width: 100%;
+}
+
+#styled-content {
+  list-style-type: none;
+}
+
+.custom,
+.disabled-toggle {
+  display: inline-flex;
+  min-width: 300px;
+  background-color: #55b0ff;
+
+  .collapsible-header {
+    flex-flow: row nowrap;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .collapsible-header:focus-within {
+    background-color: #1d93fa;
+  }
+
+  .collapsible-content {
+    background-color: #94bde0;
+  }
+}
+
+.custom-title {
+  flex-grow: 1;
+  font-size: 16px;
+  padding: 8px 8px 8px 8px;
+}
+
+.custom-header-btn {
+  width: 34px;
+  height: 34px;
+  padding: 5px;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+
+  .custom-header-icon {
+    width: 24px;
+    height: 24px;
+    fill: #ffffff;
+    opacity: 0.5;
+  }
+}
+
+.disabled-toggle {
+  .custom-header-icon {
+    opacity: 0.5;
+  }
+
+  &.collapsible__expanded {
+    .custom-header-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.collapsible-header:focus-within .custom-header-icon {
+  opacity: 0.5;
+}
+
+.methods {
+  display: inline-flex;
+}
+
+@media (hover: hover) {
+  .styled .collapsible-header:hover {
+    background-color: #2e2e2e;
+    border-color: #505050;
+  }
+
+  .custom .custom-header-icon {
+    opacity: 0;
+  }
+
+  .custom-header-btn:hover .custom-header-icon {
+    opacity: 1;
+  }
+
+  .custom .collapsible-header:hover .custom-header-icon {
+    opacity: 0.5;
+  }
+
+  .custom,
+  .disabled-toggle {
+    .collapsible-header:hover {
+      background-color: #1d93fa;
+    }
+  }
+}
