@@ -160,16 +160,19 @@ export const Menu = (props) => {
             toggleSelectItem(itemId);
         }
 
-        props.onItemClick?.(clickedItem, e);
-
         if (state.ignoreTouch) {
-            setTimeout(() => handleMouseLeave());
-        }
+            setTimeout(() => {
+                handleMouseLeave();
+                props.onItemClick?.(clickedItem, e);
+            });
+        } else {
+            setState((prev) => ({
+                ...prev,
+                ignoreTouch: false,
+            }));
 
-        setState((prev) => ({
-            ...prev,
-            ignoreTouch: false,
-        }));
+            props.onItemClick?.(clickedItem, e);
+        }
     };
 
     const isAvailableItem = (item) => (
