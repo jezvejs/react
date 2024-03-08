@@ -21,6 +21,13 @@ import {
 } from './helpers.js';
 import './Menu.scss';
 
+export {
+    MenuList,
+    MenuItem,
+    MenuSeparator,
+    MenuCheckbox,
+};
+
 /**
  * Menu component
  */
