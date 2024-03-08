@@ -5,3 +5,4 @@ export { Input } from './Components/Input/Input.jsx';
 export { Menu } from './Components/Menu/Menu.jsx';
 export { Radio } from './Components/Radio/Radio.jsx';
 export { Switch } from './Components/Switch/Switch.jsx';
+export { TabList } from './Components/TabList/TabList.jsx';

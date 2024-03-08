@@ -21,6 +21,13 @@ import {
 } from './helpers.js';
 import './Menu.scss';
 
+export {
+    MenuList,
+    MenuItem,
+    MenuSeparator,
+    MenuCheckbox,
+};
+
 /**
  * Menu component
  */
@@ -153,16 +160,19 @@ export const Menu = (props) => {
             toggleSelectItem(itemId);
         }
 
-        props.onItemClick?.(clickedItem, e);
-
         if (state.ignoreTouch) {
-            setTimeout(() => handleMouseLeave());
-        }
+            setTimeout(() => {
+                handleMouseLeave();
+                props.onItemClick?.(clickedItem, e);
+            });
+        } else {
+            setState((prev) => ({
+                ...prev,
+                ignoreTouch: false,
+            }));
 
-        setState((prev) => ({
-            ...prev,
-            ignoreTouch: false,
-        }));
+            props.onItemClick?.(clickedItem, e);
+        }
     };
 
     const isAvailableItem = (item) => (
@@ -249,8 +259,9 @@ export const Menu = (props) => {
     const { Header, Footer, List } = state.components;
     const menuHeader = Header && <Header {...(state.header ?? {})} components={state.components} />;
 
+    const { className, ...rest } = state;
     const listProps = {
-        ...state,
+        ...rest,
         beforeContent,
         afterContent,
         onItemClick: handleItemClick,
@@ -266,7 +277,7 @@ export const Menu = (props) => {
     return (
         <div
             id={props.id}
-            className={classNames('menu', props.className)}
+            className={classNames('menu', className)}
             tabIndex={-1}
             onFocusCapture={handleFocus}
             onBlurCapture={handleBlur}
