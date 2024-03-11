@@ -87,6 +87,10 @@
   }
 }
 
+.custom .collapsible-header .custom-header-btn:focus-visible .custom-header-icon {
+  opacity: 1;
+}
+
 .disabled-toggle {
   .custom-header-icon {
     opacity: 0.5;
@@ -117,7 +121,7 @@
     opacity: 0;
   }
 
-  .custom-header-btn:hover .custom-header-icon {
+  .custom .collapsible-header .custom-header-btn:hover .custom-header-icon {
     opacity: 1;
   }
 
