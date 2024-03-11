@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -29,6 +29,19 @@ export const Collapsible = (props) => {
             }));
         }
     }, []);
+
+    useEffect(() => {
+        setState((prev) => (
+            (props.expanded === prev.expanded)
+                ? prev
+                : {
+                    ...prev,
+                    expanded: props.expanded,
+                    changed: true,
+                    animationInProgress: prev.animated,
+                }
+        ));
+    }, [props.expanded]);
 
     const toggle = () => {
         const newExpanded = !state.expanded;
