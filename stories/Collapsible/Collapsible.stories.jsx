@@ -86,6 +86,6 @@ export const CustomHeader = {
             <CustomHeaderButton icon={DeleteIconCustom} />
         </>,
         animated: true,
-        children: createContent(createListContent({ prefix: 'animated' })),
+        children: createContent(createListContent({ prefix: 'custom' })),
     },
 };

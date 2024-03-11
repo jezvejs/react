@@ -31,19 +31,14 @@ export const Collapsible = (props) => {
     }, []);
 
     const toggle = () => {
-        let newExpanded = state.expanded;
+        const newExpanded = !state.expanded;
 
-        setState((prev) => {
-            newExpanded = !prev.expanded;
-            const newState = {
-                ...prev,
-                expanded: newExpanded,
-                changed: true,
-                animationInProgress: prev.animated,
-            };
-
-            return newState;
-        });
+        setState((prev) => ({
+            ...prev,
+            expanded: !prev.expanded,
+            changed: true,
+            animationInProgress: prev.animated,
+        }));
 
         if (onStateChange) {
             onStateChange(newExpanded);
@@ -76,7 +71,7 @@ export const Collapsible = (props) => {
                 props.className,
                 {
                     collapsible_animated: (
-                        state.animated && state.animationReady && state.changed
+                        state.animationInProgress
                     ),
                     collapsible__expanded: (
                         state.expanded || (!state.expanded && state.animationInProgress)
