@@ -72,6 +72,7 @@
     },
     "dependencies": {
         "@jezvejs/react": "^0.7.0",
+        "@storybook/preview-api": "^7.6.17",
         "prop-types": "^15.8.1"
     }
 }

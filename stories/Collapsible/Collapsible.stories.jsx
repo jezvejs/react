@@ -1,9 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { Button, Collapsible } from '@jezvejs/react';
+import { useArgs } from '@storybook/preview-api';
 
 import EditIcon from '../assets/icons/edit.svg';
 import DeleteIcon from '../assets/icons/del.svg';
+import ToggleIcon from '../assets/icons/toggle.svg';
 
 import './Collapsible.stories.scss';
 
@@ -71,9 +73,9 @@ const DeleteIconCustom = (props) => (
 
 const CustomHeaderButton = (props) => (
     <Button
-        {...props}
         className='custom-header-btn'
         onClick={(e) => e.stopPropagation()}
+        {...props}
     />
 );
 
@@ -87,5 +89,34 @@ export const CustomHeader = {
         </>,
         animated: true,
         children: createContent(createListContent({ prefix: 'custom' })),
+    },
+};
+
+export const ToggleOnClick = {
+    args: {
+        className: 'disabled-toggle',
+        animated: true,
+        expanded: false,
+        toggleOnClick: false,
+        children: createContent(createListContent({ prefix: 'toggle' })),
+    },
+    render: function Render(args) {
+        const [{ expanded }, updateArgs] = useArgs();
+
+        function onToggle() {
+            updateArgs({ expanded: !expanded });
+        }
+
+        return (
+            <Collapsible
+                {...args}
+                header={
+                    <>
+                        <div className='custom-title'>Toggle only by click button</div>
+                        <CustomHeaderButton icon={ToggleIcon} onClick={onToggle} />
+                    </>
+                }
+            />
+        );
     },
 };
