@@ -99,8 +99,14 @@
   }
 }
 
+/* Focused header */
 .collapsible-header:focus-within .custom-header-icon {
   opacity: 0.5;
+}
+
+/* Focused header button */
+.custom .collapsible-header .custom-header-btn:focus-visible .custom-header-icon {
+  opacity: 1;
 }
 
 .methods {
@@ -117,12 +123,14 @@
     opacity: 0;
   }
 
-  .custom-header-btn:hover .custom-header-icon {
-    opacity: 1;
-  }
-
+  /* Hovered header */
   .custom .collapsible-header:hover .custom-header-icon {
     opacity: 0.5;
+  }
+
+  /* Hovered header button */
+  .custom .collapsible-header .custom-header-btn:hover .custom-header-icon {
+    opacity: 1;
   }
 
   .custom,
