@@ -1,5 +1,6 @@
 export { Button } from './Components/Button/Button.jsx';
 export { Checkbox } from './Components/Checkbox/Checkbox.jsx';
+export { CloseButton } from './Components/CloseButton/CloseButton.jsx';
 export { Collapsible } from './Components/Collapsible/Collapsible.jsx';
 export { Header } from './Components/Header/Header.jsx';
 export { Input } from './Components/Input/Input.jsx';
