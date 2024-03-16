@@ -1,0 +1,122 @@
+:root {
+  --popup-bg: #ffffff;
+  --popup-text: #000000;
+  --popup-close-btn: #888888;
+  --popup-close-btn-bg: none;
+  --popup-close-btn-hover: #000000;
+  --popup-close-btn-hover-bg: #dbdbdb;
+  --popup-close-btn-active: #ffffff;
+  --popup-close-btn-active-bg: #dbdbdb;
+  --popup-dim-bg: rgba(0, 0, 0, 0.5);
+  --popup-padding: 1rem;
+  --popup-header-padding: var(--popup-padding);
+  --popup-content-padding: var(--popup-padding);
+  --popup-footer-padding: var(--popup-padding);
+  --popup-max-width: 600px;
+  --popup-min-width: 130px;
+}
+
+/* popup */
+.popup {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--popup-dim-bg);
+  z-index: 2010;
+  scroll-behavior: smooth;
+}
+
+.popup__wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: var(--popup-min-width);
+  max-width: var(--popup-max-width);
+  min-height: 100%;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.popup__content {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  min-width: 100%;
+  max-width: 100vw;
+  width: 100%;
+  background-color: var(--popup-bg);
+  color: var(--popup-text);
+  z-index: 2100;
+}
+
+/* Header */
+.popup__header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: normal;
+  box-sizing: border-box;
+  padding: var(--popup-header-padding);
+}
+
+.popup__title {
+  padding: 0;
+  margin-right: 1rem;
+  font-size: 22px;
+}
+
+/* Close button */
+.popup__header .close-btn {
+  --btn-size: 32px;
+  --btn-icon-size: 24px;
+  --btn-border-radius: 100vh;
+  --btn-icon-color: var(--popup-close-btn);
+  --btn-background: var(--popup-close-btn-bg);
+  --btn-hover-icon-color: var(--popup-close-btn-hover);
+  --btn-hover-background: var(--popup-close-btn-hover-bg);
+  --btn-active-icon-color: var(--popup-close-btn-active);
+  --btn-active-background: var(--popup-close-btn-active-bg);
+  --btn-padding: 4px;
+
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-right: -4px;
+}
+
+.popup__message {
+  padding: var(--popup-content-padding);
+}
+
+.popup__footer {
+  padding: var(--popup-footer-padding);
+  display: inline-block;
+}
+
+/** Don't dim background */
+.popup_nodim {
+  background: none;
+}
+
+/** Scroll message instead of whole popup */
+.popup_scroll-message {
+  overflow-y: hidden;
+
+  .popup__wrapper {
+    height: 100%;
+  }
+
+  .popup__content {
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .popup__message {
+    overflow-y: auto;
+  }
+}
