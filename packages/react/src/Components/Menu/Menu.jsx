@@ -90,6 +90,16 @@ export const Menu = (props) => {
         }
     };
 
+    const scrollToItem = () => {
+        const focused = document.activeElement;
+        if (ref.current.contains(focused)) {
+            focused.scrollIntoView({
+                behavior: 'instant',
+                block: 'nearest',
+            });
+        }
+    };
+
     const toggleSelectItem = (itemId) => {
         setState((prev) => ({
             ...prev,
@@ -198,6 +208,7 @@ export const Menu = (props) => {
 
             if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
                 activateItem(nextItem.id);
+                scrollToItem();
 
                 e.preventDefault();
             }
@@ -217,6 +228,7 @@ export const Menu = (props) => {
 
             if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
                 activateItem(nextItem.id);
+                scrollToItem();
 
                 e.preventDefault();
             }
