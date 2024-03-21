@@ -105,6 +105,7 @@ export default {
 export const Default = {
     args: {
         items: getDefaultItems(),
+        preventNavigation: true,
     },
 };
 
@@ -112,9 +113,7 @@ export const IconAlignment = {
     args: {
         items: getDefaultItems(),
         iconAlign: 'right',
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
     },
 };
 
@@ -131,9 +130,7 @@ export const CheckboxSide = {
             },
         ],
         checkboxSide: 'right',
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
     },
 };
 
@@ -141,9 +138,7 @@ export const Horizontal = {
     args: {
         items: getHorizontalItems(),
         className: 'horizontal-menu',
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
     },
 };
 
@@ -152,9 +147,7 @@ export const HeaderFooter = {
         id: 'headerFooterMenu',
         className: 'scroll-menu',
         items: initItems('Menu item', 5),
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
         header: {
             title: 'Custom header',
         },

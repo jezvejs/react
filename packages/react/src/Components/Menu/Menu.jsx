@@ -156,6 +156,8 @@ export const Menu = (props) => {
         e?.stopPropagation();
 
         const clickedItem = getItemById(itemId, state.items);
+        const activeItem = getActiveItem(state);
+        const { type } = activeItem;
 
         if (
             state.activeItem
@@ -166,6 +168,14 @@ export const Menu = (props) => {
                 ...prev,
                 activeItem: itemId,
             }));
+        }
+
+        // Prevent navigation by link if needed
+        if (
+            state.preventNavigation
+            && (type === 'link' || type === 'checkbox-link')
+        ) {
+            e?.preventDefault();
         }
 
         if (isCheckbox(clickedItem)) {
@@ -313,6 +323,7 @@ Menu.propTypes = {
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     loopNavigation: PropTypes.bool,
+    preventNavigation: PropTypes.bool,
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
@@ -343,6 +354,7 @@ Menu.defaultProps = {
     iconAlign: 'left',
     checkboxSide: 'left',
     loopNavigation: true,
+    preventNavigation: false,
     header: null,
     footer: null,
     onItemClick: null,
