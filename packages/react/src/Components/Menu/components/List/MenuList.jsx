@@ -8,7 +8,12 @@ import './MenuList.scss';
  * MenuList component
  */
 export const MenuList = (props) => {
-    const { ListItem, Separator, ListPlaceholder } = props.components;
+    const {
+        ListItem,
+        Separator,
+        GroupItem,
+        ListPlaceholder,
+    } = props.components;
 
     const handleClick = (e) => {
         e?.stopPropagation();
@@ -40,11 +45,15 @@ export const MenuList = (props) => {
         props.onMouseLeave?.(itemId, e);
     };
 
-    const itemElement = (item) => (
-        (item.type === 'separator')
-            ? <Separator {...item} />
-            : <ListItem {...item} />
-    );
+    const itemElement = (item) => {
+        if (item.type === 'separator') {
+            return <Separator {...item} />;
+        }
+        if (item.type === 'group') {
+            return <GroupItem {...item} />;
+        }
+        return <ListItem {...item} />;
+    };
 
     return (
         <div
@@ -104,6 +113,8 @@ MenuList.propTypes = {
         ListPlaceholder: PropTypes.func,
         Check: PropTypes.func,
         Separator: PropTypes.func,
+        GroupHeader: PropTypes.func,
+        GroupItem: PropTypes.func,
     }),
 };
 
@@ -111,5 +122,7 @@ MenuList.defaultProps = {
     items: [],
     components: {
         ListItem: null,
+        GroupHeader: null,
+        GroupItem: null,
     },
 };

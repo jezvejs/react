@@ -6,6 +6,8 @@ import { MenuCheckbox } from './components/Checkbox/MenuCheckbox.jsx';
 import { MenuList } from './components/List/MenuList.jsx';
 import { MenuItem } from './components/ListItem/MenuItem.jsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
+import { MenuGroupHeader } from './components/GroupHeader/MenuGroupHeader.jsx';
+import { MenuGroupItem } from './components/GroupItem/MenuGroupItem.jsx';
 
 import {
     findLastMenuItem,
@@ -331,6 +333,8 @@ Menu.propTypes = {
         ListPlaceholder: PropTypes.func,
         Check: PropTypes.func,
         Separator: PropTypes.func,
+        GroupHeader: PropTypes.func,
+        GroupItem: PropTypes.func,
         Footer: PropTypes.func,
     }),
 };
@@ -350,6 +354,8 @@ Menu.defaultProps = {
         ListPlaceholder: null,
         Check: MenuCheckbox,
         Separator: MenuSeparator,
+        GroupHeader: MenuGroupHeader,
+        GroupItem: MenuGroupItem,
         Footer: null,
     },
 };

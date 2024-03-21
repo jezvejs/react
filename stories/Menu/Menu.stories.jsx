@@ -50,6 +50,39 @@ const getHorizontalItems = () => ([{
     title: 'Item 3',
 }]);
 
+const groupItems = [{
+    id: 'noGroupItem1',
+    title: 'No group item 1',
+}, {
+    id: 'group1',
+    type: 'group',
+    title: 'Group 1',
+    items: [{
+        id: 'groupItem11',
+        title: 'Group 1 item 1',
+    }, {
+        id: 'groupItem12',
+        title: 'Group 1 item 2',
+    }, {
+        id: 'groupItem13',
+        title: 'Group 1 item 3',
+    }],
+}, {
+    id: 'noGroupItem2',
+    title: 'No group item 2',
+}, {
+    id: 'group2',
+    type: 'group',
+    title: 'Group 2',
+    items: [{
+        id: 'groupItem21',
+        title: 'Group 2 item 1',
+    }],
+}, {
+    id: 'noGroupItem3',
+    title: 'No group item 3',
+}];
+
 const initItems = (title, count, startFrom = 1) => {
     const res = [];
 
@@ -148,5 +181,11 @@ export const Scroll = {
     args: {
         items: initItems('Menu item', 30),
         className: 'scroll-menu',
+    },
+};
+
+export const Groups = {
+    args: {
+        items: groupItems,
     },
 };
