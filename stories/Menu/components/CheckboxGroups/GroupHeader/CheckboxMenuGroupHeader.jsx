@@ -9,11 +9,13 @@ export const CheckboxMenuGroupHeader = (props) => {
         <button
             className={classNames(
                 'menu-group__header',
+                'menu-item',
                 {
                     'menu-item_selected': !!props.selected,
                     'menu-item_active': (activeItem && props.id === activeItem),
                 },
             )}
+            data-id={props.id}
         >
             <span className='menu-group-header__title'>{props.title}</span>
             <MenuCheckbox />

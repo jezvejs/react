@@ -4,10 +4,10 @@ import classNames from 'classnames';
 
 import { MenuCheckbox } from './components/Checkbox/MenuCheckbox.jsx';
 import { MenuList } from './components/List/MenuList.jsx';
-import { MenuItem } from './components/ListItem/MenuItem.jsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
 import { MenuGroupHeader } from './components/GroupHeader/MenuGroupHeader.jsx';
 import { MenuGroupItem } from './components/GroupItem/MenuGroupItem.jsx';
+import { MenuItem } from './components/ListItem/MenuItem.jsx';
 
 import {
     findLastMenuItem,
@@ -134,13 +134,25 @@ export const Menu = (props) => {
         }));
     };
 
-    const handleMouseEnter = (itemId) => {
+    const handleMouseEnter = (itemId, e) => {
         if (state.ignoreTouch) {
             return;
         }
 
         if (itemId === null || itemId === state.activeItem) {
             return;
+        }
+
+        const item = getItemById(itemId, state.items);
+        if (item.type === 'group') {
+            if (!state.allowActiveGroupHeader) {
+                return;
+            }
+
+            const { GroupHeader } = state.components;
+            if (!e?.target.closest(GroupHeader?.selector)) {
+                return;
+            }
         }
 
         setState((prev) => ({
