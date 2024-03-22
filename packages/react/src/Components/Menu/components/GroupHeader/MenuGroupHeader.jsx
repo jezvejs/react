@@ -8,3 +8,5 @@ export const MenuGroupHeader = (props) => (
 MenuGroupHeader.propTypes = {
     title: PropTypes.string,
 };
+
+MenuGroupHeader.selector = '.menu-group__header';

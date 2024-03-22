@@ -1,4 +1,6 @@
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
 import './MenuGroupItem.scss';
 
 export const MenuGroupItem = (props) => {
@@ -10,8 +12,13 @@ export const MenuGroupItem = (props) => {
         throw new Error('Invalid menu list component');
     }
 
+    const commonProps = {
+        className: classNames('menu-item menu-group', props.className),
+        'data-id': props.id,
+    };
+
     return (
-        <div className='menu-item menu-group'>
+        <div {...commonProps}>
             <GroupHeader title={props.title} />
             <List {...props} />
         </div>

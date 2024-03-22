@@ -178,6 +178,17 @@ export const Menu = (props) => {
             e?.preventDefault();
         }
 
+        // Handle clicks by group header
+        if (type === 'group') {
+            const { GroupHeader } = state.components;
+            if (!e?.target.closest(GroupHeader?.selector)) {
+                return;
+            }
+
+            props.onGroupHeaderClick?.(clickedItem, e);
+            return;
+        }
+
         if (isCheckbox(clickedItem)) {
             toggleSelectItem(itemId);
         }
@@ -327,6 +338,7 @@ Menu.propTypes = {
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
+    onGroupHeaderClick: PropTypes.func,
     items: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,
         type: PropTypes.string,
@@ -358,6 +370,7 @@ Menu.defaultProps = {
     header: null,
     footer: null,
     onItemClick: null,
+    onGroupHeaderClick: null,
     items: [],
     components: {
         Header: null,
