@@ -17,7 +17,7 @@ export default {
         getAbsolutePath('@storybook/addon-interactions'),
     ],
     framework: {
-        name: getAbsolutePath('@storybook/react-vite'),
+        name: '@storybook/react-vite',
         options: {},
     },
     docs: {
@@ -26,4 +26,4 @@ export default {
     staticDirs: ['./public'],
 };
 
-export const framework = '@storybook/react';
+export const framework = getAbsolutePath("@storybook/react");
