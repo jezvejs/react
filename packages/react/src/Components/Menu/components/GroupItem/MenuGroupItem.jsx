@@ -12,15 +12,21 @@ export const MenuGroupItem = (props) => {
         throw new Error('Invalid menu list component');
     }
 
+    const {
+        id,
+        className,
+        ...listProps
+    } = props;
+
     const commonProps = {
-        className: classNames('menu-item menu-group', props.className),
-        'data-id': props.id,
+        className: classNames('menu-item menu-group', className),
+        'data-id': id,
     };
 
     return (
         <div {...commonProps}>
-            <GroupHeader title={props.title} />
-            <List {...props} />
+            <GroupHeader {...props} />
+            <List {...listProps} />
         </div>
     );
 };
@@ -29,6 +35,11 @@ MenuGroupItem.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
+    beforeContent: PropTypes.bool,
+    afterContent: PropTypes.bool,
+    onItemClick: PropTypes.func,
+    onMouseEnter: PropTypes.func,
+    onMouseLeave: PropTypes.func,
     items: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,
         type: PropTypes.string,
@@ -54,3 +65,5 @@ MenuGroupItem.defaultProps = {
         GroupHeader: null,
     },
 };
+
+MenuGroupItem.selector = '.menu-item.menu-group';

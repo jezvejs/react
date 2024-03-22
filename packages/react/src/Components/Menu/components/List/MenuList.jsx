@@ -25,7 +25,7 @@ export const MenuList = (props) => {
             return;
         }
 
-        props.onItemClick(itemId, e);
+        props.onItemClick?.(itemId, e);
     };
 
     const handleMouseEnter = (e) => {
@@ -78,9 +78,16 @@ export const MenuList = (props) => {
                         ...item,
                         iconAlign: item.iconAlign || props.iconAlign,
                         checkboxSide: item.checkboxSide || props.checkboxSide,
+                        renderNotSelected: item.renderNotSelected ?? props.renderNotSelected,
                         activeItem: props.activeItem,
                         key: item.id,
+                        type: item.type ?? props.defaultItemType,
                         components: props.components,
+                        beforeContent: props.beforeContent,
+                        afterContent: props.afterContent,
+                        onItemClick: props.onItemClick,
+                        onMouseEnter: props.onMouseEnter,
+                        onMouseLeave: props.onMouseLeave,
                     })
                 ))
                 : (ListPlaceholder && <ListPlaceholder {...props} />)
@@ -93,6 +100,8 @@ MenuList.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
     itemSelector: PropTypes.string,
+    defaultItemType: PropTypes.string,
+    renderNotSelected: PropTypes.bool,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     beforeContent: PropTypes.bool,

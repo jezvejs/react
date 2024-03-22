@@ -5,6 +5,7 @@ import { Menu } from '@jezvejs/react';
 import SelectIcon from '../assets/icons/select.svg';
 import SearchIcon from '../assets/icons/search.svg';
 
+import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.jsx';
 import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.jsx';
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx';
 import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
@@ -81,6 +82,46 @@ const groupItems = [{
 }, {
     id: 'noGroupItem3',
     title: 'No group item 3',
+}];
+
+const checkboxGroupItems = [{
+    id: 'noGroupItem1',
+    title: 'No group item 1',
+    type: 'checkbox',
+}, {
+    id: 'group1',
+    type: 'group',
+    title: 'Group 1',
+    items: [{
+        id: 'groupItem11',
+        title: 'Group 1 item 1',
+        type: 'checkbox',
+    }, {
+        id: 'groupItem12',
+        title: 'Group 1 item 2',
+        type: 'checkbox',
+    }, {
+        id: 'groupItem13',
+        title: 'Group 1 item 3',
+        type: 'checkbox',
+    }],
+}, {
+    id: 'noGroupItem2',
+    title: 'No group item 2',
+    type: 'checkbox',
+}, {
+    id: 'group2',
+    type: 'group',
+    title: 'Group 2',
+    items: [{
+        id: 'groupItem21',
+        title: 'Group 2 item 1',
+        type: 'checkbox',
+    }],
+}, {
+    id: 'noGroupItem3',
+    title: 'No group item 3',
+    type: 'checkbox',
 }];
 
 const initItems = (title, count, startFrom = 1) => {
@@ -180,5 +221,17 @@ export const Scroll = {
 export const Groups = {
     args: {
         items: groupItems,
+    },
+};
+
+export const CheckboxGroups = {
+    args: {
+        items: checkboxGroupItems,
+        allowActiveGroupHeader: true,
+    },
+    render: function Render(args) {
+        return (
+            <CheckboxGroupsMenu {...args} />
+        );
     },
 };
