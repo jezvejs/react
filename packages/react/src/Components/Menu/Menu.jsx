@@ -64,6 +64,14 @@ export const Menu = (props) => {
 
     const ref = useRef(null);
 
+    const disableTouch = () => (
+        setState((prev) => ({ ...prev, ignoreTouch: true }))
+    );
+
+    const enableTouch = () => (
+        setState((prev) => ({ ...prev, ignoreTouch: false }))
+    );
+
     const handleFocus = (e) => {
         if (ref.current === e?.target) {
             return;
@@ -95,10 +103,7 @@ export const Menu = (props) => {
 
     const handleTouchStart = (e) => {
         if (e.touches) {
-            setState((prev) => ({
-                ...prev,
-                ignoreTouch: true,
-            }));
+            disableTouch();
         }
     };
 
@@ -196,12 +201,23 @@ export const Menu = (props) => {
         }
     };
 
+    const finishClick = (callback) => {
+        if (state.ignoreTouch) {
+            setTimeout(() => {
+                handleMouseLeave();
+                callback();
+            });
+        } else {
+            enableTouch();
+            callback();
+        }
+    };
+
     const handleItemClick = (itemId, e) => {
         e?.stopPropagation();
 
         const clickedItem = getItemById(itemId, state.items);
-        const activeItem = getActiveItem(state);
-        const type = activeItem?.type ?? null;
+        const type = clickedItem?.type ?? null;
 
         if (
             state.activeItem
@@ -229,12 +245,14 @@ export const Menu = (props) => {
                 return;
             }
 
-            props.onGroupHeaderClick?.({
-                item: clickedItem,
-                e,
-                state,
-                setState,
-            });
+            finishClick(() => (
+                props.onGroupHeaderClick?.({
+                    item: clickedItem,
+                    e,
+                    state,
+                    setState,
+                })
+            ));
             return;
         }
 
@@ -242,19 +260,7 @@ export const Menu = (props) => {
             toggleSelectItem(itemId);
         }
 
-        if (state.ignoreTouch) {
-            setTimeout(() => {
-                handleMouseLeave();
-                props.onItemClick?.(clickedItem, e);
-            });
-        } else {
-            setState((prev) => ({
-                ...prev,
-                ignoreTouch: false,
-            }));
-
-            props.onItemClick?.(clickedItem, e);
-        }
+        finishClick(() => props.onItemClick?.(clickedItem, e));
     };
 
     const handleKey = (e) => {
