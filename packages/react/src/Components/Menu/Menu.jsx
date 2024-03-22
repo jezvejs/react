@@ -6,6 +6,8 @@ import { MenuCheckbox } from './components/Checkbox/MenuCheckbox.jsx';
 import { MenuList } from './components/List/MenuList.jsx';
 import { MenuItem } from './components/ListItem/MenuItem.jsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.jsx';
+import { MenuGroupHeader } from './components/GroupHeader/MenuGroupHeader.jsx';
+import { MenuGroupItem } from './components/GroupItem/MenuGroupItem.jsx';
 
 import {
     findLastMenuItem,
@@ -26,6 +28,9 @@ export {
     MenuItem,
     MenuSeparator,
     MenuCheckbox,
+    MenuGroupHeader,
+    MenuGroupItem,
+    mapItems,
 };
 
 /**
@@ -84,9 +89,24 @@ export const Menu = (props) => {
     };
 
     const activateItem = (itemId) => {
+        const item = getItemById(itemId, state.items);
+        if (!item) {
+            return;
+        }
+
+        const focusOptions = { preventScroll: true };
+
         const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
-        if (itemEl) {
-            itemEl.focus({ preventScroll: true });
+        if (!itemEl) {
+            return;
+        }
+
+        if (item.type === 'group' && state.allowActiveGroupHeader) {
+            const { GroupHeader } = state.components;
+            const groupHeader = itemEl?.querySelector(GroupHeader?.selector);
+            groupHeader?.focus(focusOptions);
+        } else {
+            itemEl.focus(focusOptions);
         }
     };
 
@@ -154,6 +174,8 @@ export const Menu = (props) => {
         e?.stopPropagation();
 
         const clickedItem = getItemById(itemId, state.items);
+        const activeItem = getActiveItem(state);
+        const { type } = activeItem;
 
         if (
             state.activeItem
@@ -164,6 +186,30 @@ export const Menu = (props) => {
                 ...prev,
                 activeItem: itemId,
             }));
+        }
+
+        // Prevent navigation by link if needed
+        if (
+            state.preventNavigation
+            && (type === 'link' || type === 'checkbox-link')
+        ) {
+            e?.preventDefault();
+        }
+
+        // Handle clicks by group header
+        if (type === 'group') {
+            const { GroupHeader } = state.components;
+            if (!e?.target.closest(GroupHeader?.selector)) {
+                return;
+            }
+
+            props.onGroupHeaderClick?.({
+                item: clickedItem,
+                e,
+                state,
+                setState,
+            });
+            return;
         }
 
         if (isCheckbox(clickedItem)) {
@@ -190,11 +236,17 @@ export const Menu = (props) => {
         && !item.hidden
         && !item.disabled
         && item.type !== 'separator'
+        && (
+            item.type !== 'group'
+            || state.allowActiveGroupHeader
+        )
     );
 
     const handleKey = (e) => {
         const availCallback = (item) => isAvailableItem(item, state);
-        const options = {};
+        const options = {
+            includeGroupItems: state.allowActiveGroupHeader,
+        };
 
         if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
             const activeItem = getActiveItem(state);
@@ -308,12 +360,16 @@ export const Menu = (props) => {
 Menu.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
+    defaultItemType: PropTypes.string,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     loopNavigation: PropTypes.bool,
+    preventNavigation: PropTypes.bool,
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
+    onGroupHeaderClick: PropTypes.func,
+    allowActiveGroupHeader: PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,
         type: PropTypes.string,
@@ -331,17 +387,24 @@ Menu.propTypes = {
         ListPlaceholder: PropTypes.func,
         Check: PropTypes.func,
         Separator: PropTypes.func,
+        GroupHeader: PropTypes.func,
+        GroupItem: PropTypes.func,
         Footer: PropTypes.func,
     }),
 };
 
 Menu.defaultProps = {
+    defaultItemType: 'button',
     iconAlign: 'left',
     checkboxSide: 'left',
     loopNavigation: true,
+    preventNavigation: false,
     header: null,
     footer: null,
     onItemClick: null,
+    onGroupHeaderClick: null,
+    renderNotSelected: false,
+    allowActiveGroupHeader: false,
     items: [],
     components: {
         Header: null,
@@ -350,6 +413,8 @@ Menu.defaultProps = {
         ListPlaceholder: null,
         Check: MenuCheckbox,
         Separator: MenuSeparator,
+        GroupHeader: MenuGroupHeader,
+        GroupItem: MenuGroupItem,
         Footer: null,
     },
 };

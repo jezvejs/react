@@ -16,7 +16,6 @@ export const MenuItem = (props) => {
         iconAlign,
         checkboxSide,
         activeItem,
-        ...rest
     } = props;
 
     const isButton = type === 'button' || type === 'checkbox';
@@ -48,7 +47,7 @@ export const MenuItem = (props) => {
     const iconContent = (icon) ? (<IconComponent className="menu-item__icon" />) : null;
 
     const { Check } = props.components;
-    const checkContent = (isCheckbox && Check && props.selected)
+    const checkContent = (isCheckbox && Check && (props.selected || props.renderNotSelected))
         ? (<Check />)
         : null;
 
@@ -82,10 +81,10 @@ export const MenuItem = (props) => {
     );
 
     if (isLink) {
-        return <a {...rest} {...commonProps}>{content}</a>;
+        return <a {...commonProps}>{content}</a>;
     }
 
-    return <button {...rest} {...commonProps}>{content}</button>;
+    return <button {...commonProps}>{content}</button>;
 };
 
 MenuItem.propTypes = {
@@ -95,6 +94,7 @@ MenuItem.propTypes = {
     className: PropTypes.string,
     title: PropTypes.string,
     selected: PropTypes.bool,
+    renderNotSelected: PropTypes.bool,
     activeItem: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.oneOf([null]),
@@ -113,6 +113,7 @@ MenuItem.propTypes = {
 MenuItem.defaultProps = {
     type: 'button',
     selected: false,
+    renderNotSelected: false,
     components: {
         Check: null,
     },

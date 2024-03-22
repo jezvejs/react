@@ -5,6 +5,7 @@ import { Menu } from '@jezvejs/react';
 import SelectIcon from '../assets/icons/select.svg';
 import SearchIcon from '../assets/icons/search.svg';
 
+import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.jsx';
 import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.jsx';
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx';
 import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
@@ -50,6 +51,79 @@ const getHorizontalItems = () => ([{
     title: 'Item 3',
 }]);
 
+const groupItems = [{
+    id: 'noGroupItem1',
+    title: 'No group item 1',
+}, {
+    id: 'group1',
+    type: 'group',
+    title: 'Group 1',
+    items: [{
+        id: 'groupItem11',
+        title: 'Group 1 item 1',
+    }, {
+        id: 'groupItem12',
+        title: 'Group 1 item 2',
+    }, {
+        id: 'groupItem13',
+        title: 'Group 1 item 3',
+    }],
+}, {
+    id: 'noGroupItem2',
+    title: 'No group item 2',
+}, {
+    id: 'group2',
+    type: 'group',
+    title: 'Group 2',
+    items: [{
+        id: 'groupItem21',
+        title: 'Group 2 item 1',
+    }],
+}, {
+    id: 'noGroupItem3',
+    title: 'No group item 3',
+}];
+
+const checkboxGroupItems = [{
+    id: 'noGroupItem1',
+    title: 'No group item 1',
+    type: 'checkbox',
+}, {
+    id: 'group1',
+    type: 'group',
+    title: 'Group 1',
+    items: [{
+        id: 'groupItem11',
+        title: 'Group 1 item 1',
+        type: 'checkbox',
+    }, {
+        id: 'groupItem12',
+        title: 'Group 1 item 2',
+        type: 'checkbox',
+    }, {
+        id: 'groupItem13',
+        title: 'Group 1 item 3',
+        type: 'checkbox',
+    }],
+}, {
+    id: 'noGroupItem2',
+    title: 'No group item 2',
+    type: 'checkbox',
+}, {
+    id: 'group2',
+    type: 'group',
+    title: 'Group 2',
+    items: [{
+        id: 'groupItem21',
+        title: 'Group 2 item 1',
+        type: 'checkbox',
+    }],
+}, {
+    id: 'noGroupItem3',
+    title: 'No group item 3',
+    type: 'checkbox',
+}];
+
 const initItems = (title, count, startFrom = 1) => {
     const res = [];
 
@@ -72,6 +146,7 @@ export default {
 export const Default = {
     args: {
         items: getDefaultItems(),
+        preventNavigation: true,
     },
 };
 
@@ -79,9 +154,7 @@ export const IconAlignment = {
     args: {
         items: getDefaultItems(),
         iconAlign: 'right',
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
     },
 };
 
@@ -98,9 +171,7 @@ export const CheckboxSide = {
             },
         ],
         checkboxSide: 'right',
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
     },
 };
 
@@ -108,9 +179,7 @@ export const Horizontal = {
     args: {
         items: getHorizontalItems(),
         className: 'horizontal-menu',
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
     },
 };
 
@@ -119,9 +188,7 @@ export const HeaderFooter = {
         id: 'headerFooterMenu',
         className: 'scroll-menu',
         items: initItems('Menu item', 5),
-        onItemClick: (_, e) => {
-            e?.preventDefault();
-        },
+        preventNavigation: true,
         header: {
             title: 'Custom header',
         },
@@ -148,5 +215,23 @@ export const Scroll = {
     args: {
         items: initItems('Menu item', 30),
         className: 'scroll-menu',
+    },
+};
+
+export const Groups = {
+    args: {
+        items: groupItems,
+    },
+};
+
+export const CheckboxGroups = {
+    args: {
+        items: checkboxGroupItems,
+        allowActiveGroupHeader: true,
+    },
+    render: function Render(args) {
+        return (
+            <CheckboxGroupsMenu {...args} />
+        );
     },
 };

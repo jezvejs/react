@@ -8,7 +8,12 @@ import './MenuList.scss';
  * MenuList component
  */
 export const MenuList = (props) => {
-    const { ListItem, Separator, ListPlaceholder } = props.components;
+    const {
+        ListItem,
+        Separator,
+        GroupItem,
+        ListPlaceholder,
+    } = props.components;
 
     const handleClick = (e) => {
         e?.stopPropagation();
@@ -20,7 +25,7 @@ export const MenuList = (props) => {
             return;
         }
 
-        props.onItemClick(itemId, e);
+        props.onItemClick?.(itemId, e);
     };
 
     const handleMouseEnter = (e) => {
@@ -40,11 +45,15 @@ export const MenuList = (props) => {
         props.onMouseLeave?.(itemId, e);
     };
 
-    const itemElement = (item) => (
-        (item.type === 'separator')
-            ? <Separator {...item} />
-            : <ListItem {...item} />
-    );
+    const itemElement = (item) => {
+        if (item.type === 'separator') {
+            return <Separator {...item} />;
+        }
+        if (item.type === 'group') {
+            return <GroupItem {...item} />;
+        }
+        return <ListItem {...item} />;
+    };
 
     return (
         <div
@@ -69,9 +78,16 @@ export const MenuList = (props) => {
                         ...item,
                         iconAlign: item.iconAlign || props.iconAlign,
                         checkboxSide: item.checkboxSide || props.checkboxSide,
+                        renderNotSelected: item.renderNotSelected ?? props.renderNotSelected,
                         activeItem: props.activeItem,
                         key: item.id,
+                        type: item.type ?? props.defaultItemType,
                         components: props.components,
+                        beforeContent: props.beforeContent,
+                        afterContent: props.afterContent,
+                        onItemClick: props.onItemClick,
+                        onMouseEnter: props.onMouseEnter,
+                        onMouseLeave: props.onMouseLeave,
                     })
                 ))
                 : (ListPlaceholder && <ListPlaceholder {...props} />)
@@ -84,6 +100,8 @@ MenuList.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
     itemSelector: PropTypes.string,
+    defaultItemType: PropTypes.string,
+    renderNotSelected: PropTypes.bool,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
     beforeContent: PropTypes.bool,
@@ -104,6 +122,8 @@ MenuList.propTypes = {
         ListPlaceholder: PropTypes.func,
         Check: PropTypes.func,
         Separator: PropTypes.func,
+        GroupHeader: PropTypes.func,
+        GroupItem: PropTypes.func,
     }),
 };
 
@@ -111,5 +131,7 @@ MenuList.defaultProps = {
     items: [],
     components: {
         ListItem: null,
+        GroupHeader: null,
+        GroupItem: null,
     },
 };
