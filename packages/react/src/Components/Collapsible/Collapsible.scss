@@ -19,9 +19,11 @@
   overflow: hidden;
   visibility: collapse;
   opacity: 0;
+  transition: height 0.35s ease;
 }
 
-.collapsible__expanded > .collapsible-content {
+.collapsible__expanded > .collapsible-content,
+.collapsible__expanding > .collapsible-content {
   visibility: visible;
   opacity: 1;
   height: auto;
@@ -30,7 +32,6 @@
 .collapsible_animated > .collapsible-content {
   height: 0;
   overflow: hidden;
-  transition: height 0.35s ease;
 }
 
 .collapse__content-wrapper {

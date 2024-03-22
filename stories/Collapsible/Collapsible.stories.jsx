@@ -96,7 +96,7 @@ export const ToggleOnClick = {
     args: {
         className: 'disabled-toggle',
         animated: true,
-        expanded: false,
+        expanded: true,
         toggleOnClick: false,
         children: createContent(createListContent({ prefix: 'toggle' })),
     },

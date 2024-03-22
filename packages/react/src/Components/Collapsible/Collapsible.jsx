@@ -87,7 +87,10 @@ export const Collapsible = (props) => {
                         state.animationInProgress
                     ),
                     collapsible__expanded: (
-                        state.expanded || (!state.expanded && state.animationInProgress)
+                        state.expanded
+                    ),
+                    collapsible__expanding: (
+                        !state.expanded && state.animationInProgress
                     ),
                 },
             )}
