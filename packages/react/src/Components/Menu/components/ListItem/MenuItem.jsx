@@ -35,6 +35,7 @@ export const MenuItem = (props) => {
             className,
         ),
         'data-id': props.id,
+        disabled: props.disabled,
     };
 
     if (isLink) {
@@ -94,6 +95,7 @@ MenuItem.propTypes = {
     className: PropTypes.string,
     title: PropTypes.string,
     selected: PropTypes.bool,
+    disabled: PropTypes.bool,
     renderNotSelected: PropTypes.bool,
     activeItem: PropTypes.oneOfType([
         PropTypes.string,
@@ -113,6 +115,7 @@ MenuItem.propTypes = {
 MenuItem.defaultProps = {
     type: 'button',
     selected: false,
+    disabled: false,
     renderNotSelected: false,
     components: {
         Check: null,

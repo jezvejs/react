@@ -271,3 +271,14 @@ export const getNextItem = (id, items, filterCallback = null, options = {}) => {
 export const getClosestItemElement = (elem, props) => (
     elem?.closest?.(props?.itemSelector ?? props?.components?.ListItem?.selector) ?? null
 );
+
+export const isAvailableItem = (item, state) => (
+    item
+    && !item.hidden
+    && !item.disabled
+    && item.type !== 'separator'
+    && (
+        item.type !== 'group'
+        || state.allowActiveGroupHeader
+    )
+);

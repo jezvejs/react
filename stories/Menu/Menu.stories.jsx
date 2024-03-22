@@ -11,6 +11,7 @@ import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx
 import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
 
 import './Menu.stories.scss';
+import { CollapsibleGroupsMenu } from './components/CollapsibleGroups/CollapsibleGroupsMenu.jsx';
 
 const getDefaultItems = () => ([{
     id: 'selectBtnItem',
@@ -61,12 +62,15 @@ const groupItems = [{
     items: [{
         id: 'groupItem11',
         title: 'Group 1 item 1',
+        group: 'group1',
     }, {
         id: 'groupItem12',
         title: 'Group 1 item 2',
+        group: 'group1',
     }, {
         id: 'groupItem13',
         title: 'Group 1 item 3',
+        group: 'group1',
     }],
 }, {
     id: 'noGroupItem2',
@@ -78,6 +82,7 @@ const groupItems = [{
     items: [{
         id: 'groupItem21',
         title: 'Group 2 item 1',
+        group: 'group2',
     }],
 }, {
     id: 'noGroupItem3',
@@ -100,6 +105,7 @@ const checkboxGroupItems = [{
         id: 'groupItem12',
         title: 'Group 1 item 2',
         type: 'checkbox',
+        disabled: true,
     }, {
         id: 'groupItem13',
         title: 'Group 1 item 3',
@@ -113,6 +119,7 @@ const checkboxGroupItems = [{
     id: 'group2',
     type: 'group',
     title: 'Group 2',
+    disabled: true,
     items: [{
         id: 'groupItem21',
         title: 'Group 2 item 1',
@@ -232,6 +239,18 @@ export const CheckboxGroups = {
     render: function Render(args) {
         return (
             <CheckboxGroupsMenu {...args} />
+        );
+    },
+};
+
+export const CollapsibleGroups = {
+    args: {
+        items: groupItems,
+        allowActiveGroupHeader: true,
+    },
+    render: function Render(args) {
+        return (
+            <CollapsibleGroupsMenu {...args} />
         );
     },
 };
