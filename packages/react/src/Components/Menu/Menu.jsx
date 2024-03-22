@@ -18,6 +18,7 @@ import {
     getItemById,
     getNextItem,
     getPreviousItem,
+    isAvailableItem,
     isCheckbox,
     mapItems,
 } from './helpers.js';
@@ -30,6 +31,19 @@ export {
     MenuCheckbox,
     MenuGroupHeader,
     MenuGroupItem,
+};
+
+export const MenuHelpers = {
+    findLastMenuItem,
+    findMenuItem,
+    forItems,
+    getActiveItem,
+    getClosestItemElement,
+    getItemById,
+    getNextItem,
+    getPreviousItem,
+    isAvailableItem,
+    isCheckbox,
     mapItems,
 };
 
@@ -187,7 +201,7 @@ export const Menu = (props) => {
 
         const clickedItem = getItemById(itemId, state.items);
         const activeItem = getActiveItem(state);
-        const { type } = activeItem;
+        const type = activeItem?.type ?? null;
 
         if (
             state.activeItem
@@ -243,19 +257,8 @@ export const Menu = (props) => {
         }
     };
 
-    const isAvailableItem = (item) => (
-        item
-        && !item.hidden
-        && !item.disabled
-        && item.type !== 'separator'
-        && (
-            item.type !== 'group'
-            || state.allowActiveGroupHeader
-        )
-    );
-
     const handleKey = (e) => {
-        const availCallback = (item) => isAvailableItem(item, state);
+        const availCallback = (item) => props.isAvailableItem(item, state);
         const options = {
             includeGroupItems: state.allowActiveGroupHeader,
         };
@@ -380,6 +383,7 @@ Menu.propTypes = {
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
+    isAvailableItem: PropTypes.func,
     onGroupHeaderClick: PropTypes.func,
     allowActiveGroupHeader: PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.shape({
@@ -414,6 +418,7 @@ Menu.defaultProps = {
     header: null,
     footer: null,
     onItemClick: null,
+    isAvailableItem,
     onGroupHeaderClick: null,
     renderNotSelected: false,
     allowActiveGroupHeader: false,

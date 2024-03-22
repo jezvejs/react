@@ -77,6 +77,7 @@ export const MenuList = (props) => {
                         ...ListItem.defaultProps,
                         ...item,
                         iconAlign: item.iconAlign || props.iconAlign,
+                        disabled: item.disabled || props.disabled,
                         checkboxSide: item.checkboxSide || props.checkboxSide,
                         renderNotSelected: item.renderNotSelected ?? props.renderNotSelected,
                         activeItem: props.activeItem,
@@ -99,6 +100,7 @@ export const MenuList = (props) => {
 MenuList.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
+    disabled: PropTypes.bool,
     itemSelector: PropTypes.string,
     defaultItemType: PropTypes.string,
     renderNotSelected: PropTypes.bool,

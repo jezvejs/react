@@ -1,9 +1,17 @@
-import { MenuGroupHeader, MenuCheckbox } from '@jezvejs/react';
+import { MenuGroupHeader } from '@jezvejs/react';
 import classNames from 'classnames';
-import './CheckboxMenuGroupHeader.scss';
 
-export const CheckboxMenuGroupHeader = (props) => {
+import PlusIcon from '../../../../assets/icons/plus.svg';
+import MinusIcon from '../../../../assets/icons/minus.svg';
+
+import './CollapsibleMenuGroupHeader.scss';
+
+export const CollapsibleMenuGroupHeader = (props) => {
     const { activeItem } = props;
+
+    const Icon = (props.expanded)
+        ? MinusIcon
+        : PlusIcon;
 
     return (
         <button
@@ -16,20 +24,19 @@ export const CheckboxMenuGroupHeader = (props) => {
                 },
             )}
             data-id={props.id}
-            disabled={props.disabled}
         >
             <span className='menu-group-header__title'>{props.title}</span>
-            <MenuCheckbox />
+            <Icon className='menu-item__icon menu-group-header__toggle-icon' />
         </button>
     );
 };
 
-CheckboxMenuGroupHeader.propTypes = {
+CollapsibleMenuGroupHeader.propTypes = {
     ...MenuGroupHeader.propTypes,
 };
 
-CheckboxMenuGroupHeader.defaultProps = {
+CollapsibleMenuGroupHeader.defaultProps = {
     ...MenuGroupHeader.defaultProps,
 };
 
-CheckboxMenuGroupHeader.selector = '.menu-group__header';
+CollapsibleMenuGroupHeader.selector = '.menu-group__header';

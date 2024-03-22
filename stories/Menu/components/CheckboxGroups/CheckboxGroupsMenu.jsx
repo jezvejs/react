@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { Menu, mapItems } from '@jezvejs/react';
+import { Menu, MenuHelpers } from '@jezvejs/react';
 
 import { CheckboxMenuGroupHeader } from './GroupHeader/CheckboxMenuGroupHeader.jsx';
 import { CheckboxMenuGroupItem } from './GroupItem/CheckboxMenuGroupItem.jsx';
@@ -14,7 +14,7 @@ export const CheckboxGroupsMenu = (props) => {
                 ? {
                     ...item,
                     selected: !item.selected,
-                    items: mapItems(
+                    items: MenuHelpers.mapItems(
                         item.items,
                         (child) => ({ ...child, selected: !item.selected }),
                     ),

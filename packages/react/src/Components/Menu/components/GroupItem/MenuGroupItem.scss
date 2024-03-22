@@ -1,5 +1,5 @@
 /* Menu group */
-.menu-group {
+.menu-item.menu-group {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
@@ -10,6 +10,6 @@
 }
 
 /* Active state */
-.menu-group:active {
+.menu-item.menu-group:active {
   background: none;
 }
