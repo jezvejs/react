@@ -1,0 +1,38 @@
+.styled {
+  gap: 2px;
+
+  .paginator-item {
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+    text-decoration: none;
+    border: 1px solid #ffffff00;
+    border-radius: 3px;
+    color: #447fd6;
+  }
+
+  .paginator-item__active {
+    font-weight: normal;
+    background-color: #557dff;
+    color: #ffffff;
+  }
+
+  .paginator-arrow {
+    width: 26px;
+    fill: #93beff;
+  }
+
+  .paginator-arrow[disabled] {
+    fill: #dbdbdb;
+  }
+}
+
+@media (hover: hover) {
+  .styled a.paginator-item:hover {
+    border-color: #93beff;
+  }
+
+  .styled a.paginator-arrow:hover {
+    fill: #447fd6;
+    border-color: #ffffff;
+  }
+}

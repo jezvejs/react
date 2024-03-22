@@ -1,0 +1,45 @@
+/* Paginator */
+.paginator {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
+  margin-left: 0;
+  gap: 2px;
+}
+
+.paginator-item {
+  padding: 0.5rem;
+}
+
+a.paginator-item {
+  cursor: pointer;
+}
+
+.paginator-item__active {
+  font-weight: bold;
+}
+
+.paginator-arrow {
+  display: flex;
+  flex-flow: row nowrap;
+  align-content: center;
+  width: 8px;
+  cursor: pointer;
+}
+
+.paginator[disabled],
+.paginator-arrow[disabled] {
+  pointer-events: none;
+}
+
+.paginator-arrow__icon {
+  display: block;
+  width: 8px;
+  height: 21px;
+}
+
+.paginator-arrow__next .paginator-arrow__icon {
+  rotate: 180deg;
+}
