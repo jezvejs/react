@@ -78,7 +78,7 @@ export const ControlledInput = (props) => {
 };
 
 ControlledInput.propTypes = {
-    ...Input.defaultProps,
+    ...Input.propTypes,
     handleValueProperty: PropTypes.bool,
     disableAutoFeatures: PropTypes.bool,
     isValidValue: PropTypes.func,
