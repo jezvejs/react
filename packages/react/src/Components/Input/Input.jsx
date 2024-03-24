@@ -1,3 +1,4 @@
+import { isFunction } from '@jezvejs/types';
 import { forwardRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -11,13 +12,20 @@ import './Input.scss';
 export const Input = forwardRef((props, ref) => {
     const {
         className,
+        renderValue,
         ...inputProps
     } = props;
 
-    const [value, setValue] = useState(props.value ?? '');
+    const [state, setState] = useState({
+        value: props.value ?? '',
+    });
+
+    const getValue = (state) => (
+        isFunction(renderValue) ? renderValue(state) : (state?.value)
+    );
 
     const onInput = (e) => {
-        setValue(e.target.value);
+        setState((prev) => ({ ...prev, value: e.target.value }));
     };
 
     return (
@@ -25,7 +33,7 @@ export const Input = forwardRef((props, ref) => {
             className={classNames('input', className)}
             {...inputProps}
             onInput={onInput}
-            value={value}
+            value={getValue(state)}
             ref={ref}
         />
     );
@@ -46,6 +54,7 @@ Input.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
+    renderValue: PropTypes.func,
 };
 
 Input.defaultProps = {
@@ -57,4 +66,5 @@ Input.defaultProps = {
     onFocus: null,
     onBlur: null,
     onChange: null,
+    renderValue: null,
 };
