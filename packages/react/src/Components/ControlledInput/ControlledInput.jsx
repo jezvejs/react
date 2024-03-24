@@ -6,6 +6,13 @@ import { Input } from '../Input/Input.jsx';
 
 import { getInputContent, replaceSelection } from './helpers.js';
 
+const autoFeatures = {
+    autocomplete: 'off',
+    autocapitalize: 'none',
+    spellCheck: false,
+    autoCorrect: 'off',
+};
+
 export const ControlledInput = (props) => {
     const isValidValue = (value) => (
         (isFunction(props.isValidValue))
@@ -64,13 +71,19 @@ export const ControlledInput = (props) => {
         }
     }, [props.handleValueProperty]);
 
+    const autoProps = (props.disableAutoFeatures)
+        ? autoFeatures
+        : {};
+
     const inputProps = {
         ...props,
+        ...autoProps,
         onBeforeInputCapture: validateInput,
         onPasteCapture: validateInput,
         onKeyPressCapture: validateInput,
         ref: contentRef,
     };
+
 
     return (
         <Input {...inputProps} />
