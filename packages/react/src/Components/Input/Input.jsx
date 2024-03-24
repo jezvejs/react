@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -7,7 +7,7 @@ import './Input.scss';
 /**
  * Input component
  */
-export const Input = (props) => {
+export const Input = forwardRef((props, ref) => {
     const {
         className,
         ...inputProps
@@ -25,9 +25,10 @@ export const Input = (props) => {
             {...inputProps}
             onInput={onInput}
             value={value}
+            ref={ref}
         />
     );
-};
+});
 
 Input.propTypes = {
     id: PropTypes.string,
