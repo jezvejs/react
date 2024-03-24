@@ -84,7 +84,6 @@ export const ControlledInput = (props) => {
         ref: contentRef,
     };
 
-
     return (
         <Input {...inputProps} />
     );

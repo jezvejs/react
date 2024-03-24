@@ -7,6 +7,7 @@ import './Input.scss';
 /**
  * Input component
  */
+// eslint-disable-next-line react/display-name
 export const Input = forwardRef((props, ref) => {
     const {
         className,

@@ -32,7 +32,6 @@ export const getCursorPos = (input) => {
     return null;
 };
 
-
 /**
  * Replace current selection by specified string or insert it to cursor position
  * @param {HTMLInputElement} input - input element
