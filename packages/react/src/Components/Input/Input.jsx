@@ -20,8 +20,8 @@ export const Input = forwardRef((props, ref) => {
         value: props.value ?? '',
     });
 
-    const getValue = (state) => (
-        isFunction(renderValue) ? renderValue(state) : (state?.value)
+    const getValue = (inputState) => (
+        isFunction(renderValue) ? renderValue(inputState) : (inputState?.value)
     );
 
     const onInput = (e) => {
