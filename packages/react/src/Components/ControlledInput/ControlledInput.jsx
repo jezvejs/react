@@ -7,24 +7,29 @@ import { Input } from '../Input/Input.jsx';
 import { getInputContent, replaceSelection } from './helpers.js';
 
 const autoFeatures = {
-    autocomplete: 'off',
-    autocapitalize: 'none',
+    autoComplete: 'off',
+    autoCapitalize: 'none',
     spellCheck: false,
     autoCorrect: 'off',
 };
 
 export const ControlledInput = (props) => {
-    const isValidValue = (value) => (
-        (isFunction(props.isValidValue))
-            ? props.isValidValue(value)
-            : true
+    const {
+        handleValueProperty,
+        disableAutoFeatures,
+        isValidValue,
+        ...childProps
+    } = props;
+
+    const validate = (value) => (
+        isFunction(isValidValue) ? isValidValue(value) : true
     );
 
     const validateInput = (e) => {
         const inputContent = getInputContent(e) ?? '';
 
         const expectedContent = replaceSelection(e.target, inputContent);
-        const res = isValidValue(expectedContent);
+        const res = validate(expectedContent);
         if (!res) {
             e.preventDefault();
             e.stopPropagation();
@@ -33,14 +38,10 @@ export const ControlledInput = (props) => {
 
     /**
      * Verifies update of input value and returns valid value
-     *
-     * @param {string} value
-     * @returns {string}
      */
-    const handleValue = (value, prev) => {
-        const isValid = isValidValue(value);
-        return (isValid) ? value : prev;
-    };
+    const handleValue = (value, prev) => (
+        validate(value) ? value : prev
+    );
 
     /** Define setter for 'value' property of input to prevent invalid values */
     const observeInputValue = (input) => {
@@ -71,12 +72,12 @@ export const ControlledInput = (props) => {
         }
     }, [props.handleValueProperty]);
 
-    const autoProps = (props.disableAutoFeatures)
+    const autoProps = (disableAutoFeatures)
         ? autoFeatures
         : {};
 
     const inputProps = {
-        ...props,
+        ...childProps,
         ...autoProps,
         onBeforeInputCapture: validateInput,
         onPasteCapture: validateInput,
