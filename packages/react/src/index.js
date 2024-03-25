@@ -3,6 +3,7 @@ export { Checkbox } from './Components/Checkbox/Checkbox.jsx';
 export { CloseButton } from './Components/CloseButton/CloseButton.jsx';
 export { Collapsible } from './Components/Collapsible/Collapsible.jsx';
 export { ControlledInput } from './Components/ControlledInput/ControlledInput.jsx';
+export { DateInput } from './Components/DateInput/DateInput.jsx';
 export { DecimalInput } from './Components/DecimalInput/DecimalInput.jsx';
 export { Header } from './Components/Header/Header.jsx';
 export { Input } from './Components/Input/Input.jsx';
