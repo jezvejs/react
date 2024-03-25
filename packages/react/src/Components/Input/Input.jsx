@@ -58,7 +58,6 @@ Input.propTypes = {
 };
 
 Input.defaultProps = {
-    placeholder: '',
     type: 'text',
     disabled: false,
     value: '',

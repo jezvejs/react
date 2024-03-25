@@ -1,3 +1,5 @@
+import { getCursorPos } from '@jezvejs/dom';
+
 /** Obtain from event input data to be inserted */
 export const getInputContent = (e) => {
     if (e.type === 'paste') {
@@ -8,25 +10,6 @@ export const getInputContent = (e) => {
     }
     if (e.type === 'keypress' && e.keyCode !== 13) {
         return e.key;
-    }
-
-    return null;
-};
-
-/**
- * Return curson/selection position for specified input element
- * @param {Element} input
- */
-export const getCursorPos = (input) => {
-    if (!input) {
-        return null;
-    }
-
-    if ('selectionStart' in input && document.activeElement === input) {
-        return {
-            start: input.selectionStart,
-            end: input.selectionEnd,
-        };
     }
 
     return null;

@@ -13,11 +13,20 @@ const autoFeatures = {
     autoCorrect: 'off',
 };
 
+export const ControlledInputHelpers = {
+    getInputContent,
+    replaceSelection,
+};
+
 export const ControlledInput = (props) => {
     const {
         handleValueProperty,
         disableAutoFeatures,
         isValidValue,
+        onValidateInput,
+        onValue,
+        selectionStart,
+        selectionEnd,
         ...childProps
     } = props;
 
@@ -25,7 +34,7 @@ export const ControlledInput = (props) => {
         isFunction(isValidValue) ? isValidValue(value) : true
     );
 
-    const validateInput = (e) => {
+    const defaultValidateHandler = (e) => {
         const inputContent = getInputContent(e) ?? '';
 
         const expectedContent = replaceSelection(e.target, inputContent);
@@ -36,12 +45,20 @@ export const ControlledInput = (props) => {
         }
     };
 
+    const validateInput = isFunction(onValidateInput)
+        ? onValidateInput
+        : defaultValidateHandler;
+
     /**
      * Verifies update of input value and returns valid value
      */
-    const handleValue = (value, prev) => (
+    const defaultValuehandler = (value, prev) => (
         validate(value) ? value : prev
     );
+
+    const handleValue = isFunction(onValue)
+        ? onValue
+        : defaultValuehandler;
 
     /** Define setter for 'value' property of input to prevent invalid values */
     const observeInputValue = (input) => {
@@ -67,10 +84,14 @@ export const ControlledInput = (props) => {
             return;
         }
 
-        if (props.handleValueProperty) {
+        if (handleValueProperty) {
             observeInputValue(node);
         }
-    }, [props.handleValueProperty]);
+
+        const elem = node;
+        elem.selectionStart = selectionStart;
+        elem.selectionEnd = selectionEnd;
+    }, [handleValueProperty, selectionStart, selectionEnd]);
 
     const autoProps = (disableAutoFeatures)
         ? autoFeatures
@@ -79,9 +100,10 @@ export const ControlledInput = (props) => {
     const inputProps = {
         ...childProps,
         ...autoProps,
-        onBeforeInputCapture: validateInput,
+        onBeforeInput: validateInput,
         onPasteCapture: validateInput,
-        onKeyPressCapture: validateInput,
+        onKeyDown: validateInput,
+        onChange: validateInput,
         ref: contentRef,
     };
 
@@ -92,9 +114,13 @@ export const ControlledInput = (props) => {
 
 ControlledInput.propTypes = {
     ...Input.propTypes,
+    selectionStart: PropTypes.number,
+    selectionEnd: PropTypes.number,
     handleValueProperty: PropTypes.bool,
     disableAutoFeatures: PropTypes.bool,
     isValidValue: PropTypes.func,
+    onValidateInput: PropTypes.func,
+    onValue: PropTypes.func,
 };
 
 ControlledInput.defaultProps = {
@@ -102,4 +128,6 @@ ControlledInput.defaultProps = {
     handleValueProperty: true,
     disableAutoFeatures: true,
     isValidValue: null,
+    onValidateInput: null,
+    onValue: null,
 };
