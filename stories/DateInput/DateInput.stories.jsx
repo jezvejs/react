@@ -3,7 +3,7 @@ import '@jezvejs/react/style';
 import { DateInput } from '@jezvejs/react';
 
 export default {
-    title: 'Components/DateInput',
+    title: 'Input/DateInput',
     component: DateInput,
     parameters: {
         layout: 'centered',

@@ -4,7 +4,7 @@ import { Input } from '@jezvejs/react';
 import './Input.stories.scss';
 
 export default {
-    title: 'Components/Input',
+    title: 'Input/Input',
     component: Input,
     parameters: {
         layout: 'centered',

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { ActionButton } from '../components/ActionButton/ActionButton.jsx';
 
 export default {
-    title: 'Components/ControlledInput',
+    title: 'Input/ControlledInput',
     component: ControlledInput,
     parameters: {
         layout: 'centered',
