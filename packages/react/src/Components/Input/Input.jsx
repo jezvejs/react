@@ -13,6 +13,7 @@ export const Input = forwardRef((props, ref) => {
     const {
         className,
         renderValue,
+        onInput,
         ...inputProps
     } = props;
 
@@ -24,15 +25,19 @@ export const Input = forwardRef((props, ref) => {
         isFunction(renderValue) ? renderValue(inputState) : (inputState?.value)
     );
 
-    const onInput = (e) => {
+    const inputHandler = (e) => {
         setState((prev) => ({ ...prev, value: e.target.value }));
+
+        if (isFunction(onInput)) {
+            onInput(e);
+        }
     };
 
     return (
         <input
             className={classNames('input', className)}
             {...inputProps}
-            onInput={onInput}
+            onInput={inputHandler}
             value={getValue(state)}
             ref={ref}
         />
