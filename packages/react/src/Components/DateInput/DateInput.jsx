@@ -1,6 +1,5 @@
-import { isNumber } from '@jezvejs/types';
 import { getCursorPos } from '@jezvejs/dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { flushSync } from 'react-dom';
 import PropTypes from 'prop-types';
 
@@ -10,45 +9,19 @@ import {
     dispatchInputEvent,
     fixCursorPos,
     formatDateString,
-    getContentRange,
     getInitialState,
     getRangeTypeByPosition,
+    handleExpectedContent,
     removeSeparators,
     renderValue,
+    setCursor,
+    stepCursor,
 } from './helpers.js';
 
 const { getInputContent } = ControlledInputHelpers;
 
 export const DateInput = (props) => {
     const [state, setState] = useState(getInitialState(props));
-
-    /** Move cursor beyond the groups separator */
-    const moveCursor = (group) => {
-        setState((prev) => (
-            (
-                prev.cursorPos === prev[group].end
-                && prev.cursorPos < prev.maxLength
-            )
-                ? { ...prev, cursorPos: prev.cursorPos + prev.separator.length }
-                : prev
-        ));
-    };
-
-    const stepCursor = () => {
-        setState((prev) => ({
-            ...prev,
-            cursorPos: prev.cursorPos + 1,
-            selectionEnd: prev.cursorPos + 1,
-        }));
-    };
-
-    const setCursor = (cursorPos) => {
-        setState((prev) => ({
-            ...prev,
-            cursorPos,
-            selectionEnd: cursorPos,
-        }));
-    };
 
     const deleteSelection = () => {
         const range = {
@@ -62,7 +35,7 @@ export const DateInput = (props) => {
 
         let res = beforeSelection;
 
-        setCursor(beforeSelection.length);
+        setState((prev) => setCursor(prev, beforeSelection.length));
 
         while (selection.length) {
             const char = selection.charAt(0);
@@ -103,7 +76,7 @@ export const DateInput = (props) => {
             }
         } while (beforeSelection.length);
 
-        setCursor(beforeSelection.length);
+        setState((prev) => setCursor(prev, beforeSelection.length));
 
         const res = beforeSelection + afterSelection;
 
@@ -156,7 +129,7 @@ export const DateInput = (props) => {
             }
         }
 
-        setCursor(lastCursorPos);
+        setState((prev) => setCursor(prev, lastCursorPos));
 
         return res;
     };
@@ -175,9 +148,10 @@ export const DateInput = (props) => {
             return text;
         }
 
-        const origValue = (state.value.length > 0)
-            ? state.value
-            : formatDateString(state);
+        let origValue = renderValue(state);
+        if (origValue.length === 0) {
+            origValue = formatDateString(state);
+        }
 
         const range = (replaceAll)
             ? { start: 0, end: origValue.length }
@@ -219,7 +193,7 @@ export const DateInput = (props) => {
 
         let textValue = removeSeparators(fixedText, state);
         if (!replaceAll) {
-            setCursor(beforeSelection.length);
+            setState((prev) => setCursor(prev, beforeSelection.length));
         }
 
         // Append input/paste text with guide characters to the length of selection
@@ -255,7 +229,7 @@ export const DateInput = (props) => {
                     !replaceAll
                     && (textValue.length > 0 || isSeparatorChar)
                 ) {
-                    stepCursor();
+                    setState(stepCursor);
                 }
 
                 valueToReplace = valueToReplace.substring(1);
@@ -282,7 +256,7 @@ export const DateInput = (props) => {
                         const beforeCurrentPart = res.substring(0, startPos);
                         res = `${beforeCurrentPart}0${currentPart}`;
 
-                        stepCursor();
+                        setState(stepCursor);
 
                         valueToReplace = valueToReplace.substring(1);
                     }
@@ -293,7 +267,7 @@ export const DateInput = (props) => {
                 res += char;
                 if (textValue.length > 0 && !isSeparatorChar) {
                     if (!replaceAll) {
-                        stepCursor();
+                        setState(stepCursor);
                     }
                     textValue = textValue.substring(1);
                 }
@@ -307,89 +281,9 @@ export const DateInput = (props) => {
         return res;
     };
 
-    const handleExpectedContent = (content) => {
-        if (content === '' || content === state.emptyStateValue) {
-            return {
-                ...state.emptyState,
-            };
-        }
-
-        let expectedDay = getContentRange(content, state.dayRange);
-        let expectedMonth = getContentRange(content, state.monthRange);
-        const expectedYear = getContentRange(content, state.yearRange);
-
-        const search = new RegExp(`${props.guideChar}`, 'g');
-
-        const dayStr = expectedDay.replaceAll(search, '');
-        const dayVal = parseInt(dayStr, 10);
-        if (dayStr.length > 0 && (!isNumber(dayStr) || !(dayVal >= 0 && dayVal <= 31))) {
-            return state;
-        }
-        if (dayStr.length === 2 && dayVal === 0) {
-            return state;
-        }
-
-        const monthStr = expectedMonth.replaceAll(search, '');
-        const monthVal = parseInt(monthStr, 10);
-        if (monthStr.length > 0 && (!isNumber(monthStr) || !(monthVal >= 0 && monthVal <= 12))) {
-            return state;
-        }
-        if (monthStr.length === 2 && monthVal === 0) {
-            return state;
-        }
-
-        const yearStr = expectedYear.replaceAll(search, '');
-        const yearVal = parseInt(yearStr, 10);
-        if (
-            yearStr.length > 0
-            && (!isNumber(yearStr) || (state.yearRange.length === 4 && yearVal < 1))
-        ) {
-            return state;
-        }
-
-        // input day
-        if (expectedDay !== state.day) {
-            const firstChar = expectedDay.substring(0, 1);
-            if (
-                firstChar !== props.guideChar
-                && firstChar !== '0'
-                && dayVal < 10
-                && dayVal * 10 > 31
-            ) {
-                expectedDay = `0${dayVal}`;
-                stepCursor();
-            }
-            moveCursor('dayRange');
-        }
-        // input month
-        if (expectedMonth !== state.month) {
-            const firstChar = expectedMonth.substring(0, 1);
-            if (
-                firstChar !== props.guideChar
-                && firstChar !== '0'
-                && monthVal < 10
-                && monthVal * 10 > 12
-            ) {
-                expectedMonth = `0${monthVal}`;
-                stepCursor();
-            }
-            moveCursor('monthRange');
-        }
-        // input year
-        if (expectedYear !== state.year) {
-            moveCursor('yearRange');
-        }
-
-        return {
-            day: expectedDay,
-            month: expectedMonth,
-            year: expectedYear,
-        };
-    };
-
     const onValue = (value) => {
         const content = replaceSelection(value, { replaceAll: true });
-        const newState = handleExpectedContent(content);
+        const newState = handleExpectedContent(content, state);
 
         return renderValue({ ...state, ...newState });
     };
@@ -410,10 +304,7 @@ export const DateInput = (props) => {
 
         const inputContent = getInputContent(e);
         if (!inputContent || inputContent.length === 0) {
-            if (
-                nativeEvent.type !== 'input'
-                || (nativeEvent.type === 'keydown' && e.keyCode === 13)
-            ) {
+            if (nativeEvent.type !== 'input') {
                 return;
             }
 
@@ -432,26 +323,17 @@ export const DateInput = (props) => {
         e.stopPropagation();
 
         flushSync(() => {
-            const newState = handleExpectedContent(expectedContent);
             setState((prev) => ({
                 ...prev,
-                ...newState,
+                ...handleExpectedContent(expectedContent, prev, true),
             }));
         });
 
         dispatchInputEvent(e.target);
     };
 
-    useEffect(() => {
-        const newState = handleExpectedContent(props.value);
-
-        setState((prev) => ({
-            ...prev,
-            ...newState,
-        }));
-    }, []);
-
     const inputProps = {
+        inputMode: 'decimal',
         selectionStart: state.cursorPos,
         selectionEnd: state.selectionEnd,
         onValidateInput,
