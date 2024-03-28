@@ -341,6 +341,10 @@ export const DateInput = (props) => {
         onSelectCapture,
         renderValue: () => renderValue(state),
         placeholder: props.placeholder ?? state.formatMask,
+        onInput: props.onInput,
+        onFocus: props.onFocus,
+        onBlur: props.onBlur,
+        onChange: props.onChange,
     };
 
     return (
