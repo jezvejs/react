@@ -8,6 +8,7 @@ commitVersion({
         'package-lock.json',
         'package.json',
         'packages/react/package.json',
+        'storybook/package.json',
     ],
     packageName: 'react',
     gitDir: process.env.PROJECT_GIT_DIR,

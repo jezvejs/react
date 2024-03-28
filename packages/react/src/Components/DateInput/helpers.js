@@ -240,10 +240,14 @@ export const handleExpectedContent = (content, state, updateCursor = false) => {
     const expectedYear = getContentRange(content, state.yearRange);
 
     const search = new RegExp(`${state.guideChar}`, 'g');
+    const testExp = new RegExp(`^[0-9${state.guideChar}]+$`);
 
     const dayStr = expectedDay.replaceAll(search, '');
     const dayVal = parseInt(dayStr, 10);
     if (dayStr.length > 0 && (!isNumber(dayStr) || !(dayVal >= 0 && dayVal <= 31))) {
+        return state;
+    }
+    if (dayStr.length > 0 && !testExp.test(dayStr)) {
         return state;
     }
     if (dayStr.length === 2 && dayVal === 0) {
@@ -253,6 +257,9 @@ export const handleExpectedContent = (content, state, updateCursor = false) => {
     const monthStr = expectedMonth.replaceAll(search, '');
     const monthVal = parseInt(monthStr, 10);
     if (monthStr.length > 0 && (!isNumber(monthStr) || !(monthVal >= 0 && monthVal <= 12))) {
+        return state;
+    }
+    if (monthStr.length > 0 && !testExp.test(monthStr)) {
         return state;
     }
     if (monthStr.length === 2 && monthVal === 0) {
@@ -265,6 +272,9 @@ export const handleExpectedContent = (content, state, updateCursor = false) => {
         yearStr.length > 0
         && (!isNumber(yearStr) || (state.yearRange.length === 4 && yearVal < 1))
     ) {
+        return state;
+    }
+    if (yearStr.length > 0 && !testExp.test(yearStr)) {
         return state;
     }
 
