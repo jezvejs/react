@@ -1,0 +1,36 @@
+{
+    "name": "jezvejs-react-storybook",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Storybook for JezveJS React",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "storybook dev -p 6006",
+        "build": "storybook build"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@storybook/addon-essentials": "^8.0.5",
+        "@storybook/addon-interactions": "^8.0.5",
+        "@storybook/addon-links": "^8.0.5",
+        "@storybook/blocks": "^8.0.5",
+        "@storybook/manager-api": "^8.0.5",
+        "@storybook/react": "^8.0.5",
+        "@storybook/react-vite": "^8.0.5",
+        "@storybook/test": "^8.0.5",
+        "@storybook/theming": "^8.0.5",
+        "commonjs-variables-for-esmodules": "^1.1.0",
+        "storybook": "^8.0.5"
+    },
+    "dependencies": {
+        "@jezvejs/react": "^0.14.1",
+        "@storybook/preview-api": "^8.0.5",
+        "classnames": "^2.5.1",
+        "prop-types": "^15.8.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    }
+}
