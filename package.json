@@ -7,16 +7,16 @@
     "module": "index.js",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./storybook/stories/",
         "lint-style": "npx stylelint packages/**/*.scss storybook/stories/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
         "prestart": "npm install",
+        "test": "npx playwright test",
         "start": "npm run dev -w jezvejs-react-storybook",
         "build": "npm run build -w @jezvejs/react",
         "build-storybook": "npm run build -w jezvejs-react-storybook",
         "build-all": "npm-run-all build build-storybook",
-        "all": "npm-run-all lint build-all",
+        "all": "npm-run-all lint build-all test",
         "deploy": "node ./scripts/deploy.js",
         "commit-version": "node ./scripts/commit-version.js",
         "release": "node ./scripts/release.js"
@@ -37,6 +37,8 @@
     ],
     "devDependencies": {
         "@jezvejs/release-tools": "^0.5.1",
+        "@playwright/test": "^1.42.1",
+        "@types/node": "^20.11.30",
         "browserslist": "^4.23.0",
         "commonjs-variables-for-esmodules": "^1.1.0",
         "dotenv": "^16.4.5",

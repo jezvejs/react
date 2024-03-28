@@ -3,6 +3,15 @@ import '@jezvejs/react/style';
 import { DateInput } from '@jezvejs/react';
 import { useState } from 'react';
 
+const TempInputDecorator = (Story) => (
+    <div>
+        <div style={{ marginBottom: '1rem' }} >
+            <Story />
+        </div>
+        <input className="input tmp-input" type="text" />
+    </div>
+);
+
 export default {
     title: 'Input/DateInput',
     component: DateInput,
@@ -58,24 +67,32 @@ export const Placeholder = {
 
 export const EnglishLocale = {
     args: {
+        id: 'usLocaleInput',
         locales: ['en-US'],
     },
+    decorators: [TempInputDecorator],
 };
 
 export const KoreanLocale = {
     args: {
+        id: 'koLocaleInput',
         locales: ['ko-KR'],
     },
+    decorators: [TempInputDecorator],
 };
 
 export const RussianLocale = {
     args: {
+        id: 'ruLocaleInput',
         locales: ['ru-RU'],
     },
+    decorators: [TempInputDecorator],
 };
 
 export const EsLocale = {
     args: {
+        id: 'esLocaleInput',
         locales: ['es'],
     },
+    decorators: [TempInputDecorator],
 };
