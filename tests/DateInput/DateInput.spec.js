@@ -176,7 +176,6 @@ const deleteSelection = ({ page }, name, initial, start, end, expected) => (
     pressKeyToSelection({ page }, name, initial, start, end, 'Delete', expected)
 );
 
-
 test.describe('Type to empty input', () => {
     test('en-US locale', async ({ page }) => {
         await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
@@ -232,16 +231,19 @@ test.describe('Type invalid values', () => {
         // Month
         await inputToEmpty({ page }, 'usLocaleInput', 'x', '');
         await inputToEmpty({ page }, 'usLocaleInput', '13', '1_/__/__');
+        await inputToEmpty({ page }, 'usLocaleInput', '1.', '1_/__/__');
         await inputToEmpty({ page }, 'usLocaleInput', '1x', '1_/__/__');
         await inputToEmpty({ page }, 'usLocaleInput', '0x', '0_/__/__');
         // Day
         await inputToEmpty({ page }, 'usLocaleInput', '4x', '04/__/__');
         await inputToEmpty({ page }, 'usLocaleInput', '438', '04/3_/__');
+        await inputToEmpty({ page }, 'usLocaleInput', '43.', '04/3_/__');
         await inputToEmpty({ page }, 'usLocaleInput', '43x', '04/3_/__');
         await inputToEmpty({ page }, 'usLocaleInput', '40x', '04/0_/__');
         // Year
         await inputToEmpty({ page }, 'usLocaleInput', '45x', '04/05/__');
         await inputToEmpty({ page }, 'usLocaleInput', '451x', '04/05/1_');
+        await inputToEmpty({ page }, 'usLocaleInput', '451.', '04/05/1_');
     });
 
     test('ko-KR locale', async ({ page }) => {
@@ -287,11 +289,13 @@ test.describe('Type invalid values', () => {
         await inputToEmpty({ page }, 'esLocaleInput', 'x', '');
         await inputToEmpty({ page }, 'esLocaleInput', '38', '3_/__/__');
         await inputToEmpty({ page }, 'esLocaleInput', '3x', '3_/__/__');
+        await inputToEmpty({ page }, 'esLocaleInput', '3.', '3_/__/__');
         await inputToEmpty({ page }, 'esLocaleInput', '0x', '0_/__/__');
         // Month
         await inputToEmpty({ page }, 'esLocaleInput', '4x', '04/__/__');
         await inputToEmpty({ page }, 'esLocaleInput', '413', '04/1_/__');
         await inputToEmpty({ page }, 'esLocaleInput', '41x', '04/1_/__');
+        await inputToEmpty({ page }, 'esLocaleInput', '41.', '04/1_/__');
         await inputToEmpty({ page }, 'esLocaleInput', '40x', '04/0_/__');
         // Year
         await inputToEmpty({ page }, 'esLocaleInput', '45x', '04/05/__');
