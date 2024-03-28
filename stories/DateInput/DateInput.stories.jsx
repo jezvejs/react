@@ -1,9 +1,10 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { DateInput } from '@jezvejs/react';
+import { useState } from 'react';
 
 export default {
-    title: 'Components/DateInput',
+    title: 'Input/DateInput',
     component: DateInput,
     parameters: {
         layout: 'centered',
@@ -16,16 +17,35 @@ export const Default = {
         value: '01.02.3456',
     },
     render: function Render(args) {
+        const [state, setState] = useState({
+            inputStatus: null,
+            formStatus: null,
+        });
+
         const onSubmit = (e) => {
             e.preventDefault();
-            alert('Form submitted');
+            setState((prev) => ({
+                ...prev,
+                formStatus: 'Form submit event fired',
+            }));
+        };
+
+        const onInput = (e) => {
+            setState((prev) => ({
+                ...prev,
+                inputStatus: e.target.value,
+            }));
         };
 
         return (
-            <form style={{ marginBottom: '1rem' }} onSubmit={onSubmit}>
-                <DateInput {...args} />
-                <input type="submit" hidden />
-            </form>
+            <>
+                <form style={{ marginBottom: '1rem' }} onSubmit={onSubmit}>
+                    <DateInput {...args} onInput={onInput} />
+                    <input type="submit" hidden />
+                </form>
+                <div>{state.inputStatus}</div>
+                <div>{state.formStatus}</div>
+            </>
         );
     },
 };

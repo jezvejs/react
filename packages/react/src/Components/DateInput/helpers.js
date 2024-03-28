@@ -1,3 +1,5 @@
+import { isNumber } from '@jezvejs/types';
+
 const DEFAULT_SEPARATOR = '.';
 const dateParts = ['day', 'month', 'year'];
 
@@ -190,6 +192,135 @@ export const renderValue = (state) => (
     isEmptyState(state) ? '' : formatDateString(state)
 );
 
+/** Move cursor beyond the groups separator */
+export const moveCursor = (state, group) => (
+    (
+        state.cursorPos === state[group].end
+        && state.cursorPos < state.maxLength
+    )
+        ? { ...state, cursorPos: state.cursorPos + state.separator.length }
+        : state
+);
+
+/**
+ * Move cursor one position to the right
+ */
+export const stepCursor = (prev) => ({
+    ...prev,
+    cursorPos: prev.cursorPos + 1,
+    selectionEnd: prev.cursorPos + 1,
+});
+
+/** Set specified cursor position */
+export const setCursor = (prev, cursorPos) => ({
+    ...prev,
+    cursorPos,
+    selectionEnd: cursorPos,
+});
+
+/**
+ * Extract day, month and year from specified string, update cursor position if needed
+ *  and returns resulting state object
+ *
+ * @param {string} content - input string
+ * @param {Objecet} state - current state object
+ * @param {boolean} updateCursor - update cursor position in the returned state
+ * @returns {object}
+ */
+export const handleExpectedContent = (content, state, updateCursor = false) => {
+    if (content === '' || content === state.emptyStateValue) {
+        return {
+            ...state,
+            ...state.emptyState,
+        };
+    }
+
+    let expectedDay = getContentRange(content, state.dayRange);
+    let expectedMonth = getContentRange(content, state.monthRange);
+    const expectedYear = getContentRange(content, state.yearRange);
+
+    const search = new RegExp(`${state.guideChar}`, 'g');
+
+    const dayStr = expectedDay.replaceAll(search, '');
+    const dayVal = parseInt(dayStr, 10);
+    if (dayStr.length > 0 && (!isNumber(dayStr) || !(dayVal >= 0 && dayVal <= 31))) {
+        return state;
+    }
+    if (dayStr.length === 2 && dayVal === 0) {
+        return state;
+    }
+
+    const monthStr = expectedMonth.replaceAll(search, '');
+    const monthVal = parseInt(monthStr, 10);
+    if (monthStr.length > 0 && (!isNumber(monthStr) || !(monthVal >= 0 && monthVal <= 12))) {
+        return state;
+    }
+    if (monthStr.length === 2 && monthVal === 0) {
+        return state;
+    }
+
+    const yearStr = expectedYear.replaceAll(search, '');
+    const yearVal = parseInt(yearStr, 10);
+    if (
+        yearStr.length > 0
+        && (!isNumber(yearStr) || (state.yearRange.length === 4 && yearVal < 1))
+    ) {
+        return state;
+    }
+
+    let newState = {
+        ...state,
+    };
+
+    // input day
+    if (expectedDay !== state.day) {
+        const firstChar = expectedDay.substring(0, 1);
+        if (
+            firstChar !== state.guideChar
+            && firstChar !== '0'
+            && dayVal < 10
+            && dayVal * 10 > 31
+        ) {
+            expectedDay = `0${dayVal}`;
+            if (updateCursor) {
+                newState = stepCursor(newState);
+            }
+        }
+        if (updateCursor) {
+            newState = moveCursor(newState, 'dayRange');
+        }
+    }
+    // input month
+    if (expectedMonth !== state.month) {
+        const firstChar = expectedMonth.substring(0, 1);
+        if (
+            firstChar !== state.guideChar
+            && firstChar !== '0'
+            && monthVal < 10
+            && monthVal * 10 > 12
+        ) {
+            expectedMonth = `0${monthVal}`;
+            if (updateCursor) {
+                newState = stepCursor(newState);
+            }
+        }
+        if (updateCursor) {
+            newState = moveCursor(newState, 'monthRange');
+        }
+    }
+    // input year
+    if (expectedYear !== state.year && updateCursor) {
+        newState = moveCursor(newState, 'yearRange');
+    }
+
+    return {
+        ...newState,
+        day: expectedDay,
+        month: expectedMonth,
+        year: expectedYear,
+    };
+};
+
 export const getInitialState = (props) => {
     const dateFormat = getDateFormat(props);
     const emptyState = {
@@ -204,7 +335,7 @@ export const getInitialState = (props) => {
         emptyState,
         cursorPos: 0,
     };
-    res.emptyStateValue = formatDateString(res);
+    res.emptyStateValue = formatDateString({ ...res, ...emptyState });
 
-    return res;
+    return handleExpectedContent(props.value, res);
 };

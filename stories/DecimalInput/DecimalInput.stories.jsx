@@ -3,7 +3,7 @@ import '@jezvejs/react/style';
 import { DecimalInput } from '@jezvejs/react';
 
 export default {
-    title: 'Components/DecimalInput',
+    title: 'Input/DecimalInput',
     component: DecimalInput,
     parameters: {
         layout: 'centered',
