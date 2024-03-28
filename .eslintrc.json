@@ -14,7 +14,8 @@
         "node": false
     },
     "ignorePatterns": [
-        "dist"
+        "dist",
+        "storybook-static"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",

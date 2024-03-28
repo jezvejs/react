@@ -8,13 +8,13 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./stories/",
-        "lint-style": "npx stylelint packages/**/*.scss stories/**/*.scss",
+        "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./storybook/stories/",
+        "lint-style": "npx stylelint packages/**/*.scss storybook/stories/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
         "prestart": "npm install",
-        "start": "storybook dev -p 6006",
+        "start": "npm run dev -w jezvejs-react-storybook",
         "build": "npm run build -w @jezvejs/react",
-        "build-storybook": "storybook build",
+        "build-storybook": "npm run build -w jezvejs-react-storybook",
         "build-all": "npm-run-all build build-storybook",
         "all": "npm-run-all lint build-all",
         "deploy": "node ./scripts/deploy.js",
@@ -32,20 +32,11 @@
     },
     "homepage": "https://github.com/jezvejs/react#readme",
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "storybook"
     ],
     "devDependencies": {
         "@jezvejs/release-tools": "^0.5.1",
-        "@storybook/addon-essentials": "^8.0.5",
-        "@storybook/addon-interactions": "^8.0.5",
-        "@storybook/addon-links": "^8.0.5",
-        "@storybook/blocks": "^8.0.4",
-        "@storybook/manager-api": "^8.0.4",
-        "@storybook/react": "^8.0.4",
-        "@storybook/react-vite": "^8.0.5",
-        "@storybook/test": "^8.0.4",
-        "@storybook/theming": "^8.0.4",
-        "@vitejs/plugin-react": "^4.2.1",
         "browserslist": "^4.23.0",
         "commonjs-variables-for-esmodules": "^1.1.0",
         "dotenv": "^16.4.5",
@@ -60,19 +51,8 @@
         "sass": "^1.72.0",
         "shelljs": "^0.8.5",
         "ssh2-sftp-client": "^10.0.3",
-        "storybook": "^8.0.5",
         "stylelint": "^16.3.1",
         "stylelint-config-prettier-scss": "^1.0.0",
-        "stylelint-config-standard-scss": "^13.0.0",
-        "vite": "^5.2.6",
-        "vite-plugin-svgr": "^4.2.0"
-    },
-    "dependencies": {
-        "@jezvejs/react": "^0.14.1",
-        "@storybook/preview-api": "^8.0.4",
-        "classnames": "^2.5.1",
-        "prop-types": "^15.8.1",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "stylelint-config-standard-scss": "^13.0.0"
     }
 }
