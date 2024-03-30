@@ -175,3 +175,17 @@ export const backspaceSelection = ({ page }, name, initial, start, end, expected
 export const deleteSelection = ({ page }, name, initial, start, end, expected) => (
     pressKeyToSelection({ page }, name, initial, start, end, 'Delete', expected)
 );
+
+export const cutSelection = async ({ page }, name, initial, start, end, expected) => {
+    const inputLocator = page.locator(`#${name}`);
+    await inputLocator.waitFor({ state: 'visible' });
+
+    await inputLocator.clear();
+    await inputLocator.fill(initial);
+    await expect(inputLocator).toHaveValue(initial);
+
+    await setSelection(inputLocator, start, end);
+
+    await inputLocator.press('Control+X');
+    await expect(inputLocator).toHaveValue(expected);
+};

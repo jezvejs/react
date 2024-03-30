@@ -10,6 +10,7 @@ import {
     pasteFromPos,
     backspaceSelection,
     deleteSelection,
+    cutSelection,
 } from '../utils/index.js';
 
 test.describe('Type to empty input', () => {
@@ -691,5 +692,35 @@ test.describe('Delete key with selection', () => {
 
         await deleteSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
         await deleteSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
+    });
+});
+
+test.describe('Cut selection', () => {
+    test('en-US locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+
+        await cutSelection({ page }, 'usLocaleInput', '11/22/33', 4, 7, '11/2_/_3');
+        await cutSelection({ page }, 'usLocaleInput', '11/22/33', 0, 8, '');
+    });
+
+    test('ko-KR locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+
+        await cutSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '33. 1_. _2.');
+        await cutSelection({ page }, 'koLocaleInput', '33. 11. 22.', 0, 10, '');
+    });
+
+    test('ru-RU locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+
+        await cutSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '22.1_._333');
+        await cutSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 10, '');
+    });
+
+    test('es-ES locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+
+        await cutSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
+        await cutSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
     });
 });
