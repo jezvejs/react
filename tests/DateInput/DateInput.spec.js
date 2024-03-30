@@ -1,180 +1,17 @@
-import { test, expect } from '@playwright/test';
-
-const inputToEmpty = async ({ page }, name, value, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await expect(inputLocator).toHaveValue('');
-
-    await inputLocator.pressSequentially(value);
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const pasteToEmpty = async ({ page }, name, value, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    const tmpLocator = page.locator('.tmp-input');
-    await tmpLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await expect(inputLocator).toHaveValue('');
-
-    await tmpLocator.clear();
-    await tmpLocator.fill(value);
-    await expect(tmpLocator).toHaveValue(value);
-
-    await tmpLocator.press('Control+A');
-    await tmpLocator.press('Control+C');
-
-    await inputLocator.press('Control+V');
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const setCursorPos = async (locator, pos) => {
-    await locator.press('Home');
-    for (let i = 0; i < pos; i++) {
-        await locator.press('ArrowRight');
-    }
-};
-
-const setSelection = async (locator, start, end) => {
-    await locator.press('Home');
-
-    const min = Math.min(start, end);
-    const max = Math.max(start, end);
-
-    for (let i = 0; i < min; i++) {
-        await locator.press('ArrowRight');
-    }
-    await locator.page().keyboard.down('Shift');
-
-    for (let i = min; i < max; i++) {
-        await locator.press('ArrowRight');
-    }
-    await locator.page().keyboard.up('Shift');
-};
-
-const pressKeyFromPos = async ({ page }, name, value, key, pos, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await inputLocator.fill(value);
-    await expect(inputLocator).toHaveValue(value);
-
-    await setCursorPos(inputLocator, pos);
-
-    await page.keyboard.press(key);
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const backspaceFromPos = ({ page }, name, value, pos, expected) => (
-    pressKeyFromPos({ page }, name, value, 'Backspace', pos, expected)
-);
-
-const deleteFromPos = ({ page }, name, value, pos, expected) => (
-    pressKeyFromPos({ page }, name, value, 'Delete', pos, expected)
-);
-
-const inputFromPos = async ({ page }, name, initial, pos, value, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await inputLocator.fill(initial);
-    await expect(inputLocator).toHaveValue(initial);
-
-    await setCursorPos(inputLocator, pos);
-
-    await inputLocator.pressSequentially(value);
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const inputToSelection = async ({ page }, name, initial, start, end, value, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await inputLocator.fill(initial);
-    await expect(inputLocator).toHaveValue(initial);
-
-    await setSelection(inputLocator, start, end);
-
-    await inputLocator.pressSequentially(value);
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const pasteToSelection = async ({ page }, name, initial, start, end, value, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    const tmpLocator = page.locator('.tmp-input');
-    await tmpLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await inputLocator.fill(initial);
-    await expect(inputLocator).toHaveValue(initial);
-
-    await tmpLocator.clear();
-    await tmpLocator.fill(value);
-    await expect(tmpLocator).toHaveValue(value);
-
-    await tmpLocator.press('Control+A');
-    await tmpLocator.press('Control+C');
-
-    await setSelection(inputLocator, start, end);
-
-    await inputLocator.press('Control+V');
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const pasteFromPos = async ({ page }, name, initial, pos, value, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    const tmpLocator = page.locator('.tmp-input');
-    await tmpLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await inputLocator.fill(initial);
-    await expect(inputLocator).toHaveValue(initial);
-
-    await tmpLocator.clear();
-    await tmpLocator.fill(value);
-    await expect(tmpLocator).toHaveValue(value);
-
-    await tmpLocator.press('Control+A');
-    await tmpLocator.press('Control+C');
-
-    await setCursorPos(inputLocator, pos);
-
-    await inputLocator.press('Control+V');
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const pressKeyToSelection = async ({ page }, name, initial, start, end, key, expected) => {
-    const inputLocator = page.locator(`#${name}`);
-    await inputLocator.waitFor({ state: 'visible' });
-
-    await inputLocator.clear();
-    await inputLocator.fill(initial);
-    await expect(inputLocator).toHaveValue(initial);
-
-    await setSelection(inputLocator, start, end);
-
-    await page.keyboard.press(key);
-    await expect(inputLocator).toHaveValue(expected);
-};
-
-const backspaceSelection = ({ page }, name, initial, start, end, expected) => (
-    pressKeyToSelection({ page }, name, initial, start, end, 'Backspace', expected)
-);
-
-const deleteSelection = ({ page }, name, initial, start, end, expected) => (
-    pressKeyToSelection({ page }, name, initial, start, end, 'Delete', expected)
-);
+import { test } from '@playwright/test';
+import {
+    inputToEmpty,
+    pasteToEmpty,
+    backspaceFromPos,
+    deleteFromPos,
+    inputFromPos,
+    inputToSelection,
+    pasteToSelection,
+    pasteFromPos,
+    backspaceSelection,
+    deleteSelection,
+    cutSelection,
+} from '../utils/index.js';
 
 test.describe('Type to empty input', () => {
     test('en-US locale', async ({ page }) => {
@@ -855,5 +692,35 @@ test.describe('Delete key with selection', () => {
 
         await deleteSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
         await deleteSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
+    });
+});
+
+test.describe('Cut selection', () => {
+    test('en-US locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+
+        await cutSelection({ page }, 'usLocaleInput', '11/22/33', 4, 7, '11/2_/_3');
+        await cutSelection({ page }, 'usLocaleInput', '11/22/33', 0, 8, '');
+    });
+
+    test('ko-KR locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+
+        await cutSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '33. 1_. _2.');
+        await cutSelection({ page }, 'koLocaleInput', '33. 11. 22.', 0, 10, '');
+    });
+
+    test('ru-RU locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+
+        await cutSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '22.1_._333');
+        await cutSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 10, '');
+    });
+
+    test('es-ES locale', async ({ page }) => {
+        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+
+        await cutSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
+        await cutSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
     });
 });

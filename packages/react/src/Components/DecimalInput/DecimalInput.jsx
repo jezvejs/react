@@ -59,6 +59,11 @@ export const DecimalInput = (props) => {
     const inputProps = {
         isValidValue,
         renderValue,
+        onInput: props.onInput,
+        onFocus: props.onFocus,
+        onBlur: props.onBlur,
+        onChange: props.onChange,
+        id: props.id,
     };
 
     return (

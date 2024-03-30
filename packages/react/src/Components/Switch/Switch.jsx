@@ -8,10 +8,14 @@ import './Switch.scss';
  * Switch component
  */
 export const Switch = (props) => {
-    const [state, setState] = useState(props);
+    const [state, setState] = useState({
+        ...props,
+        animated: false,
+    });
 
     const {
         className,
+        animated,
         tooltip = null,
         label = null,
         ...inputProps
@@ -28,8 +32,32 @@ export const Switch = (props) => {
         }));
     };
 
+    const onTouchStart = (e) => {
+        if (e?.touches) {
+            setState((prev) => ({
+                ...prev,
+                animated: true,
+            }));
+        }
+    };
+
+    const onTransitionEnd = () => {
+        setState((prev) => ({
+            ...prev,
+            animated: false,
+        }));
+    };
+
     return (
-        <label className={classNames('switch', className)}>
+        <label
+            className={classNames(
+                'switch',
+                { animated },
+                className,
+            )}
+            onTouchStart={onTouchStart}
+            onTransitionEndCapture={onTransitionEnd}
+        >
             <input
                 {...inputProps}
                 type='checkbox'
