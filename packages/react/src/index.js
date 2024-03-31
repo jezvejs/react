@@ -6,6 +6,7 @@ export { ControlledInput } from './Components/ControlledInput/ControlledInput.js
 export { DateInput } from './Components/DateInput/DateInput.jsx';
 export { DecimalInput } from './Components/DecimalInput/DecimalInput.jsx';
 export { Header } from './Components/Header/Header.jsx';
+export { IndetermProgress } from './Components/IndetermProgress/IndetermProgress.jsx';
 export { Input } from './Components/Input/Input.jsx';
 export * from './Components/Menu/Menu.jsx';
 export { Offcanvas } from './Components/Offcanvas/Offcanvas.jsx';
