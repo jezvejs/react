@@ -6,12 +6,12 @@ import SelectIcon from '../assets/icons/select.svg';
 import SearchIcon from '../assets/icons/search.svg';
 
 import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.jsx';
+import { CollapsibleGroupsMenu } from './components/CollapsibleGroups/CollapsibleGroupsMenu.jsx';
 import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.jsx';
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.jsx';
 import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.jsx';
 
 import './Menu.stories.scss';
-import { CollapsibleGroupsMenu } from './components/CollapsibleGroups/CollapsibleGroupsMenu.jsx';
 
 const getDefaultItems = () => ([{
     id: 'selectBtnItem',
