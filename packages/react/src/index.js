@@ -13,5 +13,6 @@ export { Paginator } from './Components/Paginator/Paginator.jsx';
 export { Popup } from './Components/Popup/Popup.jsx';
 export { Progress } from './Components/Progress/Progress.jsx';
 export { Radio } from './Components/Radio/Radio.jsx';
+export { Spinner } from './Components/Spinner/Spinner.jsx';
 export { Switch } from './Components/Switch/Switch.jsx';
 export { TabList } from './Components/TabList/TabList.jsx';
