@@ -1,0 +1,24 @@
+.progress {
+  --progress-height: 10px;
+  --progress-border-radius: 5px;
+  --progress-bg-color: #dddddd;
+  --progress-border: 0 none;
+  --progress-color: #0077ff;
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  overflow: hidden;
+  height: var(--progress-height);
+  border: var(--progress-border);
+  border-radius: var(--progress-border-radius);
+  background-color: var(--progress-bg-color);
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--progress-color);
+  transition-property: width;
+  transition-duration: 0.35s;
+  transition-timing-function: ease;
+}

@@ -1,0 +1,24 @@
+.w-500 {
+  max-width: 500px;
+  margin-bottom: 1rem;
+}
+
+.green-progress {
+  --progress-color: #00b909;
+}
+
+.thin-progress {
+  --progress-height: 2px;
+}
+
+.thick-progress {
+  --progress-height: 20px;
+}
+
+.square-progress {
+  --progress-border-radius: 0;
+}
+
+.border-progress {
+  --progress-border: 1px solid #888888;
+}
