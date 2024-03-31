@@ -2,6 +2,7 @@
     "name": "jezvejs-react-storybook",
     "version": "1.0.0",
     "private": true,
+    "type": "module",
     "description": "Storybook for JezveJS React",
     "main": "index.js",
     "scripts": {
