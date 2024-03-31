@@ -18,7 +18,7 @@ export const IndetermProgress = (props) => {
         Math.round(Date.now() * Math.random() * 100000).toString(30)
     );
 
-    const circles = Array(circlesCount).fill('indtp').map((item)=> (
+    const circles = Array(circlesCount).fill('indtp').map((item) => (
         `${item}${generateId()}`
     ));
 
