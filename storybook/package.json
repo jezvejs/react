@@ -2,6 +2,7 @@
     "name": "jezvejs-react-storybook",
     "version": "1.0.0",
     "private": true,
+    "type": "module",
     "description": "Storybook for JezveJS React",
     "main": "index.js",
     "scripts": {
@@ -26,7 +27,7 @@
         "storybook": "^8.0.5"
     },
     "dependencies": {
-        "@jezvejs/react": "^0.15.0",
+        "@jezvejs/react": "^0.16.0",
         "@storybook/preview-api": "^8.0.5",
         "classnames": "^2.5.1",
         "prop-types": "^15.8.1",

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { forwardRef } from 'react';
 
 import './Button.scss';
 
@@ -9,14 +10,18 @@ const ButtonContent = (title) => (
     title && <div className="btn__content">{title}</div>
 );
 
-export function Button({
-    title,
-    type,
-    url,
-    icon,
-    iconAlign,
-    ...props
-}) {
+// eslint-disable-next-line react/display-name
+export const Button = forwardRef((props, ref) => {
+    const {
+        className,
+        title,
+        type,
+        url,
+        icon,
+        iconAlign,
+        ...btnProps
+    } = props;
+
     const titleContainer = (icon)
         ? ButtonContent(title)
         : title;
@@ -33,21 +38,23 @@ export function Button({
     );
 
     const commonProps = {
-        className: classNames('btn', props.className),
+        ...btnProps,
+        ref,
+        className: classNames('btn', className),
     };
 
     if (type === 'link') {
-        return <a href={url} {...props} {...commonProps}>{content}</a>;
+        return <a {...commonProps} href={url}>{content}</a>;
     }
     if (type === 'static') {
-        return <div {...props} {...commonProps}>{content}</div>;
+        return <div {...commonProps}>{content}</div>;
     }
     if (buttonTypes.includes(type)) {
-        return <button type={type} {...props} {...commonProps}>{content}</button>;
+        return <button type={type} {...commonProps}>{content}</button>;
     }
 
     throw new Error('Invalid button type');
-}
+});
 
 Button.propTypes = {
     className: PropTypes.string,

@@ -15,7 +15,7 @@ import {
 
 test.describe('Type to empty input', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await inputToEmpty({ page }, 'usLocaleInput', '1', '1_/__/__');
         await inputToEmpty({ page }, 'usLocaleInput', '11', '11/__/__');
@@ -26,7 +26,7 @@ test.describe('Type to empty input', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await inputToEmpty({ page }, 'koLocaleInput', '0', '0_. __. __.');
         await inputToEmpty({ page }, 'koLocaleInput', '03', '03. __. __.');
@@ -37,7 +37,7 @@ test.describe('Type to empty input', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await inputToEmpty({ page }, 'ruLocaleInput', '2', '2_.__.____');
         await inputToEmpty({ page }, 'ruLocaleInput', '22', '22.__.____');
@@ -50,7 +50,7 @@ test.describe('Type to empty input', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await inputToEmpty({ page }, 'esLocaleInput', '2', '2_/__/__');
         await inputToEmpty({ page }, 'esLocaleInput', '22', '22/__/__');
@@ -63,7 +63,7 @@ test.describe('Type to empty input', () => {
 
 test.describe('Type invalid values', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         // Month
         await inputToEmpty({ page }, 'usLocaleInput', 'x', '');
@@ -84,7 +84,7 @@ test.describe('Type invalid values', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         // Year
         await inputToEmpty({ page }, 'koLocaleInput', 'x', '');
@@ -102,7 +102,7 @@ test.describe('Type invalid values', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         // Day
         await inputToEmpty({ page }, 'ruLocaleInput', 'x', '');
@@ -120,7 +120,7 @@ test.describe('Type invalid values', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         // Day
         await inputToEmpty({ page }, 'esLocaleInput', 'x', '');
@@ -142,7 +142,7 @@ test.describe('Type invalid values', () => {
 
 test.describe('Paste text to empty input', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await pasteToEmpty({ page }, 'usLocaleInput', '11', '11/__/__');
         await pasteToEmpty({ page }, 'usLocaleInput', '1122', '11/22/__');
@@ -157,7 +157,7 @@ test.describe('Paste text to empty input', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await pasteToEmpty({ page }, 'koLocaleInput', '03', '03. __. __.');
         await pasteToEmpty({ page }, 'koLocaleInput', '0311', '03. 11. __.');
@@ -173,7 +173,7 @@ test.describe('Paste text to empty input', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await pasteToEmpty({ page }, 'ruLocaleInput', '22', '22.__.____');
         await pasteToEmpty({ page }, 'ruLocaleInput', '2211', '22.11.____');
@@ -186,7 +186,7 @@ test.describe('Paste text to empty input', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await pasteToEmpty({ page }, 'esLocaleInput', '22', '22/__/__');
         await pasteToEmpty({ page }, 'esLocaleInput', '2211', '22/11/__');
@@ -201,7 +201,7 @@ test.describe('Paste text to empty input', () => {
 
 test.describe('Paste invalid text to empty input', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await pasteToEmpty({ page }, 'usLocaleInput', 'x', '');
         await pasteToEmpty({ page }, 'usLocaleInput', '45', '');
@@ -210,7 +210,7 @@ test.describe('Paste invalid text to empty input', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await pasteToEmpty({ page }, 'koLocaleInput', 'x', '');
         await pasteToEmpty({ page }, 'koLocaleInput', '11x', '');
@@ -219,7 +219,7 @@ test.describe('Paste invalid text to empty input', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await pasteToEmpty({ page }, 'ruLocaleInput', 'x', '');
         await pasteToEmpty({ page }, 'ruLocaleInput', '0x', '');
@@ -228,7 +228,7 @@ test.describe('Paste invalid text to empty input', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await pasteToEmpty({ page }, 'esLocaleInput', 'x', '');
         await pasteToEmpty({ page }, 'esLocaleInput', '45', '');
@@ -239,7 +239,7 @@ test.describe('Paste invalid text to empty input', () => {
 
 test.describe('Backspace key', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await backspaceFromPos({ page }, 'usLocaleInput', '11/22/33', 8, '11/22/3_');
         await backspaceFromPos({ page }, 'usLocaleInput', '11/22/3_', 7, '11/22/__');
@@ -258,7 +258,7 @@ test.describe('Backspace key', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await backspaceFromPos({ page }, 'koLocaleInput', '33. 11. 22.', 10, '33. 11. 2_.');
         await backspaceFromPos({ page }, 'koLocaleInput', '33. 11. 2_.', 9, '33. 11. __.');
@@ -277,7 +277,7 @@ test.describe('Backspace key', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await backspaceFromPos({ page }, 'ruLocaleInput', '22.11.3333', 10, '22.11.333_');
         await backspaceFromPos({ page }, 'ruLocaleInput', '22.11.333_', 9, '22.11.33__');
@@ -298,7 +298,7 @@ test.describe('Backspace key', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await backspaceFromPos({ page }, 'esLocaleInput', '22/11/33', 8, '22/11/3_');
         await backspaceFromPos({ page }, 'esLocaleInput', '22/11/3_', 7, '22/11/__');
@@ -318,7 +318,7 @@ test.describe('Backspace key', () => {
 
 test.describe('Delete key', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await deleteFromPos({ page }, 'usLocaleInput', '11/22/33', 6, '11/22/_3');
         await deleteFromPos({ page }, 'usLocaleInput', '11/22/33', 5, '11/22/_3');
@@ -327,7 +327,7 @@ test.describe('Delete key', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await deleteFromPos({ page }, 'koLocaleInput', '33. 11. 22.', 8, '33. 11. _2.');
         await deleteFromPos({ page }, 'koLocaleInput', '33. 11. 22.', 6, '33. 11. _2.');
@@ -336,7 +336,7 @@ test.describe('Delete key', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await deleteFromPos({ page }, 'ruLocaleInput', '22.11.3333', 6, '22.11._333');
         await deleteFromPos({ page }, 'ruLocaleInput', '22.11.3333', 5, '22.11._333');
@@ -345,7 +345,7 @@ test.describe('Delete key', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await deleteFromPos({ page }, 'esLocaleInput', '22/11/33', 6, '22/11/_3');
         await deleteFromPos({ page }, 'esLocaleInput', '22/11/33', 5, '22/11/_3');
@@ -356,7 +356,7 @@ test.describe('Delete key', () => {
 
 test.describe('Input text inside value', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await inputFromPos({ page }, 'usLocaleInput', '11/__/33', 3, '2', '11/2_/33');
         await inputFromPos({ page }, 'usLocaleInput', '11/2_/33', 4, '2', '11/22/33');
@@ -366,7 +366,7 @@ test.describe('Input text inside value', () => {
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await inputFromPos({ page }, 'koLocaleInput', '33. __. 22.', 2, '1', '33. 1_. 22.');
         await inputFromPos({ page }, 'koLocaleInput', '33. __. 22.', 3, '1', '33. 1_. 22.');
@@ -385,7 +385,7 @@ test.describe('Input text inside value', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await inputFromPos({ page }, 'ruLocaleInput', '22.__.3333', 3, '1', '22.1_.3333');
         await inputFromPos({ page }, 'ruLocaleInput', '22.1_.3333', 4, '1', '22.11.3333');
@@ -396,7 +396,7 @@ test.describe('Input text inside value', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await inputFromPos({ page }, 'esLocaleInput', '22/__/33', 3, '1', '22/1_/33');
         await inputFromPos({ page }, 'esLocaleInput', '22/1_/33', 4, '1', '22/11/33');
@@ -408,28 +408,28 @@ test.describe('Input text inside value', () => {
 
 test.describe('Input invalid text inside value', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await inputFromPos({ page }, 'usLocaleInput', '11/__/33', 3, 'x', '11/__/33');
         await inputFromPos({ page }, 'usLocaleInput', '1_/22/33', 1, '5', '1_/22/33');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await inputFromPos({ page }, 'koLocaleInput', '33. __. 22.', 4, 'x', '33. __. 22.');
         await inputFromPos({ page }, 'koLocaleInput', '33. 1_. 22.', 5, '5', '33. 1_. 22.');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await inputFromPos({ page }, 'ruLocaleInput', '22.__.3333', 3, 'x', '22.__.3333');
         await inputFromPos({ page }, 'ruLocaleInput', '22.1_.3333', 4, '5', '22.1_.3333');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await inputFromPos({ page }, 'esLocaleInput', '22/__/33', 3, 'x', '22/__/33');
         await inputFromPos({ page }, 'esLocaleInput', '22/1_/33', 4, '5', '22/1_/33');
@@ -438,14 +438,14 @@ test.describe('Input invalid text inside value', () => {
 
 test.describe('Input text into selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await inputToSelection({ page }, 'usLocaleInput', '11/22/33', 1, 4, '1', '11/_2/33');
         await inputToSelection({ page }, 'usLocaleInput', '11/22/33', 0, 7, '2', '02/__/_3');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await inputToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 2, 6, '1', '33. 1_. 22.');
         await inputToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 3, 6, '1', '33. 1_. 22.');
@@ -456,14 +456,14 @@ test.describe('Input text into selection', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await inputToSelection({ page }, 'ruLocaleInput', '22.11.3333', 1, 4, '2', '22._1.3333');
         await inputToSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 9, '2', '2_.__.___3');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await inputToSelection({ page }, 'esLocaleInput', '22/11/33', 1, 4, '2', '22/_1/33');
         await inputToSelection({ page }, 'esLocaleInput', '22/11/33', 0, 7, '2', '2_/__/_3');
@@ -472,28 +472,28 @@ test.describe('Input text into selection', () => {
 
 test.describe('Input invalid text into selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await inputToSelection({ page }, 'usLocaleInput', '11/22/33', 1, 4, 'x', '11/22/33');
         await inputToSelection({ page }, 'usLocaleInput', '11/22/33', 1, 4, '5', '11/22/33');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await inputToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, 'x', '33. 11. 22.');
         await inputToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '5', '33. 11. 22.');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await inputToSelection({ page }, 'ruLocaleInput', '22.11.3333', 1, 4, 'x', '22.11.3333');
         await inputToSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '5', '22.11.3333');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await inputToSelection({ page }, 'esLocaleInput', '22/11/33', 1, 4, 'x', '22/11/33');
         await inputToSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '5', '22/11/33');
@@ -502,14 +502,14 @@ test.describe('Input invalid text into selection', () => {
 
 test.describe('Paste text into selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await pasteToSelection({ page }, 'usLocaleInput', '11/22/33', 1, 4, '1', '11/_2/33');
         await pasteToSelection({ page }, 'usLocaleInput', '11/22/33', 0, 7, '2', '02/__/_3');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await pasteToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 2, 6, '1', '33. 1_. 22.');
         await pasteToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 3, 6, '1', '33. 1_. 22.');
@@ -521,7 +521,7 @@ test.describe('Paste text into selection', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await pasteToSelection({ page }, 'ruLocaleInput', '22.11.3333', 1, 4, '2', '22._1.3333');
         await pasteToSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 9, '2', '2_.__.___3');
@@ -529,7 +529,7 @@ test.describe('Paste text into selection', () => {
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await pasteToSelection({ page }, 'esLocaleInput', '22/11/33', 1, 4, '2', '22/_1/33');
         await pasteToSelection({ page }, 'esLocaleInput', '22/11/33', 0, 7, '2', '2_/__/_3');
@@ -540,28 +540,28 @@ test.describe('Paste text into selection', () => {
 
 test.describe('Paste invalid text into selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await pasteToSelection({ page }, 'usLocaleInput', '11/22/33', 1, 4, 'x', '11/22/33');
         await pasteToSelection({ page }, 'usLocaleInput', '11/22/33', 1, 4, '5', '11/22/33');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await pasteToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, 'x', '33. 11. 22.');
         await pasteToSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '5', '33. 11. 22.');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await pasteToSelection({ page }, 'ruLocaleInput', '22.11.3333', 1, 4, 'x', '22.11.3333');
         await pasteToSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '5', '22.11.3333');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await pasteToSelection({ page }, 'esLocaleInput', '22/11/33', 1, 4, 'x', '22/11/33');
         await pasteToSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '5', '22/11/33');
@@ -570,14 +570,14 @@ test.describe('Paste invalid text into selection', () => {
 
 test.describe('Paste text inside value', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await pasteFromPos({ page }, 'usLocaleInput', '11/__/33', 3, '2', '11/2_/33');
         await pasteFromPos({ page }, 'usLocaleInput', '11/2_/33', 4, '2', '11/22/33');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await pasteFromPos({ page }, 'koLocaleInput', '33. __. 22.', 2, '1', '33. 1_. 22.');
         await pasteFromPos({ page }, 'koLocaleInput', '33. __. 22.', 3, '1', '33. 1_. 22.');
@@ -591,14 +591,14 @@ test.describe('Paste text inside value', () => {
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await pasteFromPos({ page }, 'ruLocaleInput', '22.__.3333', 3, '1', '22.1_.3333');
         await pasteFromPos({ page }, 'ruLocaleInput', '22.1_.3333', 4, '1', '22.11.3333');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await pasteFromPos({ page }, 'esLocaleInput', '22/__/33', 3, '1', '22/1_/33');
         await pasteFromPos({ page }, 'esLocaleInput', '22/1_/33', 4, '1', '22/11/33');
@@ -607,28 +607,28 @@ test.describe('Paste text inside value', () => {
 
 test.describe('Paste invalid text inside value', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await pasteFromPos({ page }, 'usLocaleInput', '11/__/33', 3, 'x', '11/__/33');
         await pasteFromPos({ page }, 'usLocaleInput', '1_/22/33', 1, '5', '1_/22/33');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await pasteFromPos({ page }, 'koLocaleInput', '33. __. 22.', 4, 'x', '33. __. 22.');
         await pasteFromPos({ page }, 'koLocaleInput', '33. 1_. 22.', 5, '5', '33. 1_. 22.');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await pasteFromPos({ page }, 'ruLocaleInput', '22.__.3333', 3, 'x', '22.__.3333');
         await pasteFromPos({ page }, 'ruLocaleInput', '22.1_.3333', 4, '5', '22.1_.3333');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await pasteFromPos({ page }, 'esLocaleInput', '22/__/33', 3, 'x', '22/__/33');
         await pasteFromPos({ page }, 'esLocaleInput', '22/1_/33', 4, '5', '22/1_/33');
@@ -637,28 +637,28 @@ test.describe('Paste invalid text inside value', () => {
 
 test.describe('Backspace key with selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await backspaceSelection({ page }, 'usLocaleInput', '11/22/33', 4, 7, '11/2_/_3');
         await backspaceSelection({ page }, 'usLocaleInput', '11/22/33', 0, 8, '');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await backspaceSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '33. 1_. _2.');
         await backspaceSelection({ page }, 'koLocaleInput', '33. 11. 22.', 0, 10, '');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await backspaceSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '22.1_._333');
         await backspaceSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 10, '');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await backspaceSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
         await backspaceSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
@@ -667,28 +667,28 @@ test.describe('Backspace key with selection', () => {
 
 test.describe('Delete key with selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await deleteSelection({ page }, 'usLocaleInput', '11/22/33', 4, 7, '11/2_/_3');
         await deleteSelection({ page }, 'usLocaleInput', '11/22/33', 0, 8, '');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await deleteSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '33. 1_. _2.');
         await deleteSelection({ page }, 'koLocaleInput', '33. 11. 22.', 0, 10, '');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await deleteSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '22.1_._333');
         await deleteSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 10, '');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await deleteSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
         await deleteSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
@@ -697,28 +697,28 @@ test.describe('Delete key with selection', () => {
 
 test.describe('Cut selection', () => {
     test('en-US locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--english-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--english-locale');
 
         await cutSelection({ page }, 'usLocaleInput', '11/22/33', 4, 7, '11/2_/_3');
         await cutSelection({ page }, 'usLocaleInput', '11/22/33', 0, 8, '');
     });
 
     test('ko-KR locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--korean-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--korean-locale');
 
         await cutSelection({ page }, 'koLocaleInput', '33. 11. 22.', 5, 9, '33. 1_. _2.');
         await cutSelection({ page }, 'koLocaleInput', '33. 11. 22.', 0, 10, '');
     });
 
     test('ru-RU locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--russian-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--russian-locale');
 
         await cutSelection({ page }, 'ruLocaleInput', '22.11.3333', 4, 7, '22.1_._333');
         await cutSelection({ page }, 'ruLocaleInput', '22.11.3333', 0, 10, '');
     });
 
     test('es-ES locale', async ({ page }) => {
-        await page.goto('http://localhost:6006/iframe.html?viewMode=story&id=input-dateinput--es-locale');
+        await page.goto('iframe.html?viewMode=story&id=input-dateinput--es-locale');
 
         await cutSelection({ page }, 'esLocaleInput', '22/11/33', 4, 7, '22/1_/_3');
         await cutSelection({ page }, 'esLocaleInput', '22/11/33', 0, 8, '');
