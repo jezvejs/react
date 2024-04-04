@@ -16,6 +16,7 @@ export * from './Components/Menu/Menu.jsx';
 export { Offcanvas } from './Components/Offcanvas/Offcanvas.jsx';
 export { Paginator } from './Components/Paginator/Paginator.jsx';
 export { Popup } from './Components/Popup/Popup.jsx';
+export { PopupMenu } from './Components/PopupMenu/PopupMenu.jsx';
 export { Progress } from './Components/Progress/Progress.jsx';
 export { Radio } from './Components/Radio/Radio.jsx';
 export { Spinner } from './Components/Spinner/Spinner.jsx';
