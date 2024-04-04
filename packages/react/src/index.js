@@ -23,4 +23,5 @@ export { Switch } from './Components/Switch/Switch.jsx';
 export { TabList } from './Components/TabList/TabList.jsx';
 
 // Hooks
+export { PopupPosition } from './hooks/usePopupPosition/PopupPosition.js';
 export { usePopupPosition } from './hooks/usePopupPosition/usePopupPosition.js';

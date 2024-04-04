@@ -58,6 +58,21 @@ const defaultProps = {
 };
 
 export class PopupPosition {
+    static positions = [
+        'top',
+        'top-start',
+        'top-end',
+        'bottom',
+        'bottom-start',
+        'bottom-end',
+        'left',
+        'left-start',
+        'left-end',
+        'right',
+        'right-start',
+        'right-end',
+    ];
+
     static create(props = {}) {
         return new this(props);
     }
