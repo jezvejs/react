@@ -57,5 +57,7 @@ export function usePopupPosition(options = {}) {
     return {
         referenceRef,
         elementRef,
+        elem,
+        reference,
     };
 }
