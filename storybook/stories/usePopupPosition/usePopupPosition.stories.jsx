@@ -1,23 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
+import { PopupPosition } from '@jezvejs/react';
 
 import { MenuPopup } from './components/MenuPopup/MenuPopup.jsx';
 import './usePopupPosition.stories.scss';
-
-const positions = [
-    'top',
-    'top-start',
-    'top-end',
-    'bottom',
-    'bottom-start',
-    'bottom-end',
-    'left',
-    'left-start',
-    'left-end',
-    'right',
-    'right-start',
-    'right-end',
-];
 
 const defaultDecorator = (Story) => (
     <div className="rel-container">
@@ -45,7 +31,7 @@ export default {
 
 const argTypes = {
     position: {
-        options: [...positions],
+        options: [...PopupPosition.positions],
         control: { type: 'radio' },
     },
     allowFlip: {

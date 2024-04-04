@@ -1,0 +1,60 @@
+:root {
+  --popupmenu-border-width: 1px;
+  --popupmenu-border-radius: 3px;
+  --popupmenu-border-color: #888888;
+  --popupmenu-separator-size: 1px;
+  --popupmenu-separator-color: #888888;
+  --popupmenu-background: #ffffff;
+  --popupmenu-z-index: 2000;
+  --popupmenu-title-color: #000000;
+  --popupmenu-icon-color: #000000;
+  --popupmenu-padding: 8px;
+  --popupmenu-icon-gap: 10px;
+  --popupmenu-icon-margin: 6px;
+
+  /* Item hover */
+  --popupmenu-hover-background: #3078e2;
+  --popupmenu-hover-title-color: #ffffff;
+  --popupmenu-hover-icon-color: #ffffff;
+}
+
+/* Popup menu container with toggle button */
+.popup-menu {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: fit-content;
+}
+
+.popup-menu-list {
+  --menu-item-text-color: var(--popupmenu-title-color);
+  --menu-separator-size: var(--popupmenu-separator-size);
+  --menu-separator-color: var(--popupmenu-separator-color);
+
+  /* Active item state */
+  --menu-item-active-text-color: var(--popupmenu-hover-title-color);
+  --menu-item-active-background: var(--popupmenu-hover-background);
+  --menu-item-active-icon-color: var(--popupmenu-hover-icon-color);
+
+  display: flex;
+  flex-flow: column nowrap;
+  position: absolute;
+  overflow-y: auto;
+  border-width: var(--popupmenu-border-width);
+  border-style: solid;
+  border-color: var(--popupmenu-border-color);
+  border-radius: var(--popupmenu-border-radius);
+  z-index: var(--popupmenu-z-index);
+  background: var(--popupmenu-background);
+
+  &.popup-menu-list_fixed {
+    position: fixed;
+  }
+
+  .menu-item__content {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}

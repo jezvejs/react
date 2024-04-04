@@ -1,0 +1,46 @@
+.rel-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 1rem;
+  height: 400px;
+}
+
+.block {
+  display: block;
+  width: 100px;
+  height: 100px;
+  background-color: #0065bd;
+}
+
+/* List element */
+.list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  width: 100%;
+  max-width: 400px;
+  max-height: 300px;
+  overflow-y: auto;
+  row-gap: 2px;
+}
+
+.list-item {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+  padding: 0.5rem;
+  background-color: #dddddd;
+
+  .popup-menu {
+    position: static;
+  }
+}
+
+.list-item[disabled] {
+  color: #888888;
+}

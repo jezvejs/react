@@ -1,4 +1,9 @@
-import { useState, useRef } from 'react';
+import {
+    useState,
+    useRef,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -50,7 +55,8 @@ export const MenuHelpers = {
 /**
  * Menu component
  */
-export const Menu = (props) => {
+// eslint-disable-next-line react/display-name
+export const Menu = forwardRef((props, ref) => {
     const [state, setState] = useState({
         ...Menu.defaultProps,
         ...props,
@@ -62,7 +68,8 @@ export const Menu = (props) => {
         },
     });
 
-    const ref = useRef(null);
+    const innerRef = useRef(null);
+    useImperativeHandle(ref, () => innerRef.current);
 
     const disableTouch = () => (
         setState((prev) => ({ ...prev, ignoreTouch: true }))
@@ -73,7 +80,7 @@ export const Menu = (props) => {
     );
 
     const handleFocus = (e) => {
-        if (ref.current === e?.target) {
+        if (innerRef?.current === e?.target) {
             return;
         }
 
@@ -91,7 +98,10 @@ export const Menu = (props) => {
     };
 
     const handleBlur = (e) => {
-        if (e?.relatedTarget && ref.current.contains(e.relatedTarget)) {
+        if (!innerRef?.current) {
+            return;
+        }
+        if (e?.relatedTarget && innerRef.current.contains(e.relatedTarget)) {
             return;
         }
 
@@ -108,6 +118,10 @@ export const Menu = (props) => {
     };
 
     const activateItem = (itemId) => {
+        if (!innerRef?.current) {
+            return;
+        }
+
         const item = getItemById(itemId, state.items);
         if (!item) {
             return;
@@ -115,7 +129,7 @@ export const Menu = (props) => {
 
         const focusOptions = { preventScroll: true };
 
-        const itemEl = ref.current.querySelector(`.menu-item[data-id="${itemId}"]`);
+        const itemEl = innerRef.current.querySelector(`.menu-item[data-id="${itemId}"]`);
         if (!itemEl) {
             return;
         }
@@ -130,8 +144,12 @@ export const Menu = (props) => {
     };
 
     const scrollToItem = () => {
+        if (!innerRef?.current) {
+            return;
+        }
+
         const focused = document.activeElement;
-        if (ref.current.contains(focused)) {
+        if (innerRef.current.contains(focused)) {
             focused.scrollIntoView({
                 behavior: 'instant',
                 block: 'nearest',
@@ -195,9 +213,13 @@ export const Menu = (props) => {
             activeItem: null,
         }));
 
+        if (!innerRef?.current) {
+            return;
+        }
+
         const focused = document.activeElement;
-        if (ref.current.contains(focused)) {
-            ref.current.focus({ preventScroll: true });
+        if (innerRef.current.contains(focused)) {
+            innerRef.current.focus({ preventScroll: true });
         }
     };
 
@@ -369,14 +391,14 @@ export const Menu = (props) => {
             onTouchStartCapture={handleTouchStart}
             onKeyDownCapture={handleKey}
             onScrollCapture={handleScroll}
-            ref={ref}
+            ref={innerRef}
         >
             {menuHeader}
             {menuList}
             {menuFooter}
         </div>
     );
-};
+});
 
 Menu.propTypes = {
     id: PropTypes.string,
