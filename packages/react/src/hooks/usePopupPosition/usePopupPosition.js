@@ -52,7 +52,7 @@ export function usePopupPosition(options = {}) {
         }
 
         return resetPosition;
-    }, [open, elem, reference, props]);
+    }, [open, elem, reference]);
 
     return {
         referenceRef,
