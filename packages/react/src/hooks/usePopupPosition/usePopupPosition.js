@@ -33,9 +33,9 @@ export function usePopupPosition(options = {}) {
         }
 
         position.current = PopupPosition.create({
+            ...props,
             elem: elem.current,
             refElem: reference.current,
-            ...props,
         });
     };
 
@@ -52,7 +52,7 @@ export function usePopupPosition(options = {}) {
         }
 
         return resetPosition;
-    }, [open, elem, reference, props]);
+    }, [open, elem, reference]);
 
     return {
         referenceRef,

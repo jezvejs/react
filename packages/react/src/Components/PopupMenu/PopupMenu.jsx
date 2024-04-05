@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import { Menu } from '../Menu/Menu.jsx';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.js';
+import { PopupPosition } from '../../hooks/usePopupPosition/PopupPosition.js';
 
 import './PopupMenu.scss';
 
@@ -23,15 +24,13 @@ export const PopupMenu = (props) => {
     };
 
     const { referenceRef, elementRef, elem } = usePopupPosition({
-        ...state,
+        ...state.position,
+        open: state.open,
         onScrollDone: () => {
             setState((prev) => ({
                 ...prev,
                 listenScroll: true,
             }));
-        },
-        updateProps: {
-            scrollOnOverflow: false,
         },
     });
 
@@ -119,8 +118,9 @@ PopupMenu.propTypes = {
     toggleOnClick: PropTypes.bool,
     hideOnScroll: PropTypes.bool,
     hideOnSelect: PropTypes.bool,
-    allowChangeAxis: PropTypes.bool,
-    fixed: PropTypes.bool,
+    position: PropTypes.shape({
+        ...PopupPosition.propTypes,
+    }),
     children: PropTypes.oneOfType([
         PropTypes.node,
         PropTypes.elementType,
@@ -132,7 +132,12 @@ PopupMenu.defaultProps = {
     toggleOnClick: true,
     hideOnScroll: true,
     hideOnSelect: true,
-    position: 'bottom-start',
-    allowChangeAxis: true,
     fixed: true,
+    position: {
+        ...PopupPosition.defaultProps,
+        allowChangeAxis: true,
+        updateProps: {
+            scrollOnOverflow: false,
+        },
+    },
 };
