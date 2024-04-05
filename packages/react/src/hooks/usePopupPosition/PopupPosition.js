@@ -1,5 +1,7 @@
 import { isFunction, isObject } from '@jezvejs/types';
 import { removeEvents, setEvents, transform } from '@jezvejs/dom';
+import PropTypes from 'prop-types';
+
 import { debounce, minmax, px } from '../../utils/common.js';
 
 import {
@@ -37,26 +39,6 @@ import {
 
 const UPDATE_TIMEOUT = 75;
 
-const defaultProps = {
-    elem: null,
-    refElem: null,
-    updateProps: null,
-    position: 'bottom-start',
-    margin: 0,
-    screenPadding: 0,
-    bottomSafeArea: 70,
-    useRefWidth: false,
-    allowFlip: true,
-    allowHorizontalFlip: true,
-    allowChangeAxis: false,
-    scrollOnOverflow: true,
-    allowResize: true,
-    minRefHeight: 20,
-    onScrollDone: null,
-    onWindowScroll: null,
-    onViewportResize: null,
-};
-
 export class PopupPosition {
     static positions = [
         'top',
@@ -79,7 +61,7 @@ export class PopupPosition {
 
     constructor(props = {}) {
         this.props = {
-            ...defaultProps,
+            ...PopupPosition.defaultProps,
             ...props,
         };
 
@@ -716,3 +698,49 @@ export class PopupPosition {
         setTimeout(() => this.stopWindowEvents());
     }
 }
+
+PopupPosition.propTypes = {
+    elem: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
+    refElem: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
+    updateProps: PropTypes.object,
+    position: PropTypes.oneOf(PopupPosition.positions),
+    margin: PropTypes.number,
+    screenPadding: PropTypes.number,
+    bottomSafeArea: PropTypes.number,
+    useRefWidth: PropTypes.bool,
+    allowFlip: PropTypes.bool,
+    allowHorizontalFlip: PropTypes.bool,
+    allowChangeAxis: PropTypes.bool,
+    scrollOnOverflow: PropTypes.bool,
+    allowResize: PropTypes.bool,
+    minRefHeight: PropTypes.number,
+    onScrollDone: PropTypes.func,
+    onWindowScroll: PropTypes.func,
+    onViewportResize: PropTypes.func,
+};
+
+PopupPosition.defaultProps = {
+    elem: null,
+    refElem: null,
+    updateProps: null,
+    position: 'bottom-start',
+    margin: 0,
+    screenPadding: 0,
+    bottomSafeArea: 70,
+    useRefWidth: false,
+    allowFlip: true,
+    allowHorizontalFlip: true,
+    allowChangeAxis: false,
+    scrollOnOverflow: true,
+    allowResize: true,
+    minRefHeight: 20,
+    onScrollDone: null,
+    onWindowScroll: null,
+    onViewportResize: null,
+};
