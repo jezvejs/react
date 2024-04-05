@@ -74,10 +74,19 @@ export const Default = {
     render: PopupMenuDemo,
 };
 
-export const Absolute = {
+export const AbsolutePosition = {
     args: {
         items: getDefaultItems(),
         fixed: false,
+    },
+    decorators: [heightDecorator],
+    render: PopupMenuDemo,
+};
+
+export const HideOnScroll = {
+    args: {
+        items: getDefaultItems(),
+        hideOnScroll: false,
     },
     decorators: [heightDecorator],
     render: PopupMenuDemo,
