@@ -91,3 +91,12 @@ export const HideOnScroll = {
     decorators: [heightDecorator],
     render: PopupMenuDemo,
 };
+
+export const HideOnSelect = {
+    args: {
+        items: getDefaultItems(),
+        hideOnSelect: false,
+    },
+    decorators: [heightDecorator],
+    render: PopupMenuDemo,
+};
