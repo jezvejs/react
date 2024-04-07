@@ -2,7 +2,7 @@
 import '@jezvejs/react/style';
 import { Button, Header } from '@jezvejs/react';
 
-import MenuIcon from '../assets/icons/menu.svg';
+import MenuIcon from '../../assets/icons/menu.svg';
 
 import './Header.stories.scss';
 

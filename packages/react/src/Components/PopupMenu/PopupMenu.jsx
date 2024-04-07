@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { Menu } from '../Menu/Menu.jsx';
+import { Menu, MenuHelpers } from '../Menu/Menu.jsx';
+
+import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.js';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.js';
 import { PopupPosition } from '../../hooks/usePopupPosition/PopupPosition.js';
 
@@ -21,6 +23,10 @@ export const PopupMenu = (props) => {
             ...prev,
             open: !prev.open,
         }));
+    };
+
+    const closeMenu = () => {
+        setState((prev) => ({ ...prev, open: false }));
     };
 
     const { referenceRef, elementRef, elem } = usePopupPosition({
@@ -51,10 +57,7 @@ export const PopupMenu = (props) => {
             return;
         }
 
-        setState((prev) => ({
-            ...prev,
-            open: false,
-        }));
+        closeMenu();
     }
 
     const addScrollListener = () => {
@@ -76,6 +79,17 @@ export const PopupMenu = (props) => {
         window.removeEventListener('scroll', onScroll, { passive: true, capture: true });
     };
 
+    const onItemClick = (item) => {
+        if (MenuHelpers.isCheckbox(item)) {
+            setState(MenuHelpers.toggleSelectItem(item.id));
+        }
+
+        if (props.hideOnSelect) {
+            removeScrollListener();
+            closeMenu();
+        }
+    };
+
     useEffect(() => {
         if (state.open) {
             addScrollListener();
@@ -88,6 +102,8 @@ export const PopupMenu = (props) => {
         };
     }, [state.open, state.listenScroll]);
 
+    useEmptyClick(closeMenu, elem, state.open);
+
     if (!props.children) {
         return null;
     }
@@ -97,6 +113,7 @@ export const PopupMenu = (props) => {
     const popup = <Menu
         {...state}
         className="popup-menu-list"
+        onItemClick={onItemClick}
         ref={elementRef}
     />;
 

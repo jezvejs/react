@@ -282,3 +282,15 @@ export const isAvailableItem = (item, state) => (
         || state.allowActiveGroupHeader
     )
 );
+
+export const toggleSelectItem = (itemId) => (prev) => ({
+    ...prev,
+    items: mapItems(prev.items, (item) => ({
+        ...item,
+        selected: (
+            (item.id === itemId)
+                ? (!item.selected)
+                : item.selected
+        ),
+    })),
+});

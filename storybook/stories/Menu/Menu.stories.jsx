@@ -2,8 +2,8 @@
 import '@jezvejs/react/style';
 import { Menu } from '@jezvejs/react';
 
-import SelectIcon from '../assets/icons/select.svg';
-import SearchIcon from '../assets/icons/search.svg';
+import SelectIcon from '../../assets/icons/select.svg';
+import SearchIcon from '../../assets/icons/search.svg';
 
 import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.jsx';
 import { CollapsibleGroupsMenu } from './components/CollapsibleGroups/CollapsibleGroupsMenu.jsx';

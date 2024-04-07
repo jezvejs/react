@@ -3,9 +3,9 @@ import '@jezvejs/react/style';
 import { PopupMenu } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
-import SelectIcon from '../assets/icons/select.svg';
-import SearchIcon from '../assets/icons/search.svg';
-import { MenuButton } from '../components/MenuButton/MenuButton.jsx';
+import SelectIcon from '../../assets/icons/select.svg';
+import SearchIcon from '../../assets/icons/search.svg';
+import { MenuButton } from '../../Components/MenuButton/MenuButton.jsx';
 
 import './PopupMenu.stories.scss';
 
@@ -87,6 +87,15 @@ export const HideOnScroll = {
     args: {
         items: getDefaultItems(),
         hideOnScroll: false,
+    },
+    decorators: [heightDecorator],
+    render: PopupMenuDemo,
+};
+
+export const HideOnSelect = {
+    args: {
+        items: getDefaultItems(),
+        hideOnSelect: false,
     },
     decorators: [heightDecorator],
     render: PopupMenuDemo,

@@ -3,9 +3,9 @@ import '@jezvejs/react/style';
 import { Popup } from '@jezvejs/react';
 import { useState, useMemo } from 'react';
 
-import { ActionButton } from '../components/ActionButton/ActionButton.jsx';
-import { OkBtn } from '../components/ActionButton/OkBtn.jsx';
-import { CancelBtn } from '../components/ActionButton/CancelBtn.jsx';
+import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { OkBtn } from '../../Components/ActionButton/OkBtn.jsx';
+import { CancelBtn } from '../../Components/ActionButton/CancelBtn.jsx';
 
 import './Popup.stories.scss';
 

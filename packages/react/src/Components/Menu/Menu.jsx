@@ -26,6 +26,7 @@ import {
     isAvailableItem,
     isCheckbox,
     mapItems,
+    toggleSelectItem,
 } from './helpers.js';
 import './Menu.scss';
 
@@ -50,6 +51,7 @@ export const MenuHelpers = {
     isAvailableItem,
     isCheckbox,
     mapItems,
+    toggleSelectItem,
 };
 
 /**
@@ -157,20 +159,6 @@ export const Menu = forwardRef((props, ref) => {
         }
     };
 
-    const toggleSelectItem = (itemId) => {
-        setState((prev) => ({
-            ...prev,
-            items: mapItems(state.items, (item) => ({
-                ...item,
-                selected: (
-                    (item.id === itemId)
-                        ? (!item.selected)
-                        : item.selected
-                ),
-            })),
-        }));
-    };
-
     const handleMouseEnter = (itemId, e) => {
         if (state.ignoreTouch) {
             return;
@@ -235,6 +223,10 @@ export const Menu = forwardRef((props, ref) => {
         }
     };
 
+    const toggleItem = (itemId) => {
+        setState(toggleSelectItem(itemId));
+    };
+
     const handleItemClick = (itemId, e) => {
         e?.stopPropagation();
 
@@ -279,7 +271,7 @@ export const Menu = forwardRef((props, ref) => {
         }
 
         if (isCheckbox(clickedItem)) {
-            toggleSelectItem(itemId);
+            toggleItem(itemId);
         }
 
         finishClick(() => props.onItemClick?.(clickedItem, e));
