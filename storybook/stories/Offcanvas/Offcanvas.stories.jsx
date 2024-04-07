@@ -3,7 +3,7 @@ import '@jezvejs/react/style';
 import { Offcanvas } from '@jezvejs/react';
 import './Offcanvas.stories.scss';
 import { useMemo, useState } from 'react';
-import { ActionButton } from '../components/ActionButton/ActionButton.jsx';
+import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
 
 export default {
     title: 'Components/Offcanvas',

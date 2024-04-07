@@ -3,9 +3,9 @@ import '@jezvejs/react/style';
 import { Button, Collapsible } from '@jezvejs/react';
 import { useArgs } from '@storybook/preview-api';
 
-import EditIcon from '../assets/icons/edit.svg';
-import DeleteIcon from '../assets/icons/del.svg';
-import ToggleIcon from '../assets/icons/toggle.svg';
+import EditIcon from '../../assets/icons/edit.svg';
+import DeleteIcon from '../../assets/icons/del.svg';
+import ToggleIcon from '../../assets/icons/toggle.svg';
 
 import './Collapsible.stories.scss';
 
