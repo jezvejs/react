@@ -4,6 +4,8 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 
 import { Menu, MenuHelpers } from '../Menu/Menu.jsx';
+
+import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.js';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.js';
 import { PopupPosition } from '../../hooks/usePopupPosition/PopupPosition.js';
 
@@ -99,6 +101,8 @@ export const PopupMenu = (props) => {
             removeScrollListener();
         };
     }, [state.open, state.listenScroll]);
+
+    useEmptyClick(closeMenu, elem, state.open);
 
     if (!props.children) {
         return null;
