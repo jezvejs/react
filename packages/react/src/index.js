@@ -22,6 +22,8 @@ export { Radio } from './Components/Radio/Radio.jsx';
 export { Spinner } from './Components/Spinner/Spinner.jsx';
 export { Switch } from './Components/Switch/Switch.jsx';
 export { TabList } from './Components/TabList/TabList.jsx';
+export { Tag } from './Components/Tag/Tag.jsx';
+export * from './Components/Tags/Tags.jsx';
 
 // Hooks
 export { useEmptyClick } from './hooks/useEmptyClick/useEmptyClick.js';
