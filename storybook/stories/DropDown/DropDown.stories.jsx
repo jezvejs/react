@@ -157,3 +157,27 @@ export const AttachToBlock = {
         );
     },
 };
+
+export const AttachToInline = {
+    args: {
+        className: 'dd_inline',
+        listAttach: true,
+        items: initItems('Long Item Lorem Lorem', 10),
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        return (
+            <>
+                <>Lorem ipsum dolor sit, amet consectetur&nbsp;</>
+                <DropDown {...args} container={portalElement}>
+                    <span id="inlineTarget" className="link-inline">click</span>
+                </DropDown>
+                <>&nbsp;adipisicing elit. Aut consequatur iure repellat</>
+            </>
+        );
+    },
+};

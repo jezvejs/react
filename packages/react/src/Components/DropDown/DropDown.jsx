@@ -263,10 +263,11 @@ export const DropDown = forwardRef((props, ref) => {
     const { Menu, ComboBox } = state.components;
 
     const attachedTo = props.listAttach && props.children;
+    const editable = isEditable(state);
 
     const comboBoxProps = {
         ...state,
-        editable: isEditable(state),
+        editable,
         items: MenuHelpers.toFlatList(state.items),
         onInput,
         onToggle,
@@ -288,7 +289,7 @@ export const DropDown = forwardRef((props, ref) => {
             dd__list_fixed: !!state.fixedMenu,
             dd__list_open: !!state.fixedMenu && !!state.visible,
         }),
-        editable: isEditable(state),
+        editable,
         onItemClick,
         onInput,
         onDeleteSelectedItem,
@@ -305,12 +306,28 @@ export const DropDown = forwardRef((props, ref) => {
         />
     );
 
-    const select = null;
-
     const container = props.container ?? document.body;
 
     const selected = getSelectedItems(state);
     const selectedIds = selected.map((item) => item.id).join();
+
+    let tabIndex = null;
+    let selectTabIndex = null;
+    if (!state.disabled) {
+        const nativeSelectVisible = false; //isVisible(this.selectElem, true);
+
+        selectTabIndex = (nativeSelectVisible) ? 0 : -1;
+
+        const disableContainerTab = (
+            nativeSelectVisible
+            || (editable && !props.listAttach)
+            || state.active
+        );
+
+        tabIndex = (disableContainerTab) ? -1 : 0;
+    }
+
+    const select = (<select tabIndex={selectTabIndex}></select>);
 
     return (
         <div
@@ -328,7 +345,7 @@ export const DropDown = forwardRef((props, ref) => {
                 },
                 props.className,
             )}
-            tabIndex={-1}
+            tabIndex={tabIndex}
             onClickCapture={onClick}
             onFocusCapture={onFocus}
             onBlurCapture={onBlur}
