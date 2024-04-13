@@ -1,0 +1,261 @@
+.height-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 350px 1rem;
+}
+
+.fixed-menu-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.inline-container {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 1rem;
+}
+
+.dd__container_no-shrink {
+  flex-shrink: 0;
+}
+
+.dd__container_ellipsis {
+  .dd__single-selection {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    flex-shrink: 1;
+    line-height: 30px;
+  }
+}
+
+.allwidth {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.halfwidth {
+  width: 50%;
+}
+
+.dd_stretch {
+  width: 100%;
+}
+
+.dd_form {
+  width: 100%;
+  max-width: 450px;
+}
+
+/* Custom group style */
+.dd__styled-group {
+  --dd-list-group-padding: 10px;
+  --dd-list-group-text: #004fff;
+  --dd-list-group-bg: #e1e1e1;
+}
+
+.dd_inline {
+  display: inline-block;
+  cursor: pointer;
+
+  .link-inline {
+    color: #2020ff;
+  }
+}
+
+.offset-parent {
+  position: relative;
+}
+
+.dd__container.dd_static {
+  position: static;
+}
+
+.clipper {
+  display: flex;
+  flex-flow: row nowrap;
+  column-gap: 2rem;
+  padding: 1rem;
+  height: 100px;
+  overflow: auto;
+  background-color: #bbbbbb;
+}
+
+.inp {
+  border: 1px solid #000000;
+  padding: 5px;
+}
+
+.multi-line-section .demo-section__content {
+  row-gap: 0.5rem;
+}
+
+/* Custom DropDown */
+.dd__custom {
+  --dd-bg-color: #181818;
+  --dd-placeholder: #85803a;
+  --dd-list-item-text: #dddddd;
+  --dd-list-item-bg: #202020;
+  --dd-selection-item-border-radius: 5px;
+  --dd-selection-item-bg: #ffcf00;
+  --dd-selection-item-hover-bg: #ff7c00;
+  --dd-selection-item-text: #000000;
+
+  /* Active state */
+  --dd-active-bg: #202020;
+  --dd-active-placeholder: #ffcf00;
+  --dd-active-selection-item-text: #000000;
+  --dd-active-selection-bg: none;
+  --dd-active-selection-item-bg: #ffcf00;
+}
+
+.dd__custom-list-item {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.dd__custom-list-item_color {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+.dd__custom-list-item_title {
+  font-size: 1.25rem;
+}
+
+.dd__custom-list-item_check {
+  display: none;
+  width: 20px;
+  height: 25px;
+  line-height: 20px;
+  font-size: 30px;
+}
+
+.menu-item_selected .dd__custom-list-item_check {
+  display: block;
+}
+
+/* Custom selected item */
+.dd__custom-selection-item {
+  .dd__del-selection-item-btn {
+    color: #000000;
+    padding: 0 3px 0 0;
+    width: 24px;
+    text-align: center;
+  }
+
+  .dd__del-selection-item-btn::after {
+    content: "\2014";
+    font-weight: 400;
+  }
+}
+
+.dd__container[disabled] .dd__custom-selection-item {
+  border-color: #c5c5c5;
+}
+
+.dd__custom-list-item_color[data-color="blue"] {
+  background-color: #0081d6;
+}
+
+.dd__custom-list-item_color[data-color="red"] {
+  background-color: #bd0000;
+}
+
+.dd__custom-list-item_color[data-color="green"] {
+  background-color: #1dac00;
+}
+
+.dd__custom-list-item_color[data-color="yellow"] {
+  background-color: #d6c100;
+}
+
+.dd__custom-list-item_color[data-color="pink"] {
+  background-color: #ff006a;
+}
+
+.dd__custom-list-item_color[data-color="purple"] {
+  background-color: #800080;
+}
+
+.dd__custom-list-item_color[data-color="orange"] {
+  background-color: #ff7b00;
+}
+
+.dd__custom-list-item_color[data-color="grey"] {
+  background-color: #9b9b9b;
+}
+
+.dd__custom-list-item_color[data-color="brown"] {
+  background-color: #752f00;
+}
+
+.dd__custom-list-item_color[data-color="cyan"] {
+  background-color: #00e0e0;
+}
+
+.dd__custom-list-item_color[data-color="magenta"] {
+  background-color: #ff00ff;
+}
+
+/* Popup */
+.top-popup .popup__wrapper {
+  align-items: flex-start;
+}
+
+.bottom-popup .popup__wrapper {
+  align-items: flex-end;
+}
+
+.scroll-inside .popup-scroll-container {
+  height: 200px;
+  overflow: auto;
+}
+
+.popup-scroll-placeholder {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  height: 75vh;
+  font-size: 3rem;
+  color: #c3c3c3;
+}
+
+.relative-wrapper .popup__wrapper {
+  position: relative;
+}
+
+.scroll-inside .popup-scroll-placeholder {
+  height: 300px;
+}
+
+@media (hover: hover) {
+  .dd_inline:hover .link-inline {
+    text-decoration: underline;
+  }
+
+  .dd__custom-selection-item {
+    &:hover {
+      background-color: #ff7c00;
+      border-color: #ff7c00;
+    }
+
+    .dd__del-selection-item-btn:hover {
+      color: #ffffff;
+    }
+
+    .dd__del-selection-item-btn:hover::after {
+      content: "|";
+      font-weight: 400;
+    }
+  }
+}

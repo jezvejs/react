@@ -9,6 +9,7 @@ export { Collapsible } from './Components/Collapsible/Collapsible.jsx';
 export { ControlledInput } from './Components/ControlledInput/ControlledInput.jsx';
 export { DateInput } from './Components/DateInput/DateInput.jsx';
 export { DecimalInput } from './Components/DecimalInput/DecimalInput.jsx';
+export * from './Components/DropDown/DropDown.jsx';
 export { Header } from './Components/Header/Header.jsx';
 export { IndetermProgress } from './Components/IndetermProgress/IndetermProgress.jsx';
 export { Input } from './Components/Input/Input.jsx';
@@ -22,6 +23,8 @@ export { Radio } from './Components/Radio/Radio.jsx';
 export { Spinner } from './Components/Spinner/Spinner.jsx';
 export { Switch } from './Components/Switch/Switch.jsx';
 export { TabList } from './Components/TabList/TabList.jsx';
+export { Tag } from './Components/Tag/Tag.jsx';
+export * from './Components/Tags/Tags.jsx';
 
 // Hooks
 export { useEmptyClick } from './hooks/useEmptyClick/useEmptyClick.js';
