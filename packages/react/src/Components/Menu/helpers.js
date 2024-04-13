@@ -119,6 +119,26 @@ export const getItemById = (id, items) => {
 };
 
 /**
+ * Returns new identifier not existing in the specified list of items
+ *
+ * @param {Array} items array of items to search in
+ * @param {String} prefix optional string to prepend id with
+ */
+export const generateItemId = (items, prefix = '') => {
+    let found;
+
+    do {
+        const id = `${prefix}${Date.now()}${Math.random() * 10000}`;
+        found = getItemById(id, items);
+        if (!found) {
+            return id;
+        }
+    } while (found);
+
+    return null;
+};
+
+/**
  * Returns active menu item
  *
  * @param {Array} items array of items to search in
@@ -294,3 +314,35 @@ export const toggleSelectItem = (itemId) => (prev) => ({
         ),
     })),
 });
+
+/** Returns item object for specified props after applying default values */
+export const createMenuItem = (props, state) => {
+    if (!props) {
+        throw new Error('Invalid item object');
+    }
+    if (!state) {
+        throw new Error('Invalid state object');
+    }
+
+    const { ListItem } = state.components;
+    const defaultItemType = state.defaultItemType ?? ((state.multiple) ? 'checkbox' : 'button');
+
+    const res = {
+        ...ListItem.defaultProps,
+        ...props,
+        active: false,
+        id: props.id?.toString() ?? generateItemId(state?.items ?? [], 'item'),
+        type: props.type ?? defaultItemType,
+    };
+
+    const { type } = res;
+    const checkboxAvail = res.selectable && state.multiple;
+    if (
+        !checkboxAvail
+        && (type === 'checkbox' || type === 'checkbox-link')
+    ) {
+        res.type = (type === 'checkbox') ? 'button' : 'link';
+    }
+
+    return res;
+};

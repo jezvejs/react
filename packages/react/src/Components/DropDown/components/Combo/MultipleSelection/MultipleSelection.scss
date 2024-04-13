@@ -1,0 +1,7 @@
+/* Multiple selection container */
+.dd__selection {
+  --tags-background: var(--dd-multi-selection-bg);
+  --tags-padding: var(--dd-selection-items-gap);
+  --tags-items-gap: var(--dd-selection-items-gap);
+  --tags-disabled-background: var(--dd-disabled-bg);
+}

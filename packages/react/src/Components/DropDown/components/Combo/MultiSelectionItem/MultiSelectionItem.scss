@@ -1,0 +1,25 @@
+/* Multiple selection item */
+.dd__selection-item {
+  --tag-padding: var(--dd-selection-item-padding);
+  --tag-height: var(--dd-selection-item-height);
+  --tag-text-color: var(--dd-selection-item-text);
+  --tag-background-color: var(--dd-selection-item-bg);
+  --tag-border-radius: var(--dd-selection-item-border-radius);
+  --tag-close-btn-color: var(--dd-selection-item-btn);
+  --tag-close-btn-size: 12px;
+
+  /* Hover state */
+  --tag-hover-text-color: var(--dd-selection-item-hover-text);
+  --tag-hover-background-color: var(--dd-selection-item-hover-bg);
+  --tag-hover-close-btn-color: var(--dd-selection-item-hover-btn);
+  --tag-close-btn-hover-color: var(--dd-selection-item-btn-hover);
+
+  /* Active state */
+  --tag-active-text-color: var(--dd-selection-item-active-text);
+  --tag-active-background-color: var(--dd-selection-item-active-bg);
+  --tag-active-close-btn-color: var(--dd-selection-item-active-btn);
+
+  /* Disabled state */
+  --tag-disabled-text-color: var(--dd-disabled-selection-item-text);
+  --tag-disabled-background-color: var(--dd-disabled-selection-item-bg);
+}

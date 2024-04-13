@@ -14,20 +14,7 @@ import { MenuGroupHeader } from './components/GroupHeader/MenuGroupHeader.jsx';
 import { MenuGroupItem } from './components/GroupItem/MenuGroupItem.jsx';
 import { MenuItem } from './components/ListItem/MenuItem.jsx';
 
-import {
-    findLastMenuItem,
-    findMenuItem,
-    forItems,
-    getActiveItem,
-    getClosestItemElement,
-    getItemById,
-    getNextItem,
-    getPreviousItem,
-    isAvailableItem,
-    isCheckbox,
-    mapItems,
-    toggleSelectItem,
-} from './helpers.js';
+import * as MenuHelpers from './helpers.js';
 import './Menu.scss';
 
 export {
@@ -37,9 +24,11 @@ export {
     MenuCheckbox,
     MenuGroupHeader,
     MenuGroupItem,
+    // utils
+    MenuHelpers,
 };
 
-export const MenuHelpers = {
+const {
     findLastMenuItem,
     findMenuItem,
     forItems,
@@ -50,9 +39,8 @@ export const MenuHelpers = {
     getPreviousItem,
     isAvailableItem,
     isCheckbox,
-    mapItems,
     toggleSelectItem,
-};
+} = MenuHelpers;
 
 /**
  * Menu component
@@ -405,6 +393,7 @@ Menu.propTypes = {
     onItemClick: PropTypes.func,
     isAvailableItem: PropTypes.func,
     onGroupHeaderClick: PropTypes.func,
+    onItemActivate: PropTypes.func,
     allowActiveGroupHeader: PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,

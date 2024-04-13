@@ -1,0 +1,77 @@
+/* Menu container */
+.menu.dd__list {
+  --menu-border-color: var(--dd-border-color);
+  --menu-border-width: var(--dd-border-width);
+  --menu-border-style: solid;
+  --menu-border-radius: var(--dd-list-border-radius);
+  --menu-background: var(--dd-bg-color);
+
+  /* Menu item */
+  --menu-item-font-size: var(--dd-list-item-font-size);
+  --menu-item-padding: var(--dd-list-item-padding);
+  --menu-item-text-color: var(--dd-list-item-text);
+  --menu-item-background: var(--dd-list-item-bg);
+  --menu-checkbox-icon-color: var(--dd-list-item-check);
+  --menu-item-border-width: 0;
+  --menu-item-line-height: var(--dd-list-item-line-height);
+
+  /* Hovered menu item */
+  --menu-item-hover-text-color: var(--dd-active-list-item-text);
+  --menu-item-hover-background: var(--dd-active-list-item-bg);
+  --menu-item-hover-checkbox-icon-color: var(--dd-active-list-item-check);
+
+  /* Focused menu item */
+  --menu-item-focus-text-color: var(--dd-active-list-item-text);
+  --menu-item-focus-background: var(--dd-active-list-item-bg);
+  --menu-item-focus-checkbox-icon-color: var(--dd-active-list-item-check);
+
+  /* Active menu item */
+  --menu-item-active-text-color: var(--dd-list-item-text);
+  --menu-item-active-background: var(--dd-list-item-bg);
+  --menu-item-active-checkbox-icon-color: var(--dd-list-item-check);
+
+  /* Selected item */
+  --menu-item-selected-checkbox-icon-color: var(--dd-list-item-check);
+
+  /* Disabled item */
+  --menu-item-disabled-text-color: var(--dd-disabled-list-item-text);
+  --menu-item-disabled-background: var(--dd-disabled-list-item-bg);
+
+  position: absolute;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  display: none;
+  box-sizing: border-box;
+  max-width: 100vw;
+  max-height: var(--dd-max-list-height);
+  z-index: var(--dd-list-z-index);
+  overflow: hidden;
+
+  .menu-list {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    list-style-image: none;
+    list-style-type: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: var(--dd-list-item-bg);
+  }
+}
+
+/* Fixed menu */
+.dd__list.dd__list_fixed {
+  position: fixed;
+}
+
+/* Opened state */
+.dd__open .dd__list,
+.dd__list.dd__list_open {
+  display: flex;
+}
+
+/* Active component */
+.dd__container_active .dd__list,
+.dd__list.dd__list_active {
+  border-color: var(--dd-active-border);
+}

@@ -1,0 +1,12 @@
+/* List group */
+.menu-group.dd__list-group {
+  --menu-group-padding: 0;
+
+  border-width: 0;
+  border-style: none;
+  cursor: pointer;
+
+  .menu-list {
+    padding: 0 0 0 var(--dd-list-group-padding);
+  }
+}
