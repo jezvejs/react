@@ -152,13 +152,18 @@ export const DropDown = forwardRef((props, ref) => {
             return;
         }
 
+        const validTarget = isValidToggleTarget(e.target);
+
         if (
             state.waitForScroll
             || isMenuTarget(e.target)
             || isClearButtonTarget(e.target)
             || isSelectionItemDeleteButtonTarget(e.target)
-            || !isValidToggleTarget(e.target)
+            || !validTarget
         ) {
+            if (!validTarget) {
+                e.stopPropagation();
+            }
             return;
         }
 
@@ -332,7 +337,7 @@ export const DropDown = forwardRef((props, ref) => {
             data-value={selectedIds}
             ref={innerRef}
         >
-            <div ref={referenceRef} onClick={onToggle} >
+            <div ref={referenceRef} >
                 {attachedTo}
             </div>
             {comboBox}

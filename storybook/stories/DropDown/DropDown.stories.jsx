@@ -3,6 +3,8 @@ import '@jezvejs/react/style';
 import { DropDown } from '@jezvejs/react';
 import { useMemo } from 'react';
 
+import { BlueBox } from './components/BlueBox/BlueBox.jsx';
+
 import './DropDown.stories.scss';
 
 const heightDecorator = (Story) => (
@@ -134,4 +136,24 @@ export const Groups = {
         items: groupsItems(),
     },
     decorators: [heightDecorator],
+};
+
+export const AttachToBlock = {
+    args: {
+        listAttach: true,
+        isValidToggleTarget: (elem) => !elem.closest('.close-btn'),
+        items: initItems('Long Item Lorem Lorem', 10),
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        return (
+            <DropDown {...args} container={portalElement}>
+                <BlueBox id="box" />
+            </DropDown>
+        );
+    },
 };
