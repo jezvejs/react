@@ -1,6 +1,5 @@
 import { isFunction } from '@jezvejs/types';
 import PropTypes from 'prop-types';
-import { useId } from 'react';
 import { MenuHelpers } from '../Menu/Menu.jsx';
 import { getSelectedItems } from './utils.js';
 
@@ -35,7 +34,7 @@ export const getAvailableItems = (state) => {
     return MenuHelpers.toFlatList(state.items, options).filter(filterCallback);
 };
 
-export const useInitialState = (props, defaultProps) => {
+export const getInitialState = (props, defaultProps) => {
     const res = {
         ...(defaultProps ?? {}),
         ...props,
@@ -46,7 +45,7 @@ export const useInitialState = (props, defaultProps) => {
         filtered: false,
         items: [],
         actSelItemIndex: -1,
-        menuId: useId(),
+        menuId: MenuHelpers.generateItemId([]),
         isTouch: false,
         listeningWindow: false,
         waitForScroll: false,
@@ -66,7 +65,7 @@ export const useInitialState = (props, defaultProps) => {
     ));
 
     const [selectedItem] = getSelectedItems(res);
-    if (!selectedItem) {
+    if (!selectedItem && !res.multiple) {
         const itemToSelect = MenuHelpers.toFlatList(res.items).find((item) => (
             isAvailableItem(item, res)
         ));

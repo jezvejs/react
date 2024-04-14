@@ -1,11 +1,11 @@
 import { removeEvents, setEvents } from '@jezvejs/dom';
 import { isFunction } from '@jezvejs/types';
 import {
-    useState,
     useRef,
     useEffect,
     forwardRef,
     useImperativeHandle,
+    useReducer,
 } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
@@ -39,10 +39,14 @@ import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListP
 
 import {
     isEditable,
-    useInitialState,
+    getInitialState,
     componentPropType,
 } from './helpers.js';
 import { getSelectedItems } from './utils.js';
+import {
+    actions,
+    reducer,
+} from './reducer.js';
 import './DropDown.scss';
 
 export {
@@ -71,7 +75,11 @@ export {
  */
 // eslint-disable-next-line react/display-name
 export const DropDown = forwardRef((props, ref) => {
-    const [state, setState] = useState(useInitialState(props, DropDown.defaultProps));
+    const [state, dispatch] = useReducer(
+        reducer,
+        props,
+        (initialArg) => getInitialState(initialArg, DropDown.defaultProps),
+    );
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -98,12 +106,7 @@ export const DropDown = forwardRef((props, ref) => {
         }),
 
         open: state.visible,
-        onScrollDone: () => {
-            setState((prev) => ({
-                ...prev,
-                listeningWindow: true,
-            }));
-        },
+        onScrollDone: () => dispatch(actions.startWindowListening()),
     });
 
     /** Returns true if element is list or its child */
@@ -132,12 +135,36 @@ export const DropDown = forwardRef((props, ref) => {
         || props.isValidToggleTarget(target)
     );
 
-    const toggleMenu = () => {
-        setState((prev) => ({ ...prev, visible: !prev.visible }));
+    /** Toggle item selected status */
+    const toggleItem = (item) => {
+        if (!item) {
+            return;
+        }
+
+        const strId = item.id?.toString();
+
+        if (item.selected && state.multiple) {
+            dispatch(actions.deselectItem(strId));
+        } else {
+            dispatch(actions.selectItem(strId));
+        }
     };
 
+    /** Handles user item select event */
+    const handleItemSelect = (item) => {
+        if (!item || item.disabled) {
+            return;
+        }
+
+        toggleItem(item);
+    };
+
+    const toggleMenu = () => dispatch(actions.toggleShowMenu());
+
     const closeMenu = () => {
-        setState((prev) => ({ ...prev, visible: false }));
+        if (state.visible) {
+            toggleMenu();
+        }
     };
 
     const focusInputIfNeeded = () => {
@@ -145,10 +172,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     const onClick = (e) => {
         if (e.type === 'touchstart') {
-            setState((prev) => ({
-                ...prev,
-                isTouch: true,
-            }));
+            dispatch(actions.confirmTouch());
             return;
         }
 
@@ -185,16 +209,7 @@ export const DropDown = forwardRef((props, ref) => {
     };
 
     const onItemClick = (target) => {
-        const itemId = target.id;
-
-        setState((prev) => ({
-            ...prev,
-            items: MenuHelpers.mapItems(prev.items, (item) => (
-                (item.selected !== (item.id === itemId))
-                    ? { ...item, selected: item.id === itemId }
-                    : item
-            )),
-        }));
+        handleItemSelect(target);
 
         closeMenu();
     };
@@ -237,10 +252,7 @@ export const DropDown = forwardRef((props, ref) => {
             return;
         }
 
-        setState((prev) => ({
-            ...prev,
-            listeningWindow: false,
-        }));
+        dispatch(actions.stopWindowListening());
 
         removeEvents(window.visualViewport, viewportEvents);
         removeEvents(window, windowEvents);
@@ -314,7 +326,7 @@ export const DropDown = forwardRef((props, ref) => {
     let tabIndex = null;
     let selectTabIndex = null;
     if (!state.disabled) {
-        const nativeSelectVisible = false; //isVisible(this.selectElem, true);
+        const nativeSelectVisible = false; // isVisible(this.selectElem, true);
 
         selectTabIndex = (nativeSelectVisible) ? 0 : -1;
 

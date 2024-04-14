@@ -19,6 +19,12 @@ const fixedDecorator = (Story) => (
     </div>
 );
 
+const textDecorator = (Story) => (
+    <div className="text-container">
+        <Story />
+    </div>
+);
+
 const initItems = (title = 'Item', count = 10, startFrom = 1) => {
     const res = [];
 
@@ -164,7 +170,7 @@ export const AttachToInline = {
         listAttach: true,
         items: initItems('Long Item Lorem Lorem', 10),
     },
-    decorators: [heightDecorator],
+    decorators: [textDecorator],
     render: function Render(args) {
         const portalElement = useMemo(() => (
             document.getElementById('custom-root')
@@ -172,12 +178,53 @@ export const AttachToInline = {
 
         return (
             <>
-                <>Lorem ipsum dolor sit, amet consectetur&nbsp;</>
+                <span>Lorem ipsum dolor sit, amet consectetur&nbsp;</span>
                 <DropDown {...args} container={portalElement}>
                     <span id="inlineTarget" className="link-inline">click</span>
                 </DropDown>
-                <>&nbsp;adipisicing elit. Aut consequatur iure repellat</>
+                <span>&nbsp;adipisicing elit. Aut consequatur iure repellat</span>
             </>
         );
     },
+};
+
+export const Clipping = {
+    args: {
+    },
+    decorators: [textDecorator],
+    render: function Render() {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        const args1 = {
+            static: true,
+            items: initItems(),
+        };
+        const args2 = {
+            items: initItems(),
+        };
+
+        return (
+            <div className='offset-parent'>
+                <div className='clipper'>
+                    <DropDown {...args1} container={portalElement} />
+                    <DropDown {...args2} container={portalElement} />
+                </div>
+            </div>
+        );
+    },
+};
+
+export const MultipleSelect = {
+    args: {
+        className: 'dd_stretch',
+        placeholder: 'Multi select control',
+        multiple: true,
+        items: initItems('Multi select', 10).map((item) => ({
+            ...item,
+            disabled: (item.id === '3'),
+        })),
+    },
+    decorators: [textDecorator],
 };
