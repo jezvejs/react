@@ -39,6 +39,12 @@ export function usePopupPosition(options = {}) {
         });
     };
 
+    const updatePosition = () => {
+        if (position.current) {
+            position.current.updatePosition();
+        }
+    };
+
     const resetPosition = () => {
         position.current?.reset();
         position.current = null;
@@ -59,5 +65,6 @@ export function usePopupPosition(options = {}) {
         elementRef,
         elem,
         reference,
+        updatePosition,
     };
 }
