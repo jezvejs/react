@@ -144,6 +144,10 @@ export const Groups = {
     decorators: [heightDecorator],
 };
 
+/**
+ * Attach drop down menu to the block element.
+ * Click on close button should have no effect on menu popup.
+ */
 export const AttachToBlock = {
     args: {
         listAttach: true,
