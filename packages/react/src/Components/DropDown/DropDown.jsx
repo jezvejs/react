@@ -157,7 +157,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     /**
      * Send current selection data to 'change' event handler
-     * 'change' event occurs after user finnished selection of item(s) and list was hidden
+     * 'change' event occurs after user finnished selection of item(s) and menu was hidden
      */
     const sendChangeEvent = () => {
         if (!state.changed) {
@@ -174,6 +174,25 @@ export const DropDown = forwardRef((props, ref) => {
 
     /** Sets changed flag */
     const setChanged = () => dispatch(actions.setChanged());
+
+    /** Shows or hides drop down menu */
+    const showMenu = (val) => dispatch(actions.showMenu(val));
+
+    /** Toggle shows/hides menu */
+    const toggleMenu = () => dispatch(actions.toggleShowMenu());
+
+    /** Hides menu if visible and send 'change' event */
+    const closeMenu = () => {
+        showMenu(false);
+        sendChangeEvent();
+    };
+
+    /** Creates new item and add it to the list */
+    const addItem = (item) => dispatch(actions.addItem(item));
+
+    const removeCreatableMenuItem = () => (
+        dispatch(actions.removeCreatableMenuItem())
+    );
 
     /** Toggle item selected status */
     const toggleItem = (item) => {
@@ -195,17 +214,7 @@ export const DropDown = forwardRef((props, ref) => {
         dispatch(actions.showAllItems(resetInput));
     };
 
-    /** Show or hide drop down list */
-    const showList = (val) => {
-        if (state.visible === val) {
-            return;
-        }
-
-        dispatch(actions.toggleShowMenu());
-
-        if (!val) {
-            sendChangeEvent();
-        }
+    const focusInputIfNeeded = () => {
     };
 
     /** Activate specified selected item */
@@ -249,6 +258,33 @@ export const DropDown = forwardRef((props, ref) => {
         activateSelectedItem(selectedItems.length - 1);
     };
 
+    const handlePlaceholderSelect = () => {
+        const { allowCreate, inputString } = this.state;
+
+        if (
+            !allowCreate
+            || !(inputString?.length > 0)
+        ) {
+            return;
+        }
+
+        removeCreatableMenuItem();
+        addItem({
+            id: MenuHelpers.generateItemId(state?.items ?? [], 'item'),
+            title: inputString,
+            selected: true,
+        });
+
+        activateSelectedItem(-1);
+        sendItemSelectEvent();
+        setChanged();
+
+        closeMenu();
+        if (props.enableFilter && state.filtered) {
+            showAllItems();
+        }
+    };
+
     /** Handles user item select event */
     const handleItemSelect = (item) => {
         if (!item || item.disabled) {
@@ -256,6 +292,7 @@ export const DropDown = forwardRef((props, ref) => {
         }
 
         if (item.id === state.createFromInputItemId) {
+            handlePlaceholderSelect();
             return;
         }
 
@@ -265,7 +302,7 @@ export const DropDown = forwardRef((props, ref) => {
         setChanged();
 
         if (!state.multiple) {
-            showList(false);
+            closeMenu();
             if (props.enableFilter && state.filtered) {
                 showAllItems();
             }
@@ -284,17 +321,6 @@ export const DropDown = forwardRef((props, ref) => {
 
             setTimeout(() => focusInputIfNeeded());
         }
-    };
-
-    const toggleMenu = () => dispatch(actions.toggleShowMenu());
-
-    const closeMenu = () => {
-        if (state.visible) {
-            toggleMenu();
-        }
-    };
-
-    const focusInputIfNeeded = () => {
     };
 
     const onClick = (e) => {
@@ -337,11 +363,10 @@ export const DropDown = forwardRef((props, ref) => {
 
     const onItemClick = (target) => {
         handleItemSelect(target);
-
-        closeMenu();
     };
 
     const onKey = () => {
+        activateLastSelectedItem();
     };
 
     const onInput = () => {

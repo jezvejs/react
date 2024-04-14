@@ -207,6 +207,22 @@ const slice = createSlice({
         ),
     }),
 
+    showMenu: (state, visible) => (
+        (state.visible === visible)
+            ? state
+            : {
+                ...state,
+                visible,
+                inputString: (visible) ? state.inputString : null,
+                active: (visible) ? true : state.active,
+                items: (
+                    (visible)
+                        ? state.items
+                        : deactivateAllItems(state.items)
+                ),
+            }
+    ),
+
     toggleEnable: (state) => ({
         ...state,
         disabled: !state.disabled,
