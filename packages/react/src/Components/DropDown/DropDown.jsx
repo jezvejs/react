@@ -91,6 +91,7 @@ export const DropDown = forwardRef((props, ref) => {
         elementRef,
         elem,
         reference,
+        updatePosition,
     } = usePopupPosition({
         ...state.position,
 
@@ -421,6 +422,12 @@ export const DropDown = forwardRef((props, ref) => {
             stopWindowEvents();
         };
     }, [state.visible, state.listeningWindow]);
+
+    useEffect(() => {
+        if (state.visible) {
+            updatePosition();
+        }
+    }, [state.visible, state.items]);
 
     useEmptyClick(closeMenu, [elem, reference], state.visible);
 
