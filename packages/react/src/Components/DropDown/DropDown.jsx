@@ -42,7 +42,7 @@ import {
     getInitialState,
     componentPropType,
 } from './helpers.js';
-import { getSelectedItems } from './utils.js';
+import { getSelectedItems, getVisibleItems } from './utils.js';
 import {
     actions,
     reducer,
@@ -135,6 +135,46 @@ export const DropDown = forwardRef((props, ref) => {
         || props.isValidToggleTarget(target)
     );
 
+    /** Return selected items data for 'itemselect' and 'change' events */
+    const getSelectionData = () => {
+        const selectedItems = getSelectedItems(state)
+            .map((item) => ({ id: item.id, value: item.title }));
+
+        if (state.multiple) {
+            return selectedItems;
+        }
+
+        return (selectedItems.length > 0) ? selectedItems[0] : null;
+    };
+
+    /** Send current selection data to 'itemselect' event handler */
+    const sendItemSelectEvent = () => {
+        if (isFunction(props.onItemSelect)) {
+            const data = getSelectionData();
+            props.onItemSelect(data);
+        }
+    };
+
+    /**
+     * Send current selection data to 'change' event handler
+     * 'change' event occurs after user finnished selection of item(s) and list was hidden
+     */
+    const sendChangeEvent = () => {
+        if (!state.changed) {
+            return;
+        }
+
+        if (isFunction(props.onChange)) {
+            const data = getSelectionData();
+            props.onChange(data);
+        }
+
+        dispatch(actions.changeEventSent());
+    };
+
+    /** Sets changed flag */
+    const setChanged = () => dispatch(actions.setChanged());
+
     /** Toggle item selected status */
     const toggleItem = (item) => {
         if (!item) {
@@ -150,13 +190,100 @@ export const DropDown = forwardRef((props, ref) => {
         }
     };
 
+    /** Show all list items */
+    const showAllItems = (resetInput = true) => {
+        dispatch(actions.showAllItems(resetInput));
+    };
+
+    /** Show or hide drop down list */
+    const showList = (val) => {
+        if (state.visible === val) {
+            return;
+        }
+
+        dispatch(actions.toggleShowMenu());
+
+        if (!val) {
+            sendChangeEvent();
+        }
+    };
+
+    /** Activate specified selected item */
+    const activateSelectedItem = (index) => {
+        if (
+            state.disabled
+            || !state.multiple
+            || (state.actSelItemIndex === index)
+        ) {
+            return;
+        }
+
+        // Check correctness of index
+        if (index !== -1) {
+            const selectedItems = getSelectedItems(state);
+            if (index < 0 || index >= selectedItems.length) {
+                return;
+            }
+        }
+
+        dispatch(actions.activateSelectionItem(index));
+
+        if (state.actSelItemIndex === -1) {
+            setTimeout(() => {
+                if (props.enableFilter) {
+                    focusInputIfNeeded();
+                } else {
+                    elem?.current?.focus();
+                }
+            });
+        }
+    };
+
+    /** Activate last(right) selected item */
+    const activateLastSelectedItem = () => {
+        const selectedItems = getSelectedItems(state);
+        if (!selectedItems.length) {
+            return;
+        }
+
+        activateSelectedItem(selectedItems.length - 1);
+    };
+
     /** Handles user item select event */
     const handleItemSelect = (item) => {
         if (!item || item.disabled) {
             return;
         }
 
+        if (item.id === state.createFromInputItemId) {
+            return;
+        }
+
+        activateSelectedItem(-1);
         toggleItem(item);
+        sendItemSelectEvent();
+        setChanged();
+
+        if (!state.multiple) {
+            showList(false);
+            if (props.enableFilter && state.filtered) {
+                showAllItems();
+            }
+
+            elem.current?.focus();
+        } else if (props.enableFilter) {
+            if (state.filtered) {
+                const visibleItems = getVisibleItems();
+                if (
+                    props.clearFilterOnMultiSelect
+                    || visibleItems.length === 1
+                ) {
+                    showAllItems();
+                }
+            }
+
+            setTimeout(() => focusInputIfNeeded());
+        }
     };
 
     const toggleMenu = () => dispatch(actions.toggleShowMenu());
