@@ -131,11 +131,4 @@ MenuList.propTypes = {
 
 MenuList.defaultProps = {
     items: [],
-    /*
-    components: {
-        ListItem: null,
-        GroupHeader: null,
-        GroupItem: null,
-    },
-    */
 };
