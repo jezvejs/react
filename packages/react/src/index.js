@@ -1,5 +1,6 @@
 // Common
 export * from './utils/common.js';
+export * from './utils/createSlice.js';
 
 // Components
 export { Button } from './Components/Button/Button.jsx';

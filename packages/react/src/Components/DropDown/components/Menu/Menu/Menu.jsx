@@ -12,17 +12,22 @@ import './Menu.scss';
  */
 // eslint-disable-next-line react/display-name
 export const DropDownMenu = forwardRef((props, ref) => {
+    const { multiple, filtered } = props;
+    const defaultItemType = (multiple) ? 'checkbox' : 'button';
+
     const items = props.items.map((item) => ({
         ...item,
-        multiple: props.multiple,
-        filtered: props.filtered,
-        hidden: item.hidden || (props.filtered && !item.matchFilter),
+        type: (item.type !== 'group') ? defaultItemType : item.type,
+        multiple,
+        filtered,
+        hidden: item.hidden || (filtered && !item.matchFilter),
     }));
 
     return (
         <Menu
             {...props}
             ref={ref}
+            defaultItemType={defaultItemType}
             className={classNames('dd__list', props.className)}
             items={items}
             data-parent={props.parentId}

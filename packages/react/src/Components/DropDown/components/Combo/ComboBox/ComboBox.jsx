@@ -60,8 +60,8 @@ export const DropDownComboBox = forwardRef((props, ref) => {
             <MultipleSelection
                 ItemComponent={MultiSelectionItem}
                 items={selectedItems}
-                activeItemId={activeItem?.id ?? 0}
-                disabled
+                activeItemId={activeItem?.id ?? '0'}
+                disabled={disabled}
                 closeable
                 onCloseItem={onDeleteSelectedItem}
             />

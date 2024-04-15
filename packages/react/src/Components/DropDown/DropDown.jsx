@@ -1,11 +1,11 @@
 import { removeEvents, setEvents } from '@jezvejs/dom';
 import { isFunction } from '@jezvejs/types';
 import {
-    useState,
     useRef,
     useEffect,
     forwardRef,
     useImperativeHandle,
+    useReducer,
 } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
@@ -39,10 +39,14 @@ import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListP
 
 import {
     isEditable,
-    useInitialState,
+    getInitialState,
     componentPropType,
 } from './helpers.js';
-import { getSelectedItems } from './utils.js';
+import { getSelectedItems, getVisibleItems } from './utils.js';
+import {
+    actions,
+    reducer,
+} from './reducer.js';
 import './DropDown.scss';
 
 export {
@@ -71,7 +75,11 @@ export {
  */
 // eslint-disable-next-line react/display-name
 export const DropDown = forwardRef((props, ref) => {
-    const [state, setState] = useState(useInitialState(props, DropDown.defaultProps));
+    const [state, dispatch] = useReducer(
+        reducer,
+        props,
+        (initialArg) => getInitialState(initialArg, DropDown.defaultProps),
+    );
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -83,6 +91,7 @@ export const DropDown = forwardRef((props, ref) => {
         elementRef,
         elem,
         reference,
+        updatePosition,
     } = usePopupPosition({
         ...state.position,
 
@@ -98,12 +107,7 @@ export const DropDown = forwardRef((props, ref) => {
         }),
 
         open: state.visible,
-        onScrollDone: () => {
-            setState((prev) => ({
-                ...prev,
-                listeningWindow: true,
-            }));
-        },
+        onScrollDone: () => dispatch(actions.startWindowListening()),
     });
 
     /** Returns true if element is list or its child */
@@ -132,33 +136,212 @@ export const DropDown = forwardRef((props, ref) => {
         || props.isValidToggleTarget(target)
     );
 
-    const toggleMenu = () => {
-        setState((prev) => ({ ...prev, visible: !prev.visible }));
+    /** Return selected items data for 'itemselect' and 'change' events */
+    const getSelectionData = () => {
+        const selectedItems = getSelectedItems(state)
+            .map((item) => ({ id: item.id, value: item.title }));
+
+        if (state.multiple) {
+            return selectedItems;
+        }
+
+        return (selectedItems.length > 0) ? selectedItems[0] : null;
     };
 
+    /** Send current selection data to 'itemselect' event handler */
+    const sendItemSelectEvent = () => {
+        if (isFunction(props.onItemSelect)) {
+            const data = getSelectionData();
+            props.onItemSelect(data);
+        }
+    };
+
+    /**
+     * Send current selection data to 'change' event handler
+     * 'change' event occurs after user finnished selection of item(s) and menu was hidden
+     */
+    const sendChangeEvent = () => {
+        if (!state.changed) {
+            return;
+        }
+
+        if (isFunction(props.onChange)) {
+            const data = getSelectionData();
+            props.onChange(data);
+        }
+
+        dispatch(actions.changeEventSent());
+    };
+
+    /** Sets changed flag */
+    const setChanged = () => dispatch(actions.setChanged());
+
+    /** Shows or hides drop down menu */
+    const showMenu = (val) => dispatch(actions.showMenu(val));
+
+    /** Toggle shows/hides menu */
+    const toggleMenu = () => dispatch(actions.toggleShowMenu());
+
+    /** Hides menu if visible and send 'change' event */
     const closeMenu = () => {
-        setState((prev) => ({ ...prev, visible: false }));
+        showMenu(false);
+        sendChangeEvent();
+    };
+
+    /** Creates new item and add it to the list */
+    const addItem = (item) => dispatch(actions.addItem(item));
+
+    const removeCreatableMenuItem = () => (
+        dispatch(actions.removeCreatableMenuItem())
+    );
+
+    /** Toggle item selected status */
+    const toggleItem = (item) => {
+        if (!item) {
+            return;
+        }
+
+        const strId = item.id?.toString();
+
+        if (item.selected && state.multiple) {
+            dispatch(actions.deselectItem(strId));
+        } else {
+            dispatch(actions.selectItem(strId));
+        }
+    };
+
+    /** Show all list items */
+    const showAllItems = (resetInput = true) => {
+        dispatch(actions.showAllItems(resetInput));
     };
 
     const focusInputIfNeeded = () => {
     };
 
-    const onClick = (e) => {
-        if (e.type === 'touchstart') {
-            setState((prev) => ({
-                ...prev,
-                isTouch: true,
-            }));
+    /** Activate specified selected item */
+    const activateSelectedItem = (index) => {
+        if (
+            state.disabled
+            || !state.multiple
+            || (state.actSelItemIndex === index)
+        ) {
             return;
         }
+
+        // Check correctness of index
+        if (index !== -1) {
+            const selectedItems = getSelectedItems(state);
+            if (index < 0 || index >= selectedItems.length) {
+                return;
+            }
+        }
+
+        dispatch(actions.activateSelectionItem(index));
+
+        if (state.actSelItemIndex === -1) {
+            setTimeout(() => {
+                if (props.enableFilter) {
+                    focusInputIfNeeded();
+                } else {
+                    elem?.current?.focus();
+                }
+            });
+        }
+    };
+
+    /** Activate last(right) selected item */
+    const activateLastSelectedItem = () => {
+        const selectedItems = getSelectedItems(state);
+        if (!selectedItems.length) {
+            return;
+        }
+
+        activateSelectedItem(selectedItems.length - 1);
+    };
+
+    const handlePlaceholderSelect = () => {
+        const { allowCreate, inputString } = this.state;
+
+        if (
+            !allowCreate
+            || !(inputString?.length > 0)
+        ) {
+            return;
+        }
+
+        removeCreatableMenuItem();
+        addItem({
+            id: MenuHelpers.generateItemId(state?.items ?? [], 'item'),
+            title: inputString,
+            selected: true,
+        });
+
+        activateSelectedItem(-1);
+        sendItemSelectEvent();
+        setChanged();
+
+        closeMenu();
+        if (props.enableFilter && state.filtered) {
+            showAllItems();
+        }
+    };
+
+    /** Handles user item select event */
+    const handleItemSelect = (item) => {
+        if (!item || item.disabled) {
+            return;
+        }
+
+        if (item.id === state.createFromInputItemId) {
+            handlePlaceholderSelect();
+            return;
+        }
+
+        activateSelectedItem(-1);
+        toggleItem(item);
+        sendItemSelectEvent();
+        setChanged();
+
+        if (!state.multiple) {
+            closeMenu();
+            if (props.enableFilter && state.filtered) {
+                showAllItems();
+            }
+
+            elem.current?.focus();
+        } else if (props.enableFilter) {
+            if (state.filtered) {
+                const visibleItems = getVisibleItems();
+                if (
+                    props.clearFilterOnMultiSelect
+                    || visibleItems.length === 1
+                ) {
+                    showAllItems();
+                }
+            }
+
+            setTimeout(() => focusInputIfNeeded());
+        }
+    };
+
+    const onClick = (e) => {
+        if (e.type === 'touchstart') {
+            dispatch(actions.confirmTouch());
+            return;
+        }
+
+        const validTarget = isValidToggleTarget(e.target);
 
         if (
             state.waitForScroll
             || isMenuTarget(e.target)
             || isClearButtonTarget(e.target)
             || isSelectionItemDeleteButtonTarget(e.target)
-            || !isValidToggleTarget(e.target)
+            || !validTarget
         ) {
+            if (!validTarget) {
+                e.stopPropagation();
+            }
             return;
         }
 
@@ -180,21 +363,11 @@ export const DropDown = forwardRef((props, ref) => {
     };
 
     const onItemClick = (target) => {
-        const itemId = target.id;
-
-        setState((prev) => ({
-            ...prev,
-            items: MenuHelpers.mapItems(prev.items, (item) => (
-                (item.selected !== (item.id === itemId))
-                    ? { ...item, selected: item.id === itemId }
-                    : item
-            )),
-        }));
-
-        closeMenu();
+        handleItemSelect(target);
     };
 
     const onKey = () => {
+        activateLastSelectedItem();
     };
 
     const onInput = () => {
@@ -232,10 +405,7 @@ export const DropDown = forwardRef((props, ref) => {
             return;
         }
 
-        setState((prev) => ({
-            ...prev,
-            listeningWindow: false,
-        }));
+        dispatch(actions.stopWindowListening());
 
         removeEvents(window.visualViewport, viewportEvents);
         removeEvents(window, windowEvents);
@@ -253,15 +423,22 @@ export const DropDown = forwardRef((props, ref) => {
         };
     }, [state.visible, state.listeningWindow]);
 
+    useEffect(() => {
+        if (state.visible) {
+            updatePosition();
+        }
+    }, [state.visible, state.items]);
+
     useEmptyClick(closeMenu, [elem, reference], state.visible);
 
     const { Menu, ComboBox } = state.components;
 
     const attachedTo = props.listAttach && props.children;
+    const editable = isEditable(state);
 
     const comboBoxProps = {
         ...state,
-        editable: isEditable(state),
+        editable,
         items: MenuHelpers.toFlatList(state.items),
         onInput,
         onToggle,
@@ -283,7 +460,7 @@ export const DropDown = forwardRef((props, ref) => {
             dd__list_fixed: !!state.fixedMenu,
             dd__list_open: !!state.fixedMenu && !!state.visible,
         }),
-        editable: isEditable(state),
+        editable,
         onItemClick,
         onInput,
         onDeleteSelectedItem,
@@ -300,12 +477,28 @@ export const DropDown = forwardRef((props, ref) => {
         />
     );
 
-    const select = null;
-
     const container = props.container ?? document.body;
 
     const selected = getSelectedItems(state);
     const selectedIds = selected.map((item) => item.id).join();
+
+    let tabIndex = null;
+    let selectTabIndex = null;
+    if (!state.disabled) {
+        const nativeSelectVisible = false; // isVisible(this.selectElem, true);
+
+        selectTabIndex = (nativeSelectVisible) ? 0 : -1;
+
+        const disableContainerTab = (
+            nativeSelectVisible
+            || (editable && !props.listAttach)
+            || state.active
+        );
+
+        tabIndex = (disableContainerTab) ? -1 : 0;
+    }
+
+    const select = (<select tabIndex={selectTabIndex}></select>);
 
     return (
         <div
@@ -323,7 +516,7 @@ export const DropDown = forwardRef((props, ref) => {
                 },
                 props.className,
             )}
-            tabIndex={-1}
+            tabIndex={tabIndex}
             onClickCapture={onClick}
             onFocusCapture={onFocus}
             onBlurCapture={onBlur}
@@ -332,7 +525,7 @@ export const DropDown = forwardRef((props, ref) => {
             data-value={selectedIds}
             ref={innerRef}
         >
-            <div ref={referenceRef} onClick={onToggle} >
+            <div ref={referenceRef} >
                 {attachedTo}
             </div>
             {comboBox}
