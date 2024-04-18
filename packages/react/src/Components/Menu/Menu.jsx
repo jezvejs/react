@@ -361,11 +361,18 @@ export const Menu = forwardRef((props, ref) => {
     const menuList = List && <List {...listProps} components={state.components} />;
     const menuFooter = Footer && <Footer {...(state.footer ?? {})} components={state.components} />;
 
+    const { disabled } = state;
+    let tabIndex = (state.tabThrough) ? -1 : (state.tabIndex ?? null);
+    if (disabled) {
+        tabIndex = null;
+    }
+
     return (
         <div
             id={props.id}
             className={classNames('menu', className)}
-            tabIndex={-1}
+            disabled={disabled}
+            tabIndex={tabIndex}
             onFocusCapture={handleFocus}
             onBlurCapture={handleBlur}
             onTouchStartCapture={handleTouchStart}
@@ -386,6 +393,9 @@ Menu.propTypes = {
     defaultItemType: PropTypes.string,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
+    disabled: PropTypes.bool,
+    tabThrough: PropTypes.bool,
+    tabIndex: PropTypes.number,
     loopNavigation: PropTypes.bool,
     preventNavigation: PropTypes.bool,
     header: PropTypes.object,
@@ -422,6 +432,9 @@ Menu.defaultProps = {
     defaultItemType: 'button',
     iconAlign: 'left',
     checkboxSide: 'left',
+    disabled: false,
+    tabThrough: true,
+    tabIndex: 0,
     loopNavigation: true,
     preventNavigation: false,
     header: null,
