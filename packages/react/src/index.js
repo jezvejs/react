@@ -28,6 +28,7 @@ export { Tag } from './Components/Tag/Tag.jsx';
 export * from './Components/Tags/Tags.jsx';
 
 // Hooks
+export { useDebounce } from './hooks/useDebounce/useDebounce.js';
 export { useEmptyClick } from './hooks/useEmptyClick/useEmptyClick.js';
 export { PopupPosition } from './hooks/usePopupPosition/PopupPosition.js';
 export { usePopupPosition } from './hooks/usePopupPosition/usePopupPosition.js';
