@@ -351,7 +351,7 @@ export const DropDown = forwardRef((props, ref) => {
     /** Activate specified selected item */
     const activateSelectedItem = (index) => {
         if (
-            state.disabled
+            props.disabled
             || !state.multiple
             || (state.actSelItemIndex === index)
         ) {
@@ -510,7 +510,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     /** 'focus' event handler */
     const onFocus = (e) => {
-        if (state.disabled) {
+        if (props.disabled) {
             return;
         }
 
@@ -643,6 +643,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     const comboBoxProps = {
         ...state,
+        disabled: props.disabled,
         editable,
         items: MenuHelpers.toFlatList(state.items),
         onInput,
@@ -661,6 +662,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     const menuProps = {
         ...state,
+        disabled: props.disabled,
         className: classNames({
             dd__list_fixed: !!state.fixedMenu,
             dd__list_open: !!state.fixedMenu && !!state.visible,
@@ -689,7 +691,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     let tabIndex = null;
     let selectTabIndex = null;
-    if (!state.disabled) {
+    if (!props.disabled) {
         const nativeSelectVisible = false; // isVisible(this.selectElem, true);
 
         selectTabIndex = (nativeSelectVisible) ? 0 : -1;
@@ -731,7 +733,7 @@ export const DropDown = forwardRef((props, ref) => {
             onFocusCapture={onFocus}
             onBlurCapture={onBlur}
             onKeyDownCapture={onKey}
-            disabled={state.disabled}
+            disabled={props.disabled}
             data-value={selectedIds}
             ref={innerRef}
             style={style}

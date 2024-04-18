@@ -361,8 +361,8 @@ export const Menu = forwardRef((props, ref) => {
     const menuList = List && <List {...listProps} components={state.components} />;
     const menuFooter = Footer && <Footer {...(state.footer ?? {})} components={state.components} />;
 
-    const { disabled } = state;
-    let tabIndex = (state.tabThrough) ? -1 : (state.tabIndex ?? null);
+    const { disabled } = props;
+    let tabIndex = (props.tabThrough) ? -1 : (props.tabIndex ?? null);
     if (disabled) {
         tabIndex = null;
     }

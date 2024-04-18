@@ -1,8 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { DropDown } from '@jezvejs/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
+import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
 import { BlueBox } from './components/BlueBox/BlueBox.jsx';
 
 import './DropDown.stories.scss';
@@ -67,6 +68,28 @@ export default {
         layout: 'fullscreen',
     },
     tags: ['autodocs'],
+};
+
+const ToggleEnable = function (args) {
+    const [state, setState] = useState({
+        ...args,
+    });
+
+    function onToggle() {
+        setState((prev) => ({ ...prev, disabled: !prev.disabled }));
+    }
+
+    return (
+        <>
+            <div style={{ marginBottom: '1rem' }}>
+                <DropDown {...args} disabled={state.disabled} />
+            </div>
+            <ActionButton
+                title={(state.disabled ? 'Enable' : 'Disable')}
+                onClick={onToggle}
+            />
+        </>
+    );
 };
 
 export const Inline = {
@@ -231,4 +254,35 @@ export const MultipleSelect = {
         })),
     },
     decorators: [textDecorator],
+};
+
+export const DisabledSingle = {
+    args: {
+        className: 'dd_stretch',
+        disabled: true,
+        placeholder: 'Single select control',
+        items: initItems('Item', 10).map((item) => ({
+            ...item,
+            selected: (item.id === '3'),
+            disabled: (item.id === '4'),
+        })),
+    },
+    decorators: [textDecorator],
+    render: ToggleEnable,
+};
+
+export const DisabledMultiple = {
+    args: {
+        className: 'dd_stretch',
+        disabled: true,
+        multiple: true,
+        placeholder: 'Single select control',
+        items: initItems('Item', 10).map((item) => ({
+            ...item,
+            selected: (item.id === '3' || item.id === '5'),
+            disabled: (item.id === '4'),
+        })),
+    },
+    decorators: [textDecorator],
+    render: ToggleEnable,
 };
