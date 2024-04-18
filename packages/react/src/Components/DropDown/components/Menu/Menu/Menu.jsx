@@ -28,6 +28,8 @@ export const DropDownMenu = forwardRef((props, ref) => {
             {...props}
             ref={ref}
             defaultItemType={defaultItemType}
+            tabThrough={false}
+            tabIndex={null}
             className={classNames('dd__list', props.className)}
             items={items}
             data-parent={props.parentId}

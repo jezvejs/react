@@ -1,0 +1,2 @@
+export const SHOW_LIST_SCROLL_TIMEOUT = 100;
+export const INPUT_FOCUS_TIMEOUT = 100;

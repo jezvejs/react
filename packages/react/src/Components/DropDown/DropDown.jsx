@@ -11,9 +11,12 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { px } from '../../utils/common.js';
+
 // Common components
 import { MenuCheckbox, MenuHelpers } from '../Menu/Menu.jsx';
 // Common hooks
+import { useDebounce } from '../../hooks/useDebounce/useDebounce.js';
 import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.js';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.js';
 
@@ -47,6 +50,7 @@ import {
     actions,
     reducer,
 } from './reducer.js';
+import { INPUT_FOCUS_TIMEOUT, SHOW_LIST_SCROLL_TIMEOUT } from './constants.js';
 import './DropDown.scss';
 
 export {
@@ -84,7 +88,15 @@ export const DropDown = forwardRef((props, ref) => {
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
 
+    const inputElem = useRef(null);
+    const focusedElem = useRef(null);
+    const selectElem = useRef(null);
+
     const allowScrollAndResize = !state.isTouch || !isEditable(state);
+
+    let viewportEvents = null;
+    let windowEvents = null;
+    let showListHandler = null;
 
     const {
         referenceRef,
@@ -110,6 +122,30 @@ export const DropDown = forwardRef((props, ref) => {
         onScrollDone: () => dispatch(actions.startWindowListening()),
     });
 
+    /** Return index of selected item contains specified element */
+    const getSelectedItemIndex = (el) => {
+        const SelectionItemComponent = props.components.MultiSelectionItem;
+        const selItemElem = el?.closest(SelectionItemComponent.selector);
+        if (!selItemElem) {
+            return -1;
+        }
+
+        const selectedItems = getSelectedItems(state);
+        if (!Array.isArray(selectedItems)) {
+            return -1;
+        }
+
+        return selectedItems.findIndex((item) => item.id === selItemElem.dataset.id);
+    };
+
+    /** Returns current input element if exists */
+    const getInput = () => inputElem?.current;
+
+    /** Returns true if element is child of component */
+    const isChildTarget = (target) => (
+        target && innerRef?.current?.contains(target)
+    );
+
     /** Returns true if element is list or its child */
     const isMenuTarget = (target) => {
         const menuEl = elem?.current;
@@ -134,6 +170,30 @@ export const DropDown = forwardRef((props, ref) => {
     const isValidToggleTarget = (target) => (
         !isFunction(props.isValidToggleTarget)
         || props.isValidToggleTarget(target)
+    );
+
+    /**
+     * Returns true if component is containing specified element
+     *
+     * @param {Element} elem
+     * @returns {Boolean}
+     */
+    const isChildElement = (target) => (
+        !!target
+        && (
+            isChildTarget(target)
+            || isMenuTarget(target)
+        )
+    );
+
+    /**
+     * Returns true if focus moved outside of component
+     *
+     * @param {Event} e event object
+     * @returns {Boolean}
+     */
+    const isLostFocus = (e) => (
+        !isChildElement(e.relatedTarget)
     );
 
     /** Return selected items data for 'itemselect' and 'change' events */
@@ -188,6 +248,54 @@ export const DropDown = forwardRef((props, ref) => {
         sendChangeEvent();
     };
 
+    /** Returns true if fullscreen mode is enabled and active */
+    const isFullScreen = () => (
+        props.fullScreen
+        && innerRef?.current
+        && !innerRef.current.offsetParent
+    );
+
+    const setFullScreenContainerHeight = () => {
+        const screenHeight = window.visualViewport.height;
+        dispatch(actions.setFullScreenHeight(screenHeight));
+    };
+
+    /** Handles window 'scroll' and viewport 'resize' events */
+    const onUpdatePosition = () => {
+        if (state.waitForScroll) {
+            showListHandler?.();
+            return false;
+        }
+
+        if (
+            !state.visible
+            // || isVisible(this.selectElem, true)
+        ) {
+            return false;
+        }
+
+        if (isFullScreen()) {
+            setFullScreenContainerHeight();
+            return false;
+        }
+
+        return true;
+    };
+
+    const updateListPosition = () => {
+        const updateRequired = onUpdatePosition();
+        if (updateRequired) {
+            updatePosition();
+        }
+    };
+
+    const startScrollWaiting = () => dispatch(actions.startScrollWaiting());
+
+    const stopScrollWaiting = () => {
+        dispatch(actions.stopScrollWaiting());
+        updateListPosition();
+    };
+
     /** Creates new item and add it to the list */
     const addItem = (item) => dispatch(actions.addItem(item));
 
@@ -218,6 +326,28 @@ export const DropDown = forwardRef((props, ref) => {
     const focusInputIfNeeded = () => {
     };
 
+    /** Activate or deactivate component */
+    const activate = (val) => {
+        if (state.active === val) {
+            return;
+        }
+
+        if (!val) {
+            showMenu(false);
+        }
+
+        removeCreatableMenuItem();
+        dispatch(actions.toggleActivate());
+    };
+
+    const activateInput = () => {
+        if (!isEditable(state)) {
+            return;
+        }
+
+        dispatch(actions.activateInput());
+    };
+
     /** Activate specified selected item */
     const activateSelectedItem = (index) => {
         if (
@@ -243,7 +373,7 @@ export const DropDown = forwardRef((props, ref) => {
                 if (props.enableFilter) {
                     focusInputIfNeeded();
                 } else {
-                    elem?.current?.focus();
+                    innerRef.current?.focus();
                 }
             });
         }
@@ -259,8 +389,28 @@ export const DropDown = forwardRef((props, ref) => {
         activateSelectedItem(selectedItems.length - 1);
     };
 
+    /** Starts to listen events of visual viewport and window */
+    const listenWindowEvents = () => {
+        if (state.visible && state.listeningWindow) {
+            setEvents(window.visualViewport, viewportEvents);
+            setEvents(window, windowEvents);
+        }
+    };
+
+    /** Stops listening events of visual viewport and window */
+    const stopWindowEvents = () => {
+        if (!state.listeningWindow) {
+            return;
+        }
+
+        dispatch(actions.stopWindowListening());
+
+        removeEvents(window.visualViewport, viewportEvents);
+        removeEvents(window, windowEvents);
+    };
+
     const handlePlaceholderSelect = () => {
-        const { allowCreate, inputString } = this.state;
+        const { allowCreate, inputString } = state;
 
         if (
             !allowCreate
@@ -308,7 +458,7 @@ export const DropDown = forwardRef((props, ref) => {
                 showAllItems();
             }
 
-            elem.current?.focus();
+            innerRef.current?.focus();
         } else if (props.enableFilter) {
             if (state.filtered) {
                 const visibleItems = getVisibleItems();
@@ -352,10 +502,78 @@ export const DropDown = forwardRef((props, ref) => {
         }
     };
 
-    const onFocus = () => {
+    const focusInputHandler = useDebounce(
+        () => focusInputIfNeeded(true),
+        INPUT_FOCUS_TIMEOUT,
+        { cancellable: true },
+    );
+
+    /** 'focus' event handler */
+    const onFocus = (e) => {
+        if (state.disabled) {
+            return;
+        }
+
+        activate(true);
+        const input = getInput();
+
+        const index = getSelectedItemIndex(e.target);
+        if (index !== -1) {
+            activateSelectedItem(index);
+        } else if (e.target === input?.elem) {
+            activateInput();
+        }
+
+        const focusedBefore = !!focusedElem?.current;
+        if (focusedElem) {
+            focusedElem.current = e.target;
+        }
+
+        if (
+            !state.multiple
+            && props.blurInputOnSingleSelect
+            && e.target === innerRef?.current
+        ) {
+            if (!state.isTouch) {
+                focusInputHandler.cancel();
+            }
+
+            return;
+        }
+
+        listenWindowEvents();
+        if (state.openOnFocus && !state.visible && !focusedBefore) {
+            showMenu(true);
+            startScrollWaiting();
+            showListHandler?.();
+        }
+
+        if (
+            index === -1
+            && !isClearButtonTarget(e.target)
+        ) {
+            if (state.isTouch) {
+                focusInputIfNeeded();
+            } else {
+                focusInputHandler.run();
+            }
+        }
     };
 
-    const onBlur = () => {
+    /** 'blur' event handler */
+    const onBlur = (e) => {
+        if (isLostFocus(e)) {
+            if (focusedElem) {
+                focusedElem.current = null;
+            }
+            stopScrollWaiting();
+            activate(false);
+        }
+
+        const selectEl = selectElem?.current;
+        if (selectEl && e.target === selectEl) {
+            sendChangeEvent();
+        }
     };
 
     const onToggle = () => {
@@ -385,31 +603,18 @@ export const DropDown = forwardRef((props, ref) => {
     const onWindowScroll = () => {
     };
 
-    const viewportEvents = { resize: (e) => onViewportResize(e) };
-    const windowEvents = {
+    viewportEvents = { resize: (e) => onViewportResize(e) };
+    windowEvents = {
         scroll: {
             listener: (e) => onWindowScroll(e),
             options: { passive: true, capture: true },
         },
     };
 
-    const listenWindowEvents = () => {
-        if (state.visible && state.listeningWindow) {
-            setEvents(window.visualViewport, viewportEvents);
-            setEvents(window, windowEvents);
-        }
-    };
-
-    const stopWindowEvents = () => {
-        if (!state.listeningWindow) {
-            return;
-        }
-
-        dispatch(actions.stopWindowListening());
-
-        removeEvents(window.visualViewport, viewportEvents);
-        removeEvents(window, windowEvents);
-    };
+    showListHandler = useDebounce(
+        stopScrollWaiting,
+        SHOW_LIST_SCROLL_TIMEOUT,
+    );
 
     useEffect(() => {
         if (state.visible) {
@@ -500,6 +705,11 @@ export const DropDown = forwardRef((props, ref) => {
 
     const select = (<select tabIndex={selectTabIndex}></select>);
 
+    const style = {};
+    if (state.fullScreenHeight) {
+        style.height = px(state.fullScreenHeight);
+    }
+
     return (
         <div
             id={props.id}
@@ -524,6 +734,7 @@ export const DropDown = forwardRef((props, ref) => {
             disabled={state.disabled}
             data-value={selectedIds}
             ref={innerRef}
+            style={style}
         >
             <div ref={referenceRef} >
                 {attachedTo}

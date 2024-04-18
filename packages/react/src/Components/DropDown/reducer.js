@@ -438,6 +438,11 @@ const slice = createSlice({
     }),
 
     removeAllItems: (state) => ({ ...state, items: [] }),
+
+    setFullScreenHeight: (state, fullScreenHeight) => ({
+        ...state,
+        fullScreenHeight,
+    }),
 });
 
 export const { actions, reducer } = slice;

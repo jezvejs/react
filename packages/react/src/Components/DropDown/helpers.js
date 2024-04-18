@@ -49,6 +49,7 @@ export const getInitialState = (props, defaultProps) => {
         isTouch: false,
         listeningWindow: false,
         waitForScroll: false,
+        fullScreenHeight: null,
         renderTime: Date.now(),
         position: {
         },
