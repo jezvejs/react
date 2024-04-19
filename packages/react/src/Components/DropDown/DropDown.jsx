@@ -48,12 +48,10 @@ import {
     getPrevAvailableItem,
     getNextAvailableItem,
     getActiveItem,
+    getSelectedItems,
+    getVisibleItems,
 } from './helpers.js';
-import { getSelectedItems, getVisibleItems } from './utils.js';
-import {
-    actions,
-    reducer,
-} from './reducer.js';
+import { actions, reducer } from './reducer.js';
 import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.js';
 import './DropDown.scss';
 

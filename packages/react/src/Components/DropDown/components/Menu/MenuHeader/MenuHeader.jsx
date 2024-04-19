@@ -1,8 +1,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { getSelectedItems } from '../../../utils.js';
-import { componentPropType } from '../../../helpers.js';
+import { componentPropType, getSelectedItems } from '../../../helpers.js';
 
 import './MenuHeader.scss';
 

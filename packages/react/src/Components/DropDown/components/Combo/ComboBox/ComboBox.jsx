@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 
-import { getSelectedItems } from '../../../utils.js';
-
 // Local components
 import { DropDownMultiSelectionItem } from '../MultiSelectionItem/MultiSelectionItem.jsx';
 import { DropDownComboBoxControls } from '../ComboBoxControls/ComboBoxControls.jsx';
@@ -14,7 +12,7 @@ import { DropDownMultipleSelection } from '../MultipleSelection/MultipleSelectio
 import { DropDownSingleSelection } from '../SingleSelection/SingleSelection.jsx';
 import { DropDownPlaceholder } from '../Placeholder/Placeholder.jsx';
 
-import { componentPropType } from '../../../helpers.js';
+import { getSelectedItems, componentPropType } from '../../../helpers.js';
 import './ComboBox.scss';
 
 // eslint-disable-next-line react/display-name

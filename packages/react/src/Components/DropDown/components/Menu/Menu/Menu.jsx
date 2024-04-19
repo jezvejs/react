@@ -45,6 +45,7 @@ export const DropDownMenu = forwardRef((props, ref) => {
 
 DropDownMenu.propTypes = {
     parentId: PropTypes.string,
+    visible: PropTypes.bool,
     showInput: PropTypes.bool,
     getItemById: PropTypes.func,
     onItemActivate: PropTypes.func,
