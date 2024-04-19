@@ -1,8 +1,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { getSelectedItems } from '../../../utils.js';
-import { componentPropType } from '../../../helpers.js';
+import { componentPropType, getSelectedItems } from '../../../helpers.js';
 
 import './MenuHeader.scss';
 
@@ -17,7 +16,7 @@ export const DropDownMenuHeader = (props) => {
         const [item] = getSelectedItems(props);
         const str = item?.title ?? '';
         const usePlaceholder = (
-            !this.props.useSingleSelectionAsPlaceholder
+            !props.useSingleSelectionAsPlaceholder
             && placeholder?.length > 0
         );
         placeholder = (usePlaceholder) ? props.inputPlaceholder : str;
@@ -29,11 +28,13 @@ export const DropDownMenuHeader = (props) => {
             className={classNames('dd__list-group__label', props.className)}
             placeholder={placeholder}
             value={props.inputString}
+            ref={props.inputRef}
         />
     );
 };
 
 DropDownMenuHeader.propTypes = {
+    inputRef: PropTypes.object,
     inputString: PropTypes.string,
     inputPlaceholder: PropTypes.string,
     useSingleSelectionAsPlaceholder: PropTypes.bool,
@@ -46,6 +47,7 @@ DropDownMenuHeader.propTypes = {
 };
 
 DropDownMenuHeader.defaultProps = {
+    inputRef: null,
     inputString: '',
     inputPlaceholder: null,
     useSingleSelectionAsPlaceholder: true,

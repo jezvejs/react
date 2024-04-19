@@ -119,6 +119,24 @@ export const getItemById = (id, items) => {
 };
 
 /**
+ * Returns menu group item for specified id
+ *
+ * @param {String} id item id
+ * @param {Array} items array of items to search in
+ */
+export const getGroupById = (id, items) => {
+    const strId = id?.toString() ?? null;
+    if (strId === null) {
+        return null;
+    }
+
+    return findMenuItem(items, (item) => (
+        item.id?.toString() === strId
+        && item.type === 'group'
+    ));
+};
+
+/**
  * Returns new identifier not existing in the specified list of items
  *
  * @param {Array} items array of items to search in
@@ -210,6 +228,43 @@ export const mapItems = (items, callback, options = {}) => {
             });
         } else {
             res.push(callback(item, index, items));
+        }
+    }
+
+    return res;
+};
+
+/**
+ * Returns list of menu items filtered by callback function
+ * @param {Array} items menu items array
+ * @param {Function} callback
+ * @param {Object} options
+ * @returns {Array}
+ */
+export const filterItems = (items, callback, options = {}) => {
+    if (!isFunction(callback)) {
+        throw new Error('Invalid callback parameter');
+    }
+
+    const res = [];
+    for (let index = 0; index < items.length; index += 1) {
+        const item = items[index];
+
+        if (item.type === 'group') {
+            if (
+                !options.includeGroupItems
+                || callback(item, index, items)
+            ) {
+                const children = filterItems(item.items, callback, options);
+                if (children.length > 0) {
+                    res.push({
+                        ...item,
+                        items: children,
+                    });
+                }
+            }
+        } else if (callback(item, index, items)) {
+            res.push({ ...item });
         }
     }
 
@@ -314,6 +369,30 @@ export const toggleSelectItem = (itemId) => (prev) => ({
         ),
     })),
 });
+
+/**
+ * Appends specified item to the end of list or group and returns resulting list
+ * @param {Object} item
+ * @param {Array} items
+ * @returns {Array}
+ */
+export const pushItem = (item, items) => {
+    if (!item) {
+        return null;
+    }
+
+    const res = items;
+    if (item.group) {
+        const group = getGroupById(item.group, res);
+        if (group) {
+            group.items.push(item);
+        }
+    } else {
+        res.push(item);
+    }
+
+    return res;
+};
 
 /** Returns item object for specified props after applying default values */
 export const createMenuItem = (props, state) => {

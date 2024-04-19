@@ -1,0 +1,1 @@
+export const SHOW_LIST_SCROLL_TIMEOUT = 100;

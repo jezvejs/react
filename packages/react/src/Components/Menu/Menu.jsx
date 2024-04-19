@@ -3,6 +3,7 @@ import {
     useRef,
     forwardRef,
     useImperativeHandle,
+    useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -131,6 +132,8 @@ export const Menu = forwardRef((props, ref) => {
         } else {
             itemEl.focus(focusOptions);
         }
+
+        props.onItemActivate?.(itemId);
     };
 
     const scrollToItem = () => {
@@ -323,6 +326,14 @@ export const Menu = forwardRef((props, ref) => {
     const handleScroll = () => {
     };
 
+    useEffect(() => {
+        setState((prev) => ({
+            ...prev,
+            items: props.items,
+            activeItem: props.activeItem,
+        }));
+    }, [props.items, props.activeItem]);
+
     // Prepare alignment before and after item content
     let beforeContent = false;
     let afterContent = false;
@@ -361,11 +372,18 @@ export const Menu = forwardRef((props, ref) => {
     const menuList = List && <List {...listProps} components={state.components} />;
     const menuFooter = Footer && <Footer {...(state.footer ?? {})} components={state.components} />;
 
+    const { disabled } = props;
+    let tabIndex = (props.tabThrough) ? -1 : (props.tabIndex ?? null);
+    if (disabled) {
+        tabIndex = null;
+    }
+
     return (
         <div
             id={props.id}
             className={classNames('menu', className)}
-            tabIndex={-1}
+            disabled={disabled}
+            tabIndex={tabIndex}
             onFocusCapture={handleFocus}
             onBlurCapture={handleBlur}
             onTouchStartCapture={handleTouchStart}
@@ -386,6 +404,9 @@ Menu.propTypes = {
     defaultItemType: PropTypes.string,
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
+    disabled: PropTypes.bool,
+    tabThrough: PropTypes.bool,
+    tabIndex: PropTypes.number,
     loopNavigation: PropTypes.bool,
     preventNavigation: PropTypes.bool,
     header: PropTypes.object,
@@ -395,6 +416,7 @@ Menu.propTypes = {
     onGroupHeaderClick: PropTypes.func,
     onItemActivate: PropTypes.func,
     allowActiveGroupHeader: PropTypes.bool,
+    activeItem: PropTypes.string,
     items: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,
         type: PropTypes.string,
@@ -422,6 +444,9 @@ Menu.defaultProps = {
     defaultItemType: 'button',
     iconAlign: 'left',
     checkboxSide: 'left',
+    disabled: false,
+    tabThrough: true,
+    tabIndex: 0,
     loopNavigation: true,
     preventNavigation: false,
     header: null,
@@ -431,6 +456,7 @@ Menu.defaultProps = {
     onGroupHeaderClick: null,
     renderNotSelected: false,
     allowActiveGroupHeader: false,
+    activeItem: null,
     items: [],
     components: {
         Header: null,

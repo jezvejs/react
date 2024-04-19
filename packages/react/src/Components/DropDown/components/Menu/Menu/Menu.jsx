@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 
-import { Menu } from '../../../../Menu/Menu.jsx';
+import { Menu, MenuHelpers } from '../../../../Menu/Menu.jsx';
 
 import { componentPropType } from '../../../helpers.js';
 import './Menu.scss';
@@ -23,13 +23,21 @@ export const DropDownMenu = forwardRef((props, ref) => {
         hidden: item.hidden || (filtered && !item.matchFilter),
     }));
 
+    const filteredItems = (props.visible)
+        ? MenuHelpers.filterItems(items, (item) => (
+            !item.hidden && (!filtered || item.matchFilter)
+        ))
+        : [];
+
     return (
         <Menu
             {...props}
             ref={ref}
             defaultItemType={defaultItemType}
+            tabThrough={false}
+            tabIndex={null}
             className={classNames('dd__list', props.className)}
-            items={items}
+            items={filteredItems}
             data-parent={props.parentId}
         />
     );
@@ -37,6 +45,7 @@ export const DropDownMenu = forwardRef((props, ref) => {
 
 DropDownMenu.propTypes = {
     parentId: PropTypes.string,
+    visible: PropTypes.bool,
     showInput: PropTypes.bool,
     getItemById: PropTypes.func,
     onItemActivate: PropTypes.func,

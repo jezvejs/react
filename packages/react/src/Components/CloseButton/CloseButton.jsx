@@ -15,7 +15,7 @@ export const CloseButton = ({ small, ...props }) => (
     <Button
         {...props}
         className={classNames('close-btn', props.className)}
-        icon={(props.small) ? SmallCloseIcon : CloseIcon}
+        icon={(small) ? SmallCloseIcon : CloseIcon}
     />
 );
 

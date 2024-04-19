@@ -1,7 +1,50 @@
 import { isFunction } from '@jezvejs/types';
 import PropTypes from 'prop-types';
 import { MenuHelpers } from '../Menu/Menu.jsx';
-import { getSelectedItems } from './utils.js';
+
+/** Returns array of selected items */
+export const getSelectedItems = (state) => (
+    MenuHelpers.toFlatList(state?.items ?? [], {
+        includeGroupItems: state.allowActiveGroupHeader,
+    }).filter((item) => item?.selected)
+);
+
+/** Returns true is item is visible */
+export const isVisibleItem = (item, state) => (
+    (state?.filtered)
+        ? (item?.matchFilter && !item.hidden)
+        : (item && !item.hidden)
+);
+
+/** Returns array of visible items */
+export const getVisibleItems = (state) => (
+    MenuHelpers.toFlatList(state?.items ?? [], {
+        includeGroupItems: state.allowActiveGroupHeader,
+    }).filter((item) => (
+        (item.type === 'group' && getVisibleItems(item).length > 0)
+        || (item.type !== 'group' && isVisibleItem(item, state))
+    ))
+);
+
+/**
+ * Returns list items of specified group
+ * @param {Object} group - group object
+ * @param {Object} state - state object
+ */
+export const getGroupItems = (group, state) => (
+    MenuHelpers.getItemById(group?.id, state.items)?.items ?? []
+);
+
+/**
+ * Returns visible list items of specified group
+ * @param {Object} group - group object
+ * @param {Object} state - state object
+ */
+export const getVisibleGroupItems = (group, state) => (
+    getGroupItems(group, state).filter((item) => (
+        isVisibleItem(item, state)
+    ))
+);
 
 /** Returns true if filter input is available and enabled */
 export const isEditable = (state) => (
@@ -49,6 +92,7 @@ export const getInitialState = (props, defaultProps) => {
         isTouch: false,
         listeningWindow: false,
         waitForScroll: false,
+        fullScreenHeight: null,
         renderTime: Date.now(),
         position: {
         },
@@ -81,6 +125,39 @@ export const getInitialState = (props, defaultProps) => {
 
     return res;
 };
+
+/**
+ * Return list item available to select prior to specified item
+ * @returns null in case specified list item is not found or on first position
+ * @param {number} itemId - identifier of item to start looking from
+ */
+export const getPrevAvailableItem = (itemId, state) => (
+    MenuHelpers.getPreviousItem(
+        itemId,
+        state.items,
+        (item) => isAvailableItem(item, state),
+        { includeGroupItems: state.allowActiveGroupHeader },
+    )
+);
+
+/**
+ * Return list item available to select next to specified item
+ * @returns null in case specified list item is not found or on last position
+ * @param {number} itemId - identifier of item to start looking from
+ */
+export const getNextAvailableItem = (itemId, state) => (
+    MenuHelpers.getNextItem(
+        itemId,
+        state.items,
+        (item) => isAvailableItem(item, state),
+        { includeGroupItems: state.allowActiveGroupHeader },
+    )
+);
+
+/** Returns active list item */
+export const getActiveItem = (state) => (
+    MenuHelpers.findMenuItem(state.items, (item) => item.active)
+);
 
 export const componentPropType = PropTypes.oneOfType([
     PropTypes.func,

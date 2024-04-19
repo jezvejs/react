@@ -218,10 +218,14 @@ export const Placeholder = {
     },
 };
 
+/**
+ * With disabled 'tabThrough' option
+ */
 export const Scroll = {
     args: {
         items: initItems('Menu item', 30),
         className: 'scroll-menu',
+        tabThrough: false,
     },
 };
 

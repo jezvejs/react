@@ -44,6 +44,10 @@ export const MenuItem = (props) => {
         commonProps.type = type;
     }
 
+    if (!props.tabThrough || props.disabled) {
+        commonProps.tabIndex = -1;
+    }
+
     const IconComponent = icon;
     const iconContent = (icon) ? (<IconComponent className="menu-item__icon" />) : null;
 
@@ -96,6 +100,7 @@ MenuItem.propTypes = {
     title: PropTypes.string,
     selected: PropTypes.bool,
     disabled: PropTypes.bool,
+    tabThrough: PropTypes.bool,
     renderNotSelected: PropTypes.bool,
     activeItem: PropTypes.oneOfType([
         PropTypes.string,

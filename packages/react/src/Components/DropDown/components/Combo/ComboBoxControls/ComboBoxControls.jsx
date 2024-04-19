@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { DropDownClearButton } from '../ClearButton/ClearButton.jsx';
 import { DropDownToggleButton } from '../ToggleButton/ToggleButton.jsx';
 
-import { getSelectedItems } from '../../../utils.js';
-import { componentPropType } from '../../../helpers.js';
+import { componentPropType, getSelectedItems } from '../../../helpers.js';
 import './ComboBoxControls.scss';
 
 /**
