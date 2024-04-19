@@ -3,6 +3,7 @@ import {
     useRef,
     forwardRef,
     useImperativeHandle,
+    useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -131,6 +132,8 @@ export const Menu = forwardRef((props, ref) => {
         } else {
             itemEl.focus(focusOptions);
         }
+
+        props.onItemActivate?.(itemId);
     };
 
     const scrollToItem = () => {
@@ -323,6 +326,14 @@ export const Menu = forwardRef((props, ref) => {
     const handleScroll = () => {
     };
 
+    useEffect(() => {
+        setState((prev) => ({
+            ...prev,
+            items: props.items,
+            activeItem: props.activeItem,
+        }));
+    }, [props.items, props.activeItem]);
+
     // Prepare alignment before and after item content
     let beforeContent = false;
     let afterContent = false;
@@ -405,6 +416,7 @@ Menu.propTypes = {
     onGroupHeaderClick: PropTypes.func,
     onItemActivate: PropTypes.func,
     allowActiveGroupHeader: PropTypes.bool,
+    activeItem: PropTypes.string,
     items: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string,
         type: PropTypes.string,
@@ -444,6 +456,7 @@ Menu.defaultProps = {
     onGroupHeaderClick: null,
     renderNotSelected: false,
     allowActiveGroupHeader: false,
+    activeItem: null,
     items: [],
     components: {
         Header: null,
