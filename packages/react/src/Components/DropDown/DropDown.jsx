@@ -1,4 +1,4 @@
-import { removeEvents, setEvents } from '@jezvejs/dom';
+import { removeEvents, setEvents, getCursorPos } from '@jezvejs/dom';
 import { isFunction } from '@jezvejs/types';
 import {
     useRef,
@@ -44,13 +44,17 @@ import {
     isEditable,
     getInitialState,
     componentPropType,
+    getAvailableItems,
+    getPrevAvailableItem,
+    getNextAvailableItem,
+    getActiveItem,
 } from './helpers.js';
 import { getSelectedItems, getVisibleItems } from './utils.js';
 import {
     actions,
     reducer,
 } from './reducer.js';
-import { INPUT_FOCUS_TIMEOUT, SHOW_LIST_SCROLL_TIMEOUT } from './constants.js';
+import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.js';
 import './DropDown.scss';
 
 export {
@@ -138,17 +142,23 @@ export const DropDown = forwardRef((props, ref) => {
         return selectedItems.findIndex((item) => item.id === selItemElem.dataset.id);
     };
 
+    /** Returns menu element if exists */
+    const getContainer = () => innerRef?.current;
+
+    /** Returns menu element if exists */
+    const getMenu = () => elem?.current;
+
     /** Returns current input element if exists */
     const getInput = () => inputElem?.current;
 
     /** Returns true if element is child of component */
     const isChildTarget = (target) => (
-        target && innerRef?.current?.contains(target)
+        target && (getContainer())?.contains(target)
     );
 
     /** Returns true if element is list or its child */
     const isMenuTarget = (target) => {
-        const menuEl = elem?.current;
+        const menuEl = getMenu();
         return target && (target === menuEl || menuEl?.contains(target));
     };
 
@@ -269,7 +279,7 @@ export const DropDown = forwardRef((props, ref) => {
 
         if (
             !state.visible
-            // || isVisible(this.selectElem, true)
+            // || isVisible(selectElem, true)
         ) {
             return false;
         }
@@ -318,12 +328,80 @@ export const DropDown = forwardRef((props, ref) => {
         }
     };
 
+    const getItem = (itemId) => (
+        MenuHelpers.getItemById(itemId, state.items)
+    );
+
+    /** Deselect specified item */
+    const deselectItem = (itemId) => {
+        if (!state.multiple) {
+            return;
+        }
+
+        const strId = itemId?.toString();
+        const itemToDeselect = getItem(strId);
+        if (!itemToDeselect?.selected) {
+            return;
+        }
+
+        dispatch(actions.deselectItem(strId));
+    };
+
     /** Show all list items */
     const showAllItems = (resetInput = true) => {
         dispatch(actions.showAllItems(resetInput));
     };
 
-    const focusInputIfNeeded = () => {
+    /** Show only items containing specified string */
+    const filter = (inputString) => {
+        if (state.inputString === inputString) {
+            return;
+        }
+
+        if (inputString.length === 0) {
+            showAllItems(false);
+            return;
+        }
+
+        dispatch(actions.filter(inputString));
+    };
+
+    const focusContainer = () => {
+        innerRef?.current?.focus();
+    };
+
+    /** Set active state for specified list item */
+    const setActive = (itemId) => {
+        const itemToActivate = getItem(itemId);
+        const activeItem = getActiveItem(state);
+        if (
+            (activeItem && itemToActivate && activeItem.id === itemToActivate.id)
+            || (!activeItem && !itemToActivate)
+        ) {
+            return;
+        }
+
+        const strId = itemToActivate?.id?.toString() ?? null;
+        dispatch(actions.setActive(strId));
+    };
+
+    const focusInputIfNeeded = (keepActiveItem = false, activeItemId = null) => {
+        const inputEl = getInput();
+        if (!inputEl) {
+            return;
+        }
+
+        if (
+            props.enableFilter
+            && focusedElem?.current !== inputEl
+            && state.actSelItemIndex === -1
+        ) {
+            inputEl.focus();
+
+            if (keepActiveItem && activeItemId) {
+                setActive(activeItemId);
+            }
+        }
     };
 
     /** Activate or deactivate component */
@@ -340,13 +418,7 @@ export const DropDown = forwardRef((props, ref) => {
         dispatch(actions.toggleActivate());
     };
 
-    const activateInput = () => {
-        if (!isEditable(state)) {
-            return;
-        }
-
-        dispatch(actions.activateInput());
-    };
+    const activateInput = () => dispatch(actions.activateInput());
 
     /** Activate specified selected item */
     const activateSelectedItem = (index) => {
@@ -373,7 +445,7 @@ export const DropDown = forwardRef((props, ref) => {
                 if (props.enableFilter) {
                     focusInputIfNeeded();
                 } else {
-                    innerRef.current?.focus();
+                    focusContainer();
                 }
             });
         }
@@ -458,10 +530,10 @@ export const DropDown = forwardRef((props, ref) => {
                 showAllItems();
             }
 
-            innerRef.current?.focus();
+            focusContainer();
         } else if (props.enableFilter) {
             if (state.filtered) {
-                const visibleItems = getVisibleItems();
+                const visibleItems = getVisibleItems(state);
                 if (
                     props.clearFilterOnMultiSelect
                     || visibleItems.length === 1
@@ -502,25 +574,36 @@ export const DropDown = forwardRef((props, ref) => {
         }
     };
 
-    const focusInputHandler = useDebounce(
-        () => focusInputIfNeeded(true),
-        INPUT_FOCUS_TIMEOUT,
-        { cancellable: true },
-    );
+    const scrollToItem = () => {
+        const menuEl = getMenu();
+        if (!menuEl) {
+            return;
+        }
+
+        const focused = document.activeElement;
+        if (menuEl.contains(focused)) {
+            focused.scrollIntoView({
+                behavior: 'instant',
+                block: 'nearest',
+            });
+        }
+    };
 
     /** 'focus' event handler */
     const onFocus = (e) => {
+        e?.stopPropagation();
+
         if (props.disabled) {
             return;
         }
 
         activate(true);
-        const input = getInput();
+        const inputEl = getInput();
 
         const index = getSelectedItemIndex(e.target);
         if (index !== -1) {
             activateSelectedItem(index);
-        } else if (e.target === input?.elem) {
+        } else if (e.target === inputEl) {
             activateInput();
         }
 
@@ -534,10 +617,6 @@ export const DropDown = forwardRef((props, ref) => {
             && props.blurInputOnSingleSelect
             && e.target === innerRef?.current
         ) {
-            if (!state.isTouch) {
-                focusInputHandler.cancel();
-            }
-
             return;
         }
 
@@ -548,20 +627,29 @@ export const DropDown = forwardRef((props, ref) => {
             showListHandler?.();
         }
 
+        const closestElem = MenuHelpers.getClosestItemElement(e?.target, {
+            ...state,
+            itemSelector: '.menu-item',
+        });
+        const itemId = closestElem?.dataset?.id ?? null;
+
+        if (itemId) {
+            scrollToItem();
+        }
+
         if (
             index === -1
             && !isClearButtonTarget(e.target)
+            && e.target !== inputEl
         ) {
-            if (state.isTouch) {
-                focusInputIfNeeded();
-            } else {
-                focusInputHandler.run();
-            }
+            focusInputIfNeeded(true, itemId);
         }
     };
 
     /** 'blur' event handler */
     const onBlur = (e) => {
+        e?.stopPropagation();
+
         if (isLostFocus(e)) {
             if (focusedElem) {
                 focusedElem.current = null;
@@ -584,17 +672,255 @@ export const DropDown = forwardRef((props, ref) => {
         handleItemSelect(target);
     };
 
-    const onKey = () => {
-        activateLastSelectedItem();
+    /** Click by delete button of selected item event handler */
+    const onDeleteSelectedItem = (e) => {
+        if (!state.multiple || !e) {
+            return;
+        }
+
+        const isClick = (e.type === 'click');
+        if (isClick && !isSelectionItemDeleteButtonTarget(e.target)) {
+            return;
+        }
+
+        const index = (isClick)
+            ? getSelectedItemIndex(e.target)
+            : state.actSelItemIndex;
+        if (index === -1) {
+            return;
+        }
+
+        const selectedItems = getSelectedItems(state);
+        if (!selectedItems.length) {
+            return;
+        }
+
+        e.stopPropagation();
+
+        const isBackspace = (e.type === 'keydown' && e.code === 'Backspace');
+        let itemToActivate;
+        if (isBackspace) {
+            if (index === 0) {
+                // Activate first selected item if available or focus host input otherwise
+                itemToActivate = (selectedItems.length > 1) ? 0 : -1;
+            } else {
+                // Activate previous selected item
+                itemToActivate = index - 1;
+            }
+        } else {
+            // Focus input or container if deselect last(right) selected item
+            // Activate next selected item otherwise
+            itemToActivate = (isClick || index === selectedItems.length - 1) ? -1 : index;
+        }
+        activateSelectedItem(itemToActivate);
+
+        const item = selectedItems[index];
+        if (!item) {
+            return;
+        }
+
+        deselectItem(item.id);
+        sendItemSelectEvent();
+        setChanged();
+        sendChangeEvent();
     };
 
-    const onInput = () => {
+    /** Handler for left or right arrow keys */
+    const onSelectionNavigate = (e) => {
+        if (!state.multiple) {
+            return;
+        }
+
+        const selectedItems = getSelectedItems(state);
+        if (!selectedItems.length) {
+            return;
+        }
+
+        const index = state.actSelItemIndex;
+        if (e.code === 'ArrowLeft') {
+            if (index === 0) {
+                return;
+            }
+            if (index === -1) {
+                activateLastSelectedItem();
+                return;
+            }
+
+            activateSelectedItem(index - 1);
+        } else {
+            const itemToActivate = (index === selectedItems.length - 1) ? -1 : index + 1;
+            activateSelectedItem(itemToActivate);
+        }
     };
 
-    const onDeleteSelectedItem = () => {
+    const activateItem = (itemId) => {
+        const menuElem = getMenu();
+        if (!menuElem) {
+            return;
+        }
+
+        const item = getItem(itemId);
+        if (!item) {
+            return;
+        }
+
+        const focusOptions = { preventScroll: true };
+
+        const itemEl = menuElem.querySelector(`.menu-item[data-id="${itemId}"]`);
+        if (!itemEl) {
+            return;
+        }
+
+        if (item.type === 'group' && state.allowActiveGroupHeader) {
+            const { GroupHeader } = state.components;
+            const groupHeader = itemEl?.querySelector(GroupHeader?.selector);
+            groupHeader?.focus(focusOptions);
+        } else {
+            itemEl.focus(focusOptions);
+        }
     };
 
+    const onKey = (e) => {
+        e.stopPropagation();
+
+        const editable = isEditable(state);
+        const { multiple, showMultipleSelection, listAttach } = props;
+        const inputEl = getInput();
+        let newItem = null;
+
+        let allowSelectionNavigate = multiple && showMultipleSelection && !listAttach;
+        if (allowSelectionNavigate && editable && e.target === inputEl) {
+            // Check cursor is at start of input
+            const cursorPos = getCursorPos(inputEl);
+            if (cursorPos?.start !== 0 || cursorPos.start !== cursorPos.end) {
+                allowSelectionNavigate = false;
+            }
+        }
+
+        // Backspace or Arrow Left key on container or text input
+        // Activate last multiple selection item
+        if (
+            allowSelectionNavigate
+            && (e.code === 'Backspace' || e.code === 'ArrowLeft')
+            && (state.actSelItemIndex === -1)
+        ) {
+            activateLastSelectedItem();
+            return;
+        }
+
+        if (allowSelectionNavigate && (e.code === 'Backspace' || e.code === 'Delete')) {
+            if (e.code === 'Delete' && state.actSelItemIndex === -1) {
+                return;
+            }
+
+            onDeleteSelectedItem(e);
+            e.preventDefault();
+            return;
+        }
+
+        if (allowSelectionNavigate && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
+            if (e.code === 'ArrowRight' && state.actSelItemIndex === -1) {
+                return;
+            }
+
+            onSelectionNavigate(e);
+            e.preventDefault();
+            return;
+        }
+
+        const activeItem = getActiveItem(state);
+        let focusInput = false;
+
+        if (e.code === 'Space' && !editable) {
+            toggleMenu();
+            e.preventDefault();
+        } else if (e.code === 'ArrowDown') {
+            const availItems = getAvailableItems(state);
+
+            if (!state.visible && !activeItem) {
+                showMenu(true);
+                focusInput = true;
+                [newItem] = availItems;
+            } else if (state.visible) {
+                if (activeItem) {
+                    newItem = getNextAvailableItem(activeItem.id, state);
+                    if (props.loopNavigation && !newItem) {
+                        [newItem] = availItems;
+                    }
+                } else if (availItems.length > 0) {
+                    [newItem] = availItems;
+                }
+            }
+        } else if (e.code === 'ArrowUp') {
+            const availItems = getAvailableItems(state);
+            if (state.visible && activeItem) {
+                newItem = getPrevAvailableItem(activeItem.id, state);
+                if (props.loopNavigation && !newItem) {
+                    newItem = availItems[availItems.length - 1];
+                }
+            }
+        } else if (e.code === 'Home') {
+            const availItems = getAvailableItems(state);
+            if (availItems.length > 0) {
+                [newItem] = availItems;
+            }
+        } else if (e.code === 'End') {
+            const availItems = getAvailableItems(state);
+            if (availItems.length > 0) {
+                newItem = availItems[availItems.length - 1];
+            }
+        } else if (e.key === 'Enter') {
+            if (activeItem) {
+                handleItemSelect(activeItem);
+            }
+
+            e.preventDefault();
+        } else if (e.code === 'Escape') {
+            showMenu(false);
+            focusContainer();
+        } else {
+            return;
+        }
+
+        if (newItem) {
+            e.preventDefault();
+
+            activateItem(newItem.id);
+            setActive(newItem.id);
+        }
+
+        if (focusInput) {
+            focusInputIfNeeded(true, newItem.id);
+        }
+    };
+
+    /** Handler for 'input' event of text field  */
+    const onInput = (e) => {
+        if (props.enableFilter) {
+            filter(e.target.value);
+        }
+
+        props?.onInput?.(e);
+    };
+
+    /** Handler for 'clear selection' button click */
     const onClearSelection = () => {
+        if (!state.multiple) {
+            return;
+        }
+
+        dispatch(actions.deselectAll());
+        sendChangeEvent();
+
+        if (props.enableFilter) {
+            focusInputIfNeeded();
+        } else {
+            focusContainer();
+        }
+    };
+
+    const onItemActivate = (itemId) => {
+        setActive(itemId);
     };
 
     const onViewportResize = () => {
@@ -639,10 +965,14 @@ export const DropDown = forwardRef((props, ref) => {
     const { Menu, ComboBox } = state.components;
 
     const attachedTo = props.listAttach && props.children;
-    const editable = isEditable(state);
+    const editable = isEditable({
+        ...state,
+        disabled: props.disabled,
+    });
 
     const comboBoxProps = {
         ...state,
+        inputRef: inputElem,
         disabled: props.disabled,
         editable,
         items: MenuHelpers.toFlatList(state.items),
@@ -662,6 +992,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     const menuProps = {
         ...state,
+        inputRef: inputElem,
         disabled: props.disabled,
         className: classNames({
             dd__list_fixed: !!state.fixedMenu,
@@ -672,6 +1003,7 @@ export const DropDown = forwardRef((props, ref) => {
         onInput,
         onDeleteSelectedItem,
         onClearSelection,
+        onItemActivate,
         components: {
             ...props.components,
             Header: (showInput) ? DropDownMenuHeader : null,
@@ -692,7 +1024,7 @@ export const DropDown = forwardRef((props, ref) => {
     let tabIndex = null;
     let selectTabIndex = null;
     if (!props.disabled) {
-        const nativeSelectVisible = false; // isVisible(this.selectElem, true);
+        const nativeSelectVisible = false; // isVisible(selectElem, true);
 
         selectTabIndex = (nativeSelectVisible) ? 0 : -1;
 

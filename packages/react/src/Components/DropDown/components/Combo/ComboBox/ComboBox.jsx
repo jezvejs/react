@@ -20,7 +20,6 @@ import './ComboBox.scss';
 // eslint-disable-next-line react/display-name
 export const DropDownComboBox = forwardRef((props, ref) => {
     const {
-        placeholder,
         onInput,
         disabled,
     } = props;
@@ -34,18 +33,20 @@ export const DropDownComboBox = forwardRef((props, ref) => {
     } = props.components;
 
     const onDeleteSelectedItem = () => {
+        props?.onDeleteSelectedItem?.();
     };
 
     const selectedItems = getSelectedItems(props);
-    const [item] = selectedItems;
-    const str = item?.title ?? '';
+    const [selectedItem] = selectedItems;
+    const str = selectedItem?.title ?? '';
+
+    const usePlaceholder = (
+        !props.useSingleSelectionAsPlaceholder
+        && props.placeholder?.length > 0
+    );
+    const placeholder = (usePlaceholder) ? props.placeholder : str;
     const showPlaceholder = (
-        props.multiple
-        || (
-            !props.editable
-            && !props.useSingleSelectionAsPlaceholder
-            && placeholder?.length > 0
-        )
+        !props.editable && (props.multiple || usePlaceholder)
     );
 
     const activeItem = (props.showMultipleSelection && props.actSelItemIndex !== -1)
@@ -68,14 +69,16 @@ export const DropDownComboBox = forwardRef((props, ref) => {
         )
     );
 
+    const showSingleSelection = !props.multiple && !props.editable && !showPlaceholder;
+
     const inputProps = {
-        placeholder: (showPlaceholder) ? props.placeholder : str,
+        placeholder,
         onInput,
         disabled,
     };
-
-    const showSingleSelection = !props.multiple && !props.editable && !showPlaceholder;
-    const [selectedItem] = getSelectedItems(props);
+    if (props.editable) {
+        inputProps.value = props.inputString ?? str;
+    }
 
     return (
         <div
@@ -86,7 +89,7 @@ export const DropDownComboBox = forwardRef((props, ref) => {
                 {multipleSelection}
                 {showPlaceholder && <Placeholder placeholder={placeholder} />}
                 {showSingleSelection && <SingleSelection item={selectedItem} />}
-                {props.editable && <Input {...inputProps} />}
+                {props.editable && <Input {...inputProps} ref={props.inputRef} />}
             </div>
             <ComboBoxControls {...props} />
         </div>
@@ -95,6 +98,8 @@ export const DropDownComboBox = forwardRef((props, ref) => {
 
 DropDownComboBox.propTypes = {
     className: PropTypes.string,
+    inputRef: PropTypes.object,
+    inputString: PropTypes.string,
     multiple: PropTypes.bool,
     editable: PropTypes.bool,
     enableFilter: PropTypes.bool,
@@ -122,6 +127,7 @@ DropDownComboBox.propTypes = {
 };
 
 DropDownComboBox.defaultProps = {
+    inputRef: null,
     multiple: false,
     editable: false,
     enableFilter: false,

@@ -247,7 +247,6 @@ const slice = createSlice({
         filtered: (
             (state.inputString === null) ? false : state.filtered
         ),
-        items: deactivateAllItems(state.items),
     }),
 
     setChanged: (state) => (
@@ -385,6 +384,7 @@ const slice = createSlice({
             ),
             { includeGroupItems: state.allowActiveGroupHeader },
         ),
+        activeItem: id,
     }),
 
     addItem: (state, item) => processSingleSelection({

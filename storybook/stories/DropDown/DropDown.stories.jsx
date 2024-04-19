@@ -286,3 +286,28 @@ export const DisabledMultiple = {
     decorators: [textDecorator],
     render: ToggleEnable,
 };
+
+export const FilterSingle = {
+    args: {
+        className: 'dd_stretch',
+        enableFilter: true,
+        disabled: true,
+        placeholder: 'Type to filter',
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: ToggleEnable,
+};
+
+export const FilterMultiple = {
+    args: {
+        className: 'dd_stretch',
+        enableFilter: true,
+        disabled: true,
+        multiple: true,
+        placeholder: 'Type to filter',
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: ToggleEnable,
+};

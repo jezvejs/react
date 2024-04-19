@@ -83,6 +83,39 @@ export const getInitialState = (props, defaultProps) => {
     return res;
 };
 
+/**
+ * Return list item available to select prior to specified item
+ * @returns null in case specified list item is not found or on first position
+ * @param {number} itemId - identifier of item to start looking from
+ */
+export const getPrevAvailableItem = (itemId, state) => (
+    MenuHelpers.getPreviousItem(
+        itemId,
+        state.items,
+        (item) => isAvailableItem(item, state),
+        { includeGroupItems: state.allowActiveGroupHeader },
+    )
+);
+
+/**
+ * Return list item available to select next to specified item
+ * @returns null in case specified list item is not found or on last position
+ * @param {number} itemId - identifier of item to start looking from
+ */
+export const getNextAvailableItem = (itemId, state) => (
+    MenuHelpers.getNextItem(
+        itemId,
+        state.items,
+        (item) => isAvailableItem(item, state),
+        { includeGroupItems: state.allowActiveGroupHeader },
+    )
+);
+
+/** Returns active list item */
+export const getActiveItem = (state) => (
+    MenuHelpers.findMenuItem(state.items, (item) => item.active)
+);
+
 export const componentPropType = PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.object,
