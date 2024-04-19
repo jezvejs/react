@@ -93,6 +93,10 @@ export const PopupMenu = (props) => {
     useEffect(() => {
         if (state.open) {
             addScrollListener();
+
+            if (state.listenScroll) {
+                elem.current.focus();
+            }
         } else {
             removeScrollListener();
         }
