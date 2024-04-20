@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { DropDown } from '@jezvejs/react';
+import { DropDown, Tags } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
 // Local components
@@ -60,6 +60,18 @@ const ToggleEnable = function (args) {
                 onClick={onToggle}
             />
         </>
+    );
+};
+
+const AttachedToBlock = function ({ boxId = 'box', ...args }) {
+    const portalElement = useMemo(() => (
+        document.getElementById('custom-root')
+    ), []);
+
+    return (
+        <DropDown {...args} container={portalElement}>
+            <BlueBox id={boxId} />
+        </DropDown>
     );
 };
 
@@ -149,17 +161,7 @@ export const AttachToBlock = {
         items: initItems('Long Item Lorem Lorem', 10),
     },
     decorators: [heightDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        return (
-            <DropDown {...args} container={portalElement}>
-                <BlueBox id="box" />
-            </DropDown>
-        );
-    },
+    render: AttachedToBlock,
 };
 
 export const AttachToInline = {
@@ -283,6 +285,9 @@ export const FilterMultiple = {
     render: ToggleEnable,
 };
 
+/**
+ * With 'openOnFocus' option enabled
+ */
 export const FilterGroups = {
     args: {
         className: 'dd_stretch',
@@ -293,4 +298,151 @@ export const FilterGroups = {
     },
     decorators: [textDecorator],
     render: ToggleEnable,
+};
+
+/**
+ * By default focus is removed from input after select item from menu.
+ * Set 'blurInputOnSingleSelect' to false to keep input focused after select item.
+ */
+export const BlurInputOnSingleSelect = {
+    name: '\'blurInputOnSingleSelect\' option',
+    args: {
+        enableFilter: true,
+        blurInputOnSingleSelect: false,
+        placeholder: 'Type to filter',
+        items: initItems('Item', 10),
+    },
+    decorators: [textDecorator],
+};
+
+/**
+ * By default filter is not cleared after item selected if multiple items was found.
+ * In case only one item is found filter is cleared regardless of option value.
+ */
+export const ClearFilterOnSelect = {
+    name: '\'clearFilterOnMultiSelect\' option',
+    args: {
+        enableFilter: true,
+        clearFilterOnMultiSelect: true,
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_stretch',
+        items: initItems('Item', 100),
+    },
+    decorators: [textDecorator],
+};
+
+export const ShowMultipleSelection = {
+    name: '\'showMultipleSelection\' option',
+    args: {
+        enableFilter: true,
+        showMultipleSelection: false,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_stretch',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        const [state, setState] = useState({
+            items: [],
+        });
+
+        const onSelectionChange = (selection) => {
+            setState((prev) => ({
+                ...prev,
+                items: selection.map((item) => ({
+                    id: item.id,
+                    title: item.value,
+                })),
+            }));
+        };
+
+        return (
+            <div>
+                <Tags items={state.items} />
+                <DropDown
+                    {...args}
+                    onItemSelect={onSelectionChange}
+                    onChange={onSelectionChange}
+                />
+            </div>
+        );
+    },
+};
+
+export const ShowClearButton = {
+    name: '\'showClearButton\' option',
+    args: {
+        enableFilter: true,
+        showClearButton: false,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_form',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+};
+
+export const ShowToggleButton = {
+    name: '\'showToggleButton\' option',
+    args: {
+        enableFilter: true,
+        showToggleButton: false,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_form',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+};
+
+export const AllowCreate = {
+    name: '\'allowCreate\' option',
+    args: {
+        enableFilter: true,
+        allowCreate: true,
+        addItemMessage: (title) => `Add item: '${title}'`,
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_form',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+};
+
+/**
+ * + \'useSingleSelectionAsPlaceholder\' option
+ */
+export const FilterAttachToBlock = {
+    name: 'Filter attached to block element',
+    args: {
+        boxId: 'filterBox',
+        listAttach: true,
+        enableFilter: true,
+        noResultsMessage: 'Nothing found',
+        placeholder: 'Type to filter',
+        useSingleSelectionAsPlaceholder: false,
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: AttachedToBlock,
+};
+
+export const FilterMultiAttachToBlock = {
+    name: 'Filter with multiple select attached',
+    args: {
+        boxId: 'boxFilterMulti',
+        listAttach: true,
+        enableFilter: true,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: AttachedToBlock,
 };
