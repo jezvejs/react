@@ -3,13 +3,13 @@ import '@jezvejs/react/style';
 import { PopupMenu } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
-import { MenuButton } from '../../Components/MenuButton/MenuButton.jsx';
+import { MenuButton } from '../../../Components/MenuButton/MenuButton.jsx';
 
 import { getDefaultItems } from './data.js';
 import './PopupMenu.stories.scss';
 
 export default {
-    title: 'Components/PopupMenu',
+    title: 'Menu/PopupMenu',
     component: PopupMenu,
     parameters: {
         layout: 'centered',

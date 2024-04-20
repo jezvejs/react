@@ -4,7 +4,7 @@ import { DropDown } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
 // Local components
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
 import { BlueBox } from './components/BlueBox/BlueBox.jsx';
 
 import {
@@ -33,7 +33,7 @@ const textDecorator = (Story) => (
 );
 
 export default {
-    title: 'Components/DropDown',
+    title: 'Menu/DropDown',
     component: DropDown,
     parameters: {
         layout: 'fullscreen',

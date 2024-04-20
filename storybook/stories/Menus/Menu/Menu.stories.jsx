@@ -19,7 +19,7 @@ import {
 import './Menu.stories.scss';
 
 export default {
-    title: 'Components/Menu',
+    title: 'Menu/Menu',
     component: Menu,
     parameters: {
         layout: 'centered',
