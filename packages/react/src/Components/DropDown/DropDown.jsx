@@ -954,9 +954,9 @@ export const DropDown = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (state.visible) {
-            updatePosition();
+            setTimeout(() => updatePosition());
         }
-    }, [state.visible, state.items]);
+    }, [state.visible, state.items, state.inputString]);
 
     useEmptyClick(closeMenu, [elem, reference], state.visible);
 
