@@ -9,12 +9,17 @@ import './MenuHeader.scss';
  * Custom Menu header with Input component
  */
 export const DropDownMenuHeader = (props) => {
+    const {
+        onInput,
+        disabled,
+        multiple,
+    } = props;
     const { Input } = props.components;
 
     let placeholder = props.inputPlaceholder;
-    if (!props.multiple) {
-        const [item] = getSelectedItems(props);
-        const str = item?.title ?? '';
+    const [item] = getSelectedItems(props);
+    const str = item?.title ?? '';
+    if (!multiple) {
         const usePlaceholder = (
             !props.useSingleSelectionAsPlaceholder
             && placeholder?.length > 0
@@ -22,14 +27,16 @@ export const DropDownMenuHeader = (props) => {
         placeholder = (usePlaceholder) ? props.inputPlaceholder : str;
     }
 
+    const inputProps = {
+        className: classNames('dd__list-group__label', props.className),
+        placeholder,
+        onInput,
+        disabled,
+        value: props.inputString ?? ((multiple) ? '' : str),
+    };
+
     return (
-        <Input
-            {...props}
-            className={classNames('dd__list-group__label', props.className)}
-            placeholder={placeholder}
-            value={props.inputString}
-            ref={props.inputRef}
-        />
+        <Input {...inputProps} ref={props.inputRef} />
     );
 };
 
@@ -38,6 +45,7 @@ DropDownMenuHeader.propTypes = {
     inputString: PropTypes.string,
     inputPlaceholder: PropTypes.string,
     useSingleSelectionAsPlaceholder: PropTypes.bool,
+    disabled: PropTypes.bool,
     multiple: PropTypes.bool,
     onInput: PropTypes.func,
     className: PropTypes.string,
