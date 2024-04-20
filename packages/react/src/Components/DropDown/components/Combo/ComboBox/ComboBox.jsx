@@ -20,6 +20,8 @@ export const DropDownComboBox = forwardRef((props, ref) => {
     const {
         onInput,
         disabled,
+        multiple,
+        editable,
     } = props;
     const {
         Input,
@@ -39,20 +41,20 @@ export const DropDownComboBox = forwardRef((props, ref) => {
     const str = selectedItem?.title ?? '';
 
     const usePlaceholder = (
-        !props.useSingleSelectionAsPlaceholder
-        && props.placeholder?.length > 0
+        multiple || (
+            !props.useSingleSelectionAsPlaceholder
+            && props.placeholder?.length > 0
+        )
     );
     const placeholder = (usePlaceholder) ? props.placeholder : str;
-    const showPlaceholder = (
-        !props.editable && (props.multiple || usePlaceholder)
-    );
+    const showPlaceholder = (!editable && usePlaceholder);
 
     const activeItem = (props.showMultipleSelection && props.actSelItemIndex !== -1)
         ? selectedItems[props.actSelItemIndex]
         : null;
 
     const multipleSelection = (
-        props.multiple
+        multiple
         && props.showMultipleSelection
         && selectedItems.length > 0
         && (
@@ -67,14 +69,14 @@ export const DropDownComboBox = forwardRef((props, ref) => {
         )
     );
 
-    const showSingleSelection = !props.multiple && !props.editable && !showPlaceholder;
+    const showSingleSelection = !multiple && !editable && !showPlaceholder;
 
     const inputProps = {
         placeholder,
         onInput,
         disabled,
     };
-    if (props.editable) {
+    if (editable && !multiple) {
         inputProps.value = props.inputString ?? str;
     }
 
@@ -87,7 +89,7 @@ export const DropDownComboBox = forwardRef((props, ref) => {
                 {multipleSelection}
                 {showPlaceholder && <Placeholder placeholder={placeholder} />}
                 {showSingleSelection && <SingleSelection item={selectedItem} />}
-                {props.editable && <Input {...inputProps} ref={props.inputRef} />}
+                {editable && <Input {...inputProps} ref={props.inputRef} />}
             </div>
             <ComboBoxControls {...props} />
         </div>

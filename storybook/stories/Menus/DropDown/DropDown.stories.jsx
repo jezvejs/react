@@ -247,7 +247,7 @@ export const DisabledMultiple = {
         className: 'dd_stretch',
         disabled: true,
         multiple: true,
-        placeholder: 'Single select control',
+        placeholder: 'Multiple select control',
         items: initItems('Item', 10).map((item) => ({
             ...item,
             selected: (item.id === '3' || item.id === '5'),
