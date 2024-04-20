@@ -3,7 +3,7 @@ import '@jezvejs/react/style';
 import { useDebounce } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
 
 import './useDebounce.stories.scss';
 

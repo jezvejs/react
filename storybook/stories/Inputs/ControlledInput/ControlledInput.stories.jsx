@@ -3,7 +3,7 @@ import '@jezvejs/react/style';
 import { ControlledInput } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
 
 export default {
     title: 'Input/ControlledInput',

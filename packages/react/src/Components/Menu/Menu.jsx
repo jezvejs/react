@@ -355,7 +355,7 @@ export const Menu = forwardRef((props, ref) => {
     });
 
     const { Header, Footer, List } = state.components;
-    const menuHeader = Header && <Header {...(state.header ?? {})} components={state.components} />;
+    const menuHeader = Header && <Header {...(props.header ?? {})} components={state.components} />;
 
     const { className, ...rest } = state;
     const listProps = {
@@ -370,7 +370,7 @@ export const Menu = forwardRef((props, ref) => {
     listProps.itemSelector = listProps.components.ListItem.selector;
 
     const menuList = List && <List {...listProps} components={state.components} />;
-    const menuFooter = Footer && <Footer {...(state.footer ?? {})} components={state.components} />;
+    const menuFooter = Footer && <Footer {...(props.footer ?? {})} components={state.components} />;
 
     const { disabled } = props;
     let tabIndex = (props.tabThrough) ? -1 : (props.tabIndex ?? null);

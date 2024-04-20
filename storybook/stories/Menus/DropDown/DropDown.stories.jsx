@@ -1,11 +1,17 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { DropDown } from '@jezvejs/react';
+import { DropDown, Tags } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
-import { BlueBox } from './components/BlueBox/BlueBox.jsx';
+// Local components
+import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';
+import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.jsx';
 
+import {
+    initItems,
+    groupsItems,
+    initGroupItems,
+} from './data.js';
 import './DropDown.stories.scss';
 
 const heightDecorator = (Story) => (
@@ -26,70 +32,13 @@ const textDecorator = (Story) => (
     </div>
 );
 
-const initItems = (title = 'Item', count = 10, startFrom = 1) => {
-    const res = [];
-
-    for (let ind = startFrom; ind < startFrom + count; ind += 1) {
-        res.push({ id: ind.toString(), title: `${title} ${ind}` });
-    }
-
-    return res;
-};
-
-const groupsItems = () => ([{
-    id: 'grVisible',
-    title: 'Visible',
-    type: 'group',
-    items: [
-        { id: 'groupItem11', title: 'Item 1', group: 'grVisible' },
-        { id: 'groupItem12', title: 'Item 2', group: 'grVisible' },
-        {
-            id: 'groupItem13',
-            title: 'Item 3',
-            group: 'grVisible',
-            selected: true,
-        },
-    ],
-}, {
-    id: 'grHidden',
-    title: 'Hidden',
-    type: 'group',
-    items: [
-        { id: 'groupItem24', title: 'Item 4', group: 'grHidden' },
-        { id: 'groupItem25', title: 'Item 5', group: 'grHidden' },
-        { id: 'groupItem26', title: 'Item 6', group: 'grHidden' },
-    ],
-}]);
-
 export default {
-    title: 'Components/DropDown',
+    title: 'Menu/DropDown',
     component: DropDown,
     parameters: {
         layout: 'fullscreen',
     },
     tags: ['autodocs'],
-};
-
-const ToggleEnable = function (args) {
-    const [state, setState] = useState({
-        ...args,
-    });
-
-    function onToggle() {
-        setState((prev) => ({ ...prev, disabled: !prev.disabled }));
-    }
-
-    return (
-        <>
-            <div style={{ marginBottom: '1rem' }}>
-                <DropDown {...args} disabled={state.disabled} />
-            </div>
-            <ActionButton
-                title={(state.disabled ? 'Enable' : 'Disable')}
-                onClick={onToggle}
-            />
-        </>
-    );
 };
 
 export const Inline = {
@@ -178,17 +127,7 @@ export const AttachToBlock = {
         items: initItems('Long Item Lorem Lorem', 10),
     },
     decorators: [heightDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        return (
-            <DropDown {...args} container={portalElement}>
-                <BlueBox id="box" />
-            </DropDown>
-        );
-    },
+    render: AttachedToBlock,
 };
 
 export const AttachToInline = {
@@ -276,7 +215,7 @@ export const DisabledMultiple = {
         className: 'dd_stretch',
         disabled: true,
         multiple: true,
-        placeholder: 'Single select control',
+        placeholder: 'Multiple select control',
         items: initItems('Item', 10).map((item) => ({
             ...item,
             selected: (item.id === '3' || item.id === '5'),
@@ -312,59 +251,9 @@ export const FilterMultiple = {
     render: ToggleEnable,
 };
 
-const initGroupItems = () => ([
-    {
-        id: 'group10',
-        type: 'group',
-        title: '1 - 9',
-        items: [
-            { id: '1', title: 'Item 1', group: 'group10' },
-            { id: '2', title: 'Item 2', group: 'group10' },
-            { id: '3', title: 'Item 3', group: 'group10' },
-            { id: '4', title: 'Item 4', group: 'group10' },
-            { id: '5', title: 'Item 5', group: 'group10' },
-            { id: '6', title: 'Item 6', group: 'group10' },
-            { id: '7', title: 'Item 7', group: 'group10' },
-            { id: '8', title: 'Item 8', group: 'group10' },
-            { id: '9', title: 'Item 9', group: 'group10' },
-        ],
-    },
-    {
-        id: 'group20',
-        type: 'group',
-        title: '10 - 19',
-        items: [
-            { id: '10', title: 'Item 10', group: 'group20' },
-            { id: '11', title: 'Item 11', group: 'group20' },
-            { id: '12', title: 'Item 12', group: 'group20' },
-            { id: '13', title: 'Item 13', group: 'group20' },
-            { id: '14', title: 'Item 14', group: 'group20' },
-            { id: '15', title: 'Item 15', group: 'group20' },
-            { id: '16', title: 'Item 16', group: 'group20' },
-            { id: '17', title: 'Item 17', group: 'group20' },
-            { id: '18', title: 'Item 18', group: 'group20' },
-            { id: '19', title: 'Item 19', group: 'group20' },
-        ],
-    },
-    {
-        id: 'group30',
-        type: 'group',
-        title: '20 - 29',
-        items: [
-            { id: '20', title: 'Item 20', group: 'group30' },
-            { id: '21', title: 'Item 21', group: 'group30' },
-            { id: '22', title: 'Item 22', group: 'group30' },
-            { id: '23', title: 'Item 23', group: 'group30' },
-            { id: '24', title: 'Item 24', group: 'group30' },
-            { id: '25', title: 'Item 25', group: 'group30' },
-            { id: '26', title: 'Item 26', group: 'group30' },
-            { id: '27', title: 'Item 27', group: 'group30' },
-            { id: '28', title: 'Item 28', group: 'group30' },
-            { id: '29', title: 'Item 29', group: 'group30' },
-        ],
-    },
-]);
-
+/**
+ * With 'openOnFocus' option enabled
+ */
 export const FilterGroups = {
     args: {
         className: 'dd_stretch',
@@ -375,4 +264,151 @@ export const FilterGroups = {
     },
     decorators: [textDecorator],
     render: ToggleEnable,
+};
+
+/**
+ * By default focus is removed from input after select item from menu.
+ * Set 'blurInputOnSingleSelect' to false to keep input focused after select item.
+ */
+export const BlurInputOnSingleSelect = {
+    name: '\'blurInputOnSingleSelect\' option',
+    args: {
+        enableFilter: true,
+        blurInputOnSingleSelect: false,
+        placeholder: 'Type to filter',
+        items: initItems('Item', 10),
+    },
+    decorators: [textDecorator],
+};
+
+/**
+ * By default filter is not cleared after item selected if multiple items was found.
+ * In case only one item is found filter is cleared regardless of option value.
+ */
+export const ClearFilterOnSelect = {
+    name: '\'clearFilterOnMultiSelect\' option',
+    args: {
+        enableFilter: true,
+        clearFilterOnMultiSelect: true,
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_stretch',
+        items: initItems('Item', 100),
+    },
+    decorators: [textDecorator],
+};
+
+export const ShowMultipleSelection = {
+    name: '\'showMultipleSelection\' option',
+    args: {
+        enableFilter: true,
+        showMultipleSelection: false,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_stretch',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        const [state, setState] = useState({
+            items: [],
+        });
+
+        const onSelectionChange = (selection) => {
+            setState((prev) => ({
+                ...prev,
+                items: selection.map((item) => ({
+                    id: item.id,
+                    title: item.value,
+                })),
+            }));
+        };
+
+        return (
+            <div>
+                <Tags items={state.items} />
+                <DropDown
+                    {...args}
+                    onItemSelect={onSelectionChange}
+                    onChange={onSelectionChange}
+                />
+            </div>
+        );
+    },
+};
+
+export const ShowClearButton = {
+    name: '\'showClearButton\' option',
+    args: {
+        enableFilter: true,
+        showClearButton: false,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_form',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+};
+
+export const ShowToggleButton = {
+    name: '\'showToggleButton\' option',
+    args: {
+        enableFilter: true,
+        showToggleButton: false,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_form',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+};
+
+export const AllowCreate = {
+    name: '\'allowCreate\' option',
+    args: {
+        enableFilter: true,
+        allowCreate: true,
+        addItemMessage: (title) => `Add item: '${title}'`,
+        multiple: true,
+        placeholder: 'Type to filter',
+        className: 'dd_form',
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+};
+
+/**
+ * + \'useSingleSelectionAsPlaceholder\' option
+ */
+export const FilterAttachToBlock = {
+    name: 'Filter attached to block element',
+    args: {
+        boxId: 'filterBox',
+        listAttach: true,
+        enableFilter: true,
+        noResultsMessage: 'Nothing found',
+        placeholder: 'Type to filter',
+        useSingleSelectionAsPlaceholder: false,
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: AttachedToBlock,
+};
+
+export const FilterMultiAttachToBlock = {
+    name: 'Filter with multiple select attached',
+    args: {
+        boxId: 'boxFilterMulti',
+        listAttach: true,
+        enableFilter: true,
+        noResultsMessage: 'Nothing found',
+        multiple: true,
+        placeholder: 'Type to filter',
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: AttachedToBlock,
 };

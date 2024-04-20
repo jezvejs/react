@@ -1,7 +1,7 @@
 import { usePopupPosition } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { MenuButton } from '../../../../Components/MenuButton/MenuButton.jsx';
+import { MenuButton } from '../../../../../Components/MenuButton/MenuButton.jsx';
 import { PopupContainer } from '../PopupContainer/PopupContainer.jsx';
 
 export const MenuPopup = (props) => {

@@ -568,7 +568,7 @@ export const DropDown = forwardRef((props, ref) => {
         toggleMenu();
 
         if (!props.openOnFocus) {
-            focusInputIfNeeded();
+            setTimeout(() => focusInputIfNeeded());
         }
     };
 
@@ -954,9 +954,9 @@ export const DropDown = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (state.visible) {
-            updatePosition();
+            setTimeout(() => updatePosition());
         }
-    }, [state.visible, state.items]);
+    }, [state.visible, state.items, state.inputString]);
 
     useEmptyClick(closeMenu, [elem, reference], state.visible);
 
@@ -968,6 +968,7 @@ export const DropDown = forwardRef((props, ref) => {
         disabled: props.disabled,
     });
 
+    // Combo box
     const comboBoxProps = {
         ...state,
         inputRef: inputElem,
@@ -988,6 +989,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     const showInput = props.listAttach && props.enableFilter;
 
+    // Menu
     const menuProps = {
         ...state,
         inputRef: inputElem,
@@ -1007,14 +1009,31 @@ export const DropDown = forwardRef((props, ref) => {
             Header: (showInput) ? DropDownMenuHeader : null,
         },
     };
+
+    if (showInput) {
+        menuProps.header = {
+            inputRef: inputElem,
+            disabled: props.disabled,
+            inputString: state.inputString,
+            inputPlaceholder: props.placeholder,
+            useSingleSelectionAsPlaceholder: props.useSingleSelectionAsPlaceholder,
+            multiple: props.multiple,
+            onInput,
+            components: {
+                Input: props.components.Input,
+            },
+        };
+    }
+
     const menu = state.visible && (
-        <Menu
-            {...menuProps}
-            ref={elementRef}
-        />
+        <Menu {...menuProps} ref={elementRef} />
     );
 
+    // Menu popup
     const container = props.container ?? document.body;
+    const menuPopup = (state.fixedMenu)
+        ? createPortal(menu, container)
+        : menu;
 
     const selected = getSelectedItems(state);
     const selectedIds = selected.map((item) => item.id).join();
@@ -1072,13 +1091,8 @@ export const DropDown = forwardRef((props, ref) => {
                 {attachedTo}
             </div>
             {comboBox}
-
             {select}
-
-            {state.visible && !state.fixedMenu && menu}
-            {state.visible && state.fixedMenu && (
-                createPortal(menu, container)
-            )}
+            {menuPopup}
         </div>
     );
 });

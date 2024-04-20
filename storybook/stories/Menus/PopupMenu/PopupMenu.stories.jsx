@@ -3,43 +3,19 @@ import '@jezvejs/react/style';
 import { PopupMenu } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
-import SelectIcon from '../../assets/icons/select.svg';
-import SearchIcon from '../../assets/icons/search.svg';
-import { MenuButton } from '../../Components/MenuButton/MenuButton.jsx';
+import { MenuButton } from '../../../Components/MenuButton/MenuButton.jsx';
 
+import { getDefaultItems } from './data.js';
 import './PopupMenu.stories.scss';
 
 export default {
-    title: 'Components/PopupMenu',
+    title: 'Menu/PopupMenu',
     component: PopupMenu,
     parameters: {
         layout: 'centered',
     },
     tags: ['autodocs'],
 };
-
-const getDefaultItems = () => ([{
-    id: 'selectBtnItem',
-    icon: SelectIcon,
-    title: 'Button item',
-}, {
-    id: 'separator1',
-    type: 'separator',
-}, {
-    id: 'linkItem',
-    type: 'link',
-    title: 'Link item',
-    icon: SearchIcon,
-    url: '#123',
-}, {
-    id: 'noIconItem',
-    title: 'No icon item',
-}, {
-    id: 'checkboxItem',
-    type: 'checkbox',
-    title: 'Checkbox item',
-    selected: true,
-}]);
 
 const PopupMenuDemo = (args) => {
     const portalElement = useMemo(() => (
