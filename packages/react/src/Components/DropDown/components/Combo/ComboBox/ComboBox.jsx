@@ -76,8 +76,8 @@ export const DropDownComboBox = forwardRef((props, ref) => {
         onInput,
         disabled,
     };
-    if (editable && !multiple) {
-        inputProps.value = props.inputString ?? str;
+    if (editable) {
+        inputProps.value = props.inputString ?? ((multiple) ? '' : str);
     }
 
     return (
