@@ -4,8 +4,8 @@ import { DropDown, Tags } from '@jezvejs/react';
 import { useMemo, useState } from 'react';
 
 // Local components
-import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
-import { BlueBox } from './components/BlueBox/BlueBox.jsx';
+import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';
+import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.jsx';
 
 import {
     initItems,
@@ -39,40 +39,6 @@ export default {
         layout: 'fullscreen',
     },
     tags: ['autodocs'],
-};
-
-const ToggleEnable = function (args) {
-    const [state, setState] = useState({
-        ...args,
-    });
-
-    function onToggle() {
-        setState((prev) => ({ ...prev, disabled: !prev.disabled }));
-    }
-
-    return (
-        <>
-            <div style={{ marginBottom: '1rem' }}>
-                <DropDown {...args} disabled={state.disabled} />
-            </div>
-            <ActionButton
-                title={(state.disabled ? 'Enable' : 'Disable')}
-                onClick={onToggle}
-            />
-        </>
-    );
-};
-
-const AttachedToBlock = function ({ boxId = 'box', ...args }) {
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
-
-    return (
-        <DropDown {...args} container={portalElement}>
-            <BlueBox id={boxId} />
-        </DropDown>
-    );
 };
 
 export const Inline = {
