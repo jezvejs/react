@@ -74,6 +74,40 @@ export const DropDownContainer = forwardRef((props, ref) => {
     let windowEvents = null;
     let showListHandler = null;
 
+    /** Returns true if fullscreen mode is enabled and active */
+    const isFullScreen = () => (
+        props.fullScreen
+        && innerRef?.current
+        && !innerRef.current.offsetParent
+    );
+
+    const setFullScreenContainerHeight = () => {
+        const screenHeight = window.visualViewport.height;
+        dispatch(actions.setFullScreenHeight(screenHeight));
+    };
+
+    /** Handles window 'scroll' and viewport 'resize' events */
+    const onUpdatePosition = () => {
+        if (state.waitForScroll) {
+            showListHandler?.();
+            return false;
+        }
+
+        if (
+            !state.visible
+            // || isVisible(selectElem, true)
+        ) {
+            return false;
+        }
+
+        if (isFullScreen()) {
+            setFullScreenContainerHeight();
+            return false;
+        }
+
+        return true;
+    };
+
     const {
         referenceRef,
         elementRef,
@@ -94,8 +128,10 @@ export const DropDownContainer = forwardRef((props, ref) => {
             allowResize: false,
         }),
 
-        open: state.visible,
+        open: state.visible && !state.fullScreen,
         onScrollDone: () => dispatch(actions.startWindowListening()),
+        onWindowScroll: (e) => onUpdatePosition(e),
+        onViewportResize: (e) => onUpdatePosition(e),
     });
 
     /** Return index of selected item contains specified element */
@@ -228,40 +264,6 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const closeMenu = () => {
         showMenu(false);
         sendChangeEvent();
-    };
-
-    /** Returns true if fullscreen mode is enabled and active */
-    const isFullScreen = () => (
-        props.fullScreen
-        && innerRef?.current
-        && !innerRef.current.offsetParent
-    );
-
-    const setFullScreenContainerHeight = () => {
-        const screenHeight = window.visualViewport.height;
-        dispatch(actions.setFullScreenHeight(screenHeight));
-    };
-
-    /** Handles window 'scroll' and viewport 'resize' events */
-    const onUpdatePosition = () => {
-        if (state.waitForScroll) {
-            showListHandler?.();
-            return false;
-        }
-
-        if (
-            !state.visible
-            // || isVisible(selectElem, true)
-        ) {
-            return false;
-        }
-
-        if (isFullScreen()) {
-            setFullScreenContainerHeight();
-            return false;
-        }
-
-        return true;
     };
 
     const updateListPosition = () => {
@@ -916,9 +918,11 @@ export const DropDownContainer = forwardRef((props, ref) => {
     };
 
     const onViewportResize = () => {
+        updateListPosition();
     };
 
     const onWindowScroll = () => {
+        updateListPosition();
     };
 
     viewportEvents = { resize: (e) => onViewportResize(e) };
@@ -948,7 +952,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (state.visible) {
-            setTimeout(() => updatePosition());
+            setTimeout(() => updateListPosition());
         }
     }, [state.visible, state.items, state.inputString]);
 
@@ -1052,7 +1056,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const select = (<select tabIndex={selectTabIndex}></select>);
 
     const style = {};
-    if (state.fullScreenHeight) {
+    if (state.visible && state.fullScreenHeight) {
         style.height = px(state.fullScreenHeight);
     }
 
@@ -1069,6 +1073,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
                     dd__open: !state.fixedMenu && !!state.visible,
                     dd__editable: isEditable(state),
                     dd__list_active: isEditable(state),
+                    dd__fullscreen: !!state.fullScreen,
                 },
                 props.className,
             )}
@@ -1082,9 +1087,11 @@ export const DropDownContainer = forwardRef((props, ref) => {
             ref={innerRef}
             style={style}
         >
-            <div ref={referenceRef} >
-                {attachedTo}
-            </div>
+            {props.listAttach && (
+                <div ref={referenceRef} >
+                    {attachedTo}
+                </div>
+            )}
             {comboBox}
             {select}
             {menuPopup}

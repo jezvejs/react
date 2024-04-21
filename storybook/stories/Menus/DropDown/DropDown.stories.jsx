@@ -468,3 +468,43 @@ export const CollapsibleGroups = {
         );
     },
 };
+
+export const FullScreen = {
+    args: {
+        placeholder: 'Full screen',
+        className: 'dd_form',
+        fullScreen: true,
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        return (
+            <DropDown {...args} container={portalElement} />
+        );
+    },
+};
+
+export const FullScreenFilterMultiple = {
+    args: {
+        placeholder: 'Type to filter',
+        fullScreen: true,
+        multiple: true,
+        enableFilter: true,
+        className: 'dd_form',
+        items: initItems('Item', 50),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        return (
+            <DropDown {...args} container={portalElement} />
+        );
+    },
+};
