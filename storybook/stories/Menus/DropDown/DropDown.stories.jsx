@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';
+import { CollapsibleGroupsSelect } from './components/CollapsibleGroups/CollapsibleGroupsSelect.jsx';
 import { CustomControlsSelect } from './components/CustomControls/CustomControlsSelect.jsx';
 import { CustomListItem } from './components/CustomListItem/CustomListItem.jsx';
 import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.jsx';
@@ -446,6 +447,24 @@ export const CustomComboBoxComponents = {
     render: function Render(args) {
         return (
             <CustomControlsSelect {...args} />
+        );
+    },
+};
+
+export const CollapsibleGroups = {
+    args: {
+        className: 'dd_stretch',
+        placeholder: 'Select items',
+        multiple: true,
+        items: initGroupItems().map((item) => ({
+            ...item,
+            expanded: true,
+        })),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        return (
+            <CollapsibleGroupsSelect {...args} />
         );
     },
 };

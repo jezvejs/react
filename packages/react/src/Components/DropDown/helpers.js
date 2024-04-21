@@ -53,7 +53,7 @@ export const isEditable = (state) => (
     && (!state.fullScreen || state.visible)
 );
 
-export const isAvailableItem = (item, state) => (
+export const defaultIsAvailableItem = (item, state) => (
     !!item
     && !item.hidden
     && !item.disabled
@@ -64,6 +64,12 @@ export const isAvailableItem = (item, state) => (
     )
 );
 
+export const isAvailableItem = (item, state) => (
+    (state.isAvailableItem)
+        ? state.isAvailableItem(item, state)
+        : defaultIsAvailableItem(item, state)
+);
+
 /** Return array of visible and enabled list items */
 export const getAvailableItems = (state) => {
     const options = {
@@ -72,7 +78,7 @@ export const getAvailableItems = (state) => {
 
     const filterCallback = isFunction(state.isAvailableItem)
         ? (item) => state.isAvailableItem(item, state)
-        : (item) => isAvailableItem(item, state);
+        : (item) => defaultIsAvailableItem(item, state);
 
     return MenuHelpers.toFlatList(state.items, options).filter(filterCallback);
 };
@@ -97,12 +103,15 @@ export const getInitialState = (props, defaultProps) => {
         position: {
         },
         createItem: (item, state) => MenuHelpers.createMenuItem(item, state),
-        isAvailableItem: (item, state) => isAvailableItem(item, state),
         components: {
             ...(defaultProps?.components ?? {}),
             ...props.components,
         },
     };
+
+    res.isAvailableItem = isFunction(props.isAvailableItem)
+        ? (item, state) => props.isAvailableItem(item, state)
+        : (item, state) => defaultIsAvailableItem(item, state);
 
     res.items = props.items.map((item) => (
         MenuHelpers.createMenuItem(item, res)

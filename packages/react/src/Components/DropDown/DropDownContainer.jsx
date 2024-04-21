@@ -480,6 +480,15 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
     };
 
+    /** Handles group item select event */
+    const handleGroupItemSelect = (item) => {
+        props.onGroupHeaderClick?.({
+            item,
+            state,
+            dispatch,
+        });
+    };
+
     /** Handles user item select event */
     const handleItemSelect = (item) => {
         if (!item || item.disabled) {
@@ -492,6 +501,13 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
 
         activateSelectedItem(-1);
+
+        // Handle clicks by group header
+        if (item.type === 'group') {
+            handleGroupItemSelect(item);
+            return;
+        }
+
         toggleItem(item);
         sendItemSelectEvent();
         setChanged();
@@ -895,6 +911,10 @@ export const DropDownContainer = forwardRef((props, ref) => {
         setActive(itemId);
     };
 
+    const onGroupHeaderClick = ({ item }) => {
+        handleGroupItemSelect(item);
+    };
+
     const onViewportResize = () => {
     };
 
@@ -978,6 +998,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
         onDeleteSelectedItem,
         onClearSelection,
         onItemActivate,
+        onGroupHeaderClick,
         components: {
             ...state.components,
             Header: (showInput) ? DropDownMenuHeader : null,
@@ -1136,6 +1157,8 @@ DropDownContainer.propTypes = {
     showClearButton: PropTypes.bool,
     /* Enables render 'toggle' button inside combo box */
     showToggleButton: PropTypes.bool,
+    /* group header click event handler */
+    onGroupHeaderClick: PropTypes.func,
     /* item selected event handler */
     onItemSelect: PropTypes.func,
     /* selection changed event handler */
@@ -1198,6 +1221,7 @@ DropDownContainer.defaultProps = {
     showMultipleSelection: true,
     showClearButton: true,
     showToggleButton: true,
+    onGroupHeaderClick: null,
     onItemSelect: null,
     onChange: null,
     onInput: null,
