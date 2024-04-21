@@ -5,6 +5,9 @@ import { useMemo, useState } from 'react';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';
+import { CustomControlsSelect } from './components/CustomControls/CustomControlsSelect.jsx';
+import { CustomListItem } from './components/CustomListItem/CustomListItem.jsx';
+import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.jsx';
 import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.jsx';
 
 import {
@@ -381,7 +384,7 @@ export const AllowCreate = {
 };
 
 /**
- * + \'useSingleSelectionAsPlaceholder\' option
+ * With disabled \'useSingleSelectionAsPlaceholder\' option
  */
 export const FilterAttachToBlock = {
     name: 'Filter attached to block element',
@@ -411,4 +414,38 @@ export const FilterMultiAttachToBlock = {
     },
     decorators: [textDecorator],
     render: AttachedToBlock,
+};
+
+export const CustomComponents = {
+    args: {
+        className: 'dd__custom dd_stretch',
+        placeholder: 'Multi select control',
+        multiple: true,
+        items: initItems('Item', 11).map((item) => ({
+            ...item,
+            selected: item.id === '4' || item.id === '5',
+        })),
+        components: {
+            ListItem: CustomListItem,
+            Checkbox: CustomListItem,
+            MultiSelectionItem: CustomSelectionItem,
+        },
+    },
+    decorators: [textDecorator],
+};
+
+export const CustomComboBoxComponents = {
+    args: {
+        className: 'dd_stretch',
+        placeholder: 'Multi select control',
+        multiple: true,
+        enableFilter: true,
+        items: initItems('Filter item', 100),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        return (
+            <CustomControlsSelect {...args} />
+        );
+    },
 };

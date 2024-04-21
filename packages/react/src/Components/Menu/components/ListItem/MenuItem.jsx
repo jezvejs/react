@@ -16,6 +16,8 @@ export const MenuItem = (props) => {
         iconAlign,
         checkboxSide,
         activeItem,
+        before,
+        after,
     } = props;
 
     const isButton = type === 'button' || type === 'checkbox';
@@ -61,21 +63,27 @@ export const MenuItem = (props) => {
     );
 
     const hasBeforeContent = (
-        (iconAlign === 'left' && iconContent)
+        !!before
+        || (iconAlign === 'left' && iconContent)
         || (checkboxSide === 'left' && checkContent)
     );
     const hasAfterContent = (
-        (iconAlign === 'right' && iconContent)
+        !!after
+        || (iconAlign === 'right' && iconContent)
         || (checkboxSide === 'right' && checkContent)
     );
 
-    const beforeContent = (hasBeforeContent)
-        ? <div className='menu-item__side-content menu-item__before'>{iconContent ?? checkContent}</div>
-        : null;
+    const beforeContent = hasBeforeContent && (
+        <div className='menu-item__side-content menu-item__before'>
+            {before ?? iconContent ?? checkContent}
+        </div>
+    );
 
-    const afterContent = (hasAfterContent)
-        ? <div className='menu-item__side-content menu-item__after'>{checkContent ?? iconContent}</div>
-        : null;
+    const afterContent = hasAfterContent && (
+        <div className='menu-item__side-content menu-item__after'>
+            {after ?? checkContent ?? iconContent}
+        </div>
+    );
 
     const content = (
         <>
@@ -108,6 +116,16 @@ MenuItem.propTypes = {
     ]),
     iconAlign: PropTypes.oneOf(['left', 'right']),
     checkboxSide: PropTypes.oneOf(['left', 'right']),
+    before: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
+    beforeContent: PropTypes.bool,
+    after: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
+    afterContent: PropTypes.bool,
     icon: PropTypes.oneOfType([
         PropTypes.node,
         PropTypes.elementType,

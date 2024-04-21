@@ -340,6 +340,13 @@ export const Menu = forwardRef((props, ref) => {
 
     forItems(state.items, (item) => {
         const checkbox = isCheckbox(item);
+        if (item.before) {
+            beforeContent = true;
+        }
+        if (item.after) {
+            afterContent = true;
+        }
+
         if (!item.icon && !checkbox) {
             return;
         }
