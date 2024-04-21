@@ -126,7 +126,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     /** Return index of selected item contains specified element */
     const getSelectedItemIndex = (el) => {
-        const SelectionItemComponent = props.components.MultiSelectionItem;
+        const SelectionItemComponent = state.components.MultiSelectionItem;
         const selItemElem = el?.closest(SelectionItemComponent.selector);
         if (!selItemElem) {
             return -1;
@@ -170,7 +170,7 @@ export const DropDown = forwardRef((props, ref) => {
 
     /** Returns true if element is delete selection item button or its child */
     const isSelectionItemDeleteButtonTarget = (target) => {
-        const { MultiSelectionItem } = props.components;
+        const { MultiSelectionItem } = state.components;
         return target?.closest(`.${MultiSelectionItem.buttonClass}`);
     };
 
@@ -1005,7 +1005,7 @@ export const DropDown = forwardRef((props, ref) => {
         onClearSelection,
         onItemActivate,
         components: {
-            ...props.components,
+            ...state.components,
             Header: (showInput) ? DropDownMenuHeader : null,
         },
     };
