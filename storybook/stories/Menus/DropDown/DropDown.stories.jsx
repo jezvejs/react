@@ -469,6 +469,29 @@ export const CollapsibleGroups = {
     },
 };
 
+export const NativeSelect = {
+    name: '\'useNativeSelect\' option',
+    args: {
+        placeholder: 'Use native select',
+        useNativeSelect: true,
+        className: 'dd_form',
+        items: initItems('Item', 5),
+    },
+    decorators: [textDecorator],
+};
+
+export const NativeSelectMultiple = {
+    name: '\'useNativeSelect\' option multiple',
+    args: {
+        placeholder: 'Use native select',
+        useNativeSelect: true,
+        multiple: true,
+        className: 'dd_form',
+        items: initItems('Item', 5),
+    },
+    decorators: [textDecorator],
+};
+
 export const FullScreen = {
     args: {
         placeholder: 'Full screen',

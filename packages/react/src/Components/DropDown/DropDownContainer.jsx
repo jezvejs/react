@@ -21,6 +21,7 @@ import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.
 
 // Local components
 import { DropDownInput } from './components/Input/Input.jsx';
+import { DropDownNativeSelect } from './components/NativeSelect/NativeSelect.jsx';
 // Local components - Combo box
 import { DropDownComboBox } from './components/Combo/ComboBox/ComboBox.jsx';
 import { DropDownComboBoxControls } from './components/Combo/ComboBoxControls/ComboBoxControls.jsx';
@@ -158,6 +159,9 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Returns current input element if exists */
     const getInput = () => inputElem?.current;
+
+    /** Returns current select element if exists */
+    const getSelect = () => selectElem?.current;
 
     /** Returns true if element is child of component */
     const isChildTarget = (target) => (
@@ -648,7 +652,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
             activate(false);
         }
 
-        const selectEl = selectElem?.current;
+        const selectEl = getSelect();
         if (selectEl && e.target === selectEl) {
             sendChangeEvent();
         }
@@ -1053,7 +1057,17 @@ export const DropDownContainer = forwardRef((props, ref) => {
         tabIndex = (disableContainerTab) ? -1 : 0;
     }
 
-    const select = (<select tabIndex={selectTabIndex}></select>);
+    // Native select
+    const { NativeSelect } = state.components;
+    const nativeSelect = props.useNativeSelect && (
+        <NativeSelect
+            id={props.id}
+            disabled={props.disabled}
+            multiple={props.multiple}
+            tabIndex={selectTabIndex}
+            items={state.items}
+        />
+    );
 
     const style = {};
     if (state.visible && state.fullScreenHeight) {
@@ -1074,6 +1088,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
                     dd__editable: isEditable(state),
                     dd__list_active: isEditable(state),
                     dd__fullscreen: !!state.fullScreen,
+                    dd__container_native: !!state.useNativeSelect,
                 },
                 props.className,
             )}
@@ -1093,7 +1108,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
                 </div>
             )}
             {comboBox}
-            {select}
+            {nativeSelect}
             {menuPopup}
         </div>
     );
@@ -1184,6 +1199,7 @@ DropDownContainer.propTypes = {
     })),
     components: PropTypes.shape({
         Input: componentPropType,
+        NativeSelect: componentPropType,
         Placeholder: componentPropType,
         SingleSelection: componentPropType,
         ComboBox: componentPropType,
@@ -1234,6 +1250,7 @@ DropDownContainer.defaultProps = {
     onInput: null,
     components: {
         Input: DropDownInput,
+        NativeSelect: DropDownNativeSelect,
         Placeholder: DropDownPlaceholder,
         SingleSelection: DropDownSingleSelection,
         ComboBox: DropDownComboBox,

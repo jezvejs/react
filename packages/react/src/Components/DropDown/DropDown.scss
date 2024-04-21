@@ -163,6 +163,10 @@
 .dd__container_native.dd__container {
   position: relative;
 
+  .dd__list {
+    display: none;
+  }
+
   select {
     display: block;
     position: absolute;
@@ -235,8 +239,16 @@
 @media (min-width: 768px) {
   .dd__container_native.dd__container_attached,
   .dd__container_native.dd__container {
+    .dd__list.dd__list_open {
+      display: flex;
+    }
+
     select {
       display: none;
     }
+  }
+
+  .dd__container_native.dd__open .dd__list {
+    display: flex;
   }
 }
