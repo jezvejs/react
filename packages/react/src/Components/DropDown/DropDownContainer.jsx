@@ -21,6 +21,7 @@ import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.
 
 // Local components
 import { DropDownInput } from './components/Input/Input.jsx';
+import { DropDownNativeSelect } from './components/NativeSelect/NativeSelect.jsx';
 // Local components - Combo box
 import { DropDownComboBox } from './components/Combo/ComboBox/ComboBox.jsx';
 import { DropDownComboBoxControls } from './components/Combo/ComboBoxControls/ComboBoxControls.jsx';
@@ -74,6 +75,40 @@ export const DropDownContainer = forwardRef((props, ref) => {
     let windowEvents = null;
     let showListHandler = null;
 
+    /** Returns true if fullscreen mode is enabled and active */
+    const isFullScreen = () => (
+        props.fullScreen
+        && innerRef?.current
+        && !innerRef.current.offsetParent
+    );
+
+    const setFullScreenContainerHeight = () => {
+        const screenHeight = window.visualViewport.height;
+        dispatch(actions.setFullScreenHeight(screenHeight));
+    };
+
+    /** Handles window 'scroll' and viewport 'resize' events */
+    const onUpdatePosition = () => {
+        if (state.waitForScroll) {
+            showListHandler?.();
+            return false;
+        }
+
+        if (
+            !state.visible
+            // || isVisible(selectElem, true)
+        ) {
+            return false;
+        }
+
+        if (isFullScreen()) {
+            setFullScreenContainerHeight();
+            return false;
+        }
+
+        return true;
+    };
+
     const {
         referenceRef,
         elementRef,
@@ -94,8 +129,10 @@ export const DropDownContainer = forwardRef((props, ref) => {
             allowResize: false,
         }),
 
-        open: state.visible,
+        open: state.visible && !state.fullScreen,
         onScrollDone: () => dispatch(actions.startWindowListening()),
+        onWindowScroll: (e) => onUpdatePosition(e),
+        onViewportResize: (e) => onUpdatePosition(e),
     });
 
     /** Return index of selected item contains specified element */
@@ -122,6 +159,9 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Returns current input element if exists */
     const getInput = () => inputElem?.current;
+
+    /** Returns current select element if exists */
+    const getSelect = () => selectElem?.current;
 
     /** Returns true if element is child of component */
     const isChildTarget = (target) => (
@@ -228,40 +268,6 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const closeMenu = () => {
         showMenu(false);
         sendChangeEvent();
-    };
-
-    /** Returns true if fullscreen mode is enabled and active */
-    const isFullScreen = () => (
-        props.fullScreen
-        && innerRef?.current
-        && !innerRef.current.offsetParent
-    );
-
-    const setFullScreenContainerHeight = () => {
-        const screenHeight = window.visualViewport.height;
-        dispatch(actions.setFullScreenHeight(screenHeight));
-    };
-
-    /** Handles window 'scroll' and viewport 'resize' events */
-    const onUpdatePosition = () => {
-        if (state.waitForScroll) {
-            showListHandler?.();
-            return false;
-        }
-
-        if (
-            !state.visible
-            // || isVisible(selectElem, true)
-        ) {
-            return false;
-        }
-
-        if (isFullScreen()) {
-            setFullScreenContainerHeight();
-            return false;
-        }
-
-        return true;
     };
 
     const updateListPosition = () => {
@@ -480,6 +486,15 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
     };
 
+    /** Handles group item select event */
+    const handleGroupItemSelect = (item) => {
+        props.onGroupHeaderClick?.({
+            item,
+            state,
+            dispatch,
+        });
+    };
+
     /** Handles user item select event */
     const handleItemSelect = (item) => {
         if (!item || item.disabled) {
@@ -492,6 +507,13 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
 
         activateSelectedItem(-1);
+
+        // Handle clicks by group header
+        if (item.type === 'group') {
+            handleGroupItemSelect(item);
+            return;
+        }
+
         toggleItem(item);
         sendItemSelectEvent();
         setChanged();
@@ -630,7 +652,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
             activate(false);
         }
 
-        const selectEl = selectElem?.current;
+        const selectEl = getSelect();
         if (selectEl && e.target === selectEl) {
             sendChangeEvent();
         }
@@ -895,10 +917,16 @@ export const DropDownContainer = forwardRef((props, ref) => {
         setActive(itemId);
     };
 
+    const onGroupHeaderClick = ({ item }) => {
+        handleGroupItemSelect(item);
+    };
+
     const onViewportResize = () => {
+        updateListPosition();
     };
 
     const onWindowScroll = () => {
+        updateListPosition();
     };
 
     viewportEvents = { resize: (e) => onViewportResize(e) };
@@ -928,7 +956,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (state.visible) {
-            setTimeout(() => updatePosition());
+            setTimeout(() => updateListPosition());
         }
     }, [state.visible, state.items, state.inputString]);
 
@@ -978,6 +1006,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
         onDeleteSelectedItem,
         onClearSelection,
         onItemActivate,
+        onGroupHeaderClick,
         components: {
             ...state.components,
             Header: (showInput) ? DropDownMenuHeader : null,
@@ -1028,10 +1057,20 @@ export const DropDownContainer = forwardRef((props, ref) => {
         tabIndex = (disableContainerTab) ? -1 : 0;
     }
 
-    const select = (<select tabIndex={selectTabIndex}></select>);
+    // Native select
+    const { NativeSelect } = state.components;
+    const nativeSelect = props.useNativeSelect && (
+        <NativeSelect
+            id={props.id}
+            disabled={props.disabled}
+            multiple={props.multiple}
+            tabIndex={selectTabIndex}
+            items={state.items}
+        />
+    );
 
     const style = {};
-    if (state.fullScreenHeight) {
+    if (state.visible && state.fullScreenHeight) {
         style.height = px(state.fullScreenHeight);
     }
 
@@ -1048,6 +1087,8 @@ export const DropDownContainer = forwardRef((props, ref) => {
                     dd__open: !state.fixedMenu && !!state.visible,
                     dd__editable: isEditable(state),
                     dd__list_active: isEditable(state),
+                    dd__fullscreen: !!state.fullScreen,
+                    dd__container_native: !!state.useNativeSelect,
                 },
                 props.className,
             )}
@@ -1061,11 +1102,13 @@ export const DropDownContainer = forwardRef((props, ref) => {
             ref={innerRef}
             style={style}
         >
-            <div ref={referenceRef} >
-                {attachedTo}
-            </div>
+            {props.listAttach && (
+                <div ref={referenceRef} >
+                    {attachedTo}
+                </div>
+            )}
             {comboBox}
-            {select}
+            {nativeSelect}
             {menuPopup}
         </div>
     );
@@ -1136,6 +1179,8 @@ DropDownContainer.propTypes = {
     showClearButton: PropTypes.bool,
     /* Enables render 'toggle' button inside combo box */
     showToggleButton: PropTypes.bool,
+    /* group header click event handler */
+    onGroupHeaderClick: PropTypes.func,
     /* item selected event handler */
     onItemSelect: PropTypes.func,
     /* selection changed event handler */
@@ -1154,6 +1199,7 @@ DropDownContainer.propTypes = {
     })),
     components: PropTypes.shape({
         Input: componentPropType,
+        NativeSelect: componentPropType,
         Placeholder: componentPropType,
         SingleSelection: componentPropType,
         ComboBox: componentPropType,
@@ -1198,11 +1244,13 @@ DropDownContainer.defaultProps = {
     showMultipleSelection: true,
     showClearButton: true,
     showToggleButton: true,
+    onGroupHeaderClick: null,
     onItemSelect: null,
     onChange: null,
     onInput: null,
     components: {
         Input: DropDownInput,
+        NativeSelect: DropDownNativeSelect,
         Placeholder: DropDownPlaceholder,
         SingleSelection: DropDownSingleSelection,
         ComboBox: DropDownComboBox,

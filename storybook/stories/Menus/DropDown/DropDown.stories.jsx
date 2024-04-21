@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';
+import { CollapsibleGroupsSelect } from './components/CollapsibleGroups/CollapsibleGroupsSelect.jsx';
 import { CustomControlsSelect } from './components/CustomControls/CustomControlsSelect.jsx';
 import { CustomListItem } from './components/CustomListItem/CustomListItem.jsx';
 import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.jsx';
@@ -446,6 +447,87 @@ export const CustomComboBoxComponents = {
     render: function Render(args) {
         return (
             <CustomControlsSelect {...args} />
+        );
+    },
+};
+
+export const CollapsibleGroups = {
+    args: {
+        className: 'dd_stretch',
+        placeholder: 'Select items',
+        multiple: true,
+        items: initGroupItems().map((item) => ({
+            ...item,
+            expanded: true,
+        })),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        return (
+            <CollapsibleGroupsSelect {...args} />
+        );
+    },
+};
+
+export const NativeSelect = {
+    name: '\'useNativeSelect\' option',
+    args: {
+        placeholder: 'Use native select',
+        useNativeSelect: true,
+        className: 'dd_form',
+        items: initItems('Item', 5),
+    },
+    decorators: [textDecorator],
+};
+
+export const NativeSelectMultiple = {
+    name: '\'useNativeSelect\' option multiple',
+    args: {
+        placeholder: 'Use native select',
+        useNativeSelect: true,
+        multiple: true,
+        className: 'dd_form',
+        items: initItems('Item', 5),
+    },
+    decorators: [textDecorator],
+};
+
+export const FullScreen = {
+    args: {
+        placeholder: 'Full screen',
+        className: 'dd_form',
+        fullScreen: true,
+        items: initItems('Item', 20),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        return (
+            <DropDown {...args} container={portalElement} />
+        );
+    },
+};
+
+export const FullScreenFilterMultiple = {
+    args: {
+        placeholder: 'Type to filter',
+        fullScreen: true,
+        multiple: true,
+        enableFilter: true,
+        className: 'dd_form',
+        items: initItems('Item', 50),
+    },
+    decorators: [textDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        return (
+            <DropDown {...args} container={portalElement} />
         );
     },
 };

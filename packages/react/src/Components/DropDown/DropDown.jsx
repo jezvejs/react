@@ -9,6 +9,7 @@ import { combineReducers } from '../../utils/combineReducers.js';
 // Local components
 import { DropDownContainer } from './DropDownContainer.jsx';
 import { DropDownInput } from './components/Input/Input.jsx';
+import { DropDownNativeSelect } from './components/NativeSelect/NativeSelect.jsx';
 // Local components - Combo box
 import { DropDownComboBox } from './components/Combo/ComboBox/ComboBox.jsx';
 import { DropDownComboBoxControls } from './components/Combo/ComboBoxControls/ComboBoxControls.jsx';
@@ -37,6 +38,7 @@ export {
     // Combobox
     DropDownComboBox,
     DropDownInput,
+    DropDownNativeSelect,
     DropDownPlaceholder,
     DropDownSingleSelection,
     DropDownMultipleSelection,

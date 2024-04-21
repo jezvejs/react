@@ -9,7 +9,7 @@ export const DropDownListItem = (props) => (
     />
 );
 
-DropDownListItem.selector = '.dd__list-item';
+DropDownListItem.selector = MenuItem.selector;
 
 DropDownListItem.propTypes = {
     selected: PropTypes.bool,
