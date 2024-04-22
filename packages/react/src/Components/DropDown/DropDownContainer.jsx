@@ -5,6 +5,7 @@ import {
     useEffect,
     forwardRef,
     useImperativeHandle,
+    useCallback,
 } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
@@ -960,7 +961,11 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
     }, [state.visible, state.items, state.inputString]);
 
-    useEmptyClick(closeMenu, [elem, reference], state.visible);
+    const closeMenuCached = useCallback(() => {
+        closeMenu();
+    }, []);
+
+    useEmptyClick(closeMenuCached, [elem, reference], state.visible);
 
     const { Menu, ComboBox } = state.components;
 
