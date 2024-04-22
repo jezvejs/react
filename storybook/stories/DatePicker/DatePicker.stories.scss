@@ -1,0 +1,30 @@
+.height-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 350px 1rem;
+}
+
+.btn.input-group__btn {
+  --btn-icon-color: #ffffff;
+  --btn-background: var(--action-btn-bg);
+  --btn-hover-icon-color: #ffffff;
+  --btn-hover-background: var(--action-btn-hover-bg);
+}
+
+.width-container {
+  max-width: 600px;
+}
+
+.dp_full-width {
+  --dp-width: 100%;
+
+  .dp__wrapper {
+    width: var(--dp-width);
+  }
+}
+
+.right-container {
+  width: 5rem;
+  margin-left: auto;
+}
