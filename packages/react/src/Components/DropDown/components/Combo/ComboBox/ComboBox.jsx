@@ -32,8 +32,8 @@ export const DropDownComboBox = forwardRef((props, ref) => {
         ComboBoxControls,
     } = props.components;
 
-    const onDeleteSelectedItem = () => {
-        props?.onDeleteSelectedItem?.();
+    const onDeleteSelectedItem = (itemId, e) => {
+        props?.onDeleteSelectedItem?.({ itemId, e });
     };
 
     const selectedItems = getSelectedItems(props);

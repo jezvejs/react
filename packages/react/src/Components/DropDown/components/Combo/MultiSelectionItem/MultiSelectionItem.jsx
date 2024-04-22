@@ -12,6 +12,7 @@ export const DropDownMultiSelectionItem = (props) => (
     />
 );
 
+DropDownMultiSelectionItem.selector = Tag.selector;
 DropDownMultiSelectionItem.buttonClass = Tag.buttonClass;
 DropDownMultiSelectionItem.placeholderClass = Tag.placeholderClass;
 

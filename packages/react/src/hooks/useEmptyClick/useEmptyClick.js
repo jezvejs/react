@@ -1,19 +1,34 @@
 import { asArray } from '@jezvejs/types';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { setEmptyClick, removeEmptyClick } from './emptyClick.js';
 
 export function useEmptyClick(callback, elem, enabled = true) {
+    const timeoutRef = useRef(null);
+
+    const clear = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = 0;
+        }
+
+        removeEmptyClick(callback);
+    };
+
     useEffect(() => {
-        if (!callback || !enabled) {
+        if (!callback) {
             return undefined;
         }
 
-        const elems = asArray(elem).map((item) => item?.current);
-        setEmptyClick(callback, elems);
+        clear();
 
-        return () => {
-            removeEmptyClick(callback);
-        };
+        if (enabled) {
+            const elems = asArray(elem).map((item) => item?.current);
+            timeoutRef.current = setTimeout(() => {
+                setEmptyClick(callback, elems);
+            });
+        }
+
+        return () => clear();
     }, [callback, elem, enabled]);
 }
