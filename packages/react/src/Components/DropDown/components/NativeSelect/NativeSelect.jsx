@@ -5,6 +5,11 @@ const Option = (props) => (
     <option value={props.id}>{props.title}</option>
 );
 
+Option.propTypes = {
+    id: PropTypes.string,
+    title: PropTypes.string,
+};
+
 const OptGroup = (props) => (
     <optgroup label={props.title} disabled={props.disabled}>
         {props.items.map((item) => (
@@ -12,6 +17,13 @@ const OptGroup = (props) => (
         ))}
     </optgroup>
 );
+
+OptGroup.propTypes = {
+    id: PropTypes.string,
+    title: PropTypes.string,
+    disabled: PropTypes.bool,
+    items: PropTypes.array,
+};
 
 const renderListItem = ({ type, ...props }) => (
     (type === 'group')
