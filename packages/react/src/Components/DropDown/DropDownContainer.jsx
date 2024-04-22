@@ -668,7 +668,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     };
 
     /** Click by delete button of selected item event handler */
-    const onDeleteSelectedItem = (e) => {
+    const onDeleteSelectedItem = ({ e }) => {
         if (!state.multiple || !e) {
             return;
         }
@@ -808,7 +808,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
                 return;
             }
 
-            onDeleteSelectedItem(e);
+            onDeleteSelectedItem({ e });
             e.preventDefault();
             return;
         }
