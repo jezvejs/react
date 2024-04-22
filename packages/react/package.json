@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react",
-    "version": "0.22.0",
+    "version": "0.23.0",
     "type": "module",
     "files": [
         "src",
@@ -23,6 +23,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@jezvejs/datetime": "^1.1.0",
         "@jezvejs/dom": "^1.1.0",
         "@jezvejs/number": "^1.0.0",
         "@jezvejs/types": "^1.0.0",

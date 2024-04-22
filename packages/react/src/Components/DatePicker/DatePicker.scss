@@ -1,0 +1,208 @@
+/* Relative container of Date Picker */
+.dp__container {
+  --dp-padding: 0.5rem;
+  --dp-min-width: 200px;
+  --dp-bg-color: #ffffff;
+  --dp-border-color: #000000;
+  --dp-border-width: 2px;
+  --dp-text-color: #000000;
+  --dp-disabled-text-color: #dddddd;
+  --dp-focus-shadow: 0 0 0 0.25rem #0d6efd40;
+
+  /* Other item */
+  --dp-other-text-color: #b0b0b0;
+
+  /* Selected item */
+  --dp-active-text-color: #ffffff;
+  --dp-active-background: #20d0ff;
+  --dp-active-border-color: #20d0ff;
+
+  /* Today item */
+  --dp-today-text-color: var(--dp-text-color);
+  --dp-today-background: var(--dp-bg-color);
+  --dp-today-border-color: #20d0ff;
+
+  /* Hover item */
+  --dp-hover-bg-color: #80d0ff;
+  --dp-hover-color: #ffffff;
+  --dp-hover-border-color: transparent;
+
+  /* Selected range item */
+  --dp-hl-border-color: #20d0ff;
+  --dp-hl-bg-color: #20d0ff;
+  --dp-hl-color: #ffffff;
+
+  /* Range start item */
+  --dp-range-start-text-color: #20d0ff;
+  --dp-range-start-background: #ffffff;
+  --dp-range-start-border-width: 2px;
+  --dp-range-start-border-style: solid;
+  --dp-range-start-border-color: #20d0ff;
+
+  /* Range end item */
+  --dp-range-end-text-color: #20d0ff;
+  --dp-range-end-background: #ffffff;
+  --dp-range-end-border-width: 2px;
+  --dp-range-end-border-style: solid;
+  --dp-range-end-border-color: #20d0ff;
+
+  /* Header */
+  --dp-header-font-size: 1rem;
+  --dp-header-font-weight: 400;
+  --dp-nav-fill: #b0b0b0;
+  --dp-nav-hover-fill: #80d0ff;
+
+  /* Day cells */
+  --dp-day-cell-size: 2.5rem;
+  --dp-day-cell-font-size: 1rem;
+  --dp-day-cell-border-radius: 100vh;
+
+  /* Container */
+  --dp-width: calc(var(--dp-day-cell-size) * 7);
+  --dp-double-view-column-gap: 0.5rem;
+  --dp-double-view-row-gap: 0.5rem;
+
+  position: relative;
+  max-width: 100%;
+}
+
+/* View wrapper */
+.dp__wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+  position: absolute;
+  min-width: var(--dp-min-width);
+  padding: var(--dp-padding);
+  width: calc(
+    var(--dp-width) + (var(--dp-border-width) + var(--dp-padding)) * 2
+  );
+  overflow: hidden;
+  background-color: var(--dp-bg-color);
+  color: var(--dp-text-color);
+  border: var(--dp-border-width) solid var(--dp-border-color);
+  font-size: 1rem;
+  z-index: 1000;
+}
+
+.dp__inline-wrapper {
+  position: static;
+  z-index: auto;
+}
+
+/* Slider */
+.dp__view {
+  position: relative;
+  overflow: hidden;
+}
+
+.dp__slider {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  max-width: 100%;
+}
+
+/* Horizontal slider */
+.dp__horizontal {
+  touch-action: pan-y;
+
+  .dp__slider {
+    flex-flow: row nowrap;
+    left: -100%;
+  }
+}
+
+/* Vertical slider */
+.dp__vertical {
+  touch-action: pan-x;
+
+  .dp__slider {
+    flex-flow: column nowrap;
+    top: -100%;
+  }
+}
+
+/* Double views */
+.dp__double-view {
+  .dp__slider,
+  .dp__view {
+    column-gap: var(--dp-double-view-column-gap);
+    row-gap: var(--dp-double-view-row-gap);
+  }
+}
+
+@media (min-width: 724px) {
+  .dp__horizontal {
+    .dp__double-view {
+      &.dp__wrapper {
+        width: calc(
+          ((var(--dp-width) + var(--dp-border-width) + var(--dp-padding)) * 2) +
+            var(--dp-double-view-column-gap)
+        );
+      }
+
+      .dp__slider {
+        left: -50%;
+      }
+    }
+  }
+
+  .dp__vertical {
+    .dp__double-view .dp__slider {
+      top: -50%;
+    }
+  }
+}
+
+/* Zoom-in and zoom-out animations container */
+.dp__layered-view {
+  display: flex;
+  column-gap: var(--dp-double-view-column-gap);
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: none;
+  transition-delay: 0s;
+  transform-origin: 0 0;
+
+  &.top_from {
+    z-index: 3;
+    opacity: 1;
+  }
+
+  &.top_to {
+    z-index: 3;
+    opacity: 0;
+  }
+
+  &.bottom_from {
+    z-index: 2;
+    opacity: 1;
+  }
+
+  &.bottom_to {
+    z-index: 2;
+    opacity: 0;
+  }
+}
+
+.dp__horizontal .dp__layered-view {
+  flex-flow: row nowrap;
+}
+
+.dp__vertical .dp__layered-view {
+  flex-flow: column nowrap;
+}
+
+/* Animation */
+.dp__animated {
+  touch-action: none;
+}
+
+.dp__animated-view,
+.dp__animated-view > .dp__layered-view,
+.dp__animated-view .dp__slider {
+  transition-property: all;
+  transition-duration: 0.25s;
+  transition-timing-function: ease-in;
+}
