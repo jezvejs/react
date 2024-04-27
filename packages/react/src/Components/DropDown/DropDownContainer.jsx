@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { px } from '../../utils/common.js';
+import { useStore } from '../../utils/Store/StoreProvider.jsx';
 
 // Common components
 import { MenuCheckbox, MenuHelpers } from '../Menu/Menu.jsx';
@@ -52,7 +53,6 @@ import {
     getVisibleItems,
 } from './helpers.js';
 import { actions } from './reducer.js';
-import { useDropDownState, useDropDownDispatch } from './context.jsx';
 import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.js';
 
 /**
@@ -60,8 +60,7 @@ import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.js';
  */
 // eslint-disable-next-line react/display-name
 export const DropDownContainer = forwardRef((props, ref) => {
-    const state = useDropDownState();
-    const dispatch = useDropDownDispatch();
+    const { state, getState, dispatch } = useStore();
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -144,7 +143,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
             return -1;
         }
 
-        const selectedItems = getSelectedItems(state);
+        const selectedItems = getSelectedItems(getState());
         if (!Array.isArray(selectedItems)) {
             return -1;
         }
@@ -221,7 +220,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Return selected items data for 'itemselect' and 'change' events */
     const getSelectionData = () => {
-        const selectedItems = getSelectedItems(state)
+        const selectedItems = getSelectedItems(getState())
             .map((item) => ({ id: item.id, value: item.title }));
 
         if (state.multiple) {
@@ -401,17 +400,18 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Activate specified selected item */
     const activateSelectedItem = (index) => {
+        const current = getState();
         if (
             props.disabled
             || !state.multiple
-            || (state.actSelItemIndex === index)
+            || (current.actSelItemIndex === index)
         ) {
             return;
         }
 
         // Check correctness of index
         if (index !== -1) {
-            const selectedItems = getSelectedItems(state);
+            const selectedItems = getSelectedItems(current);
             if (index < 0 || index >= selectedItems.length) {
                 return;
             }
@@ -432,7 +432,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Activate last(right) selected item */
     const activateLastSelectedItem = () => {
-        const selectedItems = getSelectedItems(state);
+        const selectedItems = getSelectedItems(getState());
         if (!selectedItems.length) {
             return;
         }
@@ -669,6 +669,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Click by delete button of selected item event handler */
     const onDeleteSelectedItem = ({ e }) => {
+        const current = getState();
         if (!state.multiple || !e) {
             return;
         }
@@ -680,12 +681,12 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
         const index = (isClick)
             ? getSelectedItemIndex(e.target)
-            : state.actSelItemIndex;
+            : current.actSelItemIndex;
         if (index === -1) {
             return;
         }
 
-        const selectedItems = getSelectedItems(state);
+        const selectedItems = getSelectedItems(current);
         if (!selectedItems.length) {
             return;
         }
@@ -722,16 +723,17 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Handler for left or right arrow keys */
     const onSelectionNavigate = (e) => {
+        const current = getState();
         if (!state.multiple) {
             return;
         }
 
-        const selectedItems = getSelectedItems(state);
+        const selectedItems = getSelectedItems(current);
         if (!selectedItems.length) {
             return;
         }
 
-        const index = state.actSelItemIndex;
+        const index = current.actSelItemIndex;
         if (e.code === 'ArrowLeft') {
             if (index === 0) {
                 return;
