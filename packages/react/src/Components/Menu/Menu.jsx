@@ -39,8 +39,11 @@ const {
     getNextItem,
     getPreviousItem,
     isAvailableItem,
+    getItemProps,
     isCheckbox,
     toggleSelectItem,
+    createItems,
+    getInitialState,
 } = MenuHelpers;
 
 /**
@@ -48,16 +51,8 @@ const {
  */
 // eslint-disable-next-line react/display-name
 export const Menu = forwardRef((props, ref) => {
-    const [state, setState] = useState({
-        ...Menu.defaultProps,
-        ...props,
-        activeItem: null,
-        ignoreTouch: false,
-        components: {
-            ...Menu.defaultProps.components,
-            ...(props.components ?? {}),
-        },
-    });
+    const initial = getInitialState(props, Menu.defaultProps);
+    const [state, setState] = useState(initial);
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -327,7 +322,7 @@ export const Menu = forwardRef((props, ref) => {
     useEffect(() => {
         setState((prev) => ({
             ...prev,
-            items: props.items,
+            items: createItems(props.items, prev),
             activeItem: props.activeItem,
         }));
     }, [props.items, props.activeItem]);
@@ -418,6 +413,7 @@ Menu.propTypes = {
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
     isAvailableItem: PropTypes.func,
+    getItemProps: PropTypes.func,
     onGroupHeaderClick: PropTypes.func,
     onItemActivate: PropTypes.func,
     allowActiveGroupHeader: PropTypes.bool,
@@ -458,6 +454,7 @@ Menu.defaultProps = {
     footer: null,
     onItemClick: null,
     isAvailableItem,
+    getItemProps,
     onGroupHeaderClick: null,
     renderNotSelected: false,
     allowActiveGroupHeader: false,

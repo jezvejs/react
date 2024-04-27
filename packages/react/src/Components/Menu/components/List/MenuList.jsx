@@ -55,6 +55,10 @@ export const MenuList = (props) => {
         return <ListItem {...item} />;
     };
 
+    const itemProps = (item, state) => (
+        state.getItemProps(item, state)
+    );
+
     return (
         <div
             className={classNames(
@@ -73,24 +77,7 @@ export const MenuList = (props) => {
         >
             {(props.items.length > 0)
                 ? props.items.map((item) => (
-                    itemElement({
-                        ...ListItem.defaultProps,
-                        ...item,
-                        iconAlign: item.iconAlign || props.iconAlign,
-                        disabled: item.disabled || props.disabled,
-                        checkboxSide: item.checkboxSide || props.checkboxSide,
-                        renderNotSelected: item.renderNotSelected ?? props.renderNotSelected,
-                        activeItem: props.activeItem,
-                        tabThrough: props.tabThrough,
-                        key: item.id,
-                        type: item.type ?? props.defaultItemType,
-                        components: props.components,
-                        beforeContent: item.beforeContent || props.beforeContent,
-                        afterContent: item.afterContent || props.afterContent,
-                        onItemClick: props.onItemClick,
-                        onMouseEnter: props.onMouseEnter,
-                        onMouseLeave: props.onMouseLeave,
-                    })
+                    itemElement(itemProps(item, props))
                 ))
                 : (ListPlaceholder && <ListPlaceholder {...props} />)
             }
@@ -113,6 +100,7 @@ MenuList.propTypes = {
     onItemClick: PropTypes.func,
     onMouseEnter: PropTypes.func,
     onMouseLeave: PropTypes.func,
+    getItemProps: PropTypes.func,
     activeItem: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.oneOf([null]),
