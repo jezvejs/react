@@ -28,6 +28,7 @@ export { Switch } from './Components/Switch/Switch.jsx';
 export { TabList } from './Components/TabList/TabList.jsx';
 export { Tag } from './Components/Tag/Tag.jsx';
 export * from './Components/Tags/Tags.jsx';
+export { WeekDaySelect } from './Components/WeekDaySelect/WeekDaySelect.jsx';
 
 // Hooks
 export { useDebounce } from './hooks/useDebounce/useDebounce.js';

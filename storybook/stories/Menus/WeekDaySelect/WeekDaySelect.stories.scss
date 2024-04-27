@@ -1,0 +1,40 @@
+.weekday-select.styled {
+  --menu-item-size: 2rem;
+  --menu-item-border-width: 1px;
+  --menu-item-border-color: #ff3c00;
+  --menu-item-text-color: #ff3c00;
+
+  /* Selected item */
+  --menu-item-selected-text-color: #ffffff;
+  --menu-item-selected-background: #ff3c00;
+
+  /* Focused item */
+  --menu-item-focus-text-color: #ffffff;
+  --menu-item-focus-background: #ff3c00;
+
+  /* Hover item */
+  --menu-item-hover-text-color: #ffffff;
+  --menu-item-hover-background: #ff3c00;
+
+  /* Disabled item */
+  --menu-item-disabled-border-color: var(--menu-item-disabled-text-color);
+
+  .menu-item,
+  .menu-item:visited {
+    border-radius: 100vh;
+    width: var(--menu-item-size);
+    height: var(--menu-item-size);
+    justify-content: center;
+    align-items: center;
+
+    .menu-item__content {
+      min-height: 0;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+
+  .checkbox__check {
+    display: none;
+  }
+}

@@ -1,0 +1,12 @@
+.weekday-select {
+  --menu-item-text-transform: capitalize;
+  --menu-item-padding: 2px;
+  --menu-column-gap: 12px;
+  --menu-row-gap: 6px;
+  --menu-item-gap: 6px;
+  --menu-item-selected-font-weight: 600;
+
+  .menu-list {
+    flex-flow: row nowrap;
+  }
+}
