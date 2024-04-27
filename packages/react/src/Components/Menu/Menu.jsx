@@ -4,6 +4,7 @@ import {
     forwardRef,
     useImperativeHandle,
     useEffect,
+    useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -32,7 +33,7 @@ export {
 const {
     findLastMenuItem,
     findMenuItem,
-    forItems,
+    toFlatList,
     getActiveItem,
     getClosestItemElement,
     getItemById,
@@ -331,31 +332,47 @@ export const Menu = forwardRef((props, ref) => {
     }, [props.items, props.activeItem]);
 
     // Prepare alignment before and after item content
-    let beforeContent = false;
-    let afterContent = false;
+    const columns = useMemo(() => {
+        const res = {
+            beforeContent: false,
+            afterContent: false,
+        };
 
-    forItems(state.items, (item) => {
-        const checkbox = isCheckbox(item);
-        if (item.before) {
-            beforeContent = true;
-        }
-        if (item.after) {
-            afterContent = true;
+        const flatItems = toFlatList(state.items, {
+            includeGroupItems: state.allowActiveGroupHeader,
+        });
+
+        for (let index = 0; index < flatItems.length; index += 1) {
+            const item = flatItems[index];
+            const checkbox = isCheckbox(item);
+            if (item.before) {
+                res.beforeContent = true;
+            }
+            if (item.after) {
+                res.afterContent = true;
+            }
+            if (!item.icon && !checkbox) {
+                continue;
+            }
+
+            const isLeftCheckbox = (state.checkboxSide === 'left' || item.checkboxSide === 'left');
+            const isLeftIcon = (state.iconAlign === 'left' || item.iconAlign === 'left');
+            if (
+                (checkbox && isLeftCheckbox)
+                || (item.icon && isLeftIcon)
+            ) {
+                res.beforeContent = true;
+            } else {
+                res.afterContent = true;
+            }
+
+            if (res.beforeContent && res.afterContent) {
+                break;
+            }
         }
 
-        if (!item.icon && !checkbox) {
-            return;
-        }
-
-        if (
-            (checkbox && (state.checkboxSide === 'left' || item.checkboxSide === 'left'))
-            || (item.icon && (state.iconAlign === 'left' || item.iconAlign === 'left'))
-        ) {
-            beforeContent = true;
-        } else {
-            afterContent = true;
-        }
-    });
+        return res;
+    }, [props.items]);
 
     const { Header, Footer, List } = state.components;
     const menuHeader = Header && <Header {...(props.header ?? {})} components={state.components} />;
@@ -363,8 +380,7 @@ export const Menu = forwardRef((props, ref) => {
     const { className, ...rest } = state;
     const listProps = {
         ...rest,
-        beforeContent,
-        afterContent,
+        ...columns,
         onItemClick: handleItemClick,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
