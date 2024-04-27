@@ -110,6 +110,19 @@ export const Scroll = {
     },
 };
 
+/**
+ * Disabled \'focusItemOnHover\' option. Default is enabled.
+ */
+export const FocusItemOnHover = {
+    name: '\'focusItemOnHover\' option',
+    args: {
+        id: 'focusOnHoverMenu',
+        focusItemOnHover: false,
+        className: 'horizontal-menu',
+        items: initItems('Menu item', 4),
+    },
+};
+
 export const Groups = {
     args: {
         items: groupItems,

@@ -146,7 +146,10 @@ export const Menu = forwardRef((props, ref) => {
     };
 
     const handleMouseEnter = (itemId, e) => {
-        if (state.ignoreTouch) {
+        if (
+            state.ignoreTouch
+            || !state.focusItemOnHover
+        ) {
             return;
         }
 
@@ -409,6 +412,7 @@ Menu.propTypes = {
     tabIndex: PropTypes.number,
     loopNavigation: PropTypes.bool,
     preventNavigation: PropTypes.bool,
+    focusItemOnHover: PropTypes.bool,
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
@@ -450,6 +454,7 @@ Menu.defaultProps = {
     tabIndex: 0,
     loopNavigation: true,
     preventNavigation: false,
+    focusItemOnHover: true,
     header: null,
     footer: null,
     onItemClick: null,
