@@ -370,7 +370,6 @@ export const getItemProps = (item, state) => {
         renderNotSelected: item.renderNotSelected || state.renderNotSelected,
         activeItem: state.activeItem,
         tabThrough: state.tabThrough,
-        key: item.id,
         type: item.type ?? state.defaultItemType,
         components: state.components,
         beforeContent: item.beforeContent || state.beforeContent,
