@@ -22,6 +22,7 @@ export const getDefaultItems = () => ([{
     type: 'checkbox',
     title: 'Checkbox item',
     selected: true,
+    selectable: true,
 }]);
 
 export const getHorizontalItems = () => ([{
@@ -81,42 +82,51 @@ export const checkboxGroupItems = [{
     id: 'noGroupItem1',
     title: 'No group item 1',
     type: 'checkbox',
+    selectable: true,
 }, {
     id: 'group1',
     type: 'group',
     title: 'Group 1',
+    selectable: true,
     items: [{
         id: 'groupItem11',
         title: 'Group 1 item 1',
         type: 'checkbox',
+        selectable: true,
     }, {
         id: 'groupItem12',
         title: 'Group 1 item 2',
         type: 'checkbox',
+        selectable: true,
         disabled: true,
     }, {
         id: 'groupItem13',
         title: 'Group 1 item 3',
         type: 'checkbox',
+        selectable: true,
     }],
 }, {
     id: 'noGroupItem2',
     title: 'No group item 2',
     type: 'checkbox',
+    selectable: true,
 }, {
     id: 'group2',
     type: 'group',
     title: 'Group 2',
     disabled: true,
+    selectable: true,
     items: [{
         id: 'groupItem21',
         title: 'Group 2 item 1',
         type: 'checkbox',
+        selectable: true,
     }],
 }, {
     id: 'noGroupItem3',
     title: 'No group item 3',
     type: 'checkbox',
+    selectable: true,
 }];
 
 export const initItems = (title, count, startFrom = 1) => {

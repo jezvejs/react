@@ -358,16 +358,28 @@ export const isAvailableItem = (item, state) => (
     )
 );
 
-export const toggleSelectItem = (itemId) => (prev) => ({
-    ...prev,
-    items: mapItems(prev.items, (item) => ({
-        ...item,
-        selected: (
-            (item.id === itemId)
-                ? (!item.selected)
-                : item.selected
-        ),
-    })),
+export const toggleSelectItem = (itemId) => (state) => ({
+    ...state,
+    items: mapItems(
+        state.items,
+        (item) => {
+            if (item.id?.toString() === itemId) {
+                if (!item.selectable || item.disabled) {
+                    return item;
+                }
+
+                return {
+                    ...item,
+                    selected: (state.multiple) ? !item.selected : true,
+                };
+            }
+
+            return (state.multiple)
+                ? item
+                : { ...item, selected: false };
+        },
+        { includeGroupItems: state.allowActiveGroupHeader },
+    ),
 });
 
 /**

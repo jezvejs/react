@@ -261,9 +261,7 @@ export const Menu = forwardRef((props, ref) => {
             return;
         }
 
-        if (isCheckbox(clickedItem)) {
-            toggleItem(itemId);
-        }
+        toggleItem(itemId);
 
         finishClick(() => props.onItemClick?.(clickedItem, e));
     };
