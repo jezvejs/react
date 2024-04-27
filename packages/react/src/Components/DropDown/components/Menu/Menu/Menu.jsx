@@ -44,6 +44,7 @@ export const DropDownMenu = forwardRef((props, ref) => {
 });
 
 DropDownMenu.propTypes = {
+    ...Menu.propTypes,
     parentId: PropTypes.string,
     visible: PropTypes.bool,
     showInput: PropTypes.bool,
@@ -84,6 +85,7 @@ DropDownMenu.propTypes = {
 };
 
 DropDownMenu.defaultProps = {
+    ...Menu.defaultProps,
     parentId: null,
     items: [],
     showInput: false,

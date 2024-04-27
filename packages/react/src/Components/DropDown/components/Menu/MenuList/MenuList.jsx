@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { MenuList } from '../../../../Menu/Menu.jsx';
 
 /**
@@ -9,24 +8,9 @@ export const DropDownMenuList = (props) => (
 );
 
 DropDownMenuList.propTypes = {
-    selected: PropTypes.string,
-    active: PropTypes.bool,
-    hidden: PropTypes.bool,
-    disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
-    group: PropTypes.string,
-    className: PropTypes.string,
+    ...MenuList.propTypes,
 };
 
 DropDownMenuList.defaultProps = {
-    items: [],
-    multiple: false,
-    filtered: false,
-    inputString: false,
-    components: {
-        ListItem: null,
-        Checkbox: null,
-        ListPlaceholder: null,
-        GroupItem: null,
-    },
+    ...MenuList.defaultProps,
 };

@@ -12,20 +12,11 @@ export const DropDownListItem = (props) => (
 DropDownListItem.selector = MenuItem.selector;
 
 DropDownListItem.propTypes = {
-    selected: PropTypes.bool,
-    active: PropTypes.bool,
+    ...MenuItem.propTypes,
     hidden: PropTypes.bool,
-    disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
-    group: PropTypes.string,
-    className: PropTypes.string,
 };
 
 DropDownListItem.defaultProps = {
-    selected: false,
-    active: false,
+    ...MenuItem.defaultProps,
     hidden: false,
-    disabled: false,
-    multiple: false,
-    group: null,
 };
