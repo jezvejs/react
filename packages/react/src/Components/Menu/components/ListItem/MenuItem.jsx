@@ -106,6 +106,7 @@ MenuItem.propTypes = {
     url: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
+    selectable: PropTypes.bool,
     selected: PropTypes.bool,
     disabled: PropTypes.bool,
     tabThrough: PropTypes.bool,
@@ -137,6 +138,7 @@ MenuItem.propTypes = {
 
 MenuItem.defaultProps = {
     type: 'button',
+    selectable: true,
     selected: false,
     disabled: false,
     renderNotSelected: false,

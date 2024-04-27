@@ -1,4 +1,4 @@
-import { isFunction } from '@jezvejs/types';
+import { asArray, isFunction } from '@jezvejs/types';
 
 const checkboxTypes = ['checkbox', 'checkbox-link'];
 
@@ -358,16 +358,57 @@ export const isAvailableItem = (item, state) => (
     )
 );
 
-export const toggleSelectItem = (itemId) => (prev) => ({
-    ...prev,
-    items: mapItems(prev.items, (item) => ({
+export const getItemProps = (item, state) => {
+    const { ListItem } = state.components;
+
+    const res = {
+        ...ListItem.defaultProps,
         ...item,
-        selected: (
-            (item.id === itemId)
-                ? (!item.selected)
-                : item.selected
-        ),
-    })),
+        iconAlign: item.iconAlign || state.iconAlign,
+        disabled: item.disabled || state.disabled,
+        checkboxSide: item.checkboxSide || state.checkboxSide,
+        renderNotSelected: item.renderNotSelected || state.renderNotSelected,
+        activeItem: state.activeItem,
+        tabThrough: state.tabThrough,
+        key: item.id,
+        type: item.type ?? state.defaultItemType,
+        components: state.components,
+        beforeContent: item.beforeContent || state.beforeContent,
+        afterContent: item.afterContent || state.afterContent,
+        onItemClick: state.onItemClick,
+        onMouseEnter: state.onMouseEnter,
+        onMouseLeave: state.onMouseLeave,
+    };
+
+    if (item.type === 'group') {
+        res.getItemProps = state.getItemProps;
+    }
+
+    return res;
+};
+
+export const toggleSelectItem = (itemId) => (state) => ({
+    ...state,
+    items: mapItems(
+        state.items,
+        (item) => {
+            if (item.id?.toString() === itemId) {
+                if (!item.selectable || item.disabled) {
+                    return item;
+                }
+
+                return {
+                    ...item,
+                    selected: (state.multiple) ? !item.selected : true,
+                };
+            }
+
+            return (state.multiple)
+                ? item
+                : { ...item, selected: false };
+        },
+        { includeGroupItems: state.allowActiveGroupHeader },
+    ),
 });
 
 /**
@@ -422,6 +463,43 @@ export const createMenuItem = (props, state) => {
     ) {
         res.type = (type === 'checkbox') ? 'button' : 'link';
     }
+
+    return res;
+};
+
+/**
+ * Create menu items from specified array
+ * @param {Object|Object[]} items
+ * @param {Object} state
+ */
+export const createItems = (items, state) => (
+    mapItems(
+        asArray(items),
+        (item) => createMenuItem(item, state),
+        { includeGroupItems: state.allowActiveGroupHeader },
+    )
+);
+
+/**
+ * Returns initial state object for specified props
+ *
+ * @param {Object} props
+ * @param {Object} defaultProps
+ * @returns {Object}
+ */
+export const getInitialState = (props, defaultProps) => {
+    const res = {
+        ...(defaultProps ?? {}),
+        ...props,
+        activeItem: null,
+        ignoreTouch: false,
+        components: {
+            ...(defaultProps?.components ?? {}),
+            ...props.components,
+        },
+    };
+
+    res.items = createItems(props.items, res);
 
     return res;
 };

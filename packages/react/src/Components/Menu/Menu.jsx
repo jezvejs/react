@@ -4,6 +4,7 @@ import {
     forwardRef,
     useImperativeHandle,
     useEffect,
+    useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -32,15 +33,18 @@ export {
 const {
     findLastMenuItem,
     findMenuItem,
-    forItems,
+    toFlatList,
     getActiveItem,
     getClosestItemElement,
     getItemById,
     getNextItem,
     getPreviousItem,
     isAvailableItem,
+    getItemProps,
     isCheckbox,
     toggleSelectItem,
+    createItems,
+    getInitialState,
 } = MenuHelpers;
 
 /**
@@ -48,16 +52,8 @@ const {
  */
 // eslint-disable-next-line react/display-name
 export const Menu = forwardRef((props, ref) => {
-    const [state, setState] = useState({
-        ...Menu.defaultProps,
-        ...props,
-        activeItem: null,
-        ignoreTouch: false,
-        components: {
-            ...Menu.defaultProps.components,
-            ...(props.components ?? {}),
-        },
-    });
+    const initial = getInitialState(props, Menu.defaultProps);
+    const [state, setState] = useState(initial);
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -151,7 +147,10 @@ export const Menu = forwardRef((props, ref) => {
     };
 
     const handleMouseEnter = (itemId, e) => {
-        if (state.ignoreTouch) {
+        if (
+            state.ignoreTouch
+            || !state.focusItemOnHover
+        ) {
             return;
         }
 
@@ -261,9 +260,7 @@ export const Menu = forwardRef((props, ref) => {
             return;
         }
 
-        if (isCheckbox(clickedItem)) {
-            toggleItem(itemId);
-        }
+        toggleItem(itemId);
 
         finishClick(() => props.onItemClick?.(clickedItem, e));
     };
@@ -329,37 +326,53 @@ export const Menu = forwardRef((props, ref) => {
     useEffect(() => {
         setState((prev) => ({
             ...prev,
-            items: props.items,
+            items: createItems(props.items, prev),
             activeItem: props.activeItem,
         }));
     }, [props.items, props.activeItem]);
 
     // Prepare alignment before and after item content
-    let beforeContent = false;
-    let afterContent = false;
+    const columns = useMemo(() => {
+        const res = {
+            beforeContent: false,
+            afterContent: false,
+        };
 
-    forItems(state.items, (item) => {
-        const checkbox = isCheckbox(item);
-        if (item.before) {
-            beforeContent = true;
-        }
-        if (item.after) {
-            afterContent = true;
+        const flatItems = toFlatList(state.items, {
+            includeGroupItems: state.allowActiveGroupHeader,
+        });
+
+        for (let index = 0; index < flatItems.length; index += 1) {
+            const item = flatItems[index];
+            const checkbox = isCheckbox(item);
+            if (item.before) {
+                res.beforeContent = true;
+            }
+            if (item.after) {
+                res.afterContent = true;
+            }
+            if (!item.icon && !checkbox) {
+                continue;
+            }
+
+            const isLeftCheckbox = (state.checkboxSide === 'left' || item.checkboxSide === 'left');
+            const isLeftIcon = (state.iconAlign === 'left' || item.iconAlign === 'left');
+            if (
+                (checkbox && isLeftCheckbox)
+                || (item.icon && isLeftIcon)
+            ) {
+                res.beforeContent = true;
+            } else {
+                res.afterContent = true;
+            }
+
+            if (res.beforeContent && res.afterContent) {
+                break;
+            }
         }
 
-        if (!item.icon && !checkbox) {
-            return;
-        }
-
-        if (
-            (checkbox && (state.checkboxSide === 'left' || item.checkboxSide === 'left'))
-            || (item.icon && (state.iconAlign === 'left' || item.iconAlign === 'left'))
-        ) {
-            beforeContent = true;
-        } else {
-            afterContent = true;
-        }
-    });
+        return res;
+    }, [props.items]);
 
     const { Header, Footer, List } = state.components;
     const menuHeader = Header && <Header {...(props.header ?? {})} components={state.components} />;
@@ -367,8 +380,7 @@ export const Menu = forwardRef((props, ref) => {
     const { className, ...rest } = state;
     const listProps = {
         ...rest,
-        beforeContent,
-        afterContent,
+        ...columns,
         onItemClick: handleItemClick,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
@@ -416,10 +428,12 @@ Menu.propTypes = {
     tabIndex: PropTypes.number,
     loopNavigation: PropTypes.bool,
     preventNavigation: PropTypes.bool,
+    focusItemOnHover: PropTypes.bool,
     header: PropTypes.object,
     footer: PropTypes.object,
     onItemClick: PropTypes.func,
     isAvailableItem: PropTypes.func,
+    getItemProps: PropTypes.func,
     onGroupHeaderClick: PropTypes.func,
     onItemActivate: PropTypes.func,
     allowActiveGroupHeader: PropTypes.bool,
@@ -456,10 +470,12 @@ Menu.defaultProps = {
     tabIndex: 0,
     loopNavigation: true,
     preventNavigation: false,
+    focusItemOnHover: true,
     header: null,
     footer: null,
     onItemClick: null,
     isAvailableItem,
+    getItemProps,
     onGroupHeaderClick: null,
     renderNotSelected: false,
     allowActiveGroupHeader: false,

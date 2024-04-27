@@ -1,5 +1,5 @@
 /* Menu component */
-:root {
+.menu {
   /* Container */
   --menu-column-gap: 0;
   --menu-row-gap: 0;
@@ -139,10 +139,7 @@
   /* Separator */
   --menu-separator-size: 1px;
   --menu-separator-color: #808080;
-}
 
-/* Menu container */
-.menu {
   display: flex;
   flex-flow: column nowrap;
   align-items: center;

@@ -31,6 +31,7 @@ export const Default = {
     args: {
         items: getDefaultItems(),
         preventNavigation: true,
+        multiple: true,
     },
 };
 
@@ -39,6 +40,7 @@ export const IconAlignment = {
         items: getDefaultItems(),
         iconAlign: 'right',
         preventNavigation: true,
+        multiple: true,
     },
 };
 
@@ -51,11 +53,13 @@ export const CheckboxSide = {
                 type: 'checkbox',
                 title: 'Checkbox item',
                 selected: true,
+                selectable: true,
                 checkboxSide: 'left',
             },
         ],
         checkboxSide: 'right',
         preventNavigation: true,
+        multiple: true,
     },
 };
 
@@ -106,6 +110,19 @@ export const Scroll = {
     },
 };
 
+/**
+ * Disabled \'focusItemOnHover\' option. Default is enabled.
+ */
+export const FocusItemOnHover = {
+    name: '\'focusItemOnHover\' option',
+    args: {
+        id: 'focusOnHoverMenu',
+        focusItemOnHover: false,
+        className: 'horizontal-menu',
+        items: initItems('Menu item', 4),
+    },
+};
+
 export const Groups = {
     args: {
         items: groupItems,
@@ -116,6 +133,7 @@ export const CheckboxGroups = {
     args: {
         items: checkboxGroupItems,
         allowActiveGroupHeader: true,
+        multiple: true,
     },
     render: function Render(args) {
         return (
