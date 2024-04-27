@@ -4,6 +4,7 @@ import {
     useMemo,
 } from 'react';
 
+import { StoreProvider } from '../../utils/Store/StoreProvider.jsx';
 import { combineReducers } from '../../utils/combineReducers.js';
 
 // Local components
@@ -30,7 +31,6 @@ import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListP
 
 import * as DropDownHelpers from './helpers.js';
 import { reducer } from './reducer.js';
-import { DropDownContextProvider, useDropDownState, useDropDownDispatch } from './context.jsx';
 import './DropDown.scss';
 
 export {
@@ -56,9 +56,6 @@ export {
     DropDownListPlaceholder,
     // utils
     DropDownHelpers,
-    // Hooks
-    useDropDownState,
-    useDropDownDispatch,
 };
 
 /**
@@ -73,18 +70,17 @@ export const DropDown = forwardRef((props, ref) => {
             : reducer;
     }, [props.reducers]);
 
-    const init = (initialArg) => (
-        DropDownHelpers.getInitialState(initialArg, DropDown.defaultProps)
+    const initialState = (
+        DropDownHelpers.getInitialState(props, DropDown.defaultProps)
     );
 
     return (
-        <DropDownContextProvider
+        <StoreProvider
             reducer={reducers}
-            initialState={props}
-            init={init}
+            initialState={initialState}
         >
             <DropDownContainer ref={ref} {...props} />
-        </DropDownContextProvider>
+        </StoreProvider>
     );
 });
 

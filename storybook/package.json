@@ -27,7 +27,7 @@
         "storybook": "^8.0.9"
     },
     "dependencies": {
-        "@jezvejs/react": "^0.24.0",
+        "@jezvejs/react": "^0.25.0",
         "@storybook/preview-api": "^8.0.5",
         "classnames": "^2.5.1",
         "prop-types": "^15.8.1",

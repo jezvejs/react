@@ -47,12 +47,12 @@ export const MenuList = (props) => {
 
     const itemElement = (item) => {
         if (item.type === 'separator') {
-            return <Separator {...item} />;
+            return <Separator key={item.id} {...item} />;
         }
         if (item.type === 'group') {
-            return <GroupItem {...item} />;
+            return <GroupItem key={item.id} {...item} />;
         }
-        return <ListItem {...item} />;
+        return <ListItem key={item.id} {...item} />;
     };
 
     const itemProps = (item, state) => (

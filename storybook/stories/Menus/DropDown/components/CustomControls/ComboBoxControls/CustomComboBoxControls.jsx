@@ -2,7 +2,7 @@ import {
     DropDownComboBoxControls,
     DropDownHelpers,
     Spinner,
-    useDropDownState,
+    useStore,
 } from '@jezvejs/react';
 import PropTypes from 'prop-types';
 import { MenuButton } from '../../../../../../Components/MenuButton/MenuButton.jsx';
@@ -20,7 +20,7 @@ export const CustomComboBoxControls = (props) => {
         ComboMenuButton,
     } = props.components;
 
-    const state = useDropDownState();
+    const { state } = useStore();
 
     const selectedItems = DropDownHelpers.getSelectedItems(props);
 
