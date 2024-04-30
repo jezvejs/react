@@ -32,6 +32,7 @@ export function StoreProvider(props) {
         store,
         state,
         getState: () => store.getState(),
+        setState: (...args) => store.setState(...args),
         dispatch: (...args) => store.dispatch(...args),
     }), [state]);
 
@@ -44,7 +45,7 @@ export function StoreProvider(props) {
 
 StoreProvider.propTypes = {
     reducer: PropTypes.func,
-    options: PropTypes.any,
+    initialState: PropTypes.object,
     children: PropTypes.oneOfType([
         PropTypes.node,
         PropTypes.elementType,
