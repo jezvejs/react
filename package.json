@@ -1,5 +1,5 @@
 {
-    "name": "jezvejs-react",
+    "name": "jezvejs-react-monorepo",
     "version": "1.0.0",
     "private": true,
     "type": "module",
