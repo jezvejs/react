@@ -1,20 +1,11 @@
 import { getOffset } from '@jezvejs/dom';
-import { DragMaster } from '@jezvejs/react';
+import { DragMaster, useDragnDrop } from '@jezvejs/react';
 import { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 
-import { DefaultDragZone } from './DefaultDragZone.jsx';
-
-export const OriginalDropTarget = () => {
+export const OriginalDropTarget = (props) => {
     const dropTargetRef = useRef(null);
-
-    const [state, setState] = useState({
-        box: {
-            id: 'orig',
-            left: 0,
-            top: 0,
-            absolutePos: true,
-        },
-    });
+    const { setState } = useDragnDrop();
 
     useEffect(() => {
         const dropTarget = {
@@ -50,7 +41,14 @@ export const OriginalDropTarget = () => {
 
     return (
         <div ref={dropTargetRef} className="section-h200 drag-area">
-            <DefaultDragZone {...state.box} dragOriginal />
+            {props.children}
         </div>
     );
+};
+
+OriginalDropTarget.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
 };

@@ -2,15 +2,29 @@
 import '@jezvejs/react/style';
 import { DragnDropProvider, createSlice, useDragnDrop } from '@jezvejs/react';
 
-import { OriginalDropTarget } from './components/OriginalDropTarget.jsx';
+import { DefaultDragZone } from './components/DefaultDragZone.jsx';
 import { DefaultDropTarget } from './components/DefaultDropTarget.jsx';
-
-import './DragnDrop.stories.scss';
+import { OriginalDropTarget } from './components/OriginalDropTarget.jsx';
 import { XAxisDropTarget } from './components/XAxisDropTarget.jsx';
 import { XAxisDragZone } from './components/XAxisDragZone.jsx';
 
+import './DragnDrop.stories.scss';
+
+const DefaultDragBox = () => {
+    const { state } = useDragnDrop();
+    return (
+        <DefaultDragZone {...state.box} dragOriginal />
+    );
+};
+
 const DragOriginalDemo = () => {
     const initialState = {
+        box: {
+            id: 'orig',
+            left: 0,
+            top: 0,
+            absolutePos: true,
+        },
         left: 0,
         top: 0,
         shiftX: 0,
@@ -23,7 +37,9 @@ const DragOriginalDemo = () => {
 
     return (
         <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-            <OriginalDropTarget />
+            <OriginalDropTarget>
+                <DefaultDragBox />
+            </OriginalDropTarget>
         </DragnDropProvider>
     );
 };
