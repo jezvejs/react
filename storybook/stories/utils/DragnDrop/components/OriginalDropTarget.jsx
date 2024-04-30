@@ -1,6 +1,6 @@
 import { getOffset } from '@jezvejs/dom';
 import { DragMaster, useDragnDrop } from '@jezvejs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 export const OriginalDropTarget = (props) => {
@@ -22,12 +22,13 @@ export const OriginalDropTarget = (props) => {
 
                 const avatarInfo = avatar.getDragInfo(e);
                 avatar.onDragEnd?.();
+                const { id } = avatarInfo;
 
                 const page = DragMaster.getEventPageCoordinates(e);
                 setState((prev) => ({
                     ...prev,
-                    box: {
-                        ...prev.box,
+                    [id]: {
+                        ...(prev[id] ?? {}),
                         left: page.x - avatarInfo.mouseShift.x - offset.left - border.left,
                         top: page.y - avatarInfo.mouseShift.y - offset.top - border.top,
                         dragging: false,

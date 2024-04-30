@@ -1,7 +1,17 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { DragnDropProvider, createSlice, useDragnDrop } from '@jezvejs/react';
+import {
+    Button,
+    DragnDropProvider,
+    createSlice,
+    px,
+    useDragnDrop,
+} from '@jezvejs/react';
+import { forwardRef } from 'react';
 
+import MenuIcon from '../../../assets/icons/menu.svg';
+
+// Local components
 import { DefaultDragZone } from './components/DefaultDragZone.jsx';
 import { DefaultDropTarget } from './components/DefaultDropTarget.jsx';
 import { OriginalDropTarget } from './components/OriginalDropTarget.jsx';
@@ -20,7 +30,7 @@ const DefaultDragBox = () => {
 const DragOriginalDemo = () => {
     const initialState = {
         box: {
-            id: 'orig',
+            id: 'box',
             left: 0,
             top: 0,
             absolutePos: true,
@@ -166,6 +176,147 @@ export const XAxisAvatar = {
                     <XAxisDragZone />
                 </XAxisDropTarget>
             </DragnDropProvider >
+        );
+    },
+};
+
+// eslint-disable-next-line react/display-name
+const SimpleDragItem = forwardRef((_, ref) => {
+    const { state } = useDragnDrop();
+
+    const { handleItem1 } = state;
+    const isDragging = (
+        state.dragging
+        && state.draggingId === handleItem1.id
+    );
+    const left = (isDragging) ? state.left : handleItem1.left;
+    const top = (isDragging) ? state.top : handleItem1.top;
+
+    return (
+        <div
+            ref={ref}
+            className="drag_item"
+            style={{
+                left: px(left),
+                top: px(top),
+            }}
+        >
+            <input type="text" />
+        </div>
+    );
+});
+
+// eslint-disable-next-line react/display-name
+const HandleDragItem = forwardRef((_, ref) => {
+    const { state } = useDragnDrop();
+
+    const { handleItem2 } = state;
+    const isDragging = (
+        state.dragging
+        && state.draggingId === handleItem2.id
+    );
+    const left = (isDragging) ? state.left : handleItem2.left;
+    const top = (isDragging) ? state.top : handleItem2.top;
+
+    return (
+        <div
+            ref={ref}
+            className="drag_item"
+            style={{
+                left: px(left),
+                top: px(top),
+            }}
+        >
+            <input type="text" />
+            <div className="drag-handle" />
+        </div>
+    );
+});
+
+// eslint-disable-next-line react/display-name
+const DoubleHandleDragItem = forwardRef((_, ref) => {
+    const { state } = useDragnDrop();
+
+    const { handleItem3 } = state;
+    const isDragging = (
+        state.dragging
+        && state.draggingId === handleItem3.id
+    );
+    const left = (isDragging) ? state.left : handleItem3.left;
+    const top = (isDragging) ? state.top : handleItem3.top;
+
+    return (
+        <div
+            ref={ref}
+            className="drag_item"
+            style={{
+                left: px(left),
+                top: px(top),
+            }}
+        >
+            <input type="text" />
+            <Button type="static" icon={MenuIcon} className="drag-handle-btn black" />
+            <Button type="static" icon={MenuIcon} className="drag-handle-btn red" />
+        </div>
+    );
+});
+
+export const Handles = {
+    render: function HandlesDemo() {
+        const initialState = {
+            handleItem1: {
+                id: 'handleItem1',
+                left: 0,
+                top: 0,
+                absolutePos: true,
+            },
+            handleItem2: {
+                id: 'handleItem2',
+                left: 0,
+                top: 50,
+                absolutePos: true,
+            },
+            handleItem3: {
+                id: 'handleItem3',
+                left: 0,
+                top: 100,
+                absolutePos: true,
+            },
+            left: 0,
+            top: 0,
+            shiftX: 0,
+            shiftY: 0,
+            dragging: false,
+        };
+
+        const slice = createSlice({
+        });
+
+        return (
+            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+                <OriginalDropTarget>
+                    <DefaultDragZone
+                        id="handleItem1"
+                        Content={SimpleDragItem}
+                        dragOriginal
+                    />
+                    <DefaultDragZone
+                        id="handleItem2"
+                        Content={HandleDragItem}
+                        dragOriginal
+                        handles={{ query: '.drag-handle' }}
+                    />
+                    <DefaultDragZone
+                        id="handleItem3"
+                        Content={DoubleHandleDragItem}
+                        dragOriginal
+                        handles={[
+                            { query: '.drag-handle-btn.black', includeChilds: true },
+                            { query: '.drag-handle-btn.red', includeChilds: false },
+                        ]}
+                    />
+                </OriginalDropTarget>
+            </DragnDropProvider>
         );
     },
 };

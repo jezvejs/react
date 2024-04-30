@@ -16,6 +16,7 @@ import { OriginalDragAvatar } from './OriginalDragAvatar.jsx';
 export const DefaultDragZone = forwardRef((props, ref) => {
     const {
         dragOriginal = false,
+        Content = Box,
         ...dragZoneProps
     } = props;
 
@@ -145,17 +146,17 @@ export const DefaultDragZone = forwardRef((props, ref) => {
         title: props.title,
     };
 
-    const box = <Box {...origProps} ref={dragZoneRef} />;
+    const content = <Content {...origProps} ref={dragZoneRef} />;
 
     const avatar = (showAvatar && (
         <OriginalDragAvatar container={portalElement}>
-            <Box {...avatarProps} ref={avatarRef} />
+            <Content {...avatarProps} ref={avatarRef} />
         </OriginalDragAvatar>
     ));
 
     return (
         <div ref={innerRef}>
-            {box}
+            {content}
             {avatar}
         </div>
     );
@@ -168,4 +169,5 @@ DefaultDragZone.propTypes = {
     top: PropTypes.number,
     dragOriginal: PropTypes.bool,
     absolutePos: PropTypes.bool,
+    Content: PropTypes.object,
 };

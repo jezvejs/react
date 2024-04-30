@@ -1,5 +1,5 @@
-import { removeEvents, setEvents } from '@jezvejs/dom';
-import { isFunction } from '@jezvejs/types';
+import { ge, removeEvents, setEvents } from '@jezvejs/dom';
+import { asArray, isFunction, isObject } from '@jezvejs/types';
 
 /** Main drag and drop class */
 export class DragMaster {
@@ -489,6 +489,51 @@ export class DragMaster {
         }
     }
 
+    defaultDragHandleValildation(target) {
+        if (!target) {
+            return false;
+        }
+
+        // allow to drag using whole drag zone in case no handles is set
+        if (!this.dragZone.handles) {
+            return true;
+        }
+
+        const handles = asArray(this.dragZone.handles);
+
+        return handles.some((hnd) => {
+            let elem;
+            if (isObject(hnd) && (hnd.elem || hnd.query)) {
+                if (hnd.query) {
+                    const qres = this.dragZone.elem.querySelectorAll(hnd.query);
+                    elem = Array.from(qres);
+                } else if (typeof hnd === 'string') {
+                    elem = ge(hnd.elem);
+                } else {
+                    elem = hnd.elem;
+                }
+            } else if (typeof hnd === 'string') {
+                elem = ge(hnd);
+            } else {
+                elem = hnd;
+            }
+
+            elem = asArray(elem);
+
+            return elem.some((el) => (
+                el
+                && (
+                    el === target
+                    || (
+                        isObject(hnd)
+                        && hnd.includeChilds
+                        && el.contains(target)
+                    )
+                )
+            ));
+        });
+    }
+
     /** Mouse down on drag object element event handler */
     mouseDown(e) {
         if (!this.isValidStartEvent(e)) {
@@ -504,7 +549,7 @@ export class DragMaster {
 
         const isValidDragHandle = isFunction(this.dragZone.isValidDragHandle)
             ? this.dragZone.isValidDragHandle(e.target)
-            : true;
+            : this.defaultDragHandleValildation(e.target);
         if (!isValidDragHandle) {
             this.dragZone = null;
             return;
