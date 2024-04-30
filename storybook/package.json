@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@jezvejs/dom": "^1.1.0",
-        "@jezvejs/react": "^0.26.0",
+        "@jezvejs/react": "^0.26.1",
         "@storybook/preview-api": "^8.0.5",
         "classnames": "^2.5.1",
         "prop-types": "^15.8.1",
