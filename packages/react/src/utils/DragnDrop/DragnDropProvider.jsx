@@ -5,13 +5,13 @@ import {
     useState,
 } from 'react';
 import PropTypes from 'prop-types';
-import { createStore } from './Store.js';
+import { createStore } from '../Store/Store.js';
 
-const StoreContext = createContext(null);
+const DragnDropContext = createContext(null);
 
-export const useStore = () => useContext(StoreContext);
+export const useDragnDrop = () => useContext(DragnDropContext);
 
-export function StoreProvider(props) {
+export function DragnDropProvider(props) {
     const {
         reducer,
         children,
@@ -37,13 +37,13 @@ export function StoreProvider(props) {
     }), [state]);
 
     return (
-        <StoreContext.Provider value={contextValue}>
+        <DragnDropContext.Provider value={contextValue}>
             {children}
-        </StoreContext.Provider>
+        </DragnDropContext.Provider>
     );
 }
 
-StoreProvider.propTypes = {
+DragnDropProvider.propTypes = {
     reducer: PropTypes.func,
     initialState: PropTypes.object,
     children: PropTypes.oneOfType([
