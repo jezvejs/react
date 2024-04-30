@@ -23,9 +23,7 @@ export const DefaultDropTarget = (props) => {
 
         DragMaster.registerDropTarget(dropTarget);
 
-        return () => {
-            DragMaster.unregisterDropTarget(dropTarget);
-        };
+        return () => DragMaster.unregisterDropTarget(dropTarget);
     }, []);
 
     return (

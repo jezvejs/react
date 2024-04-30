@@ -6,6 +6,8 @@ import { OriginalDropTarget } from './components/OriginalDropTarget.jsx';
 import { DefaultDropTarget } from './components/DefaultDropTarget.jsx';
 
 import './DragnDrop.stories.scss';
+import { XAxisDropTarget } from './components/XAxisDropTarget.jsx';
+import { XAxisDragZone } from './components/XAxisDragZone.jsx';
 
 const DragOriginalDemo = () => {
     const initialState = {
@@ -121,6 +123,33 @@ export const DragCloned = {
             <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
                 <DragClonedDropTargets />
             </DragnDropProvider>
+        );
+    },
+};
+
+/**
+ * \'mouseMoveThreshold\' and \'touchMoveTimeout\' options are set to 0
+ */
+export const XAxisAvatar = {
+    name: 'Drag only by X axis',
+    render: function DragClonedDemo() {
+        const initialState = {
+            left: 0,
+            shiftX: 0,
+            dragging: false,
+            offset: {},
+            rect: {},
+        };
+
+        const slice = createSlice({
+        });
+
+        return (
+            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+                <XAxisDropTarget>
+                    <XAxisDragZone />
+                </XAxisDropTarget>
+            </DragnDropProvider >
         );
     },
 };
