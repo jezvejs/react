@@ -1,44 +1,26 @@
-import { getOffset } from '@jezvejs/dom';
-import { DragMaster, useDragnDrop } from '@jezvejs/react';
-import { useEffect, useRef } from 'react';
+import { DragMaster, useDragnDrop, useDropTarget } from '@jezvejs/react';
 import PropTypes from 'prop-types';
 
 export const OriginalDropTarget = (props) => {
-    const dropTargetRef = useRef(null);
     const { setState } = useDragnDrop();
 
-    useEffect(() => {
-        const dropTarget = {
-            elem: dropTargetRef?.current,
-            onDragEnd(params) {
-                const { avatar, e } = params;
+    const { dropTargetRef } = useDropTarget({
+        onDragEnd(params) {
+            const { avatarInfo, offset, border, e } = params;
+            const { id } = avatarInfo;
 
-                const elem = dropTargetRef?.current;
-                const offset = getOffset(elem);
-                const border = {
-                    top: elem.clientTop,
-                    left: elem.clientLeft,
-                };
-
-                const avatarInfo = avatar.getDragInfo(e);
-                avatar.onDragEnd?.();
-                const { id } = avatarInfo;
-
-                const page = DragMaster.getEventPageCoordinates(e);
-                setState((prev) => ({
-                    ...prev,
-                    [id]: {
-                        ...(prev[id] ?? {}),
-                        left: page.x - avatarInfo.mouseShift.x - offset.left - border.left,
-                        top: page.y - avatarInfo.mouseShift.y - offset.top - border.top,
-                        dragging: false,
-                    },
-                }));
-            },
-        };
-
-        DragMaster.registerDropTarget(dropTarget);
-    }, []);
+            const page = DragMaster.getEventPageCoordinates(e);
+            setState((prev) => ({
+                ...prev,
+                [id]: {
+                    ...(prev[id] ?? {}),
+                    left: page.x - avatarInfo.mouseShift.x - offset.left - border.left,
+                    top: page.y - avatarInfo.mouseShift.y - offset.top - border.top,
+                    dragging: false,
+                },
+            }));
+        },
+    });
 
     return (
         <div ref={dropTargetRef} className="section-h200 drag-area">
