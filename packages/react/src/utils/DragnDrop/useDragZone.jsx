@@ -1,10 +1,11 @@
 import { getOffset } from '@jezvejs/dom';
-import { DragMaster, useDragnDrop } from '@jezvejs/react';
 import {
     useEffect,
     useRef,
 } from 'react';
 import PropTypes from 'prop-types';
+import { DragMaster } from './DragMaster.js';
+import { useDragnDrop } from './DragnDropProvider.jsx';
 
 export function useDragZone(props) {
     const {
@@ -28,10 +29,8 @@ export function useDragZone(props) {
         }
 
         const dragZone = {
-            ...dragZoneProps,
-            elem: dragZoneRef.current,
-            onDragStart(params) {
-                const avatar = {
+            makeAvatar() {
+                return {
                     id: props.id,
                     elem: avatarRef.current,
                     getDragInfo() {
@@ -93,11 +92,15 @@ export function useDragZone(props) {
                         }));
                     },
                 };
-
-                avatar.initFromEvent(params);
+            },
+            onDragStart(params) {
+                const avatar = dragZone.makeAvatar();
+                avatar?.initFromEvent?.(params);
 
                 return avatar;
             },
+            ...dragZoneProps,
+            elem: dragZoneRef.current,
         };
 
         DragMaster.makeDraggable(dragZone);

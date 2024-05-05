@@ -6,10 +6,10 @@ export const OriginalDropTarget = (props) => {
 
     const { dropTargetRef } = useDropTarget({
         onDragEnd(params) {
-            const { avatarInfo, offset, border, e } = params;
+            const { avatarInfo, offset, border } = params;
             const { id } = avatarInfo;
 
-            const page = DragMaster.getEventPageCoordinates(e);
+            const page = DragMaster.getEventPageCoordinates(params.e);
             setState((prev) => ({
                 ...prev,
                 [id]: {

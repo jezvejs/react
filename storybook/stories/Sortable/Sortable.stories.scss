@@ -1,0 +1,63 @@
+.dbg-hover {
+  outline-width: 5px;
+  outline-color: #9955ee;
+  outline-offset: 3px;
+  outline-style: dashed;
+}
+
+.container {
+  padding: 1rem;
+}
+
+/* Sortable tiles list */
+.sortable-tiles {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 10px;
+}
+
+/* Sortable list */
+.list-area {
+  display: inline-flex;
+  flex-flow: column nowrap;
+  max-width: 300px;
+  width: 100%;
+}
+
+.exch-lists-container {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 15px;
+}
+
+.animated {
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+.list-item_red {
+  background-color: #dd5599;
+}
+
+.list-item_red.list_item_drag {
+  background-color: #9955ee;
+}
+
+/* Sortable tree */
+.tree {
+  display: inline-flex;
+  flex-flow: column nowrap;
+  row-gap: 10px;
+  padding-bottom: 10px;
+  max-width: 300px;
+  width: 100%;
+}
+
+/* Sortable table */
+.sortable_tbl td > div {
+  color: #000000;
+  background-color: #ffffff;
+  padding: 10px;
+  height: 40px;
+  line-height: 20px;
+}

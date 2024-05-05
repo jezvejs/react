@@ -1,0 +1,43 @@
+/* Sortable Tree Item component */
+.tree-item {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.tree-item:first-child {
+  margin-top: 10px;
+}
+
+.tree-item__title {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 5px;
+  background-color: #55dd99;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.tree-item_red > .tree-item__title {
+  background-color: #dd5599;
+}
+
+.tree-item__content {
+  display: inline-flex;
+  flex-flow: column nowrap;
+  row-gap: 10px;
+  max-width: 300px;
+  width: 100%;
+  padding: 0 0 0 1rem;
+}
+
+.tree-item__placeholder {
+  outline-width: 3px;
+  outline-style: dashed;
+  outline-offset: -3px;
+  outline-color: #143fff86;
+
+  * {
+    visibility: hidden;
+  }
+}

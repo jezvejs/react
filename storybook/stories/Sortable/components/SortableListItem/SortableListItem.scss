@@ -1,0 +1,31 @@
+.sortable-list-item {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  width: 100% !important;
+  background-color: #55dd99;
+  overflow: hidden;
+  min-height: 0;
+  margin-bottom: 10px;
+}
+
+.sortable-list-item > span {
+  font-size: 18px;
+  padding: 5px;
+  margin: 0 5px;
+  color: #ffffff;
+}
+
+.sortable-list-item__placeholder,
+.sortable-list-item.sortable-list-item__placeholder {
+  border: 1px dashed #bbbbbb;
+  background: none;
+}
+
+.sortable-list-item__placeholder * {
+  visibility: hidden;
+}
+
+.sortable-list-item.drag {
+  opacity: 0.5;
+}

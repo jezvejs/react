@@ -1,3 +1,5 @@
+/* eslint no-bitwise: "off" */
+
 /** Returns value normalized to specified range */
 export const minmax = (min, max, value) => (
     Math.max(
@@ -8,6 +10,9 @@ export const minmax = (min, max, value) => (
 
 /** Return string for value in pixels */
 export const px = (val) => `${parseInt(val, 10)}px`;
+
+/** Check bit flag is set */
+export const hasFlag = (x, flag) => ((x & flag) === flag);
 
 /**
  * Runs only last call of function after timeout

@@ -1,0 +1,41 @@
+/* SortableTile component */
+.sortable-tile {
+  width: 100px;
+  height: 100px;
+  background-color: #55dd99;
+  position: relative;
+}
+
+.sortable-tile__title {
+  position: absolute;
+  bottom: 5px;
+  left: 10px;
+  color: #ffffff;
+}
+
+.sortable-tile__icon-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 23px;
+}
+
+.sortable-tile__icon {
+  width: 60px;
+  height: 54px;
+  fill: #ffffff;
+}
+
+.sortable-tile_placeholder {
+  width: 100px;
+  height: 100px;
+  border: 1px dashed #888888;
+  background: none;
+}
+
+.sortable-tile_placeholder * {
+  visibility: hidden;
+}

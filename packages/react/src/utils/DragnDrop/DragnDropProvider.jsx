@@ -13,7 +13,7 @@ export const useDragnDrop = () => useContext(DragnDropContext);
 
 export function DragnDropProvider(props) {
     const {
-        reducer,
+        reducer = (state) => state,
         children,
         ...options
     } = props;

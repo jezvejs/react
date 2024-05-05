@@ -1,7 +1,7 @@
 import { getOffset } from '@jezvejs/dom';
-import { DragMaster } from '@jezvejs/react';
 import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { DragMaster } from './DragMaster.js';
 
 export function useDropTarget(props) {
     const dropTargetRef = useRef(null);

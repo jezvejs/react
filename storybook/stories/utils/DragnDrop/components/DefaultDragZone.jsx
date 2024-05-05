@@ -1,5 +1,4 @@
-import { getOffset } from '@jezvejs/dom';
-import { DragMaster, useDragZone, useDragnDrop } from '@jezvejs/react';
+import { useDragZone, useDragnDrop } from '@jezvejs/react';
 import {
     forwardRef,
     useEffect,
