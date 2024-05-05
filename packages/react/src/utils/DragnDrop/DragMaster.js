@@ -360,11 +360,7 @@ export class DragMaster {
 
     /** Try to find drop target under mouse cursor */
     findDropTarget() {
-        if (!this.avatar?.getTargetElem) {
-            return null;
-        }
-
-        let elem = this.avatar.getTargetElem();
+        let elem = this.avatar?.getTargetElem?.() ?? null;
         while (elem && elem !== document) {
             const dropTarget = this.findDropTargetByElement(elem);
             if (dropTarget) {

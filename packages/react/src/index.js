@@ -4,8 +4,7 @@ export * from './utils/createSlice.js';
 export * from './utils/combineReducers.js';
 
 // utils
-export * from './utils/DragnDrop/DragMaster.js';
-export * from './utils/DragnDrop/DragnDropProvider.jsx';
+export * from './utils/DragnDrop/index.js';
 export * from './utils/Store/Store.js';
 export * from './utils/Store/StoreProvider.jsx';
 
@@ -29,6 +28,7 @@ export { Popup } from './Components/Popup/Popup.jsx';
 export { PopupMenu } from './Components/PopupMenu/PopupMenu.jsx';
 export { Progress } from './Components/Progress/Progress.jsx';
 export { Radio } from './Components/Radio/Radio.jsx';
+export * from './Components/Sortable/Sortable.jsx';
 export { Spinner } from './Components/Spinner/Spinner.jsx';
 export { Switch } from './Components/Switch/Switch.jsx';
 export { TabList } from './Components/TabList/TabList.jsx';

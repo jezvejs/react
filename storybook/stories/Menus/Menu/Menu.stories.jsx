@@ -2,6 +2,8 @@
 import '@jezvejs/react/style';
 import { Menu } from '@jezvejs/react';
 
+import { initItems } from '../../../utils/utils.js';
+
 // Local components
 import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.jsx';
 import { CollapsibleGroupsMenu } from './components/CollapsibleGroups/CollapsibleGroupsMenu.jsx';
@@ -14,7 +16,6 @@ import {
     getHorizontalItems,
     groupItems,
     checkboxGroupItems,
-    initItems,
 } from './data.js';
 import './Menu.stories.scss';
 
@@ -75,7 +76,7 @@ export const HeaderFooter = {
     args: {
         id: 'headerFooterMenu',
         className: 'scroll-menu',
-        items: initItems('Menu item', 5),
+        items: initItems({ title: 'Menu item', count: 5 }),
         preventNavigation: true,
         header: {
             title: 'Custom header',
@@ -104,7 +105,7 @@ export const Placeholder = {
  */
 export const Scroll = {
     args: {
-        items: initItems('Menu item', 30),
+        items: initItems({ title: 'Menu item', count: 30 }),
         className: 'scroll-menu',
         tabThrough: false,
     },
@@ -119,7 +120,7 @@ export const FocusItemOnHover = {
         id: 'focusOnHoverMenu',
         focusItemOnHover: false,
         className: 'horizontal-menu',
-        items: initItems('Menu item', 4),
+        items: initItems({ title: 'Menu item', count: 4 }),
     },
 };
 

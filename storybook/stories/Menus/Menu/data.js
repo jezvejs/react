@@ -118,13 +118,3 @@ export const checkboxGroupItems = [{
     title: 'No group item 3',
     type: 'checkbox',
 }];
-
-export const initItems = (title, count, startFrom = 1) => {
-    const res = [];
-
-    for (let ind = startFrom; ind < startFrom + count; ind += 1) {
-        res.push({ id: ind.toString(), title: `${title} ${ind}` });
-    }
-
-    return res;
-};
