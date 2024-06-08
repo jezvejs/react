@@ -131,7 +131,7 @@ const DragClonedDropTargets = () => {
  */
 export const DragCloned = {
     name: 'Drag copy object',
-    render: function DragClonedDemo() {
+    render: function Render() {
         const initialState = {
             leftItems: [{ id: '1', title: '1' }, { id: '2', title: '2' }],
             rightItems: [],
@@ -158,7 +158,7 @@ export const DragCloned = {
  */
 export const XAxisAvatar = {
     name: 'Drag only by X axis',
-    render: function DragClonedDemo() {
+    render: function Render() {
         const initialState = {
             left: 0,
             shiftX: 0,

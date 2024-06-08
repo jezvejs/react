@@ -10,6 +10,7 @@ import {
 // Local components
 import { SortableListItem } from './components/SortableListItem/SortableListItem.jsx';
 import { SortableTile } from './components/SortableTile/SortableTile.jsx';
+import { SortableTreeItem } from './components/SortableTreeItem/SortableTreeItem.jsx';
 
 import {
     getCustomGroupItems,
@@ -21,7 +22,6 @@ import {
     getTreeItems,
 } from './data.js';
 import './Sortable.stories.scss';
-import { SortableTreeItem } from './components/SortableTreeItem/SortableTreeItem.jsx';
 
 // Storybook component configuration
 export default {
