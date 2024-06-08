@@ -28,6 +28,7 @@ export { Popup } from './Components/Popup/Popup.jsx';
 export { PopupMenu } from './Components/PopupMenu/PopupMenu.jsx';
 export { Progress } from './Components/Progress/Progress.jsx';
 export { Radio } from './Components/Radio/Radio.jsx';
+export { RangeSlider } from './Components/RangeSlider/RangeSlider.jsx';
 export * from './Components/Sortable/Sortable.jsx';
 export { Spinner } from './Components/Spinner/Spinner.jsx';
 export { Switch } from './Components/Switch/Switch.jsx';

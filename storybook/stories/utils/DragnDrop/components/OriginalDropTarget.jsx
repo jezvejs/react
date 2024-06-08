@@ -18,6 +18,7 @@ export const OriginalDropTarget = (props) => {
                     top: page.y - avatarInfo.mouseShift.y - offset.top - border.top,
                     dragging: false,
                 },
+                dragging: false,
             }));
         },
     });
