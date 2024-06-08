@@ -191,17 +191,21 @@ const SimpleDragItem = forwardRef((_, ref) => {
         state.dragging
         && state.draggingId === handleItem1.id
     );
-    const left = (isDragging) ? state.left : handleItem1.left;
-    const top = (isDragging) ? state.top : handleItem1.top;
+
+    const style = {
+        left: px((isDragging) ? state.left : handleItem1.left),
+        top: px((isDragging) ? state.top : handleItem1.top),
+    };
+
+    if (isDragging) {
+        style.zIndex = 9999;
+    }
 
     return (
         <div
             ref={ref}
             className="drag_item"
-            style={{
-                left: px(left),
-                top: px(top),
-            }}
+            style={style}
         >
             <input type="text" />
         </div>
@@ -217,17 +221,21 @@ const HandleDragItem = forwardRef((_, ref) => {
         state.dragging
         && state.draggingId === handleItem2.id
     );
-    const left = (isDragging) ? state.left : handleItem2.left;
-    const top = (isDragging) ? state.top : handleItem2.top;
+
+    const style = {
+        left: px((isDragging) ? state.left : handleItem2.left),
+        top: px((isDragging) ? state.top : handleItem2.top),
+    };
+
+    if (isDragging) {
+        style.zIndex = 9999;
+    }
 
     return (
         <div
             ref={ref}
             className="drag_item"
-            style={{
-                left: px(left),
-                top: px(top),
-            }}
+            style={style}
         >
             <input type="text" />
             <div className="drag-handle" />
@@ -244,17 +252,21 @@ const DoubleHandleDragItem = forwardRef((_, ref) => {
         state.dragging
         && state.draggingId === handleItem3.id
     );
-    const left = (isDragging) ? state.left : handleItem3.left;
-    const top = (isDragging) ? state.top : handleItem3.top;
+
+    const style = {
+        left: px((isDragging) ? state.left : handleItem3.left),
+        top: px((isDragging) ? state.top : handleItem3.top),
+    };
+
+    if (isDragging) {
+        style.zIndex = 9999;
+    }
 
     return (
         <div
             ref={ref}
             className="drag_item"
-            style={{
-                left: px(left),
-                top: px(top),
-            }}
+            style={style}
         >
             <input type="text" />
             <Button type="static" icon={MenuIcon} className="drag-handle-btn black" />
