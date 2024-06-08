@@ -355,6 +355,7 @@ RangeSliderContainer.propTypes = {
     onClick: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
+    onKey: PropTypes.func,
     onBeforeChange: PropTypes.func,
     onChange: PropTypes.func,
     onScroll: PropTypes.func,
