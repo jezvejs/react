@@ -172,9 +172,11 @@ export const XAxisAvatar = {
 
         return (
             <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <XAxisDropTarget>
-                    <XAxisDragZone />
-                </XAxisDropTarget>
+                <div className="section-h200">
+                    <XAxisDropTarget>
+                        <XAxisDragZone />
+                    </XAxisDropTarget>
+                </div>
             </DragnDropProvider >
         );
     },
