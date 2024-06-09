@@ -5,6 +5,7 @@ export * from './utils/combineReducers.js';
 
 // utils
 export * from './utils/DragnDrop/index.js';
+export * from './utils/ScrollLock/ScrollLock.js';
 export * from './utils/Store/Store.js';
 export * from './utils/Store/StoreProvider.jsx';
 
@@ -42,3 +43,4 @@ export { useDebounce } from './hooks/useDebounce/useDebounce.js';
 export { useEmptyClick } from './hooks/useEmptyClick/useEmptyClick.js';
 export { PopupPosition } from './hooks/usePopupPosition/PopupPosition.js';
 export { usePopupPosition } from './hooks/usePopupPosition/usePopupPosition.js';
+export { useScrollLock } from './hooks/useScrollLock/useScrollLock.js';
