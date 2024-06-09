@@ -67,3 +67,15 @@ export const Bottom = {
     },
     render: OpenOffcanvas,
 };
+
+/**
+ * In this example scroll lock is disabled, with useScrollLock: false option.
+ * Body scroll should be available under backdrop of active component.
+ */
+export const Scroll = {
+    args: {
+        children: 'Offcanvas value',
+        useScrollLock: false,
+    },
+    render: OpenOffcanvas,
+};

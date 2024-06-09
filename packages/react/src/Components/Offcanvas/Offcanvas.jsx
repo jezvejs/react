@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.js';
+
 import './Offcanvas.scss';
 
 export const Offcanvas = (props) => {
@@ -19,6 +21,8 @@ export const Offcanvas = (props) => {
                 }
         ));
     }, [props.closed]);
+
+    useScrollLock(props.useScrollLock && showBackground);
 
     const handleClose = () => {
         setState((prev) => ({
