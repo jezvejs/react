@@ -2,6 +2,8 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.js';
+
 import { CloseButton } from '../CloseButton/CloseButton.jsx';
 
 import './Popup.scss';
@@ -13,6 +15,8 @@ export const Popup = (props) => {
     const attrs = {
         id: props.id,
     };
+
+    useScrollLock(props.nodim !== true && props.show);
 
     const onClose = (e) => {
         props.onClose?.(e);
