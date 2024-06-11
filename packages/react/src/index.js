@@ -25,6 +25,7 @@ export { Input } from './Components/Input/Input.jsx';
 export * from './Components/Menu/Menu.jsx';
 export { Offcanvas } from './Components/Offcanvas/Offcanvas.jsx';
 export { Paginator } from './Components/Paginator/Paginator.jsx';
+export { PieChart } from './Components/PieChart/PieChart.jsx';
 export { Popup } from './Components/Popup/Popup.jsx';
 export { PopupMenu } from './Components/PopupMenu/PopupMenu.jsx';
 export { Progress } from './Components/Progress/Progress.jsx';

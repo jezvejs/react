@@ -1,0 +1,106 @@
+.middle_pie {
+  .pie__sector-1 {
+    fill: #00b74a;
+  }
+
+  .pie__sector-2 {
+    fill: #ff8700;
+  }
+
+  .pie__sector-3 {
+    fill: #db0058;
+  }
+
+  .pie__sector-4 {
+    fill: #086ca2;
+  }
+
+  .pie__sector-5 {
+    fill: #ffba00;
+  }
+
+  .pie__sector-6 {
+    fill: #ff3900;
+  }
+
+  .pie__sector-7 {
+    fill: #dc0055;
+  }
+
+  .pie__sector-8 {
+    fill: #00b64f;
+  }
+
+  .pie__sector-9 {
+    fill: #dcf900;
+  }
+
+  .pie__sector-gray {
+    fill: #9c9c9c;
+  }
+}
+
+.std_chart_wrap {
+  position: relative;
+  width: fit-content;
+}
+
+.info-bottom {
+  height: 1rem;
+}
+
+.info-inner {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  left: calc(50% - 25px);
+  top: calc(50% - 25px);
+}
+
+.single-value-section {
+  column-gap: 2rem;
+}
+
+@media (hover: hover) {
+  .middle_pie {
+    .pie__sector-1:hover {
+      fill: #37db79;
+    }
+
+    .pie__sector-2:hover {
+      fill: #ffa540;
+    }
+
+    .pie__sector-3:hover {
+      fill: #ed3b83;
+    }
+
+    .pie__sector-4:hover {
+      fill: #3c9dd1;
+    }
+
+    .pie__sector-5:hover {
+      fill: #ffcb40;
+    }
+
+    .pie__sector-6:hover {
+      fill: #ff6b40;
+    }
+
+    .pie__sector-7:hover {
+      fill: #ee3b80;
+    }
+
+    .pie__sector-8:hover {
+      fill: #37da7e;
+    }
+
+    .pie__sector-9:hover {
+      fill: #e6fc3f;
+    }
+
+    .pie__sector-gray:hover {
+      fill: #c5c5c5;
+    }
+  }
+}
