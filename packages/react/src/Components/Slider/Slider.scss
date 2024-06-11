@@ -1,0 +1,20 @@
+.slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.slider__content {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  position: absolute;
+  width: fit-content;
+}
+
+.slider_vertical .slider__content {
+  flex-flow: column nowrap;
+}
+
+.slider__content.animate {
+  transition: all 0.5s ease;
+}
