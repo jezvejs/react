@@ -40,6 +40,8 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
 
         const dragZone = {
             elem: innerRef.current,
+            mouseMoveThreshold: 0,
+            touchMoveTimeout: 0,
             onDragStart(params) {
                 const avatar = {
                     id: props.id,
