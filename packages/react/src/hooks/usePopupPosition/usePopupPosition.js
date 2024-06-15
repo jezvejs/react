@@ -58,7 +58,7 @@ export function usePopupPosition(options = {}) {
         }
 
         return resetPosition;
-    }, [open, elem, reference]);
+    }, [open, elem?.current, reference?.current]);
 
     return {
         referenceRef,
