@@ -10,6 +10,7 @@ export * from './utils/Store/Store.js';
 export * from './utils/Store/StoreProvider.jsx';
 
 // Components
+export * from './Components/BaseChart/BaseChart.jsx';
 export { Button } from './Components/Button/Button.jsx';
 export { Checkbox } from './Components/Checkbox/Checkbox.jsx';
 export { CloseButton } from './Components/CloseButton/CloseButton.jsx';
@@ -20,6 +21,7 @@ export * from './Components/DatePicker/DatePicker.jsx';
 export { DecimalInput } from './Components/DecimalInput/DecimalInput.jsx';
 export * from './Components/DropDown/DropDown.jsx';
 export { Header } from './Components/Header/Header.jsx';
+export { Histogram } from './Components/Histogram/Histogram.jsx';
 export { IndetermProgress } from './Components/IndetermProgress/IndetermProgress.jsx';
 export { Input } from './Components/Input/Input.jsx';
 export * from './Components/Menu/Menu.jsx';

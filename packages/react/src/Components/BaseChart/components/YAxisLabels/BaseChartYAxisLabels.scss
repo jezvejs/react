@@ -1,0 +1,39 @@
+/* Chart y-axis labels */
+.chart_y-axis-left .chart-y-axis-labels {
+  order: -1;
+}
+
+.chart_x-axis-top .chart-y-axis-labels {
+  padding-top: var(--chart-x-axis-height);
+}
+
+/* Content element */
+.chart-y-axis-labels__content {
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: calc(var(--chart-grid-height) + 1em);
+  margin-top: -0.5em;
+  padding: 0 0.25rem;
+}
+
+/* Labels text */
+.chart__text.chart-y-axis-labels__label {
+  font-family: var(--chart-y-axis-font-family);
+  font-size: var(--chart-y-axis-font-size);
+  font-weight: var(--chart-y-axis-font-weight);
+  color: var(--chart-y-axis-text-color);
+  white-space: nowrap;
+}
+
+/* Right aligned labels */
+.chart-y-axis-labels_right-align .chart-y-axis-labels__content {
+  align-items: flex-end;
+}
+
+/* Center aligned labels */
+.chart-y-axis-labels_center-align .chart-y-axis-labels__content {
+  align-items: center;
+}
