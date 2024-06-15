@@ -66,5 +66,6 @@ export function usePopupPosition(options = {}) {
         elem,
         reference,
         updatePosition,
+        resetPosition,
     };
 }
