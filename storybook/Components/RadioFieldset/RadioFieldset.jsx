@@ -25,8 +25,7 @@ export const RadioFieldset = (props) => {
         checked: item.checked ?? false,
         className: item.className,
         onChange: () => {
-        console.log('RadioFieldset onChange() item.value: ', item.value);
-            props?.onChange?.(item.value)
+            props?.onChange?.(item.value);
         },
     }));
 
@@ -47,6 +46,7 @@ export const RadioFieldset = (props) => {
 
 RadioFieldset.propTypes = {
     className: PropTypes.string,
+    items: PropTypes.array,
     radioName: PropTypes.string,
     inputId: PropTypes.string,
     title: PropTypes.string,

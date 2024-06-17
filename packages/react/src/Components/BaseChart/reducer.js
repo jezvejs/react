@@ -9,6 +9,8 @@ import {
 
 // Reducers
 const slice = createSlice({
+    update: (state, stateUpdate) => ({ ...state, ...stateUpdate }),
+
     setScroll: (state, scrollLeft) => (
         (state.scrollLeft === scrollLeft)
             ? state

@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Histogram, px } from '@jezvejs/react';
 
 import { chartData, chartData2, chartMultiData } from '../../assets/data/index.js';
@@ -188,7 +188,7 @@ export const ChartAxes = {
             yAxisLabelsAlign: 'left',
         });
 
-        const items = useMemo(() => ([{
+        const items = [{
             title: 'X-Axis',
             radioName: 'xAxis',
             items: Object.entries(xAxisMap).map(([value, label]) => ({
@@ -197,7 +197,6 @@ export const ChartAxes = {
                 checked: (state.xAxis === value),
             })),
             onChange: (xAxis) => {
-    console.log('onChange() xAxis: ', xAxis);
                 setState((prev) => ({ ...prev, xAxis }));
             },
         }, {
@@ -209,7 +208,6 @@ export const ChartAxes = {
                 checked: (state.yAxis === value),
             })),
             onChange: (yAxis) => {
-console.log('onChange() yAxis: ', yAxis);
                 setState((prev) => ({ ...prev, yAxis }));
             },
         }, {
@@ -221,20 +219,15 @@ console.log('onChange() yAxis: ', yAxis);
                 checked: (state.yAxisLabelsAlign === value),
             })),
             onChange: (yAxisLabelsAlign) => {
-    console.log('onChange() yAxisLabelsAlign: ', yAxisLabelsAlign);
                 setState((prev) => ({ ...prev, yAxisLabelsAlign }));
             },
-        }]), [state.xAxis, state.yAxis, state.yAxisLabelsAlign]);
-
-console.log(' items: ', items);
+        }];
 
         const chartProps = {
             ...args,
             data: chartData2,
             ...state,
         };
-
-console.log(' state: ', state);
 
         return (
             <div>

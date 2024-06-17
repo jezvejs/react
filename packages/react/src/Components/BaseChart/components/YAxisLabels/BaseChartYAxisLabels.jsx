@@ -17,6 +17,11 @@ export const BaseChartYAxisLabels = (props) => {
         return null;
     }
 
+    const disabled = props.yAxis === 'none';
+    if (disabled) {
+        return null;
+    }
+
     let curY = grid.yFirst;
     const firstY = curY;
     let lastY = curY;
@@ -82,6 +87,7 @@ export const BaseChartYAxisLabels = (props) => {
 
 BaseChartYAxisLabels.propTypes = {
     grid: PropTypes.object,
+    yAxis: PropTypes.oneOf(['left', 'right', 'none']),
     yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
     renderYAxisLabel: PropTypes.func,
 };

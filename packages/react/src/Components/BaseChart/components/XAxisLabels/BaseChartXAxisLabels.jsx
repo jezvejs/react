@@ -1,5 +1,11 @@
 import PropTypes from 'prop-types';
-import { useEffect, useRef, useState } from 'react';
+import {
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
+} from 'react';
 
 import { px } from '../../../../utils/common.js';
 import { useStore } from '../../../../utils/Store/StoreProvider.jsx';
@@ -9,7 +15,8 @@ import './BaseChartXAxisLabels.scss';
 /**
  * BaseChartXAxisLabels component
  */
-export const BaseChartXAxisLabels = (props) => {
+// eslint-disable-next-line react/display-name
+export const BaseChartXAxisLabels = forwardRef((props, ref) => {
     const defaultLabelRenderer = (value) => value?.toString();
 
     const {
@@ -24,7 +31,8 @@ export const BaseChartXAxisLabels = (props) => {
         scrollLeft: 0,
     });
 
-    const containerRef = useRef(0);
+    const innerRef = useRef(null);
+    useImperativeHandle(ref, () => innerRef.current);
     const animationFrameRef = useRef(0);
 
     const initLabels = () => {
@@ -104,7 +112,7 @@ export const BaseChartXAxisLabels = (props) => {
             && props.scrollLeft < prevState.scrollLeft
         );
 
-        const labels = containerRef.current.children;
+        const labels = innerRef.current.children;
         const filteredItems = getFilteredItems();
 
         if (labels.length < filteredItems.length) {
@@ -184,7 +192,7 @@ export const BaseChartXAxisLabels = (props) => {
     };
 
     useEffect(() => {
-        if (disabled || !containerRef.current) {
+        if (disabled || !innerRef.current) {
             return undefined;
         }
 
@@ -195,7 +203,7 @@ export const BaseChartXAxisLabels = (props) => {
 
         return () => cancelUpdate();
     }, [
-        containerRef.current,
+        innerRef.current,
         props.chartContentWidth,
         props.scrollerWidth,
         props.fitToWidth,
@@ -211,13 +219,13 @@ export const BaseChartXAxisLabels = (props) => {
     const filteredItems = labels.filter((item) => !item.hidden);
 
     return (
-        <div className="chart-x-axis-labels" ref={containerRef}>
+        <div className="chart-x-axis-labels" ref={innerRef}>
             {filteredItems.map(({ id, value, ...item }) => (
                 <span {...item} key={id}>{value}</span>
             ))}
         </div>
     );
-};
+});
 
 BaseChartXAxisLabels.propTypes = {
     data: PropTypes.object,

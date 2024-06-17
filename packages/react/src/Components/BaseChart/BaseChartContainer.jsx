@@ -52,20 +52,14 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         };
 
         res.xAxisLabelsHeight = xAxisLabelsRef.current?.offsetHeight ?? 0;
-console.log('measureLayout()  xAxisLabelsHeight: ', res.xAxisLabelsHeight);
 
         if (!props.height) {
             const { clientHeight } = scrollerRef.current;
 
             res.containerHeight = innerRef.current?.offsetHeight;
 
-
-
             res.height = clientHeight - res.xAxisLabelsHeight;
             res.chartHeight = clientHeight - res.xAxisLabelsHeight - props.marginTop;
-
-
-        console.log(' measureLayout() res.height: ', res.height, ' res.chartHeight: ', res.chartHeight);
         }
 
         return res;
@@ -228,6 +222,21 @@ console.log('measureLayout()  xAxisLabelsHeight: ', res.xAxisLabelsHeight);
         dispatch(actions.setGroupsGap(props.groupsGap));
     }, [props.groupsGap]);
 
+    // Chart axes
+    useEffect(() => {
+        const {
+            xAxis,
+            yAxis,
+            yAxisLabelsAlign,
+        } = props;
+
+        dispatch(actions.update({
+            xAxis,
+            yAxis,
+            yAxisLabelsAlign,
+        }));
+    }, [props.xAxis, props.yAxis, props.yAxisLabelsAlign]);
+
     // Resize observer
     useEffect(() => {
         const handler = debounce(() => onResize(), state.resizeTimeout);
@@ -258,13 +267,8 @@ console.log('measureLayout()  xAxisLabelsHeight: ', res.xAxisLabelsHeight);
         chartContentProps.width = state.chartWidth;
     }
     if (state.height) {
-        chartContentProps.height = state.height - 24;
-
-//const xAxisLabelsHeight = xAxisLabelsRef.current?.offsetHeight ?? 0;
-
-console.log(' chartContentProps.height: ',chartContentProps.height,' state.height: ', state.height, ' xAxisLabelsHeight: ', state.xAxisLabelsHeight);
+        chartContentProps.height = state.height;
     }
-
 
     if (
         props.activateOnHover
@@ -283,7 +287,7 @@ console.log(' chartContentProps.height: ',chartContentProps.height,' state.heigh
 
     // x axis labels
     const XAxisLabels = getComponent('XAxisLabels', state);
-    const xAxisLabels = <XAxisLabels {...state} />;
+    const xAxisLabels = <XAxisLabels {...state} ref={xAxisLabelsRef} />;
 
     // y axis labels
     const YAxisLabels = getComponent('YAxisLabels', state);
@@ -385,8 +389,13 @@ console.log(' chartContentProps.height: ',chartContentProps.height,' state.heigh
 BaseChartContainer.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
+    columnWidth: PropTypes.number,
+    groupsGap: PropTypes.number,
     height: PropTypes.number,
     marginTop: PropTypes.number,
+    xAxis: PropTypes.oneOf(['bottom', 'top', 'none']),
+    yAxis: PropTypes.oneOf(['left', 'right', 'none']),
+    yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
     activateOnHover: PropTypes.bool,
     showPopupOnHover: PropTypes.bool,
     showLegend: PropTypes.bool,
