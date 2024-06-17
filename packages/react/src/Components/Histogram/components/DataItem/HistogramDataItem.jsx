@@ -18,6 +18,22 @@ export const HistogramDataItem = forwardRef((props, ref) => {
         height,
     } = props;
 
+    const attrs = {
+        x,
+        y,
+        width,
+        height,
+    };
+
+    const isValid = Object.values(attrs).every((value) => value >= 0);
+    if (!isValid) {
+        return null;
+    }
+
+    Object.entries(attrs).forEach(([key, value]) => {
+        attrs[key] = formatCoord(value);
+    });
+
     const categoryIndexClass = props.stacked
         ? `histogram_category-ind-${props.categoryIndex + 1}`
         : null;
@@ -36,10 +52,7 @@ export const HistogramDataItem = forwardRef((props, ref) => {
                 chart__item_active: !!props.active,
             },
         ),
-        x: formatCoord(x),
-        y: formatCoord(y),
-        width: formatCoord(width),
-        height: formatCoord(height),
+        ...attrs,
     };
 
     return (
