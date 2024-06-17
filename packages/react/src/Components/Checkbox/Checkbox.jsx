@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -16,34 +15,41 @@ const defaultCheckIcon = () => (
  * Checkbox component
  */
 export const Checkbox = (props) => {
-    const [state, setState] = useState(props);
-
     const {
-        className,
-        checkIcon,
+        checked = false,
         tooltip = null,
         label = null,
-        ...inputProps
-    } = state;
+        value = '',
+        form,
+        name,
+        tabIndex,
+        disabled = false,
+        onFocus = null,
+        onBlur = null,
+        onChange = null,
+    } = props;
+
+    const inputProps = {
+        form,
+        name,
+        value,
+        tabIndex,
+        disabled,
+        onFocus,
+        onBlur,
+        onChange,
+    };
 
     inputProps.title = (tooltip === null && typeof label === 'string')
         ? label
         : (tooltip ?? '');
 
-    const onChange = () => {
-        setState((prev) => ({
-            ...prev,
-            checked: !prev.checked,
-        }));
-    };
-
     return (
-        <label className={classNames('checkbox', className)}>
+        <label className={classNames('checkbox', props.className)}>
             <input
                 {...inputProps}
                 type='checkbox'
-                onChange={onChange}
-                checked={state.checked}
+                defaultChecked={checked}
             />
             <span className='checkbox__check'>
                 {props.checkIcon ?? defaultCheckIcon()}
@@ -71,15 +77,4 @@ Checkbox.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
-};
-
-Checkbox.defaultProps = {
-    checked: false,
-    disabled: false,
-    value: '',
-    label: null,
-    tooltip: null,
-    onFocus: null,
-    onBlur: null,
-    onChange: null,
 };

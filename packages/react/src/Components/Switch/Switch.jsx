@@ -9,28 +9,39 @@ import './Switch.scss';
  */
 export const Switch = (props) => {
     const [state, setState] = useState({
-        ...props,
         animated: false,
     });
 
+    const { animated } = state;
+
     const {
-        className,
-        animated,
+        checked = false,
         tooltip = null,
         label = null,
-        ...inputProps
-    } = state;
+        value = '',
+        form,
+        name,
+        tabIndex,
+        disabled = false,
+        onFocus = null,
+        onBlur = null,
+        onChange = null,
+    } = props;
+
+    const inputProps = {
+        form,
+        name,
+        value,
+        tabIndex,
+        disabled,
+        onFocus,
+        onBlur,
+        onChange,
+    };
 
     inputProps.title = (tooltip === null && typeof label === 'string')
         ? label
         : (tooltip ?? '');
-
-    const onChange = () => {
-        setState((prev) => ({
-            ...prev,
-            checked: !prev.checked,
-        }));
-    };
 
     const onTouchStart = (e) => {
         if (e?.touches) {
@@ -53,7 +64,7 @@ export const Switch = (props) => {
             className={classNames(
                 'switch',
                 { animated },
-                className,
+                props.className,
             )}
             onTouchStart={onTouchStart}
             onTransitionEndCapture={onTransitionEnd}
@@ -61,8 +72,7 @@ export const Switch = (props) => {
             <input
                 {...inputProps}
                 type='checkbox'
-                onChange={onChange}
-                checked={state.checked}
+                defaultChecked={checked}
             />
             <div className='switch-slider'></div>
             {props.label && (<span className='switch__label'>{props.label}</span>)}
@@ -84,15 +94,4 @@ Switch.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
-};
-
-Switch.defaultProps = {
-    checked: false,
-    disabled: false,
-    value: '',
-    label: null,
-    tooltip: null,
-    onFocus: null,
-    onBlur: null,
-    onChange: null,
 };
