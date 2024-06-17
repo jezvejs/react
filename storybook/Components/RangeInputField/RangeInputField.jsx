@@ -51,6 +51,8 @@ export const RangeInputField = (props) => {
 RangeInputField.propTypes = {
     className: PropTypes.string,
     inputId: PropTypes.string,
+    min: PropTypes.number,
+    max: PropTypes.number,
     value: PropTypes.string,
     title: PropTypes.string,
     onInput: PropTypes.func,

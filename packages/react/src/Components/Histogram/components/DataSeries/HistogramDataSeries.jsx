@@ -160,6 +160,7 @@ HistogramDataSeries.propTypes = {
     columnWidth: PropTypes.number,
     columnsInGroup: PropTypes.number,
     chartContentWidth: PropTypes.number,
+    height: PropTypes.number,
     chartWidth: PropTypes.number,
     scrollerWidth: PropTypes.number,
     activeTarget: PropTypes.object,

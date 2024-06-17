@@ -2,6 +2,8 @@ import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { formatCoord } from '../../../BaseChart/helpers.js';
+
 import './HistogramDataItem.scss';
 
 /**
@@ -34,10 +36,10 @@ export const HistogramDataItem = forwardRef((props, ref) => {
                 chart__item_active: !!props.active,
             },
         ),
-        x,
-        y,
-        width,
-        height,
+        x: formatCoord(x),
+        y: formatCoord(y),
+        width: formatCoord(width),
+        height: formatCoord(height),
     };
 
     return (

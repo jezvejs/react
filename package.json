@@ -7,8 +7,8 @@
     "module": "index.js",
     "main": "index.js",
     "scripts": {
-        "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./storybook/stories/",
-        "lint-style": "npx stylelint packages/**/*.scss storybook/stories/**/*.scss",
+        "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./storybook/",
+        "lint-style": "npx stylelint packages/**/*.scss storybook/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
         "prestart": "npm install",
         "test": "npx playwright test",
@@ -38,7 +38,7 @@
     "devDependencies": {
         "@jezvejs/release-tools": "^0.5.1",
         "@playwright/test": "^1.44.1",
-        "@types/node": "^20.14.2",
+        "@types/node": "^20.14.4",
         "browserslist": "^4.23.1",
         "commonjs-variables-for-esmodules": "^1.1.0",
         "dotenv": "^16.4.5",
@@ -50,7 +50,7 @@
         "eslint-plugin-react-refresh": "^0.4.7",
         "eslint-plugin-storybook": "^0.8.0",
         "npm-run-all": "^4.1.5",
-        "sass": "^1.77.4",
+        "sass": "^1.77.6",
         "shelljs": "^0.8.5",
         "ssh2-sftp-client": "^10.0.3",
         "stylelint": "^16.6.1",
