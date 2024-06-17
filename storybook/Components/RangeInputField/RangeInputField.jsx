@@ -53,7 +53,10 @@ RangeInputField.propTypes = {
     inputId: PropTypes.string,
     min: PropTypes.number,
     max: PropTypes.number,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+    ]),
     title: PropTypes.string,
     onInput: PropTypes.func,
     onChange: PropTypes.func,
