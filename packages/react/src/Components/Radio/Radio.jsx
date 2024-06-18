@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -8,33 +7,41 @@ import './Radio.scss';
  * Radio component
  */
 export const Radio = (props) => {
-    const [state, setState] = useState(props);
-
     const {
-        className,
+        checked = false,
         tooltip = null,
         label = null,
-        ...inputProps
-    } = state;
+        value = '',
+        form,
+        name,
+        tabIndex,
+        disabled = false,
+        onFocus = null,
+        onBlur = null,
+        onChange = null,
+    } = props;
+
+    const inputProps = {
+        form,
+        name,
+        value,
+        tabIndex,
+        disabled,
+        onFocus,
+        onBlur,
+        onChange,
+    };
 
     inputProps.title = (tooltip === null && typeof label === 'string')
         ? label
         : (tooltip ?? '');
 
-    const onChange = () => {
-        setState((prev) => ({
-            ...prev,
-            checked: !prev.checked,
-        }));
-    };
-
     return (
-        <label className={classNames('radio', className)}>
+        <label className={classNames('radio', props.className)}>
             <input
                 {...inputProps}
                 type='radio'
-                onChange={onChange}
-                checked={state.checked}
+                defaultChecked={checked}
             />
             <span className='radio__check'></span>
             {props.label && (<span className='radio__label'>{props.label}</span>)}
@@ -56,15 +63,4 @@ Radio.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
-};
-
-Radio.defaultProps = {
-    checked: false,
-    disabled: false,
-    value: '',
-    label: null,
-    tooltip: null,
-    onFocus: null,
-    onBlur: null,
-    onChange: null,
 };

@@ -1,0 +1,19 @@
+/* Chart x-axis labels */
+.chart-x-axis-labels {
+  position: relative;
+  height: var(--chart-x-axis-height);
+}
+
+.chart_x-axis-top .chart-x-axis-labels {
+  order: -1;
+}
+
+.chart__text.chart-x-axis__label {
+  font-family: var(--chart-x-axis-font-family);
+  font-size: var(--chart-x-axis-font-size);
+  font-weight: var(--chart-x-axis-font-weight);
+  fill: var(--chart-x-axis-text-color);
+  position: absolute;
+  white-space: nowrap;
+  line-height: var(--chart-x-axis-height);
+}

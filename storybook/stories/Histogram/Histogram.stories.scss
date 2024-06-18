@@ -1,0 +1,49 @@
+@use "sass:list";
+
+@use "../../assets/colors/colors";
+
+.histogram {
+  @for $i from 1 through list.length(colors.$colors) {
+    --charts-color-#{$i}: #{list.nth(colors.$colors, $i)};
+    --charts-active-color-#{$i}: #{list.nth(colors.$active-colors, $i)};
+  }
+}
+
+.chart-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  padding: 2rem 1rem;
+  margin: 8px auto 16px auto;
+  max-width: 450px;
+}
+
+section {
+  max-width: 1000px;
+}
+
+.section-controls {
+  margin-top: 1rem;
+
+  .btn {
+    margin-bottom: 6px;
+  }
+}
+
+@for $i from 1 through list.length(colors.$colors) {
+  .histogram_column-#{$i} {
+    --histogram-bar-color: var(--charts-color-#{$i});
+    --histogram-active-bar-color: var(--charts-active-color-#{$i});
+  }
+}
+
+@for $i from 1 through list.length(colors.$colors) {
+  .chart_stacked .histogram_category-ind-#{$i} {
+    --histogram-bar-color: var(--charts-color-#{$i});
+    --histogram-active-bar-color: var(--charts-active-color-#{$i});
+  }
+}
+
+.histogram_autoscale {
+  --chart-text-color: #9d6dff;
+}

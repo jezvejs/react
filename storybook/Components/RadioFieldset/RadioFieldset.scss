@@ -1,0 +1,25 @@
+/* Radio form */
+.radio-form {
+  display: block;
+  margin-right: 2rem;
+  margin-bottom: 1rem;
+
+  legend {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Radio fieldset */
+.radio-fieldset {
+  legend {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .radio-fieldset__content {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 0.5rem 1rem;
+  }
+}

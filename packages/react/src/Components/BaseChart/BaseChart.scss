@@ -1,0 +1,103 @@
+/* Main container for charts */
+.chart {
+  --chart-text-size: 14px;
+  --chart-text-color: #000000;
+  --chart-animation-duration: 0.5s;
+
+  /* Grid */
+  --chart-grid-stroke-width: 1;
+  --chart-grid-stroke-dasharray: 4, 3;
+  --chart-grid-color: #808080;
+
+  /* Active group */
+  --chart-active-group-background: #808080;
+  --chart-active-group-opacity: 0.3;
+
+  /* x-axis labels */
+  --chart-x-axis-height: 1.5rem;
+  --chart-x-axis-font-family: "Segoe UI", sans-serif;
+  --chart-x-axis-font-size: var(--chart-text-size);
+  --chart-x-axis-font-weight: 400;
+  --chart-x-axis-text-color: var(--chart-text-color);
+
+  /* y-axis labels */
+  --chart-y-axis-font-family: "Segoe UI", sans-serif;
+  --chart-y-axis-font-size: var(--chart-text-size);
+  --chart-y-axis-font-weight: 400;
+  --chart-y-axis-text-color: var(--chart-text-color);
+
+  /* Popup */
+  --chart-popup-text: #000000;
+  --chart-popup-border: #000000;
+  --chart-popup-bg: #ffffff;
+
+  display: flex;
+  flex-flow: column nowrap;
+  flex-basis: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Horizontal container for chart */
+.chart__horizontal {
+  display: flex;
+  flex-flow: row nowrap;
+  flex-basis: 100%;
+  height: 100%;
+}
+
+.chart__container {
+  flex-basis: 100%;
+  overflow: hidden;
+}
+
+.chart__scroller {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Main content SVG element */
+.chart__content {
+  user-select: none;
+  pointer-events: all;
+  overflow: hidden;
+}
+
+/* Bar chart information popup */
+.chart__popup {
+  position: absolute;
+  color: var(--chart-popup-text);
+  border: 1px solid var(--chart-popup-border);
+  background-color: var(--chart-popup-bg);
+  padding: 5px;
+  white-space: nowrap;
+  z-index: 9999;
+}
+
+/* Pinned popup */
+.chart__popup_pinned {
+  z-index: 9998;
+}
+
+/* Animated popup */
+.chart__popup_animated {
+  transition: all 0.2s ease;
+}
+
+/* Chart text */
+.chart__text {
+  font-family: "Segoe UI", sans-serif;
+  font-size: var(--chart-text-size);
+  text-anchor: start;
+  fill: var(--chart-text-color);
+}
+
+/* Chart legend */
+.chart__legend {
+  display: flex;
+  width: 100%;
+}
