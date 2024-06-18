@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@jezvejs/dom": "^1.1.0",
-        "@jezvejs/react": "^0.31.0",
+        "@jezvejs/react": "^0.32.0",
         "@jezvejs/types": "^1.0.0",
         "@storybook/preview-api": "^8.0.5",
         "@vitejs/plugin-react": "^4.3.1",

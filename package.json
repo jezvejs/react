@@ -38,7 +38,7 @@
     "devDependencies": {
         "@jezvejs/release-tools": "^0.5.1",
         "@playwright/test": "^1.44.1",
-        "@types/node": "^20.14.4",
+        "@types/node": "^20.14.5",
         "browserslist": "^4.23.1",
         "commonjs-variables-for-esmodules": "^1.1.0",
         "dotenv": "^16.4.5",
