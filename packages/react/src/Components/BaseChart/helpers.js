@@ -191,12 +191,6 @@ export const updateColumnWidth = (state) => {
 
 /** Calculates new state for specified chart data */
 export const getDataState = (data, state) => {
-    /*
-        if (state.data === data) {
-            return state;
-        }
-    */
-
     const newState = {
         ...state,
         data: {
@@ -270,14 +264,14 @@ export const isVerticalScaleNeeded = (state, prevState = {}) => (
 
 /** Find item by event object */
 export const findItemByEvent = (e, state, elem) => {
-    const { contentOffset } = state;
     if (
-        !contentOffset
+        !state?.contentOffset
         || !elem?.contains(e?.target)
     ) {
         return { item: null, index: -1 };
     }
 
+    const { contentOffset } = state;
     const { items } = state.dataSeries;
 
     const firstGroupIndex = state.getFirstVisibleGroupIndex(state);
