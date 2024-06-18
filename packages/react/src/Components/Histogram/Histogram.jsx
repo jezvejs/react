@@ -187,6 +187,7 @@ export const Histogram = (props) => {
         },
 
         components: {
+            ...props.components,
             DataItem: HistogramDataItem,
             DataSeries: HistogramDataSeries,
         },
@@ -205,4 +206,8 @@ Histogram.propTypes = {
     getGroupOuterWidth: PropTypes.func,
     getFirstVisibleGroupIndex: PropTypes.func,
     getVisibleGroupsCount: PropTypes.func,
+    components: PropTypes.shape({
+        DataItem: PropTypes.func,
+        DataSeries: PropTypes.func,
+    }),
 };

@@ -8,6 +8,8 @@ import { chartData, chartData2, chartMultiData } from '../../assets/data/index.j
 import { RadioFieldset } from '../../Components/RadioFieldset/RadioFieldset.jsx';
 import { RangeInputField } from '../../Components/RangeInputField/RangeInputField.jsx';
 
+import { CustomActiveGroup } from './components/CustomActiveGroup/CustomActiveGroup.jsx';
+
 import { maxColumnWidthData } from './data.js';
 import { formatAsUSD, formatDecimalValue } from './helpers.js';
 import './Histogram.stories.scss';
@@ -289,5 +291,24 @@ export const ActiveGroup = {
         autoScale: true,
         activateOnClick: true,
         activateOnHover: true,
+    },
+};
+
+/**
+ * Multi column + Legend + 'showPopupOnHover' and 'activateOnHover' options
+ */
+export const CustomActiveGroupComponent = {
+    args: {
+        data: chartData2,
+        height: 320,
+        marginTop: 35,
+        alignColumns: 'center',
+        showActiveGroup: true,
+        autoScale: true,
+        activateOnClick: true,
+        activateOnHover: true,
+        components: {
+            ActiveGroup: CustomActiveGroup,
+        },
     },
 };
