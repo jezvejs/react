@@ -2,9 +2,13 @@ import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { useStore } from '../../../../utils/Store/StoreProvider.jsx';
+
 import { formatCoord } from '../../../BaseChart/helpers.js';
 
 import './HistogramDataItem.scss';
+
+const animateAttributes = ['y', 'height'];
 
 /**
  * HistogramDataItem component
@@ -25,13 +29,33 @@ export const HistogramDataItem = forwardRef((props, ref) => {
         height,
     };
 
+    const { getState } = useStore();
+    const state = getState();
+
     const isValid = Object.values(attrs).every((value) => value >= 0);
     if (!isValid) {
         return null;
     }
 
     Object.entries(attrs).forEach(([key, value]) => {
-        attrs[key] = formatCoord(value);
+        if (
+            state.autoScale
+            && state.animate
+            && animateAttributes.includes(key)
+        ) {
+            if (!attrs.style) {
+                attrs.style = {};
+            }
+
+            if (state.animateNow) {
+                attrs.style[key] = formatCoord(value, true);
+            } else {
+                attrs.style[key] = '';
+                attrs[key] = formatCoord(value);
+            }
+        } else {
+            attrs[key] = formatCoord(value);
+        }
     });
 
     const categoryIndexClass = props.stacked
@@ -67,7 +91,13 @@ HistogramDataItem.propTypes = {
     height: PropTypes.number,
     columnIndex: PropTypes.number,
     categoryIndex: PropTypes.number,
-    category: PropTypes.string,
+    category: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+    ]),
     stacked: PropTypes.bool,
     active: PropTypes.bool,
+    autoScale: PropTypes.bool,
+    animate: PropTypes.bool,
+    animateNow: PropTypes.bool,
 };

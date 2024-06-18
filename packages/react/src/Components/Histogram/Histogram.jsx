@@ -93,7 +93,7 @@ export const Histogram = (props) => {
                     x = groupX + groupWidth - 1;
                 }
 
-                const y = e.offsetY;
+                const y = e.nativeEvent.offsetY;
                 index = result.item.findIndex((bar) => (
                     x >= bar.x
                     && x < bar.x + bar.width
@@ -172,6 +172,7 @@ export const Histogram = (props) => {
                 height,
                 autoScale: state.autoScale,
                 animate: state.animate,
+                animateNow: state.animateNow,
                 stacked: state.data?.stacked ?? false,
             };
 

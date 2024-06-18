@@ -13,7 +13,7 @@ import { debounce } from '../../utils/common.js';
 import { useStore } from '../../utils/Store/StoreProvider.jsx';
 
 import { actions } from './reducer.js';
-import { getComponent } from './helpers.js';
+import { getComponent, mapValues } from './helpers.js';
 import { BaseChartPopupContainer } from './BaseChartPopupContainer.jsx';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.js';
 
@@ -33,9 +33,16 @@ export const BaseChartContainer = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => innerRef.current);
 
     const scrollerRef = useRef(null);
+    const chartContentRef = useRef(null);
     const xAxisLabelsRef = useRef(null);
     const popupRef = useRef(null);
     const pinnedPopupRef = useRef(null);
+
+    const scaleFunc = useRef(null);
+    const cancelScaleFunc = useRef(null);
+
+    const animationFrameRef = useRef(null);
+    const removeTransitionHandlerRef = useRef(null);
 
     /** Returns object with main dimensions of component */
     const measureLayout = () => {
@@ -79,17 +86,43 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         dispatch(actions.deactivateTarget());
     };
 
+    /** Scale visible items of chart */
+    const scaleVisible = () => {
+        const st = getState();
+
+        if (!st.autoScale) {
+            return;
+        }
+
+        dispatch(actions.startAnimation());
+
+        requestAnimationFrame(() => {
+            const stat = getState();
+
+            const vItems = stat.getVisibleItems(stat);
+            const values = mapValues(vItems);
+
+            dispatch(actions.scaleVisible(values));
+        });
+    };
+
+    const handleTransitionEnd = () => {
+        removeTransitionHandlerRef.current = null;
+
+        dispatch(actions.animationDone());
+    };
+
     /**
      * 'scroll' event handler
      */
     const onScroll = () => {
         dispatch(actions.scroll(measureLayout()));
 
-        /*
-        if (this.scaleFunc) {
-            this.scaleFunc();
+        if (scaleFunc.current) {
+            scaleFunc.current();
         }
 
+        /*
         if (this.scrollFunc) {
             this.scrollFunc();
         }
@@ -210,8 +243,8 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
     // Process chart data on update
     useEffect(() => {
-        dispatch(actions.setData({ data: state.data, layout: measureLayout() }));
-    }, [state.data]);
+        dispatch(actions.setData({ data: props.data, layout: measureLayout() }));
+    }, [props.data]);
 
     // Process chart data on update
     useEffect(() => {
@@ -221,6 +254,13 @@ export const BaseChartContainer = forwardRef((props, ref) => {
     useEffect(() => {
         dispatch(actions.setGroupsGap(props.groupsGap));
     }, [props.groupsGap]);
+
+    useEffect(() => {
+        const { alignColumns } = props;
+        dispatch(actions.update({
+            alignColumns,
+        }));
+    }, [props.alignColumns]);
 
     // Chart axes
     useEffect(() => {
@@ -248,6 +288,48 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         };
     }, [scrollerRef.current]);
 
+    // Auto scale
+    useEffect(() => {
+        if (!props.autoScale) {
+            scaleFunc.current = null;
+            return;
+        }
+
+        if (props.autoScaleTimeout === false) {
+            scaleFunc.current = () => scaleVisible();
+        } else {
+            const scaleHandler = debounce(
+                () => scaleVisible(),
+                props.autoScaleTimeout,
+                { cancellable: true },
+            );
+
+            scaleFunc.current = scaleHandler.run;
+            cancelScaleFunc.current = scaleHandler.cancel;
+        }
+    }, [props.autoScale, props.autoScaleTimeout]);
+
+    // Animation
+    const cancelAnimation = () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = 0;
+        }
+    };
+
+    useEffect(() => {
+        cancelAnimation();
+
+        animationFrameRef.current = requestAnimationFrame(() => {
+            animationFrameRef.current = 0;
+
+            dispatch(actions.startAnimation());
+        });
+
+        return () => cancelAnimation();
+    }, [state.animateNow]);
+
+    // Main chart element props
     const chartProps = {
         className: classNames(
             'chart',
@@ -259,9 +341,21 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         ),
     };
 
+    // Chart container
+    const chartContainerProps = {
+        className: classNames(
+            'chart__horizontal',
+            {
+                chart_animated: state.autoScale && state.animate && state.animateNow,
+                chart_stacked: !!props.data.stacked,
+            },
+        ),
+    };
+
     const chartContentProps = {
         className: 'chart__content',
         onClick,
+        onTransitionEndCapture: handleTransitionEnd,
     };
     if (state.chartWidth) {
         chartContentProps.width = state.chartWidth;
@@ -276,9 +370,9 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         || isFunction(props.onItemOver)
         || isFunction(props.onItemOut)
     ) {
-        chartProps.onTouchStart = onTouchStart;
-        chartProps.onMouseMove = onMouseMove;
-        chartProps.onMouseLeave = onMouseLeave;
+        chartContentProps.onTouchStart = onTouchStart;
+        chartContentProps.onMouseMove = onMouseMove;
+        chartContentProps.onMouseLeave = onMouseLeave;
     }
 
     // Grid
@@ -364,11 +458,11 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
     return (
         <div {...chartProps} ref={innerRef}>
-            <div className="chart__horizontal">
+            <div {...chartContainerProps}>
                 <div className="chart__container">
                     <div className="chart__scroller" onScroll={onScroll} ref={scrollerRef}>
                         <div className="chart">
-                            <svg {...chartContentProps}>
+                            <svg {...chartContentProps} ref={chartContentRef}>
                                 {chartGrid}
                                 {activeGroup}
                                 {series}
@@ -388,17 +482,22 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
 BaseChartContainer.propTypes = {
     id: PropTypes.string,
+    data: PropTypes.object,
     className: PropTypes.string,
     columnWidth: PropTypes.number,
     groupsGap: PropTypes.number,
     height: PropTypes.number,
     marginTop: PropTypes.number,
+    autoScale: PropTypes.bool,
+    autoScaleTimeout: PropTypes.number,
     xAxis: PropTypes.oneOf(['bottom', 'top', 'none']),
     yAxis: PropTypes.oneOf(['left', 'right', 'none']),
     yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
+    alignColumns: PropTypes.oneOf(['left', 'center', 'right']),
     activateOnHover: PropTypes.bool,
     showPopupOnHover: PropTypes.bool,
     showLegend: PropTypes.bool,
+    animationEndTimeout: PropTypes.number,
     onItemClick: PropTypes.func,
     onItemOver: PropTypes.func,
     onItemOut: PropTypes.func,

@@ -119,12 +119,19 @@ export const HistogramDataSeries = (props) => {
     const state = getState();
     const items = state.dataSeries?.items ?? [];
 
+    const commonProps = {
+        autoScale: state.autoScale,
+        animate: state.animate,
+        animateNow: state.animateNow,
+    };
+
     return (
         <g>
             {items.flat().map((item, ind) => {
                 if (isSameTarget(item, state.popupTarget)) {
                     return (
                         <DataItem
+                            {...commonProps}
                             {...item}
                             key={`xgrid_${ind}`}
                             ref={props.popupTargetRef}
@@ -135,6 +142,7 @@ export const HistogramDataSeries = (props) => {
                 if (isSameTarget(item, state.pinnedTarget)) {
                     return (
                         <DataItem
+                            {...commonProps}
                             {...item}
                             key={`xgrid_${ind}`}
                             ref={props.pinnedPopupTargetRef}
@@ -142,7 +150,13 @@ export const HistogramDataSeries = (props) => {
                     );
                 }
 
-                return <DataItem {...item} key={`xgrid_${ind}`} />;
+                return (
+                    <DataItem
+                        {...commonProps}
+                        {...item}
+                        key={`xgrid_${ind}`}
+                    />
+                );
             })}
         </g>
     );
@@ -153,6 +167,8 @@ HistogramDataSeries.propTypes = {
     dataSets: PropTypes.array,
     items: PropTypes.array,
     data: PropTypes.object,
+    autoScale: PropTypes.bool,
+    animate: PropTypes.bool,
     animateNow: PropTypes.bool,
     scrollLeft: PropTypes.number,
     groupsGap: PropTypes.number,

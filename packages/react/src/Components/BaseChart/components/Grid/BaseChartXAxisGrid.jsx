@@ -6,7 +6,7 @@ import { formatCoord } from '../../helpers.js';
  */
 export const BaseChartXAxisGrid = (props) => {
     const { grid, data } = props;
-    if (!grid) {
+    if (!grid?.steps || !props.xAxisGrid) {
         return null;
     }
 
@@ -55,6 +55,7 @@ export const BaseChartXAxisGrid = (props) => {
 
 BaseChartXAxisGrid.propTypes = {
     grid: PropTypes.object,
+    xAxisGrid: PropTypes.bool,
     data: PropTypes.object,
     getGroupOuterWidth: PropTypes.func,
     getFirstVisibleGroupIndex: PropTypes.func,

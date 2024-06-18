@@ -189,6 +189,18 @@ export const defaultProps = {
         return categories;
     },
 
+    getVisibleItems: (state) => {
+        const firstItem = state.getFirstVisibleGroupIndex(state);
+        const itemsOnWidth = state.getVisibleGroupsCount(firstItem, state);
+        const lastItem = firstItem + itemsOnWidth - 1;
+
+        return state.dataSeries.items.filter((item) => (
+            item?.length > 0
+            && item[0].groupIndex >= firstItem
+            && item[0].groupIndex <= lastItem
+        ));
+    },
+
     findItemByEvent: (...args) => findItemByEvent(...args),
 
     findItemByTarget: (target, state) => {

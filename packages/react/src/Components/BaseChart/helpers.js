@@ -247,17 +247,6 @@ export const getInitialState = (props, defaultProps) => {
             ...defaultProps.components,
             ...(props?.components ?? {}),
         },
-        /*
-        getDataSets: (...args) => this.getDataSets(...args),
-        getGroupsCount: (...args) => this.getGroupsCount(...args),
-        getColumnsInGroupCount: (...args) => this.getColumnsInGroupCount(...args),
-        calculateGrid: (...args) => this.calculateGrid(...args),
-        isHorizontalScaleNeeded: (...args) => this.isHorizontalScaleNeeded(...args),
-        getGroupOuterWidth: (...args) => this.getGroupOuterWidth(...args),
-        getFirstVisibleGroupIndex: (...args) => this.getFirstVisibleGroupIndex(...args),
-        getVisibleGroupsCount: (...args) => this.getVisibleGroupsCount(...args),
-        onResize: (...args) => this.onResize(...args),
-        */
     };
 
     const { height, marginTop } = state;

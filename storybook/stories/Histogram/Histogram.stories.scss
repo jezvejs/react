@@ -9,8 +9,25 @@
   }
 }
 
+.chart-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  padding: 2rem 1rem;
+  margin: 8px auto 16px auto;
+  max-width: 450px;
+}
+
 section {
   max-width: 1000px;
+}
+
+.section-controls {
+  margin-top: 1rem;
+
+  .btn {
+    margin-bottom: 6px;
+  }
 }
 
 @for $i from 1 through list.length(colors.$colors) {

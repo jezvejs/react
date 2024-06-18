@@ -97,6 +97,12 @@ const slice = createSlice({
             : state
     ),
 
+    startAnimation: (state) => (
+        (!state.animateNow)
+            ? { ...state, animateNow: true }
+            : state
+    ),
+
     animationDone: (state) => (
         (state.animateNow)
             ? { ...state, animateNow: false }
