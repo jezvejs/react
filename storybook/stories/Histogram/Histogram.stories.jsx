@@ -459,6 +459,7 @@ export const Stacked = {
             ChartPopup: ChartMultiColumnPopup,
         },
     },
+    decorators: [chartContainerDecorator],
 };
 
 export const StackedNegative = {
@@ -476,6 +477,7 @@ export const StackedNegative = {
             ChartPopup: ChartMultiColumnPopup,
         },
     },
+    decorators: [chartContainerDecorator],
 };
 
 /**
@@ -501,6 +503,7 @@ export const StackedGrouped = {
             ChartPopup: ChartMultiColumnPopup,
         },
     },
+    decorators: [chartContainerDecorator],
 };
 
 /**
@@ -528,6 +531,7 @@ export const StackedCategories = {
             ChartPopup: ChartCategoriesPopup,
         },
     },
+    decorators: [chartContainerDecorator],
 };
 
 /**
@@ -555,6 +559,7 @@ export const LegendCategories = {
             ChartPopup: ChartMultiColumnPopup,
         },
     },
+    decorators: [chartContainerDecorator],
 };
 
 export const SetData = {
@@ -568,6 +573,7 @@ export const SetData = {
             Legend: ChartCustomLegend,
         },
     },
+    decorators: [chartContainerDecorator],
     render: function Render(args) {
         const [state, setState] = useState({
             data: negPosData,
