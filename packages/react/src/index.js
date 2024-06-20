@@ -15,6 +15,8 @@ export { Button } from './Components/Button/Button.jsx';
 export { Checkbox } from './Components/Checkbox/Checkbox.jsx';
 export { CloseButton } from './Components/CloseButton/CloseButton.jsx';
 export { Collapsible } from './Components/Collapsible/Collapsible.jsx';
+export { ColorInput } from './Components/ColorInput/ColorInput.jsx';
+export { ColorItem } from './Components/ColorItem/ColorItem.jsx';
 export { ControlledInput } from './Components/ControlledInput/ControlledInput.jsx';
 export { DateInput } from './Components/DateInput/DateInput.jsx';
 export * from './Components/DatePicker/DatePicker.jsx';
