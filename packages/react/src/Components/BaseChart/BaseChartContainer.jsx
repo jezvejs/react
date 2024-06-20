@@ -23,7 +23,6 @@ import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.
 // eslint-disable-next-line react/display-name
 export const BaseChartContainer = forwardRef((props, ref) => {
     const {
-        state,
         getState,
         setState,
         dispatch,
@@ -40,6 +39,8 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
     const scaleFunc = useRef(null);
     const cancelScaleFunc = useRef(null);
+    const scrollFunc = useRef(null);
+    const cancelScrollFunc = useRef(null);
 
     const animationFrameRef = useRef(null);
     const removeTransitionHandlerRef = useRef(null);
@@ -50,23 +51,22 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             return {};
         }
 
+        const { clientHeight, scrollWidth, scrollLeft } = scrollerRef.current;
+
         const res = {
             contentOffset: getOffset(scrollerRef.current),
             scrollerWidth: scrollerRef.current?.offsetWidth,
-            scrollLeft: scrollerRef.current?.scrollLeft,
-            scrollWidth: scrollerRef.current?.scrollWidth,
+            scrollLeft,
+            scrollWidth,
             containerWidth: innerRef.current?.offsetWidth,
+            containerHeight: innerRef.current?.offsetHeight,
         };
 
-        res.xAxisLabelsHeight = xAxisLabelsRef.current?.offsetHeight ?? 0;
-
+        // Auto height
         if (!props.height) {
-            const { clientHeight } = scrollerRef.current;
-
-            res.containerHeight = innerRef.current?.offsetHeight;
-
+            res.xAxisLabelsHeight = xAxisLabelsRef.current?.offsetHeight ?? 0;
             res.height = clientHeight - res.xAxisLabelsHeight;
-            res.chartHeight = clientHeight - res.xAxisLabelsHeight - props.marginTop;
+            res.chartHeight = res.height - props.marginTop;
         }
 
         return res;
@@ -86,20 +86,23 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         dispatch(actions.deactivateTarget());
     };
 
+    const scrollToRight = () => {
+        dispatch(actions.scrollToRight());
+
+        props.scrollDone?.();
+    };
+
     /** Scale visible items of chart */
     const scaleVisible = () => {
-        const st = getState();
-
-        if (!st.autoScale) {
+        const state = getState();
+        if (!state?.autoScale) {
             return;
         }
 
         dispatch(actions.startAnimation());
 
         requestAnimationFrame(() => {
-            const stat = getState();
-
-            const vItems = stat.getVisibleItems(stat);
+            const vItems = state.getVisibleItems(getState());
             const values = mapValues(vItems);
 
             dispatch(actions.scaleVisible(values));
@@ -122,12 +125,11 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             scaleFunc.current();
         }
 
-        /*
-        if (this.scrollFunc) {
-            this.scrollFunc();
+        if (scrollFunc.current) {
+            scrollFunc.current();
         }
-        */
 
+        const state = getState();
         if (state.showPopupOnClick || state.showPopupOnHover) {
             hidePopup();
         }
@@ -140,6 +142,8 @@ export const BaseChartContainer = forwardRef((props, ref) => {
      * @param {MouseEvent} e
      */
     const onClick = (e) => {
+        const state = getState();
+
         const target = state.findItemByEvent(e, getState(), innerRef.current);
         if (!target.item) {
             deactivateTarget();
@@ -170,6 +174,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
      * @param {MouseEvent} e
      */
     const onMouseMove = (e) => {
+        const state = getState();
         if (state.ignoreTouch) {
             return;
         }
@@ -209,6 +214,8 @@ export const BaseChartContainer = forwardRef((props, ref) => {
      * @param {MouseEvent} e
      */
     const onMouseLeave = (e) => {
+        const state = getState();
+
         if (
             e.relatedTarget
             && (
@@ -239,11 +246,20 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             ...measureLayout(),
             lastHLabelOffset,
         }));
+
+        if (scaleFunc.current) {
+            scaleFunc.current();
+        }
+
+        if (scrollFunc.current) {
+            scrollFunc.current();
+        }
     };
 
     // Process chart data on update
     useEffect(() => {
         dispatch(actions.setData({ data: props.data, layout: measureLayout() }));
+        dispatch(actions.requestScroll());
     }, [props.data]);
 
     // Process chart data on update
@@ -279,6 +295,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
     // Resize observer
     useEffect(() => {
+        const state = getState();
         const handler = debounce(() => onResize(), state.resizeTimeout);
         const observer = new ResizeObserver(handler);
         observer.observe(scrollerRef.current);
@@ -307,6 +324,19 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             scaleFunc.current = scaleHandler.run;
             cancelScaleFunc.current = scaleHandler.cancel;
         }
+
+        if (props.scrollToEnd) {
+            const scrollHandler = debounce(
+                () => scrollToRight(),
+                100,
+                { cancellable: true },
+            );
+
+            scrollFunc.current = scrollHandler.run;
+            cancelScrollFunc.current = scrollHandler.cancel;
+        } else {
+            scrollFunc.current = null;
+        }
     }, [props.autoScale, props.autoScaleTimeout]);
 
     // Animation
@@ -316,6 +346,8 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             animationFrameRef.current = 0;
         }
     };
+
+    const state = getState();
 
     useEffect(() => {
         cancelAnimation();
@@ -327,7 +359,16 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         });
 
         return () => cancelAnimation();
-    }, [state.animateNow]);
+    }, [state?.animateNow]);
+
+    // Scroll
+    useEffect(() => {
+        if (!scrollerRef.current) {
+            return;
+        }
+
+        scrollerRef.current.scrollLeft = state.scrollLeft;
+    }, [state?.scrollLeft]);
 
     // Main chart element props
     const chartProps = {
@@ -346,7 +387,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         className: classNames(
             'chart__horizontal',
             {
-                chart_animated: state.autoScale && state.animate && state.animateNow,
+                chart_animated: state?.autoScale && state?.animate && state?.animateNow,
                 chart_stacked: !!props.data.stacked,
             },
         ),
@@ -357,10 +398,10 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         onClick,
         onTransitionEndCapture: handleTransitionEnd,
     };
-    if (state.chartWidth) {
+    if (state?.chartWidth) {
         chartContentProps.width = state.chartWidth;
     }
-    if (state.height) {
+    if (state?.height) {
         chartContentProps.height = state.height;
     }
 
@@ -373,6 +414,58 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         chartContentProps.onTouchStart = onTouchStart;
         chartContentProps.onMouseMove = onMouseMove;
         chartContentProps.onMouseLeave = onMouseLeave;
+    }
+
+    // Popup position
+    const popupPositionProps = {
+        position: state?.popupPosition,
+        margin: 5,
+        screenPadding: 5,
+        useRefWidth: false,
+        minRefHeight: 5,
+        scrollOnOverflow: false,
+        allowResize: true,
+        allowFlip: true,
+        allowChangeAxis: true,
+    };
+
+    // Popup
+    const popupPosition = usePopupPosition({
+        open: !!state?.popupTarget,
+        ...popupPositionProps,
+    });
+
+    const PopupContainer = BaseChartPopupContainer;
+
+    const chartPopup = (
+        state?.popupTarget
+        && (
+            <PopupContainer
+                {...state}
+                target={state?.popupTarget}
+                ref={popupPosition.elementRef}
+            />
+        )
+    );
+
+    // Pinned popup
+    const pinnedPopupPosition = usePopupPosition({
+        open: !!state?.pinnedTarget,
+        ...popupPositionProps,
+    });
+    const pinnedPopup = (
+        state?.pinnedTarget
+        && (
+            <PopupContainer
+                {...state}
+                target={state?.pinnedTarget}
+                ref={pinnedPopupPosition.elementRef}
+            />
+        )
+    );
+
+    if (!state?.components) {
+        return null;
     }
 
     // Grid
@@ -394,56 +487,9 @@ export const BaseChartContainer = forwardRef((props, ref) => {
     // Active group
     const ActiveGroup = getComponent('ActiveGroup', state);
     const activeGroup = (
-        state.showActiveGroup
-        && state.activeTarget
+        state?.showActiveGroup
+        && state?.activeTarget
         && <ActiveGroup {...state} />
-    );
-
-    // Popup
-    const PopupContainer = BaseChartPopupContainer;
-
-    const popupPositionProps = {
-        position: state.popupPosition,
-        margin: 5,
-        screenPadding: 5,
-        useRefWidth: false,
-        minRefHeight: 5,
-        scrollOnOverflow: false,
-        allowResize: true,
-        allowFlip: true,
-        allowChangeAxis: true,
-    };
-
-    const popupPosition = usePopupPosition({
-        open: !!state.popupTarget,
-        ...popupPositionProps,
-    });
-
-    const chartPopup = (
-        state.popupTarget
-        && (
-            <PopupContainer
-                {...state}
-                target={state.popupTarget}
-                ref={popupPosition.elementRef}
-            />
-        )
-    );
-
-    // Pinned popup
-    const pinnedPopupPosition = usePopupPosition({
-        open: !!state.pinnedTarget,
-        ...popupPositionProps,
-    });
-    const pinnedPopup = (
-        state.pinnedTarget
-        && (
-            <PopupContainer
-                {...state}
-                target={state.pinnedTarget}
-                ref={pinnedPopupPosition.elementRef}
-            />
-        )
     );
 
     // Data series
@@ -490,6 +536,7 @@ BaseChartContainer.propTypes = {
     marginTop: PropTypes.number,
     autoScale: PropTypes.bool,
     autoScaleTimeout: PropTypes.number,
+    scrollToEnd: PropTypes.bool,
     xAxis: PropTypes.oneOf(['bottom', 'top', 'none']),
     yAxis: PropTypes.oneOf(['left', 'right', 'none']),
     yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
@@ -502,4 +549,5 @@ BaseChartContainer.propTypes = {
     onItemOver: PropTypes.func,
     onItemOut: PropTypes.func,
     onScroll: PropTypes.func,
+    scrollDone: PropTypes.func,
 };
