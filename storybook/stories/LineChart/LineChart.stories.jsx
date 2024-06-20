@@ -21,18 +21,16 @@ import { largeData } from '../../assets/data/largeData.js';
 
 // Global components
 import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
-import { ChartCategoriesPopup } from '../../Components/ChartCategoriesPopup/ChartCategoriesPopup.jsx';
 import { ChartCustomLegend } from '../../Components/ChartCustomLegend/ChartCustomLegend.jsx';
 import { ChartMultiColumnPopup } from '../../Components/ChartMultiColumnPopup/ChartMultiColumnPopup.jsx';
 import { RadioFieldset } from '../../Components/RadioFieldset/RadioFieldset.jsx';
 import { RangeInputField } from '../../Components/RangeInputField/RangeInputField.jsx';
 
 // Local components
-import { CustomActiveGroup } from './components/CustomActiveGroup/CustomActiveGroup.jsx';
+import { CustomLineChartActiveGroup } from './components/CustomActiveGroup/CustomLineChartActiveGroup.jsx';
 
 import {
-    chartGroupedCategoriesData,
-    chartGroupedData,
+    eurData,
     gapData,
     legendCategoriesData,
     maxColumnWidthData,
@@ -181,18 +179,6 @@ export const AutoHeight = {
     },
 };
 
-/**
- * 'maxColumnWidth' option
- */
-export const MaxColumnWidth = {
-    args: {
-        data: maxColumnWidthData,
-        maxColumnWidth: 75,
-        fitToWidth: true,
-    },
-    decorators: [chartContainerDecorator],
-};
-
 const xAxisMap = {
     top: 'Top',
     bottom: 'Bottom',
@@ -232,6 +218,7 @@ export const ChartAxes = {
             title: 'X-Axis',
             radioName: 'xAxis',
             items: Object.entries(xAxisMap).map(([value, label]) => ({
+                id: `xAxis_${value}`,
                 value,
                 label,
                 checked: (state.xAxis === value),
@@ -243,6 +230,7 @@ export const ChartAxes = {
             title: 'Y-Axis',
             radioName: 'yAxis',
             items: Object.entries(yAxisMap).map(([value, label]) => ({
+                id: `yAxis_${value}`,
                 value,
                 label,
                 checked: (state.yAxis === value),
@@ -254,6 +242,7 @@ export const ChartAxes = {
             title: 'Y-Axis text align',
             radioName: 'yAxisLabelsAlign',
             items: Object.entries(textAlignMap).map(([value, label]) => ({
+                id: `yAxisLabelsAlign_${value}`,
                 value,
                 label,
                 checked: (state.yAxisLabelsAlign === value),
@@ -274,7 +263,7 @@ export const ChartAxes = {
                 <LineChart {...chartProps} />
                 <div className="section-controls">
                     {items.map((item) => (
-                        <RadioFieldset {...item} key={item.id} />
+                        <RadioFieldset {...item} key={item.radioName} />
                     ))}
                 </div>
             </div>
@@ -299,8 +288,9 @@ export const XAxisGrid = {
  */
 export const AutoScale = {
     args: {
-        data: chartData2,
+        data: eurData,
         autoScale: true,
+        autoScaleTimeout: 0,
         drawNodeCircles: true,
         className: 'histogram_autoscale',
     },
@@ -319,26 +309,29 @@ export const Callbacks = {
         autoScale: true,
         animate: true,
         showPopupOnClick: true,
-        activateOnClick: true,
         renderPopup: (target) => formatAsUSD(target.item.value),
         renderXAxisLabel: formatDecimalValue,
         renderYAxisLabel: formatDecimalValue,
+        activateOnHover: true,
     },
     decorators: [chartContainerDecorator],
 };
 
 /**
- * Multi column + Legend + 'showPopupOnHover' and 'activateOnHover' options
+ * Multiple series + Legend + 'showPopupOnHover' and 'activateOnHover' options
  */
-export const MultiColumn = {
+export const MultipleSeries = {
     args: {
         data: chartMultiData,
         height: 320,
         marginTop: 35,
         autoScale: true,
-        showPopupOnHover: true,
+        showPopupOnClick: true,
         activateOnHover: true,
         showLegend: true,
+        components: {
+            ChartPopup: ChartMultiColumnPopup,
+        },
     },
     decorators: [chartContainerDecorator],
 };
@@ -374,9 +367,10 @@ export const AlignColumns = {
             title: 'Align columns',
             radioName: 'align',
             items: Object.entries(alignMap).map(([value, label]) => ({
+                id: `alignColumns_${value}`,
                 value,
                 label,
-                checked: (args.alignColumns === value),
+                checked: (state.alignColumns === value),
             })),
             onChange: (alignColumns) => (
                 setState((chartState) => ({
@@ -396,7 +390,7 @@ export const AlignColumns = {
                 <LineChart {...chartProps} />
                 <div className="section-controls">
                     {items.map((item) => (
-                        <RadioFieldset {...item} key={item.id} />
+                        <RadioFieldset {...item} key={item.radioName} />
                     ))}
                 </div>
             </div>
@@ -435,7 +429,7 @@ export const CustomActiveGroupComponent = {
         activateOnClick: true,
         activateOnHover: true,
         components: {
-            ActiveGroup: CustomActiveGroup,
+            ActiveGroup: CustomLineChartActiveGroup,
         },
     },
     decorators: [chartContainerDecorator],
@@ -476,60 +470,6 @@ export const StackedNegative = {
         components: {
             Legend: ChartCustomLegend,
             ChartPopup: ChartMultiColumnPopup,
-        },
-    },
-    decorators: [chartContainerDecorator],
-};
-
-/**
- * Stacked and grouped + 'animatePopup' and 'pinPopupOnClick' options
- */
-export const StackedGrouped = {
-    args: {
-        data: chartGroupedData,
-        height: 320,
-        marginTop: 35,
-        columnWidth: 25,
-        groupsGap: 15,
-        columnGap: 2,
-        autoScale: true,
-        showPopupOnClick: true,
-        activateOnClick: true,
-        activateOnHover: true,
-        animatePopup: true,
-        pinPopupOnClick: true,
-        showLegend: true,
-        components: {
-            Legend: ChartCustomLegend,
-            ChartPopup: ChartMultiColumnPopup,
-        },
-    },
-    decorators: [chartContainerDecorator],
-};
-
-/**
- * Stacked and grouped with custom categories.
- * 'showPopupOnHover', 'animatePopup' and 'pinPopupOnClick' options
- */
-export const StackedCategories = {
-    args: {
-        data: chartGroupedCategoriesData,
-        height: 320,
-        marginTop: 35,
-        columnWidth: 25,
-        groupsGap: 15,
-        columnGap: 2,
-        autoScale: true,
-        showPopupOnClick: true,
-        showPopupOnHover: true,
-        animatePopup: true,
-        pinPopupOnClick: true,
-        activateOnClick: true,
-        activateOnHover: true,
-        showLegend: true,
-        components: {
-            Legend: ChartCustomLegend,
-            ChartPopup: ChartCategoriesPopup,
         },
     },
     decorators: [chartContainerDecorator],
@@ -612,10 +552,6 @@ export const SetData = {
             id: 'stackedDataBtn',
             title: 'Stacked',
             data: chartStackedData,
-        }, {
-            id: 'stackedGroupedDataBtn',
-            title: 'Stacked and grouped',
-            data: chartGroupedCategoriesData,
         }, {
             id: 'largeDataBtn',
             title: 'Large data set',

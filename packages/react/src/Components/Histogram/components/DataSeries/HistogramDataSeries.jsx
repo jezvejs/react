@@ -96,6 +96,7 @@ export const HistogramDataSeries = (props) => {
     }, [
         dataSets,
         props.data,
+        props.grid,
         props.height,
         props.chartWidth,
         props.chartContentWidth,

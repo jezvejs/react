@@ -18,7 +18,7 @@ export const RadioFieldset = (props) => {
     };
 
     const radios = items.map((item) => ({
-        id: `${item.value}${radioName}Radio`,
+        id: `${item.id}${radioName}Radio`,
         value: item.value,
         label: item.label,
         name: radioName,
@@ -35,8 +35,8 @@ export const RadioFieldset = (props) => {
                 <legend>{props.title}</legend>
 
                 <div className="radio-fieldset__content">
-                    {radios.map((item) => (
-                        <Radio {...item} key={item.id} />
+                    {radios.map(({ id, ...item }) => (
+                        <Radio {...item} key={id} />
                     ))}
                 </div>
             </fieldset>

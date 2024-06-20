@@ -294,7 +294,7 @@ export const findItemByEvent = (e, state, elem) => {
 
 /** Returns component for specified name */
 export const getComponent = (name, state) => {
-    const res = state.components?.[name] ?? null;
+    const res = state?.components?.[name] ?? null;
     if (!res) {
         throw new Error(`Invalid ${name} component`);
     }

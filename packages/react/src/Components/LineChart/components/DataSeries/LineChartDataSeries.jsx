@@ -1,4 +1,3 @@
-import { asArray } from '@jezvejs/types';
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
@@ -12,34 +11,27 @@ import { getLinePath } from '../../helpers.js';
  */
 export const LineChartDataSeries = (props) => {
     const { getState, setState } = useStore();
-    const { dataSets, activeTarget, grid } = props;
+    const { dataSets, activeTarget, grid } = getState();
 
-    const getCategoryItems = (categoryIndex, state) => {
-        const items = state.dataSeries?.items ?? [];
-        return items.map((item) => {
-            const group = asArray(item);
-            if (categoryIndex < 0 || categoryIndex >= group.length) {
-                throw new Error(`Invalid category ${categoryIndex}`);
-            }
-
-            return group[categoryIndex];
-        });
-    };
+    const storeState = getState();
 
     useEffect(() => {
-        const firstGroupIndex = props.getFirstVisibleGroupIndex(props);
-        const visibleGroups = props.getVisibleGroupsCount(firstGroupIndex, props);
-        const activeCategory = props.activeCategory?.toString() ?? null;
+        const firstGroupIndex = props.getFirstVisibleGroupIndex(storeState);
+        const visibleGroups = props.getVisibleGroupsCount(firstGroupIndex, storeState);
+        const activeCategory = storeState.activeCategory?.toString() ?? null;
 
         const items = [];
         for (let i = 0; i < visibleGroups; i += 1) {
             const groupIndex = firstGroupIndex + i;
             const group = [];
-            let valueOffset = 0;
+            let posValueOffset = 0;
+            let negValueOffset = 0;
 
             dataSets.forEach((dataSet, categoryIndex) => {
                 const value = dataSet.data[groupIndex] ?? 0;
                 const category = dataSet.category ?? null;
+                const valueOffset = (value >= 0) ? posValueOffset : negValueOffset;
+
                 const active = (
                     (category?.toString() === activeCategory)
                     || (categoryIndex.toString() === activeCategory)
@@ -59,22 +51,32 @@ export const LineChartDataSeries = (props) => {
                     valueOffset,
                 };
 
-                const item = props.createItem(itemProps, props);
+                const item = props.createItem(itemProps, storeState);
 
                 group.push(item);
 
-                if (props.data.stacked) {
-                    valueOffset += value;
+                if (!storeState.data.stacked) {
+                    return;
+                }
+                if (value >= 0) {
+                    posValueOffset += value;
+                } else {
+                    negValueOffset += value;
                 }
             });
 
             items.push(group);
         }
 
-        const categoriesCount = props.getCategoriesCount(props);
+        // Paths
+        const categoriesCount = props.getCategoriesCount(storeState);
         const paths = [];
+        const flatItems = items.flat();
         for (let i = 0; i < categoriesCount; i += 1) {
-            const categoryItems = getCategoryItems(i, props) ?? [];
+            const categoryItems = flatItems.filter((item) => (
+                item?.categoryIndex === i
+            ));
+
             const pathItem = categoryItems[0] ?? null;
             if (categoryItems.length === 0 || pathItem === null) {
                 continue;
@@ -83,7 +85,7 @@ export const LineChartDataSeries = (props) => {
             const { category, categoryIndex } = pathItem;
             const active = (
                 (category?.toString() === activeCategory)
-                || (categoryIndex.toString() === activeCategory)
+                || (categoryIndex?.toString() === activeCategory)
             );
 
             const path = getLinePath({
@@ -91,7 +93,7 @@ export const LineChartDataSeries = (props) => {
                 categoryIndex,
                 category,
                 active,
-            }, props);
+            }, storeState);
 
             paths.push(path);
         }
@@ -109,19 +111,20 @@ export const LineChartDataSeries = (props) => {
         }));
     }, [
         dataSets,
-        props.data,
-        props.height,
-        props.chartWidth,
-        props.chartContentWidth,
-        props.scrollerWidth,
-        props.columnWidth,
-        props.groupsGap,
-        props.groupsCount,
-        props.scrollLeft,
-        props.activeTarget,
-        props.activeCategory,
-        props.popupTarget,
-        props.pinnedTarget,
+        storeState.data,
+        storeState.grid,
+        storeState.height,
+        storeState.chartWidth,
+        storeState.chartContentWidth,
+        storeState.scrollerWidth,
+        storeState.columnWidth,
+        storeState.groupsGap,
+        storeState.groupsCount,
+        storeState.scrollLeft,
+        storeState.activeTarget,
+        storeState.activeCategory,
+        storeState.popupTarget,
+        storeState.pinnedTarget,
     ]);
 
     if (dataSets.length === 0 || !grid) {

@@ -232,6 +232,7 @@ export const ChartAxes = {
             title: 'X-Axis',
             radioName: 'xAxis',
             items: Object.entries(xAxisMap).map(([value, label]) => ({
+                id: `xAxis_${value}`,
                 value,
                 label,
                 checked: (state.xAxis === value),
@@ -243,6 +244,7 @@ export const ChartAxes = {
             title: 'Y-Axis',
             radioName: 'yAxis',
             items: Object.entries(yAxisMap).map(([value, label]) => ({
+                id: `yAxis_${value}`,
                 value,
                 label,
                 checked: (state.yAxis === value),
@@ -254,6 +256,7 @@ export const ChartAxes = {
             title: 'Y-Axis text align',
             radioName: 'yAxisLabelsAlign',
             items: Object.entries(textAlignMap).map(([value, label]) => ({
+                id: `yAxisLabelsAlign_${value}`,
                 value,
                 label,
                 checked: (state.yAxisLabelsAlign === value),
@@ -274,7 +277,7 @@ export const ChartAxes = {
                 <Histogram {...chartProps} />
                 <div className="section-controls">
                     {items.map((item) => (
-                        <RadioFieldset {...item} key={item.id} />
+                        <RadioFieldset {...item} key={item.radioName} />
                     ))}
                 </div>
             </div>
@@ -373,9 +376,10 @@ export const AlignColumns = {
             title: 'Align columns',
             radioName: 'align',
             items: Object.entries(alignMap).map(([value, label]) => ({
+                id: `alignColumns_${value}`,
                 value,
                 label,
-                checked: (args.alignColumns === value),
+                checked: (state.alignColumns === value),
             })),
             onChange: (alignColumns) => (
                 setState((chartState) => ({

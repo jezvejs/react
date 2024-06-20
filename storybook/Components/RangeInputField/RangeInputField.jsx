@@ -38,7 +38,7 @@ export const RangeInputField = (props) => {
                     type="range"
                     min={props.min}
                     max={props.max}
-                    value={props.value}
+                    defaultValue={props.value}
                     onInput={onInput}
                     onChange={onChange}
                 />

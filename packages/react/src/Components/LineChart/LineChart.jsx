@@ -19,6 +19,7 @@ export const LineChart = (props) => {
         xAxisGrid: false,
         drawNodeCircles: false,
         nodeCircleRadius: 4,
+        scaleAroundAxis: false,
 
         ...props,
 
@@ -59,10 +60,6 @@ export const LineChart = (props) => {
                 groupWidth = 0,
                 alignColumns = 'left',
             } = options;
-
-            if (!state) {
-                throw new Error('123');
-            }
 
             let x = state.getX({ groupIndex }, groupWidth);
             if (alignColumns === 'right') {

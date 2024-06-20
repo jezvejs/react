@@ -7,6 +7,30 @@ import {
     getDataState,
 } from './helpers.js';
 
+/** Updates state of component based on layout changes(scroll or resize) */
+const refreshView = (state, layout) => {
+    let newState = {
+        ...state,
+        ...layout,
+    };
+
+    newState = updateColumnWidth(newState);
+
+    // Update width of x axis labels
+    newState.lastHLabelOffset = (!newState.fitToWidth)
+        ? Math.ceil(newState.lastHLabelOffset)
+        : 0;
+
+    if (!state.autoScale) {
+        newState.grid = newState.calculateGrid(newState.data.values, newState);
+    }
+
+    return updateChartWidth({
+        ...newState,
+        animateNow: false,
+    });
+};
+
 // Reducers
 const slice = createSlice({
     update: (state, stateUpdate) => ({ ...state, ...stateUpdate }),
@@ -69,6 +93,31 @@ const slice = createSlice({
             : state
     ),
 
+    requestScroll: (state) => (
+        (!state.scrollRequested)
+            ? { ...state, scrollRequested: true }
+            : state
+    ),
+
+    scrollToRight: (state) => {
+        if (!state.scrollRequested) {
+            return state;
+        }
+
+        const width = Math.max(state.chartWidth, state.scrollWidth);
+        if (state.scrollLeft + state.scrollerWidth >= width) {
+            return {
+                ...state,
+                scrollRequested: false,
+            };
+        }
+
+        return {
+            ...state,
+            scrollLeft: width,
+        };
+    },
+
     ignoreTouch: (state) => (
         (state.ignoreTouch)
             ? state
@@ -109,34 +158,9 @@ const slice = createSlice({
             : state
     ),
 
-    scroll: (state, layout) => ({
-        ...state,
-        ...layout,
-        animateNow: false,
-    }),
+    scroll: refreshView,
 
-    resize: (state, layout) => {
-        let newState = {
-            ...state,
-            ...layout,
-        };
-
-        newState = updateColumnWidth(newState);
-
-        // Update width of x axis labels
-        newState.lastHLabelOffset = (!newState.fitToWidth)
-            ? Math.ceil(newState.lastHLabelOffset)
-            : 0;
-
-        if (!state.autoScale) {
-            newState.grid = state.calculateGrid(newState.data.values, newState);
-        }
-
-        return updateChartWidth({
-            ...newState,
-            animateNow: false,
-        });
-    },
+    resize: refreshView,
 
     setData: (state, { data, layout }) => {
         if (state.data === data) {
