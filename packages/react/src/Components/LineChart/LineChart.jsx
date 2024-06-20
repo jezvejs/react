@@ -14,7 +14,6 @@ import './LineChart.scss';
  */
 export const LineChart = (props) => {
     const chartProps = {
-        grid: null,
         yAxisGrid: true,
         xAxisGrid: false,
         drawNodeCircles: false,
@@ -167,17 +166,10 @@ export const LineChart = (props) => {
 };
 
 LineChart.propTypes = {
-    className: PropTypes.string,
-    grid: PropTypes.object,
-    yAxisGrid: PropTypes.bool,
-    xAxisGrid: PropTypes.bool,
+    ...BaseChart.propTypes,
     drawNodeCircles: PropTypes.bool,
-    getGroupOuterWidth: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
     components: PropTypes.shape({
-        DataItem: PropTypes.func,
+        ...BaseChart.childComponents,
         DataPath: PropTypes.func,
-        DataSeries: PropTypes.func,
     }),
 };

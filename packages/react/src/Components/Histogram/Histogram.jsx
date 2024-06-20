@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { BaseChart, BaseChartHelpers } from '../BaseChart/BaseChart.jsx';
@@ -13,7 +12,6 @@ import './Histogram.scss';
  */
 export const Histogram = (props) => {
     const chartProps = {
-        grid: null,
         yAxisGrid: true,
         xAxisGrid: false,
 
@@ -200,15 +198,5 @@ export const Histogram = (props) => {
 };
 
 Histogram.propTypes = {
-    className: PropTypes.string,
-    grid: PropTypes.object,
-    yAxisGrid: PropTypes.bool,
-    xAxisGrid: PropTypes.bool,
-    getGroupOuterWidth: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
-    components: PropTypes.shape({
-        DataItem: PropTypes.func,
-        DataSeries: PropTypes.func,
-    }),
+    ...BaseChart.propTypes,
 };

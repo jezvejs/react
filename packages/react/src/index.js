@@ -33,6 +33,7 @@ export { Popup } from './Components/Popup/Popup.jsx';
 export { PopupMenu } from './Components/PopupMenu/PopupMenu.jsx';
 export { Progress } from './Components/Progress/Progress.jsx';
 export { Radio } from './Components/Radio/Radio.jsx';
+export { RangeScrollChart } from './Components/RangeScrollChart/RangeScrollChart.jsx';
 export { RangeSlider } from './Components/RangeSlider/RangeSlider.jsx';
 export { Slider } from './Components/Slider/Slider.jsx';
 export * from './Components/Sortable/Sortable.jsx';

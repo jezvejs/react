@@ -48,3 +48,7 @@ BaseChart.propTypes = {
         PropTypes.func,
     ]),
 };
+
+BaseChart.childComponents = {
+    ...BaseChartContainer.childComponents,
+};

@@ -99,6 +99,12 @@ const slice = createSlice({
             : state
     ),
 
+    finishScroll: (state) => (
+        (state.scrollRequested)
+            ? { ...state, scrollRequested: false }
+            : state
+    ),
+
     scrollToRight: (state) => {
         if (!state.scrollRequested) {
             return state;
