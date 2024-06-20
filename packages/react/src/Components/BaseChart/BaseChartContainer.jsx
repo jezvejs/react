@@ -22,11 +22,16 @@ import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.
  */
 // eslint-disable-next-line react/display-name
 export const BaseChartContainer = forwardRef((props, ref) => {
+    const store = useStore();
     const {
         getState,
         setState,
         dispatch,
-    } = useStore();
+    } = store;
+
+    useEffect(() => {
+        props?.onStoreReady(store);
+    }, [store]);
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -119,6 +124,11 @@ export const BaseChartContainer = forwardRef((props, ref) => {
      * 'scroll' event handler
      */
     const onScroll = () => {
+        const state = getState();
+        if (state.scrollRequested) {
+            dispatch(actions.finishScroll());
+        }
+
         dispatch(actions.scroll(measureLayout()));
 
         if (scaleFunc.current) {
@@ -129,7 +139,6 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             scrollFunc.current();
         }
 
-        const state = getState();
         if (state.showPopupOnClick || state.showPopupOnHover) {
             hidePopup();
         }
@@ -363,11 +372,41 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
     // Scroll
     useEffect(() => {
-        if (!scrollerRef.current) {
+        const scrollLeft = props.scrollLeft
+            ? Math.round(parseFloat(props.scrollLeft))
+            : null;
+
+        if (
+            scrollLeft === null
+            || scrollLeft === state.scrollLeft
+        ) {
             return;
         }
 
-        scrollerRef.current.scrollLeft = state.scrollLeft;
+        dispatch(actions.requestScroll());
+        dispatch(actions.setScroll(scrollLeft));
+    }, [props.scrollLeft]);
+
+    useEffect(() => {
+        if (!scrollerRef.current) {
+            return undefined;
+        }
+
+        if (!state.scrollRequested) {
+            return undefined;
+        }
+
+        cancelAnimation();
+
+        animationFrameRef.current = requestAnimationFrame(() => {
+            animationFrameRef.current = 0;
+
+            if (scrollerRef.current) {
+                scrollerRef.current.scrollLeft = state.scrollLeft;
+            }
+        });
+
+        return () => cancelAnimation();
     }, [state?.scrollLeft]);
 
     // Main chart element props
@@ -502,10 +541,17 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         />
     );
 
+    // Custom scroller container content
+    const {
+        beforeScroller = null,
+        afterScroller = null,
+    } = props;
+
     return (
         <div {...chartProps} ref={innerRef}>
             <div {...chartContainerProps}>
                 <div className="chart__container">
+                    {beforeScroller}
                     <div className="chart__scroller" onScroll={onScroll} ref={scrollerRef}>
                         <div className="chart">
                             <svg {...chartContentProps} ref={chartContentRef}>
@@ -516,6 +562,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
                             {xAxisLabels}
                         </div>
                     </div>
+                    {afterScroller}
                 </div>
                 {yAxisLabels}
             </div>
@@ -526,10 +573,28 @@ export const BaseChartContainer = forwardRef((props, ref) => {
     );
 });
 
+const isComponent = PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.func,
+]);
+
+BaseChartContainer.childComponents = {
+    ActiveGroup: isComponent,
+    ChartPopup: isComponent,
+    DataItem: isComponent,
+    DataSeries: isComponent,
+    Grid: isComponent,
+    Legend: isComponent,
+    XAxisLabels: isComponent,
+    YAxisLabels: isComponent,
+};
+
 BaseChartContainer.propTypes = {
     id: PropTypes.string,
     data: PropTypes.object,
     className: PropTypes.string,
+
+    // Layout
     columnWidth: PropTypes.number,
     groupsGap: PropTypes.number,
     height: PropTypes.number,
@@ -537,17 +602,50 @@ BaseChartContainer.propTypes = {
     autoScale: PropTypes.bool,
     autoScaleTimeout: PropTypes.number,
     scrollToEnd: PropTypes.bool,
+
+    scrollLeft: PropTypes.number,
+
+    beforeScroller: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
+    afterScroller: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
+
+    // Grid
+    xAxisGrid: PropTypes.bool,
+    yAxisGrid: PropTypes.bool,
+
+    // Labels
     xAxis: PropTypes.oneOf(['bottom', 'top', 'none']),
     yAxis: PropTypes.oneOf(['left', 'right', 'none']),
     yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
+
     alignColumns: PropTypes.oneOf(['left', 'center', 'right']),
     activateOnHover: PropTypes.bool,
-    showPopupOnHover: PropTypes.bool,
     showLegend: PropTypes.bool,
     animationEndTimeout: PropTypes.number,
+
+    // Popup
+    showPopupOnHover: PropTypes.bool,
+
+    // Callbacks
+    onStoreReady: PropTypes.func,
     onItemClick: PropTypes.func,
     onItemOver: PropTypes.func,
     onItemOut: PropTypes.func,
     onScroll: PropTypes.func,
     scrollDone: PropTypes.func,
+
+    // Chart data functions
+    getGroupOuterWidth: PropTypes.func,
+    getFirstVisibleGroupIndex: PropTypes.func,
+    getVisibleGroupsCount: PropTypes.func,
+
+    // Child components
+    components: PropTypes.shape({
+        ...BaseChartContainer.childComponents,
+    }),
 };

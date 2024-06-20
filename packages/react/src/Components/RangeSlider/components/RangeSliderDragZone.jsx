@@ -96,8 +96,8 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
 
                         const maxPos = Math.round(
                             (props.axis === 'x')
-                                ? (currentState.offset.width - sliderState.rect.width)
-                                : (currentState.offset.height - sliderState.rect.height),
+                                ? (currentState.offset.width - (sliderState.rect?.width ?? 0))
+                                : (currentState.offset.height - (sliderState.rect?.height ?? 0)),
                         );
 
                         const newPos = minmax(0, maxPos, pos);
