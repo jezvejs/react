@@ -113,9 +113,23 @@ export const Sortable = forwardRef((props, ref) => {
                     return prev;
                 }
 
+                // Prevent to move drag zone to parent subtree
+                if (
+                    targetId === null
+                    && parentId === targetZoneId
+                    && dragZoneItems.length > 0
+                    && parentId === prev.sortPosition.parentId
+                    && targetZoneId === prev.sortPosition.parentZoneId
+                ) {
+                    return prev;
+                }
+
+                const insertToEnd = true;
+                const indexAtNewZone = (insertToEnd) ? dragZoneItems.length : 0;
+
                 const index = (targetId !== null)
                     ? findTreeItemIndex(dragZoneItems, (item) => item.id === targetId)
-                    : 0;
+                    : indexAtNewZone;
 
                 if (
                     index === -1

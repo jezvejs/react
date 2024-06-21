@@ -3,11 +3,13 @@ import { isFunction } from '@jezvejs/types';
 import { useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { DragMaster, useDropTarget } from '../../utils/DragnDrop/index.js';
+import { DragMaster, useDragnDrop, useDropTarget } from '../../utils/DragnDrop/index.js';
 import { hasFlag } from '../../utils/common.js';
 
 export function useSortableDropTarget(props) {
     const targetElem = useRef(null);
+
+    const { getState } = useDragnDrop();
 
     const dropTarget = useDropTarget({
         ...props,
@@ -47,52 +49,58 @@ export function useSortableDropTarget(props) {
             return !!avatar; // (avatar instanceof SortableDragAvatar)
         },
 
+        applyNewTarget(avatar, elem) {
+            this.hideHoverIndication?.(avatar);
+            targetElem.current = elem;
+            this.showHoverIndication?.(avatar);
+        },
+
         onDragMove(avatar, e) {
             const newTargetElem = this.getTargetElem(avatar, e);
-            if (targetElem.current === newTargetElem) {
+            if (!newTargetElem || targetElem.current === newTargetElem) {
                 return;
             }
 
-            this.hideHoverIndication?.(avatar);
-            targetElem.current = newTargetElem;
-            this.showHoverIndication?.(avatar);
+            this.applyNewTarget(avatar, newTargetElem);
 
             const dragMaster = DragMaster.getInstance();
             const { dragZone } = dragMaster;
             const dragZoneElem = dragZone.getDragItemElement();
             const currentGroup = dragZone.getGroup(dragZoneElem);
 
-            const targetDragZone = dragMaster.findDragZone(targetElem.current);
-            const targetItemElem = targetDragZone?.findDragZoneItem(targetElem.current);
+            const targetDragZone = dragMaster.findDragZone(newTargetElem);
+            const targetItemElem = targetDragZone?.findDragZoneItem(newTargetElem);
             const targetGroup = targetDragZone?.getGroup(targetItemElem);
 
             if (
-                !targetElem.current
-                || !this.isAceptableAvatar(avatar)
+                !this.isAceptableAvatar(avatar)
                 || (targetGroup !== currentGroup)
             ) {
                 return;
             }
 
-            const nodeCmp = comparePosition(targetElem.current, dragZoneElem);
+            const nodeCmp = comparePosition(newTargetElem, dragZoneElem);
             if (!nodeCmp) {
                 return;
             }
 
+            const dragZoneBeforeTarget = hasFlag(nodeCmp, 2);
+            const dragZoneAfterTarget = hasFlag(nodeCmp, 4);
             const dragZoneContainsTarget = hasFlag(nodeCmp, 8);
             const { containerSelector } = dragZone;
-            const targetContainer = targetElem.current.querySelector(containerSelector);
+            const targetContainer = newTargetElem.querySelector(containerSelector);
 
-            let targetId = targetDragZone.itemIdFromElem(targetElem.current);
-            const parentElem = targetDragZone.findDragZoneItem(targetElem.current.parentNode);
+            const targetZoneId = targetDragZone.id;
+            let targetId = targetDragZone.itemIdFromElem(newTargetElem);
+            const parentElem = targetDragZone.findDragZoneItem(newTargetElem.parentNode);
             const targetParentZone = targetDragZone.itemIdFromElem(parentElem);
-            let parentId = targetParentZone ?? targetDragZone.id;
+            let parentId = targetParentZone ?? targetZoneId;
 
             // check drop target is already a placeholder
-            if (targetElem.current.classList.contains(dragZone.getPlaceholder())) {
+            if (newTargetElem.classList.contains(dragZone.getPlaceholder())) {
                 // swap drag zone with drop target
             } else if (
-                dragZoneElem.parentNode !== targetElem.current.parentNode
+                dragZoneElem.parentNode !== newTargetElem.parentNode
                 && !dragZoneContainsTarget
             ) {
                 // move between containers
@@ -105,13 +113,29 @@ export function useSortableDropTarget(props) {
                 /* new target element has empty container */
                 parentId = targetId;
                 targetId = null;
+            } else if (dragZoneBeforeTarget && !dragZoneContainsTarget) {
+                /* drag zone element is before new drop target */
+            } else if (dragZoneAfterTarget && !dragZoneContainsTarget) {
+                /* drag zone element is after new drop target */
+            }
+
+            // Skip move item to parent container without target item
+            // if current target item is already at this container
+            const state = getState();
+            if (
+                targetId === null
+                && state.targetId !== null
+                && parentId === state.sortPosition.parentId
+                && targetZoneId === state.sortPosition.parentZoneId
+            ) {
+                return;
             }
 
             props.onDragMove?.({
                 avatar,
                 e,
                 targetId,
-                targetZoneId: targetDragZone.id,
+                targetZoneId,
                 parentId,
             });
         },
