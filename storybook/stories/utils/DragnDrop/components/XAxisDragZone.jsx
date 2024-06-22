@@ -31,6 +31,8 @@ export const XAxisDragZone = forwardRef((props, ref) => {
 
         const dragZone = {
             elem: dragZoneRef.current,
+            mouseMoveThreshold: 0,
+            touchMoveTimeout: 0,
             onDragStart(params) {
                 const avatar = {
                     id: props.id,
