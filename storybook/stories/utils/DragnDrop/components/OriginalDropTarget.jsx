@@ -16,10 +16,20 @@ export const OriginalDropTarget = (props) => {
                     ...(prev[id] ?? {}),
                     left: page.x - avatarInfo.mouseShift.x - offset.left - border.left,
                     top: page.y - avatarInfo.mouseShift.y - offset.top - border.top,
-                    dragging: false,
                 },
-                dragging: false,
             }));
+
+            requestAnimationFrame(() => {
+                setState((prev) => ({
+                    ...prev,
+                    [id]: {
+                        ...(prev[id] ?? {}),
+                        dragging: false,
+                    },
+                    dragging: false,
+                    draggingId: null,
+                }));
+            });
         },
     });
 
