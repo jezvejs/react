@@ -20,7 +20,7 @@ import {
 export const Sortable = forwardRef((props, ref) => {
     const {
         className,
-        onSort,
+        onSort = null,
         components,
         ...commonProps
     } = props;
@@ -96,7 +96,12 @@ export const Sortable = forwardRef((props, ref) => {
     } = useSortableDropTarget({
         ...commonProps,
 
-        onDragMove({ targetId, parentId, targetZoneId }) {
+        onDragMove({
+            targetId,
+            parentId,
+            targetZoneId,
+            swapWithPlaceholder,
+        }) {
             if (targetId === parentId) {
                 return;
             }
@@ -155,21 +160,28 @@ export const Sortable = forwardRef((props, ref) => {
 
                 // Remove item from source list
                 const sourceZoneId = prev.sortPosition.parentZoneId;
-                const sourceItems = prev[sourceZoneId].items;
+                const sourceItems = getDragZoneItems(sourceZoneId, prev);
+                let destItems = getDragZoneItems(targetZoneId, prev);
+
+                const movingItem = getTreeItemById(newState.itemId, sourceItems);
+                const targetItem = getTreeItemById(newState.targetId, destItems);
+                const origIndex = prev.sortPosition?.index ?? null;
 
                 newState[sourceZoneId] = {
                     ...newState[sourceZoneId],
-                    items: filterTreeItems(sourceItems, (item) => item?.id !== newState.itemId),
+                    items: (swapWithPlaceholder)
+                        ? sourceItems.toSpliced(origIndex, 1, targetItem)
+                        : filterTreeItems(sourceItems, (item) => item?.id !== newState.itemId),
                 };
 
                 // Insert item to destination list
-                const movingItem = getTreeItemById(newState.itemId, sourceItems);
-                const destItems = getDragZoneItems(targetZoneId, newState);
+                destItems = getDragZoneItems(targetZoneId, newState);
+                const deleteLength = (swapWithPlaceholder) ? 1 : 0;
 
                 newState[targetZoneId] = {
                     ...newState[targetZoneId],
                     items: (parentId === targetZoneId)
-                        ? destItems.toSpliced(index, 0, movingItem)
+                        ? destItems.toSpliced(index, deleteLength, movingItem)
                         : (
                             mapTreeItems(destItems, (item) => {
                                 if (item.id !== parentId) {
@@ -178,7 +190,8 @@ export const Sortable = forwardRef((props, ref) => {
 
                                 return {
                                     ...item,
-                                    items: asArray(item.items).toSpliced(index, 0, movingItem),
+                                    items: asArray(item.items)
+                                        .toSpliced(index, deleteLength, movingItem),
                                 };
                             })
                         ),
@@ -280,8 +293,4 @@ Sortable.propTypes = {
         ListItem: PropTypes.object,
         Avatar: PropTypes.object,
     }),
-};
-
-Sortable.defaultProps = {
-    onSort: null,
 };

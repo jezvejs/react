@@ -116,6 +116,52 @@ export function useSortableDragZone(props) {
             }
         },
 
+        restoreSourceNode() {
+            if (this.sourceNode) {
+                this.sourceNodeRestored = true;
+                this.sourceNode.style.display = 'none';
+                document.body.appendChild(this.sourceNode);
+            }
+        },
+
+        observeNode(node) {
+            this.disconnectNodeObserver();
+            this.removeSourceNode();
+
+            this.sourceNode = node;
+            this.nodeObserver = new MutationObserver(() => {
+                if (node && !node.parentElement) {
+                    this.restoreSourceNode();
+                    this.disconnectNodeObserver();
+                }
+            });
+
+            this.nodeObserver.observe(node.parentElement, {
+                childList: true,
+            });
+        },
+
+        disconnectNodeObserver() {
+            if (this.nodeObserver) {
+                this.nodeObserver.disconnect();
+            }
+
+            this.nodeObserver = null;
+        },
+
+        removeSourceNode() {
+            if (this.sourceNodeRestored) {
+                this.sourceNode?.remove();
+            }
+            this.sourceNode = null;
+            this.sourceNodeRestored = false;
+        },
+
+        finishDrag() {
+            this.disconnectNodeObserver();
+            this.removeSourceNode();
+        },
+
         /* Drag start event handler */
         onDragStart(params) {
             const { e } = params;
@@ -131,6 +177,8 @@ export function useSortableDragZone(props) {
             }
 
             dragItemRef.current = itemEl;
+
+            this.observeNode(itemEl);
 
             const parentEl = this.findDragZoneItem(itemEl.parentNode);
             const parentId = this.itemIdFromElem(parentEl) ?? this.id;

@@ -96,9 +96,12 @@ export function useSortableDropTarget(props) {
             const targetParentZone = targetDragZone.itemIdFromElem(parentElem);
             let parentId = targetParentZone ?? targetZoneId;
 
+            let swapWithPlaceholder = false;
+
             // check drop target is already a placeholder
             if (newTargetElem.classList.contains(dragZone.getPlaceholder())) {
                 // swap drag zone with drop target
+                swapWithPlaceholder = true;
             } else if (
                 dragZoneElem.parentNode !== newTargetElem.parentNode
                 && !dragZoneContainsTarget
@@ -137,7 +140,15 @@ export function useSortableDropTarget(props) {
                 targetId,
                 targetZoneId,
                 parentId,
+                swapWithPlaceholder,
             });
+        },
+
+        finishDrag() {
+            const dragMaster = DragMaster.getInstance();
+            const { dragZone } = dragMaster;
+
+            dragZone.finishDrag();
         },
 
         onDragEnd(params) {
@@ -147,14 +158,17 @@ export function useSortableDropTarget(props) {
                 return;
             }
 
-            this.hideHoverIndication?.();
+            this.finishDrag();
 
+            this.hideHoverIndication?.();
             this.applySort(params);
 
             targetElem.current = null;
         },
 
         onDragCancel(params) {
+            this.finishDrag();
+
             if (params?.e?.type === 'keydown') {
                 this.cancelSort(params);
             } else {
@@ -201,16 +215,8 @@ export function useSortableDropTarget(props) {
             });
         },
 
-        cancelSort({ avatar, e }) {
-            const avatarInfo = avatar.getDragInfo(e);
+        cancelSort({ avatar }) {
             avatar.onDragEnd();
-
-            const { initialPos, dragZoneElem } = avatarInfo;
-            if (initialPos.prev) {
-                initialPos.prev.after(dragZoneElem);
-            } else {
-                initialPos.next.before(dragZoneElem);
-            }
         },
     });
 
