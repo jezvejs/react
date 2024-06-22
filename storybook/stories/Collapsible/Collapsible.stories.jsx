@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
+import { useState } from 'react';
 import { Button, Collapsible } from '@jezvejs/react';
-import { useArgs } from '@storybook/preview-api';
 
 import EditIcon from '../../assets/icons/edit.svg';
 import DeleteIcon from '../../assets/icons/del.svg';
@@ -101,15 +101,17 @@ export const ToggleOnClick = {
         children: createContent(createListContent({ prefix: 'toggle' })),
     },
     render: function Render(args) {
-        const [{ expanded }, updateArgs] = useArgs();
+        const [state, setState] = useState({
+            ...args,
+        });
 
         function onToggle() {
-            updateArgs({ expanded: !expanded });
+            setState((prev) => ({ ...prev, expanded: !prev.expanded }));
         }
 
         return (
             <Collapsible
-                {...args}
+                {...state}
                 header={
                     <>
                         <div className='custom-title'>Toggle only by click button</div>
