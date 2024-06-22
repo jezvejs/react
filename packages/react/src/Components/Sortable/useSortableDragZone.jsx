@@ -199,7 +199,7 @@ export function useSortableDragZone(props) {
                 ...params,
                 avatar,
                 parentId,
-                parentZoneId: this.id,
+                zoneId: this.id,
                 itemId,
             });
 

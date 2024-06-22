@@ -129,7 +129,7 @@ export function useSortableDropTarget(props) {
                 targetId === null
                 && state.targetId !== null
                 && parentId === state.sortPosition.parentId
-                && targetZoneId === state.sortPosition.parentZoneId
+                && targetZoneId === state.sortPosition.zoneId
             ) {
                 return;
             }
@@ -177,9 +177,7 @@ export function useSortableDropTarget(props) {
         },
 
         showHoverIndication(avatar) {
-            props.showHoverIndication?.({
-                avatar,
-            });
+            props.showHoverIndication?.({ avatar });
 
             if (
                 !targetElem.current
@@ -192,9 +190,7 @@ export function useSortableDropTarget(props) {
         },
 
         hideHoverIndication(avatar) {
-            props.hideHoverIndication?.({
-                avatar,
-            });
+            props.hideHoverIndication?.({ avatar });
 
             if (
                 !targetElem.current
@@ -207,16 +203,11 @@ export function useSortableDropTarget(props) {
         },
 
         applySort({ avatar, e }) {
-            avatar.onDragEnd?.();
-
-            props.onSortEnd?.({
-                avatar,
-                e,
-            });
+            props.onSortEnd?.({ avatar, e });
         },
 
-        cancelSort({ avatar }) {
-            avatar.onDragEnd();
+        cancelSort({ avatar, e }) {
+            props.onSortCancel?.({ avatar, e });
         },
     });
 

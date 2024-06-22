@@ -1,4 +1,4 @@
-import { isFunction } from '@jezvejs/types';
+import { isFunction, asArray } from '@jezvejs/types';
 
 /**
  * Searches for first tree item for which callback function return true
@@ -157,4 +157,132 @@ export const filterTreeItems = (items, callback) => {
     }
 
     return res;
+};
+
+/**
+ * Returns list items for specified drag zone
+ * @param {string} dragZoneId
+ * @param {object} state
+ * @returns {Array}
+ */
+export const getDragZoneItems = (dragZoneId, state) => (
+    state[dragZoneId]?.items ?? []
+);
+
+/**
+ * Moves tree item from one position to another
+ * If 'swapWithPlaceholder' option is enabled then swaps source and target items
+ *
+ * @param {object} state
+ * @param {object} options
+ * @returns {object}
+ */
+export const moveTreeItem = (state, options) => {
+    const {
+        source,
+        target,
+        swapWithPlaceholder = false,
+    } = options;
+
+    const targetId = target?.id ?? null;
+
+    if (source.id === target.id) {
+        return state;
+    }
+
+    const dragZoneItems = getDragZoneItems(target.zoneId, state);
+
+    // Prevent to move parent subtree into own child
+    if (isTreeContains(source.id, target.id, dragZoneItems)) {
+        return state;
+    }
+
+    // Prevent to move drag zone to parent subtree
+    if (
+        targetId === null
+        && target.parentId === target.zoneId
+        && dragZoneItems.length > 0
+        && target.parentId === state.sortPosition.parentId
+        && target.zoneId === state.sortPosition.zoneId
+    ) {
+        return state;
+    }
+
+    const insertToEnd = true;
+    const indexAtNewZone = (insertToEnd) ? dragZoneItems.length : 0;
+
+    const index = (targetId !== null)
+        ? findTreeItemIndex(dragZoneItems, (item) => item?.id === target.id)
+        : indexAtNewZone;
+
+    if (
+        index === -1
+        || (
+            index === state.sortPosition.index
+            && target.parentId === state.sortPosition.parentId
+            && target.zoneId === state.sortPosition.zoneId
+        )
+    ) {
+        return state;
+    }
+
+    const newState = {
+        ...state,
+        targetId,
+        sortPosition: {
+            id: targetId,
+            index,
+            parentId: target.parentId,
+            zoneId: target.zoneId,
+        },
+        swapWithPlaceholder,
+    };
+
+    // Remove item from source list
+    const sourceItems = getDragZoneItems(source.zoneId, state);
+    let destItems = getDragZoneItems(target.zoneId, state);
+
+    const movingItem = getTreeItemById(source.id, sourceItems);
+    const targetItem = getTreeItemById(target.id, destItems);
+    const origIndex = state.sortPosition?.index ?? null;
+
+    if (!movingItem) {
+        return state;
+    }
+
+    if (!targetItem && (!target.parentId || !target.zoneId)) {
+        return state;
+    }
+
+    if (!swapWithPlaceholder || targetItem) {
+        newState[source.zoneId] = {
+            ...newState[source.zoneId],
+            items: (swapWithPlaceholder)
+                ? sourceItems.toSpliced(origIndex, 1, targetItem)
+                : filterTreeItems(sourceItems, (item) => item?.id !== source.id),
+        };
+    }
+
+    // Insert item to destination list
+    destItems = getDragZoneItems(target.zoneId, newState);
+    const deleteLength = (swapWithPlaceholder) ? 1 : 0;
+
+    newState[target.zoneId] = {
+        ...newState[target.zoneId],
+        items: (target.parentId === target.zoneId)
+            ? destItems.toSpliced(index, deleteLength, movingItem)
+            : (
+                mapTreeItems(destItems, (item) => (
+                    (item.id !== target.parentId)
+                        ? item
+                        : {
+                            ...item,
+                            items: asArray(item.items)
+                                .toSpliced(index, deleteLength, movingItem),
+                        }
+                ))
+            ),
+    };
+
+    return newState;
 };
