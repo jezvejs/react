@@ -1,6 +1,7 @@
 import { Slider } from '@jezvejs/react';
 import { useState } from 'react';
 import { ActionButton } from '../../../../Components/ActionButton/ActionButton.jsx';
+import './ControlledSlider.scss';
 
 export const ControlledSlider = (args) => {
     const [state, setState] = useState({
