@@ -227,6 +227,11 @@ export const Sortable = forwardRef((props, ref) => {
     );
 });
 
+const isComponent = PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.func,
+]);
+
 Sortable.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
@@ -234,7 +239,7 @@ Sortable.propTypes = {
     copyWidth: PropTypes.bool,
     onSort: PropTypes.func,
     components: PropTypes.shape({
-        ListItem: PropTypes.object,
-        Avatar: PropTypes.object,
+        ListItem: isComponent,
+        Avatar: isComponent,
     }),
 };

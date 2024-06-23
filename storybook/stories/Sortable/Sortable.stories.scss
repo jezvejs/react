@@ -30,16 +30,47 @@
   gap: 15px;
 }
 
+.list_item {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  width: 100% !important;
+  background-color: #55dd99;
+  overflow: hidden;
+  min-height: 0;
+  margin-bottom: 10px;
+}
+
 .animated {
   transition-duration: 0.2s;
   transition-timing-function: ease;
 }
 
-.list-item_red {
+.list_item_2 {
   background-color: #dd5599;
 }
 
-.list-item_red.list_item_drag {
+.list_item > span {
+  font-size: 18px;
+  padding: 5px;
+  margin: 0 5px;
+  color: #ffffff;
+}
+
+.list_item_placeholder {
+  border: 1px dashed #ffffff;
+  background: none;
+}
+
+.list_item_placeholder * {
+  visibility: hidden;
+}
+
+.list_item.drag {
+  opacity: 0.5;
+}
+
+.list_item_2.list_item_drag {
   background-color: #9955ee;
 }
 
@@ -60,4 +91,42 @@
   padding: 10px;
   height: 40px;
   line-height: 20px;
+}
+
+.drag_item {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  padding: 10px 30px 10px 10px;
+  background-color: #77bbff;
+}
+
+.drag_item > input[type="text"],
+.list_item input[type="text"] {
+  height: 25px;
+  border: 1px solid #000000;
+}
+
+.drag-handle {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin-right: 0.5rem;
+  background-color: #00a354;
+}
+
+.drag-handle-btn {
+  --btn-size: 30px;
+  --btn-icon-size: 20px;
+  --btn-background: #006d38;
+  --btn-icon-color: #383838;
+  --btn-padding: 5px;
+
+  margin: 0 0.5rem;
+}
+
+.drag-handle-btn.red {
+  --btn-icon-color: #ff2222;
 }
