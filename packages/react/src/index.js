@@ -26,6 +26,7 @@ export { Header } from './Components/Header/Header.jsx';
 export { Histogram } from './Components/Histogram/Histogram.jsx';
 export { IndetermProgress } from './Components/IndetermProgress/IndetermProgress.jsx';
 export { Input } from './Components/Input/Input.jsx';
+export * from './Components/InputGroup/InputGroup.jsx';
 export { LineChart } from './Components/LineChart/LineChart.jsx';
 export * from './Components/Menu/Menu.jsx';
 export { Offcanvas } from './Components/Offcanvas/Offcanvas.jsx';

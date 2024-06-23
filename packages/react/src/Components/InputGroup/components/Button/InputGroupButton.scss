@@ -1,0 +1,21 @@
+/* Input group button */
+.btn.input-group__btn {
+  --btn-size: var(--ig-height);
+  --btn-padding: 0;
+
+  min-width: var(--ig-height);
+  margin: 0;
+}
+
+/* Inner content of input group button */
+.input-group__btn-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 var(--ig-hor-padding);
+  box-sizing: border-box;
+  height: 100%;
+  line-height: 100%;
+  white-space: nowrap;
+}
