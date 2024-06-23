@@ -15,16 +15,18 @@ export const Button = forwardRef((props, ref) => {
     const {
         className,
         title,
-        type,
+        children,
+        type = 'button',
         url,
         icon,
-        iconAlign,
+        iconAlign = 'left',
         ...btnProps
     } = props;
 
+    const btnContent = title ?? children;
     const titleContainer = (icon)
-        ? ButtonContent(title)
-        : title;
+        ? ButtonContent(btnContent)
+        : btnContent;
 
     const IconComponent = icon;
     const iconContent = (icon) ? (<IconComponent className="btn__icon" />) : null;
@@ -69,11 +71,8 @@ Button.propTypes = {
         PropTypes.node,
         PropTypes.elementType,
     ]),
-};
-
-Button.defaultProps = {
-    type: 'button', // button, link or static
-    disabled: false,
-    iconAlign: 'left', // available value: 'left', 'right'
-    onClick: null,
+    children: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
 };
