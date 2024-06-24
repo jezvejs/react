@@ -1,5 +1,4 @@
-import { isFunction } from '@jezvejs/types';
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -10,35 +9,13 @@ import './Input.scss';
  */
 // eslint-disable-next-line react/display-name
 export const Input = forwardRef((props, ref) => {
-    const {
-        className,
-        renderValue,
-        onInput,
-        ...inputProps
-    } = props;
-
-    const [state, setState] = useState({
-        value: props.value ?? '',
-    });
-
-    const getValue = (inputState) => (
-        isFunction(renderValue) ? renderValue(inputState) : (inputState?.value)
-    );
-
-    const inputHandler = (e) => {
-        setState((prev) => ({ ...prev, value: e.target.value }));
-
-        if (isFunction(onInput)) {
-            onInput(e);
-        }
-    };
+    const onChange = (e) => props.onChange?.(e);
 
     return (
         <input
-            className={classNames('input', className)}
-            {...inputProps}
-            onInput={inputHandler}
-            value={getValue(state)}
+            {...props}
+            className={classNames('input', props.className)}
+            onChange={onChange}
             ref={ref}
         />
     );
@@ -59,7 +36,6 @@ Input.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
-    renderValue: PropTypes.func,
 };
 
 Input.defaultProps = {
@@ -70,5 +46,4 @@ Input.defaultProps = {
     onFocus: null,
     onBlur: null,
     onChange: null,
-    renderValue: null,
 };
