@@ -1,11 +1,18 @@
 import {
     forwardRef,
+    useEffect,
     useImperativeHandle,
     useMemo,
     useRef,
 } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+
+import { usePopupPosition } from '../../../../hooks/usePopupPosition/usePopupPosition.js';
+import { PopupPosition } from '../../../../hooks/usePopupPosition/PopupPosition.js';
+
+import { useStore } from '../../../../utils/Store/StoreProvider.jsx';
 
 // Local components
 import { DatePickerHeader } from '../Header/Header.jsx';
@@ -24,14 +31,13 @@ import {
     getHeaderTitle,
     getScreenWidth,
 } from '../../helpers.js';
-import { useDatePickerDispatch, useDatePickerState } from '../../context.jsx';
 import { actions } from '../../reducer.js';
 import './DatePickerContainer.scss';
 
 // eslint-disable-next-line react/display-name
 export const DatePickerContainer = forwardRef((props, ref) => {
-    const state = useDatePickerState();
-    const dispatch = useDatePickerDispatch();
+    const { getState, dispatch } = useStore();
+    const state = getState();
 
     const {
         keyboardNavigation,
@@ -50,6 +56,12 @@ export const DatePickerContainer = forwardRef((props, ref) => {
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
+
+    // Popup position
+    const { referenceRef, elementRef } = usePopupPosition({
+        ...state.position,
+        open: state.visible,
+    });
 
     const onStateReady = () => {
         if (state.waitingForAnimation) {
@@ -161,7 +173,8 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         } else {
             setSelection(start, date, false);
 
-            props.onRangeSelect?.(state.curRange);
+            const { curRange } = getState();
+            props.onRangeSelect?.(curRange);
         }
     };
 
@@ -173,7 +186,8 @@ export const DatePickerContainer = forwardRef((props, ref) => {
 
         dispatch(actions.selectDay(date));
 
-        props.onDateSelect?.(state.actDate);
+        const { actDate } = getState();
+        props.onDateSelect?.(actDate);
 
         if (props.range) {
             onRangeSelect(date);
@@ -312,8 +326,13 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         throw new Error('Invalid view type');
     };
 
+    // Update visibility of component
+    useEffect(() => {
+        show(props.visible);
+    }, [props.visible]);
+
     // Header
-    const { Header } = props.components;
+    const { Header } = state.components;
 
     const title = getHeaderTitle({
         viewType: state.viewType,
@@ -331,7 +350,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     );
 
     // Weekdays header
-    const { WeekDaysHeader } = props.components;
+    const { WeekDaysHeader } = state.components;
     let weekdays = null;
     if (props.vertical && WeekDaysHeader && state.viewType === MONTH_VIEW) {
         weekdays = (
@@ -354,21 +373,61 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     );
 
     // Footer
-    const { Footer } = props.components;
-    const footer = Footer && <Footer {...props.footer} />;
+    const { Footer } = state.components;
+    const footer = !!Footer && <Footer {...state.footer} />;
 
-    return (
-        <div
-            ref={innerRef}
-            className={classNames('dp__container', props.className)}
-        >
-            <div className='dp__wrapper' onClick={onViewClick}>
+    // Container props
+    const contProps = {
+        className: classNames(
+            'dp__container',
+            {
+                dp__horizontal: !props.vertical,
+                dp__vertical: !!props.vertical,
+                'dp__double-view': !!props.doubleView,
+            },
+            props.className,
+        ),
+    };
+
+    // Wrapper props
+    const wrapperProps = {
+        className: classNames(
+            'dp__wrapper',
+            {
+                'dp__inline-wrapper': props.inline,
+                'dp__double-view': props.doubleView,
+            },
+        ),
+        onClick: onViewClick,
+    };
+
+    const datePicker = (
+        <div {...contProps} ref={innerRef} >
+            <div {...wrapperProps} ref={elementRef} >
                 {header}
                 {weekdays}
                 {cellsContainer}
                 {footer}
             </div>
         </div>
+    );
+
+    if (props.inline) {
+        return datePicker;
+    }
+
+    const container = props.container ?? document.body;
+
+    return (
+        <>
+            <div ref={referenceRef}>
+                {props.children}
+            </div>
+            {state.visible && !state.fixed && datePicker}
+            {state.visible && state.fixed && (
+                createPortal(datePicker, container)
+            )}
+        </>
     );
 });
 
@@ -396,6 +455,8 @@ DatePickerContainer.propTypes = {
         PropTypes.instanceOf(Date),
         PropTypes.number,
     ]),
+    /** Show datepicker popup */
+    visible: PropTypes.bool,
     /** If enabled component will be rendered on place instead of wrapping it with popup */
     inline: PropTypes.bool,
     /** If enabled popup will be hidden after select date */
@@ -441,6 +502,17 @@ DatePickerContainer.propTypes = {
     onHide: PropTypes.func,
     /** Props for footer component */
     footer: PropTypes.object,
+    /** If enabled popup will use fixed position */
+    fixed: PropTypes.bool,
+    /** Popup position props */
+    position: PropTypes.shape({
+        ...PopupPosition.propTypes,
+    }),
+    container: PropTypes.object,
+    children: PropTypes.oneOfType([
+        PropTypes.node,
+        PropTypes.elementType,
+    ]),
     components: PropTypes.shape({
         Footer: PropTypes.func,
         Header: PropTypes.func,
@@ -454,6 +526,7 @@ DatePickerContainer.defaultProps = {
     popupScreenPadding: 5,
     mode: 'date', // possible values: 'date', 'month', 'year'
     date: new Date(),
+    visible: false,
     inline: false,
     hideOnSelect: false,
     multiple: false,
@@ -475,6 +548,7 @@ DatePickerContainer.defaultProps = {
     onShow: null,
     onHide: null,
     footer: {},
+    position: {},
     components: {
         Footer: null,
         Header: DatePickerHeader,

@@ -11,14 +11,17 @@ import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { useStore } from '../../../../utils/Store/StoreProvider.jsx';
+
 import { MONTH_VIEW } from '../../constants.js';
-import { getHeaderTitle } from '../../helpers.js';
+import { getHeaderTitle, includesDate } from '../../helpers.js';
 import './MonthView.scss';
 
 const DatePickerMonthViewItem = (props) => {
     const {
         date,
         isOtherMonth,
+        isActive,
         isToday,
         focusable,
         showOtherMonthDays,
@@ -32,6 +35,7 @@ const DatePickerMonthViewItem = (props) => {
             {
                 'dp__today-cell': isToday,
                 'dp__other-month-cell': isOtherMonth,
+                dp__cell_act: isActive,
             },
         ),
     };
@@ -63,6 +67,7 @@ DatePickerMonthViewItem.propTypes = {
         PropTypes.number,
     ]),
     isOtherMonth: PropTypes.bool,
+    isActive: PropTypes.bool,
     isToday: PropTypes.bool,
     disabled: PropTypes.bool,
     focusable: PropTypes.bool,
@@ -82,6 +87,8 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
     const today = new Date();
     const rMonth = date.getMonth();
     const rYear = date.getFullYear();
+
+    const { state } = useStore();
 
     // month header
     const title = getHeaderTitle({
@@ -143,6 +150,11 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
             const isOtherMonth = !isSameYearMonth(date, weekday);
             const isToday = isSameDate(weekday, today) && (!doubleView || !isOtherMonth);
 
+            const isActive = (
+                includesDate(state.actDate, weekday)
+                && !isOtherMonth
+            );
+
             const disabled = (
                 (!showOtherMonthDays && isOtherMonth)
                 || (!!disabledFilter && props.disabledDateFilter(weekday))
@@ -151,6 +163,7 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
             const item = {
                 date: weekday,
                 isOtherMonth,
+                isActive,
                 isToday,
                 disabled,
                 focusable,

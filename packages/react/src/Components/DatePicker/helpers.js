@@ -22,6 +22,7 @@ export const getInitialState = (props, defaultProps) => {
         ...(defaultProps ?? {}),
         ...props,
         visible: !!props.inline,
+        fixed: false,
         viewType: viewTypesMap[mode],
         date: isDate(props.date) ? props.date : new Date(),
         curRange: { start: null, end: null },
@@ -29,6 +30,9 @@ export const getInitialState = (props, defaultProps) => {
         actDate: null,
         transition: null,
         secondViewTransition: false,
+        position: {
+            ...(props.position ?? {}),
+        },
         components: {
             ...(defaultProps?.components ?? {}),
             ...props.components,

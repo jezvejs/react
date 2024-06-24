@@ -27,6 +27,7 @@
         "storybook": "^8.1.10"
     },
     "dependencies": {
+        "@jezvejs/datetime": "^1.1.0",
         "@jezvejs/dom": "^1.1.0",
         "@jezvejs/react": "^0.34.0",
         "@jezvejs/types": "^1.0.0",

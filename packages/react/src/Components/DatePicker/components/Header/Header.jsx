@@ -36,10 +36,10 @@ DatePickerHeaderTitle.propTypes = {
 
 export const DatePickerHeader = (props) => {
     const {
-        doubleView,
-        focusable,
-        title,
-        secondTitle,
+        doubleView = false,
+        focusable = false,
+        title = null,
+        secondTitle = null,
     } = props;
 
     const onClick = (e) => {
@@ -107,14 +107,4 @@ DatePickerHeader.propTypes = {
     onClickTitle: PropTypes.func,
     onClickPrev: PropTypes.func,
     onClickNext: PropTypes.func,
-};
-
-DatePickerHeader.defaultProps = {
-    title: null,
-    secondTitle: null,
-    doubleView: false,
-    focusable: false,
-    onClickTitle: null,
-    onClickPrev: null,
-    onClickNext: null,
 };
