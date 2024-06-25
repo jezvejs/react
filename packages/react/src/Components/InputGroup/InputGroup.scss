@@ -44,10 +44,10 @@
   cursor: pointer;
 }
 
-.input-group > .input-group__input,
-.input-group > .input-group__text,
-.input-group > .input-group__input-outer,
-.input-group > .input-group__inner-btn {
+.input-group .input-group__input,
+.input-group .input-group__text,
+.input-group .input-group__input-outer,
+.input-group .input-group__inner-btn {
   box-sizing: border-box;
   margin: 0;
   height: var(--ig-height);
@@ -64,37 +64,37 @@
 }
 
 /* Borders of first element of groups */
-.input-group > .input-group__input:first-child,
-.input-group > .input-group__text:first-child,
-.input-group > .input-group__btn:first-child,
-.input-group > .input-group__input-outer:first-child,
-.input-group > .input-group__inner-btn:first-child {
+.input-group .input-group__input:first-child,
+.input-group .input-group__text:first-child,
+.input-group .input-group__btn:first-child,
+.input-group .input-group__input-outer:first-child,
+.input-group .input-group__inner-btn:first-child {
   border-left-width: var(--ig-border-width);
   border-bottom-left-radius: var(--ig-border-radius);
   border-top-left-radius: var(--ig-border-radius);
 }
 
 /* Borders of last element of groups */
-.input-group > .input-group__input:last-child,
-.input-group > .input-group__text:last-child,
-.input-group > .input-group__btn:last-child,
-.input-group > .input-group__input-outer:last-child,
-.input-group > .input-group__inner-btn:last-child {
+.input-group .input-group__input:last-child,
+.input-group .input-group__text:last-child,
+.input-group .input-group__btn:last-child,
+.input-group .input-group__input-outer:last-child,
+.input-group .input-group__inner-btn:last-child {
   border-right-width: var(--ig-border-width);
   border-bottom-right-radius: var(--ig-border-radius);
   border-top-right-radius: var(--ig-border-radius);
 }
 
 /* Focused input */
-.input-group > .input-group__input:focus {
+.input-group .input-group__input:focus {
   border-color: var(--ig-input-active-border);
 }
 
 /* Focused buttons */
-.input-group > .input-group__input:focus,
-.input-group > .input-group__input-outer:focus-within,
-.input-group > .input-group__btn:focus,
-.input-group > .input-group__inner-btn:focus {
+.input-group .input-group__input:focus,
+.input-group .input-group__input-outer:focus-within,
+.input-group .input-group__btn:focus,
+.input-group .input-group__inner-btn:focus {
   z-index: 2;
 }
 
