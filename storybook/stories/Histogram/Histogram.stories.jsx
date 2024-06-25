@@ -399,7 +399,7 @@ export const AlignColumns = {
                 <Histogram {...chartProps} />
                 <div className="section-controls">
                     {items.map((item) => (
-                        <RadioFieldset {...item} key={item.id} />
+                        <RadioFieldset {...item} key={item.radioName} />
                     ))}
                 </div>
             </div>
