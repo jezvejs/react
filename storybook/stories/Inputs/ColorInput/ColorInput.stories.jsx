@@ -2,7 +2,10 @@
 import '@jezvejs/react/style';
 import { ColorInput } from '@jezvejs/react';
 import { useState } from 'react';
+
+// Common components
 import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
 export default {
     title: 'Input/ColorInput',
@@ -31,9 +34,7 @@ export const Default = {
         };
 
         return (
-            <div style={{ marginBottom: '1rem' }}>
-                <ColorInput {...inputProps} />
-            </div>
+            <ColorInput {...inputProps} />
         );
     },
 };
@@ -64,13 +65,13 @@ export const Disabled = {
 
         return (
             <>
-                <div style={{ marginBottom: '1rem' }}>
-                    <ColorInput {...inputProps} />
-                </div>
-                <ActionButton
-                    title={(state.disabled ? 'Enable' : 'Disable')}
-                    onClick={onToggle}
-                />
+                <ColorInput {...inputProps} />
+                <SectionControls>
+                    <ActionButton
+                        title={(state.disabled ? 'Enable' : 'Disable')}
+                        onClick={onToggle}
+                    />
+                </SectionControls>
             </>
         );
     },

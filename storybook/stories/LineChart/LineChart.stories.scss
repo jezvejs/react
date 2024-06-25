@@ -22,14 +22,6 @@ section {
   max-width: 1000px;
 }
 
-.section-controls {
-  margin-top: 1rem;
-
-  .btn {
-    margin-bottom: 6px;
-  }
-}
-
 @for $i from 1 through list.length(colors.$colors) {
   .linechart_category-ind-#{$i} {
     --linechart-item-border: var(--charts-color-#{$i});

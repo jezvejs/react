@@ -26,6 +26,9 @@ import { ChartMultiColumnPopup } from '../../Components/ChartMultiColumnPopup/Ch
 import { RadioFieldset } from '../../Components/RadioFieldset/RadioFieldset.jsx';
 import { RangeInputField } from '../../Components/RangeInputField/RangeInputField.jsx';
 
+// Common components
+import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
+
 // Local components
 import { CustomLineChartActiveGroup } from './components/CustomActiveGroup/CustomLineChartActiveGroup.jsx';
 
@@ -95,10 +98,10 @@ export const Default = {
         return (
             <>
                 <LineChart {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     <RangeInputField {...colWidthProps} />
                     <RangeInputField {...grGapProps} />
-                </div>
+                </SectionControls>
             </>
         );
     },
@@ -168,9 +171,9 @@ export const AutoHeight = {
 
         return (
             <>
-                <div className="section-controls">
+                <SectionControls>
                     <RangeInputField {...heightProps} />
-                </div>
+                </SectionControls>
                 <div {...wrapperProps}>
                     <LineChart {...chartProps} />
                 </div>
@@ -261,11 +264,11 @@ export const ChartAxes = {
         return (
             <div>
                 <LineChart {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     {items.map((item) => (
                         <RadioFieldset {...item} key={item.radioName} />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },
@@ -388,11 +391,11 @@ export const AlignColumns = {
         return (
             <div>
                 <LineChart {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     {items.map((item) => (
                         <RadioFieldset {...item} key={item.radioName} />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },
@@ -570,7 +573,7 @@ export const SetData = {
         return (
             <div>
                 <LineChart {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     {items.map((item) => (
                         <ActionButton
                             {...item}
@@ -578,7 +581,7 @@ export const SetData = {
                             key={item.id}
                         />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },

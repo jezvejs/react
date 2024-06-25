@@ -10,10 +10,13 @@ import {
 } from '@jezvejs/react';
 import { useState } from 'react';
 
+// Icons
 import SmallCloseIcon from '../../../assets/icons/close-sm.svg';
 import SearchIcon from '../../../assets/icons/search.svg';
 
+// Common components
 import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
 import './InputGroup.stories.scss';
 
@@ -186,12 +189,12 @@ export const Disabled = {
                     </InputGroupOuterContainer>
                 </InputGroup>
 
-                <div className="section-controls">
+                <SectionControls>
                     <ActionButton
                         title={(state.disabled ? 'Enable' : 'Disable')}
                         onClick={onToggle}
                     />
-                </div>
+                </SectionControls>
             </>
         );
     },

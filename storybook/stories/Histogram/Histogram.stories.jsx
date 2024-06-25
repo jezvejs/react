@@ -26,6 +26,7 @@ import { ChartCustomLegend } from '../../Components/ChartCustomLegend/ChartCusto
 import { ChartMultiColumnPopup } from '../../Components/ChartMultiColumnPopup/ChartMultiColumnPopup.jsx';
 import { RadioFieldset } from '../../Components/RadioFieldset/RadioFieldset.jsx';
 import { RangeInputField } from '../../Components/RangeInputField/RangeInputField.jsx';
+import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
 
 // Local components
 import { CustomActiveGroup } from './components/CustomActiveGroup/CustomActiveGroup.jsx';
@@ -97,10 +98,10 @@ export const Default = {
         return (
             <>
                 <Histogram {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     <RangeInputField {...colWidthProps} />
                     <RangeInputField {...grGapProps} />
-                </div>
+                </SectionControls>
             </>
         );
     },
@@ -170,9 +171,9 @@ export const AutoHeight = {
 
         return (
             <>
-                <div className="section-controls">
+                <SectionControls>
                     <RangeInputField {...heightProps} />
-                </div>
+                </SectionControls>
                 <div {...wrapperProps}>
                     <Histogram {...chartProps} />
                 </div>
@@ -275,11 +276,11 @@ export const ChartAxes = {
         return (
             <div>
                 <Histogram {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     {items.map((item) => (
                         <RadioFieldset {...item} key={item.radioName} />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },
@@ -397,11 +398,11 @@ export const AlignColumns = {
         return (
             <div>
                 <Histogram {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     {items.map((item) => (
                         <RadioFieldset {...item} key={item.radioName} />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },
@@ -637,7 +638,7 @@ export const SetData = {
         return (
             <div>
                 <Histogram {...chartProps} />
-                <div className="section-controls">
+                <SectionControls>
                     {items.map((item) => (
                         <ActionButton
                             {...item}
@@ -645,7 +646,7 @@ export const SetData = {
                             key={item.id}
                         />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },

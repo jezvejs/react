@@ -2,13 +2,14 @@
 import '@jezvejs/react/style';
 import { DateInput } from '@jezvejs/react';
 import { useState } from 'react';
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
 const TempInputDecorator = (Story) => (
     <div>
-        <div style={{ marginBottom: '1rem' }} >
-            <Story />
-        </div>
-        <input className="input tmp-input" type="text" />
+        <Story />
+        <SectionControls>
+            <input className="input tmp-input" type="text" />
+        </SectionControls>
     </div>
 );
 
@@ -48,12 +49,14 @@ export const Default = {
 
         return (
             <>
-                <form style={{ marginBottom: '1rem' }} onSubmit={onSubmit}>
+                <form onSubmit={onSubmit}>
                     <DateInput {...args} onInput={onInput} />
                     <input type="submit" hidden />
                 </form>
-                <div>{state.inputStatus}</div>
-                <div>{state.formStatus}</div>
+                <SectionControls>
+                    <div>{state.inputStatus}</div>
+                    <div>{state.formStatus}</div>
+                </SectionControls>
             </>
         );
     },
