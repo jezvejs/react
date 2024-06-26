@@ -96,8 +96,13 @@ export const DatePickerContainer = forwardRef((props, ref) => {
      * @param {boolean} visible - if true then show view, hide otherwise
      */
     const show = (visible = true) => {
+        const changed = state.visible !== visible;
+
         dispatch(actions.show(visible));
-        sendShowEvents(visible);
+
+        if (changed) {
+            sendShowEvents(visible);
+        }
     };
 
     const hide = () => show(false);
@@ -162,6 +167,15 @@ export const DatePickerContainer = forwardRef((props, ref) => {
             endDate,
             navigateToFirst,
         }));
+    };
+
+    /** Clears selected items range */
+    const clearSelection = () => {
+        if (state.waitingForAnimation) {
+            return;
+        }
+
+        dispatch(actions.clearSelection());
     };
 
     /** Range select inner callback */
@@ -334,6 +348,15 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         show(props.visible);
     }, [props.visible]);
 
+    // Update selection
+    useEffect(() => {
+        if (!props.startDate && !props.endDate) {
+            clearSelection();
+        } else {
+            setSelection(props.startDate, props.endDate);
+        }
+    }, [props.startDate, props.endDate]);
+
     const currentDate = (state.doubleView && state.secondViewTransition)
         ? getPrevViewDate(state.date, state.viewType)
         : state.date;
@@ -491,6 +514,16 @@ DatePickerContainer.propTypes = {
     multiple: PropTypes.bool,
     /** Enables range select mode */
     range: PropTypes.bool,
+    /** Range selection start date */
+    startDate: PropTypes.oneOfType([
+        PropTypes.instanceOf(Date),
+        PropTypes.number,
+    ]),
+    /** Range selection end date */
+    endDate: PropTypes.oneOfType([
+        PropTypes.instanceOf(Date),
+        PropTypes.number,
+    ]),
     /** Columns gap in pixels */
     columnGap: PropTypes.number,
     /** Rows gap in pixels */

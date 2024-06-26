@@ -12,6 +12,7 @@ import { DateInputGroup } from './components/DateInputGroup/DateInputGroup.jsx';
 
 import './DatePicker.stories.scss';
 import { formatDateRange, formatDates } from './helpers.js';
+import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
 
 export default {
     title: 'Components/DatePicker',
@@ -327,4 +328,143 @@ export const VerticalDoubleView = {
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
+};
+
+export const Callbacks = {
+    args: {
+        range: true,
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const {
+            inputId = null,
+            ...rest
+        } = args;
+
+        const [state, setState] = useState({
+            value: '',
+            open: false,
+            statusText: 'Waiting',
+        });
+
+        const setStatus = (statusText) => setState((prev) => ({ ...prev, statusText }));
+
+        const inputProps = {
+            id: inputId,
+            value: state.value,
+            onButtonClick: () => {
+                setState((prev) => ({ ...prev, open: !prev.open }));
+            },
+        };
+
+        const datePickerProps = {
+            ...rest,
+            visible: state.open,
+            onDateSelect: (date) => {
+                setStatus(`Date selected: ${formatDate(date)}`);
+            },
+            onRangeSelect: (range) => {
+                setState((prev) => ({ ...prev, value: formatDateRange(range) }));
+            },
+            onShow: () => {
+                setStatus('Select range...');
+            },
+            onHide: () => {
+                setStatus('Loading...');
+            },
+        };
+
+        return (
+            <div>
+                <div>{state.statusText}</div>
+                <DatePicker {...datePickerProps} >
+                    <DateInputGroup {...inputProps} />
+                </DatePicker>
+            </div>
+        );
+    },
+};
+
+export const SetSelection = {
+    args: {
+        range: true,
+        startDate: new Date(Date.UTC(2020, 11, 1)),
+        endDate: new Date(Date.UTC(2020, 11, 7)),
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const {
+            inputId = null,
+            ...rest
+        } = args;
+
+        const [state, setState] = useState({
+            value: '',
+            open: false,
+            startDate: rest.startDate,
+            endDate: rest.endDate,
+        });
+
+        const onSelect = () => {
+            setState((prev) => ({
+                ...prev,
+                startDate: new Date(Date.UTC(2020, 11, 8)),
+                endDate: new Date(Date.UTC(2020, 11, 14)),
+            }));
+        };
+
+        const onClear = () => {
+            setState((prev) => ({
+                ...prev,
+                startDate: null,
+                endDate: null,
+            }));
+        };
+
+        const inputProps = {
+            id: inputId,
+            value: state.value,
+            onButtonClick: () => {
+                setState((prev) => ({ ...prev, open: !prev.open }));
+            },
+        };
+
+        const datePickerProps = {
+            ...rest,
+            visible: state.open,
+            startDate: state.startDate,
+            endDate: state.endDate,
+            onRangeSelect: (range) => {
+                setState((prev) => ({ ...prev, value: formatDateRange(range) }));
+            },
+        };
+
+        return (
+            <div>
+                <DatePicker {...datePickerProps} >
+                    <DateInputGroup {...inputProps} />
+                </DatePicker>
+                <SectionControls>
+                    <ActionButton
+                        id="setSelectionBtn"
+                        title="Select"
+                        onClick={onSelect}
+                    />
+                    <ActionButton
+                        id="clearSelectionBtn"
+                        title="Clear"
+                        onClick={onClear}
+                    />
+                </SectionControls>
+            </div>
+        );
+    },
 };
