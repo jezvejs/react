@@ -135,3 +135,16 @@ export const getHeaderTitle = (state) => {
 export const getComponentHeight = (component) => (
     component?.offsetHeight ?? 0
 );
+
+/**
+ * Check specified date is in range
+ * @param {Date} date - date to check
+ * @param {object} range - date range object
+ */
+export const inRange = (date, range) => {
+    if (!isDate(date) || !isDate(range?.start) || !isDate(range?.end)) {
+        return false;
+    }
+
+    return (date - range.start >= 0 && date - range.end <= 0);
+};
