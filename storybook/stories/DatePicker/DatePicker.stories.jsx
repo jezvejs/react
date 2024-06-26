@@ -292,3 +292,39 @@ export const DoubleView = {
         <DatePickerInputGroup {...args} />
     ),
 };
+
+/**
+ * + disabled 'showOtherMonthDays' option
+ */
+export const Vertical = {
+    args: {
+        vertical: true,
+        animated: true,
+        showOtherMonthDays: false,
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: (args) => (
+        <DatePickerInputGroup {...args} />
+    ),
+};
+
+export const VerticalDoubleView = {
+    args: {
+        vertical: true,
+        doubleView: true,
+        animated: true,
+        showOtherMonthDays: false,
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: (args) => (
+        <DatePickerInputGroup {...args} />
+    ),
+};

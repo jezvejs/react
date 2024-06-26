@@ -66,6 +66,7 @@ export const DatePickerYearView = forwardRef((props, ref) => {
     // year range header
     const header = props.renderHeader && (
         <Header
+            {...(props.header ?? {})}
             locales={locales}
             title={title}
             focusable={focusable}

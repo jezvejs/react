@@ -109,6 +109,7 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
 
     const header = props.renderHeader && (
         <Header
+            {...(props.header ?? {})}
             locales={locales}
             title={title}
             focusable={focusable}
