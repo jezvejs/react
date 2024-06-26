@@ -5,14 +5,15 @@ import { formatDate } from '@jezvejs/datetime';
 import { DatePicker, Input } from '@jezvejs/react';
 
 import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
 
 import { CustomDatePickerFooter } from './components/CustomFooter/CustomDatePickerFooter.jsx';
-import { DatePickerInputGroup } from './components/DatePickerInputGroup/DatePickerInputGroup.jsx';
 import { DateInputGroup } from './components/DateInputGroup/DateInputGroup.jsx';
+import { DatePickerInputGroup } from './components/DatePickerInputGroup/DatePickerInputGroup.jsx';
+import { DateRangeInputGroup } from './components/DateRangeInputGroup/DateRangeInputGroup.jsx';
 
-import './DatePicker.stories.scss';
 import { disabledOutsideRange, formatDateRange, formatDates } from './helpers.js';
-import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
+import './DatePicker.stories.scss';
 
 export default {
     title: 'Components/DatePicker',
@@ -544,6 +545,103 @@ export const DisabledDateFilter = {
                         onClick={onClearDisabled}
                     />
                 </SectionControls>
+            </div>
+        );
+    },
+};
+
+export const RangePart = {
+    args: {
+        startDate: new Date(Date.UTC(2010, 1, 10)),
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const [state, setState] = useState({
+            value: '',
+            open: false,
+            startDate: args.startDate,
+            endDate: args.endDate,
+        });
+
+        const show = () => {
+            setState((prev) => ({ ...prev, open: true }));
+        };
+
+        const hide = () => {
+            setState((prev) => ({ ...prev, open: false }));
+        };
+
+        const setRangePart = (rangePart) => {
+            setState((prev) => ({ ...prev, rangePart }));
+        };
+
+        const setStartDate = (startDate) => {
+            setState((prev) => ({ ...prev, startDate }));
+        };
+
+        const setEndDate = (endDate) => {
+            setState((prev) => ({ ...prev, endDate }));
+        };
+
+        const inputProps = {
+            id: 'dpRangePartGroup',
+            startInputId: 'startDateInp',
+            endInputId: 'endDateInp',
+            startButtonId: 'selectStartDateBtn',
+            endButtonId: 'selectEndDateBtn',
+            startDate: formatDates(state.startDate),
+            endDate: formatDates(state.endDate),
+            onStartButtonClick: () => {
+                setRangePart('start');
+                show();
+            },
+            onEndButtonClick: () => {
+                setRangePart('end');
+                show();
+            },
+        };
+
+        const datePickerProps = {
+            ...args,
+            visible: state.open,
+            startDate: state.startDate,
+            endDate: state.endDate,
+            rangePart: state.rangePart,
+            disabledDateFilter: (date) => {
+                const rangePart = state?.rangePart;
+                if (rangePart !== 'start' && rangePart !== 'end') {
+                    return false;
+                }
+
+                const limitDate = (rangePart === 'start')
+                    ? state.endDate
+                    : state.startDate;
+                if (!limitDate) {
+                    return false;
+                }
+
+                return (rangePart === 'start') ? (limitDate - date < 0) : (limitDate - date > 0);
+            },
+            onDateSelect: (date) => {
+                if (state.rangePart === 'start') {
+                    setStartDate(date);
+                } else if (state.rangePart === 'end') {
+                    setEndDate(date);
+                }
+
+                hide();
+            },
+        };
+
+        return (
+            <div>
+                <DatePicker {...datePickerProps} >
+                    <DateRangeInputGroup {...inputProps} />
+                </DatePicker>
             </div>
         );
     },

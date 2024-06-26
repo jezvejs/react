@@ -186,6 +186,14 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         dispatch(actions.setDisabledDateFilter(disabledDateFilter));
     };
 
+    const setRangePart = (rangePart) => {
+        if (state.waitingForAnimation) {
+            return;
+        }
+
+        dispatch(actions.setRangePart(rangePart));
+    };
+
     /** Range select inner callback */
     const onRangeSelect = (date) => {
         if (state.waitingForAnimation) {
@@ -198,8 +206,9 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         } else {
             setSelection(start, date, false);
 
-            const { curRange } = getState();
-            props.onRangeSelect?.(curRange);
+            const newState = getState();
+            const { curRange } = newState;
+            props.onRangeSelect?.(curRange, newState);
         }
     };
 
@@ -211,8 +220,9 @@ export const DatePickerContainer = forwardRef((props, ref) => {
 
         dispatch(actions.selectDay(date));
 
-        const { actDate } = getState();
-        props.onDateSelect?.(actDate);
+        const newState = getState();
+        const { actDate } = newState;
+        props.onDateSelect?.(actDate, newState);
 
         if (props.range) {
             onRangeSelect(date);
@@ -369,6 +379,11 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     useEffect(() => {
         setDisabledDateFilter(props.disabledDateFilter);
     }, [props.disabledDateFilter]);
+
+    // Update range part
+    useEffect(() => {
+        setRangePart(props.rangePart);
+    }, [props.rangePart]);
 
     const currentDate = (state.doubleView && state.secondViewTransition)
         ? getPrevViewDate(state.date, state.viewType)
