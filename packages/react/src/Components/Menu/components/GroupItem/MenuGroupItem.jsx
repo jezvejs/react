@@ -3,7 +3,25 @@ import classNames from 'classnames';
 
 import './MenuGroupItem.scss';
 
-export const MenuGroupItem = (props) => {
+const defaultProps = {
+    items: [],
+    components: {
+        List: null,
+        ListItem: null,
+        GroupHeader: null,
+    },
+};
+
+export const MenuGroupItem = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const { GroupHeader, List } = props.components;
     if (!GroupHeader) {
         throw new Error('Invalid group header component');
@@ -55,15 +73,6 @@ MenuGroupItem.propTypes = {
         ListItem: PropTypes.func,
         GroupHeader: PropTypes.func,
     }),
-};
-
-MenuGroupItem.defaultProps = {
-    items: [],
-    components: {
-        List: null,
-        ListItem: null,
-        GroupHeader: null,
-    },
 };
 
 MenuGroupItem.selector = '.menu-item.menu-group';

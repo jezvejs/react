@@ -15,6 +15,7 @@ import { DatePickerYearRangeView } from './components/YearRangeView/YearRangeVie
 import { DatePickerHeader } from './components/Header/Header.jsx';
 import { DatePickerWeekDaysHeader } from './components/WeekDaysHeader/WeekDaysHeader.jsx';
 
+import { defaultProps } from './defaultProps.js';
 import { reducer } from './reducer.js';
 import * as DatePickerHelpers from './helpers.js';
 import './DatePicker.scss';
@@ -40,7 +41,7 @@ export const DatePicker = forwardRef((props, ref) => {
     }, [props.reducers]);
 
     const initialState = (
-        DatePickerHelpers.getInitialState(props, DatePicker.defaultProps)
+        DatePickerHelpers.getInitialState(props, defaultProps)
     );
 
     return (
@@ -48,15 +49,11 @@ export const DatePicker = forwardRef((props, ref) => {
             reducer={reducers}
             initialState={initialState}
         >
-            <DatePickerContainer ref={ref} {...props} />
+            <DatePickerContainer ref={ref} {...initialState} />
         </StoreProvider>
     );
 });
 
 DatePicker.propTypes = {
     ...DatePickerContainer.propTypes,
-};
-
-DatePicker.defaultProps = {
-    ...DatePickerContainer.defaultProps,
 };

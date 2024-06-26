@@ -18,6 +18,3 @@ export const DropDownToggleButton = (props) => (
 DropDownToggleButton.propTypes = {
     className: PropTypes.string,
 };
-
-DropDownToggleButton.defaultProps = {
-};

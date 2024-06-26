@@ -147,14 +147,12 @@ export const getRangeTypeByPosition = (position, state) => {
  * @returns {string}
  */
 export const getContentRange = (content, range) => {
-    if (typeof content !== 'string') {
-        throw new Error('Invalid content');
-    }
+    const srcContent = content ?? '';
     if (!range) {
         throw new Error('Invalid range');
     }
 
-    return content.substring(range.start, range.end);
+    return srcContent.substring(range.start, range.end);
 };
 
 export const fixCursorPos = (pos, state) => {
@@ -228,16 +226,17 @@ export const setCursor = (prev, cursorPos) => ({
  * @returns {object}
  */
 export const handleExpectedContent = (content, state, updateCursor = false) => {
-    if (content === '' || content === state.emptyStateValue) {
+    const expContent = content ?? '';
+    if (expContent === '' || expContent === state.emptyStateValue) {
         return {
             ...state,
             ...state.emptyState,
         };
     }
 
-    let expectedDay = getContentRange(content, state.dayRange);
-    let expectedMonth = getContentRange(content, state.monthRange);
-    const expectedYear = getContentRange(content, state.yearRange);
+    let expectedDay = getContentRange(expContent, state.dayRange);
+    let expectedMonth = getContentRange(expContent, state.monthRange);
+    const expectedYear = getContentRange(expContent, state.yearRange);
 
     const search = new RegExp(`${state.guideChar}`, 'g');
     const testExp = new RegExp(`^[0-9${state.guideChar}]+$`);

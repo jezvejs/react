@@ -15,9 +15,7 @@ import { PopupPosition } from '../../../../hooks/usePopupPosition/PopupPosition.
 import { useStore } from '../../../../utils/Store/StoreProvider.jsx';
 
 // Local components
-import { DatePickerHeader } from '../Header/Header.jsx';
 import { DatePickerMonthView } from '../MonthView/MonthView.jsx';
-import { DatePickerWeekDaysHeader } from '../WeekDaysHeader/WeekDaysHeader.jsx';
 import { DatePickerYearRangeView } from '../YearRangeView/YearRangeView.jsx';
 import { DatePickerYearView } from '../YearView/YearView.jsx';
 
@@ -516,15 +514,6 @@ DatePickerContainer.propTypes = {
     ]),
     /** Additional CSS classes */
     className: PropTypes.string,
-    /** Reference element for popup position */
-    relparent: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    /** Margin between reference element and popup */
-    popupMargin: PropTypes.number,
-    /** Padding between popup and screen edge */
-    popupScreenPadding: PropTypes.number,
     /** Date select mode. Possible values: 'date', 'month', 'year' */
     mode: PropTypes.oneOf(['date', 'month', 'year']),
     /** Initial date to render */
@@ -605,40 +594,4 @@ DatePickerContainer.propTypes = {
         Header: PropTypes.func,
         WeekDaysHeader: PropTypes.func,
     }),
-};
-
-DatePickerContainer.defaultProps = {
-    relparent: null,
-    popupMargin: 5,
-    popupScreenPadding: 5,
-    mode: 'date', // possible values: 'date', 'month', 'year'
-    date: new Date(),
-    visible: false,
-    inline: false,
-    hideOnSelect: false,
-    multiple: false,
-    range: false,
-    columnGap: 8,
-    rowGap: 8,
-    doubleView: false,
-    vertical: false,
-    rangePart: null, // possible values: 'start', 'end' or null
-    locales: [],
-    firstDay: null,
-    keyboardNavigation: true,
-    showOtherMonthDays: true,
-    fixedHeight: false,
-    animated: false,
-    disabledDateFilter: null,
-    onRangeSelect: null,
-    onDateSelect: null,
-    onShow: null,
-    onHide: null,
-    footer: {},
-    position: {},
-    components: {
-        Footer: null,
-        Header: DatePickerHeader,
-        WeekDaysHeader: DatePickerWeekDaysHeader,
-    },
 };

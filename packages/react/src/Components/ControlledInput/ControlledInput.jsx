@@ -20,11 +20,11 @@ export const ControlledInputHelpers = {
 
 export const ControlledInput = (props) => {
     const {
-        handleValueProperty,
-        disableAutoFeatures,
-        isValidValue,
-        onValidateInput,
-        onValue,
+        handleValueProperty = true,
+        disableAutoFeatures = true,
+        isValidValue = null,
+        onValidateInput = null,
+        onValue = null,
         selectionStart,
         selectionEnd,
         ...childProps
@@ -128,13 +128,4 @@ ControlledInput.propTypes = {
     isValidValue: PropTypes.func,
     onValidateInput: PropTypes.func,
     onValue: PropTypes.func,
-};
-
-ControlledInput.defaultProps = {
-    ...Input.defaultProps,
-    handleValueProperty: true,
-    disableAutoFeatures: true,
-    isValidValue: null,
-    onValidateInput: null,
-    onValue: null,
 };

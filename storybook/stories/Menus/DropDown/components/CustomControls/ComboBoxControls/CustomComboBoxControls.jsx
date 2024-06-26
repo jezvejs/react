@@ -7,7 +7,24 @@ import {
 import PropTypes from 'prop-types';
 import { MenuButton } from '../../../../../../Components/MenuButton/MenuButton.jsx';
 
-export const CustomComboBoxControls = (props) => {
+const defaultProps = {
+    loading: false,
+    components: {
+        Loading: Spinner,
+        ComboMenuButton: MenuButton,
+    },
+};
+
+export const CustomComboBoxControls = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         disabled,
         showToggleButton,
@@ -58,14 +75,4 @@ CustomComboBoxControls.propTypes = {
         Loading: DropDownHelpers.componentPropType,
         ComboMenuButton: DropDownHelpers.componentPropType,
     }),
-};
-
-CustomComboBoxControls.defaultProps = {
-    ...DropDownComboBoxControls.defaultProps,
-    loading: false,
-    components: {
-        ...DropDownComboBoxControls.defaultProps.components,
-        Loading: Spinner,
-        ComboMenuButton: MenuButton,
-    },
 };

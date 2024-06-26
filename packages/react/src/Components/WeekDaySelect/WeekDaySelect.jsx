@@ -5,7 +5,17 @@ import PropTypes from 'prop-types';
 import { Menu } from '../Menu/Menu.jsx';
 import './WeekDaySelect.scss';
 
-export const WeekDaySelect = (props) => {
+const defaultProps = {
+    defaultItemType: 'link',
+    locales: [],
+};
+
+export const WeekDaySelect = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const menuProps = {
         ...props,
         className: classNames('weekday-select', props.className),
@@ -37,10 +47,4 @@ WeekDaySelect.propTypes = {
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
     ]),
-};
-
-WeekDaySelect.defaultProps = {
-    ...Menu.defaultProps,
-    defaultItemType: 'link',
-    locales: [],
 };

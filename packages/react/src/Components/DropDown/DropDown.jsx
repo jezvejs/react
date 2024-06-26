@@ -29,6 +29,7 @@ import { DropDownGroupItem } from './components/Menu/GroupItem/GroupItem.jsx';
 import { DropDownGroupHeader } from './components/Menu/GroupHeader/GroupHeader.jsx';
 import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListPlaceholder.jsx';
 
+import * as DropDownProps from './defaultProps.js';
 import * as DropDownHelpers from './helpers.js';
 import { reducer } from './reducer.js';
 import './DropDown.scss';
@@ -56,6 +57,7 @@ export {
     DropDownListPlaceholder,
     // utils
     DropDownHelpers,
+    DropDownProps,
 };
 
 /**
@@ -71,7 +73,7 @@ export const DropDown = forwardRef((props, ref) => {
     }, [props.reducers]);
 
     const initialState = (
-        DropDownHelpers.getInitialState(props, DropDown.defaultProps)
+        DropDownHelpers.getInitialState(props, DropDownProps.defaultProps)
     );
 
     return (
@@ -79,15 +81,11 @@ export const DropDown = forwardRef((props, ref) => {
             reducer={reducers}
             initialState={initialState}
         >
-            <DropDownContainer ref={ref} {...props} />
+            <DropDownContainer ref={ref} {...initialState} />
         </StoreProvider>
     );
 });
 
 DropDown.propTypes = {
     ...DropDownContainer.propTypes,
-};
-
-DropDown.defaultProps = {
-    ...DropDownContainer.defaultProps,
 };

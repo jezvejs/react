@@ -4,10 +4,19 @@ import classNames from 'classnames';
 import { getClosestItemElement } from '../../helpers.js';
 import './MenuList.scss';
 
+const defaultProps = {
+    items: [],
+};
+
 /**
  * MenuList component
  */
-export const MenuList = (props) => {
+export const MenuList = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         ListItem,
         Separator,
@@ -117,8 +126,4 @@ MenuList.propTypes = {
         GroupHeader: PropTypes.func,
         GroupItem: PropTypes.func,
     }),
-};
-
-MenuList.defaultProps = {
-    items: [],
 };

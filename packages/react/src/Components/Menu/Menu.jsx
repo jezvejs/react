@@ -16,6 +16,7 @@ import { MenuGroupHeader } from './components/GroupHeader/MenuGroupHeader.jsx';
 import { MenuGroupItem } from './components/GroupItem/MenuGroupItem.jsx';
 import { MenuItem } from './components/ListItem/MenuItem.jsx';
 
+import * as MenuProps from './defaultProps.js';
 import * as MenuHelpers from './helpers.js';
 import './Menu.scss';
 
@@ -28,6 +29,7 @@ export {
     MenuGroupItem,
     // utils
     MenuHelpers,
+    MenuProps,
 };
 
 const {
@@ -39,20 +41,29 @@ const {
     getItemById,
     getNextItem,
     getPreviousItem,
-    isAvailableItem,
-    getItemProps,
     isCheckbox,
     toggleSelectItem,
     createItems,
     getInitialState,
 } = MenuHelpers;
 
+const defaultProps = MenuProps.getDefaultProps();
+
 /**
  * Menu component
  */
 // eslint-disable-next-line react/display-name
-export const Menu = forwardRef((props, ref) => {
-    const initial = getInitialState(props, Menu.defaultProps);
+export const Menu = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
+    const initial = getInitialState(props, defaultProps);
     const [state, setState] = useState(initial);
 
     const innerRef = useRef(null);
@@ -381,6 +392,7 @@ export const Menu = forwardRef((props, ref) => {
     const listProps = {
         ...rest,
         ...columns,
+        getItemProps: MenuHelpers.getItemProps,
         onItemClick: handleItemClick,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
@@ -459,37 +471,4 @@ Menu.propTypes = {
         GroupItem: PropTypes.func,
         Footer: PropTypes.func,
     }),
-};
-
-Menu.defaultProps = {
-    defaultItemType: 'button',
-    iconAlign: 'left',
-    checkboxSide: 'left',
-    disabled: false,
-    tabThrough: true,
-    tabIndex: 0,
-    loopNavigation: true,
-    preventNavigation: false,
-    focusItemOnHover: true,
-    header: null,
-    footer: null,
-    onItemClick: null,
-    isAvailableItem,
-    getItemProps,
-    onGroupHeaderClick: null,
-    renderNotSelected: false,
-    allowActiveGroupHeader: false,
-    activeItem: null,
-    items: [],
-    components: {
-        Header: null,
-        List: MenuList,
-        ListItem: MenuItem,
-        ListPlaceholder: null,
-        Check: MenuCheckbox,
-        Separator: MenuSeparator,
-        GroupHeader: MenuGroupHeader,
-        GroupItem: MenuGroupItem,
-        Footer: null,
-    },
 };

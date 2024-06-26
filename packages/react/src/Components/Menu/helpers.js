@@ -359,10 +359,10 @@ export const isAvailableItem = (item, state) => (
 );
 
 export const getItemProps = (item, state) => {
-    const { ListItem } = state.components;
+    const itemDefaultProps = state.getItemDefaultProps?.() ?? {};
 
     const res = {
-        ...ListItem.defaultProps,
+        ...itemDefaultProps,
         ...item,
         iconAlign: item.iconAlign || state.iconAlign,
         disabled: item.disabled || state.disabled,
@@ -443,11 +443,11 @@ export const createMenuItem = (props, state) => {
         throw new Error('Invalid state object');
     }
 
-    const { ListItem } = state.components;
     const defaultItemType = state.defaultItemType ?? ((state.multiple) ? 'checkbox' : 'button');
+    const itemDefaultProps = state.getItemDefaultProps?.() ?? {};
 
     const res = {
-        ...ListItem.defaultProps,
+        ...itemDefaultProps,
         ...props,
         active: false,
         id: props.id?.toString() ?? generateItemId(state?.items ?? [], 'item'),
@@ -483,17 +483,17 @@ export const createItems = (items, state) => (
  * Returns initial state object for specified props
  *
  * @param {Object} props
- * @param {Object} defaultProps
+ * @param {Object} defProps
  * @returns {Object}
  */
-export const getInitialState = (props, defaultProps) => {
+export const getInitialState = (props, defProps) => {
     const res = {
-        ...(defaultProps ?? {}),
+        ...(defProps ?? {}),
         ...props,
         activeItem: null,
         ignoreTouch: false,
         components: {
-            ...(defaultProps?.components ?? {}),
+            ...(defProps?.components ?? {}),
             ...props.components,
         },
     };

@@ -28,8 +28,4 @@ CheckboxMenuGroupHeader.propTypes = {
     ...MenuGroupHeader.propTypes,
 };
 
-CheckboxMenuGroupHeader.defaultProps = {
-    ...MenuGroupHeader.defaultProps,
-};
-
 CheckboxMenuGroupHeader.selector = '.menu-group__header';

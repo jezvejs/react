@@ -20,8 +20,22 @@ const validInputTypes = [
     'url',
 ];
 
+const defaultProps = {
+    value: '',
+    type: 'text',
+    placeholder: '',
+    tabIndex: 0,
+    disabled: false,
+    onInput: null,
+};
+
 // eslint-disable-next-line react/display-name
-export const DropDownInput = forwardRef((props, ref) => {
+export const DropDownInput = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         id,
         value,
@@ -62,13 +76,4 @@ DropDownInput.propTypes = {
     tabIndex: PropTypes.number,
     disabled: PropTypes.bool,
     onInput: PropTypes.func,
-};
-
-DropDownInput.defaultProps = {
-    value: '',
-    type: 'text',
-    placeholder: '',
-    tabIndex: 0,
-    disabled: false,
-    onInput: null,
 };

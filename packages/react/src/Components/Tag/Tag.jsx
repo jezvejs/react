@@ -5,7 +5,20 @@ import { CloseButton } from '../CloseButton/CloseButton.jsx';
 
 import './Tag.scss';
 
-export const Tag = (props) => {
+const defaultProps = {
+    active: false,
+    disabled: false,
+    closeable: false,
+    listMode: 'list',
+    onClose: null,
+};
+
+export const Tag = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const { disabled, onClose } = props;
 
     const closeBtn = (
@@ -52,12 +65,4 @@ Tag.propTypes = {
     listMode: PropTypes.string,
     onClose: PropTypes.func,
     className: PropTypes.string,
-};
-
-Tag.defaultProps = {
-    active: false,
-    disabled: false,
-    closeable: false,
-    listMode: 'list',
-    onClose: null,
 };

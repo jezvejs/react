@@ -21,7 +21,3 @@ DropDownSingleSelection.propTypes = {
         title: PropTypes.string,
     }),
 };
-
-DropDownSingleSelection.defaultProps = {
-    item: null,
-};

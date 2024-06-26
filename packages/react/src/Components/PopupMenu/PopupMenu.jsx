@@ -11,7 +11,33 @@ import { PopupPosition } from '../../hooks/usePopupPosition/PopupPosition.js';
 
 import './PopupMenu.scss';
 
-export const PopupMenu = (props) => {
+const defaultProps = {
+    toggleOnClick: true,
+    hideOnScroll: true,
+    hideOnSelect: true,
+    fixed: true,
+    position: {
+        allowChangeAxis: true,
+        updateProps: {
+            scrollOnOverflow: false,
+        },
+    },
+};
+
+export const PopupMenu = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        position: {
+            ...defaultProps.position,
+            ...(p?.position ?? {}),
+            updateProps: {
+                ...defaultProps.position.updateProps,
+                ...(p?.position?.updateProps ?? {}),
+            },
+        },
+    };
+
     const [state, setState] = useState({
         ...props,
         open: false,
@@ -147,18 +173,4 @@ PopupMenu.propTypes = {
         PropTypes.elementType,
     ]),
     container: PropTypes.object,
-};
-
-PopupMenu.defaultProps = {
-    toggleOnClick: true,
-    hideOnScroll: true,
-    hideOnSelect: true,
-    fixed: true,
-    position: {
-        ...PopupPosition.defaultProps,
-        allowChangeAxis: true,
-        updateProps: {
-            scrollOnOverflow: false,
-        },
-    },
 };

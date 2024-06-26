@@ -3,7 +3,18 @@ import PropTypes from 'prop-types';
 
 import { PaginatorArrow } from '../Arrow/PaginatorArrow.jsx';
 
-export const PaginatorItem = (props) => {
+const defaultProps = {
+    ellipsis: false,
+    active: false,
+    allowActiveLink: false,
+};
+
+export const PaginatorItem = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     if (props.ellipsis) {
         return <span className='paginator-item'>...</span>;
     }
@@ -50,10 +61,4 @@ PaginatorItem.propTypes = {
     url: PropTypes.string,
     pageParam: PropTypes.string,
     navigation: PropTypes.string,
-};
-
-PaginatorItem.defaultProps = {
-    ellipsis: false,
-    active: false,
-    allowActiveLink: false,
 };

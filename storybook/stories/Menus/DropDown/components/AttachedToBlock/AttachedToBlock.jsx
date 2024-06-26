@@ -3,13 +3,16 @@ import { useMemo } from 'react';
 import { DropDown } from '@jezvejs/react';
 import { BlueBox } from '../BlueBox/BlueBox.jsx';
 
-export const AttachedToBlock = ({ boxId, ...args }) => {
+export const AttachedToBlock = ({
+    boxId = 'box',
+    ...props
+}) => {
     const portalElement = useMemo(() => (
         document.getElementById('custom-root')
     ), []);
 
     return (
-        <DropDown {...args} container={portalElement}>
+        <DropDown {...props} container={portalElement}>
             <BlueBox id={boxId} />
         </DropDown>
     );
@@ -18,9 +21,4 @@ export const AttachedToBlock = ({ boxId, ...args }) => {
 AttachedToBlock.propTypes = {
     ...DropDown.propTypes,
     boxId: PropTypes.string,
-};
-
-AttachedToBlock.defaultProps = {
-    ...DropDown.defaultProps,
-    boxId: 'box',
 };

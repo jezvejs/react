@@ -16,7 +16,21 @@ const customColorsMap = {
     11: 'magenta',
 };
 
-export const CustomListItem = (props) => {
+const defaultProps = {
+    selected: false,
+    active: false,
+    hidden: false,
+    disabled: false,
+    multiple: false,
+    group: null,
+};
+
+export const CustomListItem = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const color = customColorsMap[props.id];
 
     const before = (
@@ -47,13 +61,4 @@ CustomListItem.propTypes = {
     multiple: PropTypes.bool,
     group: PropTypes.string,
     className: PropTypes.string,
-};
-
-CustomListItem.defaultProps = {
-    selected: false,
-    active: false,
-    hidden: false,
-    disabled: false,
-    multiple: false,
-    group: null,
 };

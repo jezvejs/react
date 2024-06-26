@@ -16,7 +16,3 @@ export const CheckboxMenuGroupItem = (props) => (
 CheckboxMenuGroupItem.propTypes = {
     ...MenuGroupItem.propTypes,
 };
-
-CheckboxMenuGroupItem.defaultProps = {
-    ...MenuGroupItem.defaultProps,
-};

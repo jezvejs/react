@@ -5,11 +5,26 @@ import classNames from 'classnames';
 
 import './Input.scss';
 
+const defaultProps = {
+    type: 'text',
+    disabled: false,
+    value: '',
+    onInput: null,
+    onFocus: null,
+    onBlur: null,
+    onChange: null,
+};
+
 /**
  * Input component
  */
 // eslint-disable-next-line react/display-name
-export const Input = forwardRef((props, ref) => {
+export const Input = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         renderValue,
         ...rest
@@ -51,14 +66,4 @@ Input.propTypes = {
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
     renderValue: PropTypes.func,
-};
-
-Input.defaultProps = {
-    type: 'text',
-    disabled: false,
-    value: '',
-    onInput: null,
-    onFocus: null,
-    onBlur: null,
-    onChange: null,
 };

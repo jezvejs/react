@@ -86,8 +86,37 @@ DatePickerMonthViewItem.propTypes = {
     showOtherMonthDays: PropTypes.bool,
 };
 
+const defaultProps = {
+    date: null,
+    title: null,
+    nav: null,
+    locales: [],
+    firstDay: null,
+    doubleView: false,
+    renderWeekdays: true,
+    renderHeader: false,
+    showOtherMonthDays: true,
+    fixedHeight: false,
+    header: null,
+    focusable: false,
+    disabledDateFilter: null,
+    components: {
+        Header: null,
+        WeekDaysHeader: null,
+    },
+};
+
 // eslint-disable-next-line react/display-name
-export const DatePickerMonthView = forwardRef((props, ref) => {
+export const DatePickerMonthView = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         date,
         locales,
@@ -259,24 +288,4 @@ DatePickerMonthView.propTypes = {
         Header: PropTypes.func,
         WeekDaysHeader: PropTypes.func,
     }),
-};
-
-DatePickerMonthView.defaultProps = {
-    date: null,
-    title: null,
-    nav: null,
-    locales: [],
-    firstDay: null,
-    doubleView: false,
-    renderWeekdays: true,
-    renderHeader: false,
-    showOtherMonthDays: true,
-    fixedHeight: false,
-    header: null,
-    focusable: false,
-    disabledDateFilter: null,
-    components: {
-        Header: null,
-        WeekDaysHeader: null,
-    },
 };

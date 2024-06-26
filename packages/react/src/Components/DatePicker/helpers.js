@@ -13,7 +13,7 @@ export const toCSSValue = (val) => (+val.toFixed(4));
 
 /** Returns initial state object for specified props */
 export const getInitialState = (props, defaultProps) => {
-    const { mode } = props;
+    const mode = props.mode ?? defaultProps?.mode;
     if (!(mode in viewTypesMap)) {
         throw new Error('Invalid mode');
     }
@@ -31,6 +31,7 @@ export const getInitialState = (props, defaultProps) => {
         transition: null,
         secondViewTransition: false,
         position: {
+            ...(defaultProps?.position ?? {}),
             ...(props.position ?? {}),
         },
         components: {
