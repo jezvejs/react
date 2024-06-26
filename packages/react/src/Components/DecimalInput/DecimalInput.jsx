@@ -64,6 +64,8 @@ export const DecimalInput = (props) => {
         onBlur: props.onBlur,
         onChange: props.onChange,
         id: props.id,
+        className: props.className,
+        value: props.value,
     };
 
     return (

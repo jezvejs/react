@@ -49,6 +49,14 @@ export const ControlledInput = (props) => {
         ? onValidateInput
         : defaultValidateHandler;
 
+    const onChange = (e) => {
+        validateInput(e);
+
+        if (!e.defaultPrevented) {
+            props.onChange?.(e);
+        }
+    };
+
     /**
      * Verifies update of input value and returns valid value
      */
@@ -102,8 +110,7 @@ export const ControlledInput = (props) => {
         ...autoProps,
         onBeforeInput: validateInput,
         onPasteCapture: validateInput,
-        onKeyDown: validateInput,
-        onChange: validateInput,
+        onChange,
         ref: contentRef,
     };
 

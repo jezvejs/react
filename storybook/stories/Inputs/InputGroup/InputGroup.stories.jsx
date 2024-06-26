@@ -8,11 +8,13 @@ import {
     InputGroupInnerButton,
     InputGroupOuterContainer,
 } from '@jezvejs/react';
-import { useState } from 'react';
 
 // Icons
 import SmallCloseIcon from '../../../assets/icons/close-sm.svg';
 import SearchIcon from '../../../assets/icons/search.svg';
+
+// Hooks
+import { useInputState } from '../../../hooks/useInputState.js';
 
 // Common components
 import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
@@ -29,11 +31,19 @@ export default {
     tags: ['autodocs'],
 };
 
+const InputWithState = (props) => {
+    const { inputProps } = useInputState(props);
+
+    return (
+        <InputGroupInput {...inputProps} />
+    );
+};
+
 export const TextAfterInput = {
     args: {
         children: (
             <>
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input amount-input"
                     placeholder="Input value"
                 />
@@ -48,7 +58,7 @@ export const TextBeforeInput = {
         children: (
             <>
                 <InputGroupText title="$" />
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input amount-input"
                     placeholder="Input value"
                     value="1000"
@@ -63,7 +73,7 @@ export const TextBothBeforeAndAfterInput = {
         children: (
             <>
                 <InputGroupText title="$" />
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input amount-input"
                     placeholder="Input value"
                     value="1000"
@@ -80,7 +90,7 @@ export const MoreText = {
             <>
                 <InputGroupText title="€" />
                 <InputGroupText title="$" />
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input amount-input"
                     placeholder="Input value"
                     value="1000"
@@ -98,7 +108,7 @@ export const Buttons = {
             <>
                 <InputGroupButton title="€" />
                 <InputGroupButton title="$" />
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input amount-input"
                     placeholder="Input value"
                     value="1000"
@@ -114,7 +124,7 @@ export const InnerButtons = {
     args: {
         children: (
             <>
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input"
                     placeholder="Start"
                 />
@@ -134,7 +144,7 @@ export const OuterContainer = {
         className: 'input-group__input-outer',
         children: (
             <>
-                <InputGroupInput
+                <InputWithState
                     className="stretch-input"
                     placeholder="Start"
                 />
@@ -153,7 +163,7 @@ export const OuterContainerComponent = {
         children: (
             <>
                 <InputGroupOuterContainer>
-                    <InputGroupInput
+                    <InputWithState
                         className="stretch-input"
                         placeholder="Start"
                     />
@@ -167,7 +177,7 @@ export const OuterContainerComponent = {
 
 export const Disabled = {
     render: function Render() {
-        const [state, setState] = useState({
+        const { inputProps, state, setState } = useInputState({
             disabled: true,
         });
 
@@ -184,7 +194,7 @@ export const Disabled = {
                             icon={SearchIcon}
                             disabled={state.disabled}
                         />
-                        <InputGroupInput className="stretch-input" disabled={state.disabled} />
+                        <InputGroupInput className="stretch-input" {...inputProps} />
                         <InputGroupInnerButton icon={SmallCloseIcon} disabled={state.disabled} />
                     </InputGroupOuterContainer>
                 </InputGroup>

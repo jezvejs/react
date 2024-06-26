@@ -1,15 +1,25 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { ControlledInput } from '@jezvejs/react';
-import { useState } from 'react';
+
+// Hooks
+import { useInputState } from '../../../hooks/useInputState.js';
 
 // Common components
 import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
 import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
+const InputWithState = (props) => {
+    const { inputProps } = useInputState(props);
+
+    return (
+        <ControlledInput {...inputProps} />
+    );
+};
+
 export default {
     title: 'Input/ControlledInput',
-    component: ControlledInput,
+    component: InputWithState,
     parameters: {
         layout: 'centered',
     },
@@ -35,21 +45,27 @@ export const Disabled = {
         isValidValue: (value) => /^-?\d*\.?\d*$/.test(value),
     },
     render: function Render(args) {
-        const [state, setState] = useState({
-            ...args,
-        });
+        const { inputProps, state, setState } = useInputState(args);
 
-        function onToggle() {
+        const onToggle = () => {
             setState((prev) => ({ ...prev, disabled: !prev.disabled }));
-        }
+        };
+
+        const onChangeValue = () => {
+            setState((prev) => ({ ...prev, value: '1000' }));
+        };
 
         return (
             <>
-                <ControlledInput {...args} disabled={state.disabled} />
+                <ControlledInput {...inputProps} />
                 <SectionControls>
                     <ActionButton
                         title={(state.disabled ? 'Enable' : 'Disable')}
                         onClick={onToggle}
+                    />
+                    <ActionButton
+                        title="Change value"
+                        onClick={onChangeValue}
                     />
                 </SectionControls>
             </>

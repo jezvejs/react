@@ -2,6 +2,7 @@
 import '@jezvejs/react/style';
 import { DecimalInput } from '@jezvejs/react';
 import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
+import { useInputState } from '../../../hooks/useInputState.js';
 
 const TempInputDecorator = (Story) => (
     <div>
@@ -12,9 +13,17 @@ const TempInputDecorator = (Story) => (
     </div>
 );
 
+const InputWithState = (props) => {
+    const { inputProps } = useInputState(props);
+
+    return (
+        <DecimalInput {...inputProps} />
+    );
+};
+
 export default {
     title: 'Input/DecimalInput',
-    component: DecimalInput,
+    component: InputWithState,
     parameters: {
         layout: 'centered',
     },
@@ -33,7 +42,7 @@ export const Default = {
 
         return (
             <form onSubmit={onSubmit}>
-                <DecimalInput {...args} />
+                <InputWithState {...args} />
                 <input type="submit" hidden />
             </form>
         );
