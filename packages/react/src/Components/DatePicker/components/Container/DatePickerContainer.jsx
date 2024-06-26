@@ -29,6 +29,8 @@ import {
 } from '../../constants.js';
 import {
     getHeaderTitle,
+    getNextViewDate,
+    getPrevViewDate,
     getScreenWidth,
 } from '../../helpers.js';
 import { actions } from '../../reducer.js';
@@ -53,6 +55,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     ), [props.doubleView, props.vertical]);
 
     const currViewRef = useRef(null);
+    const secondViewRef = useRef(null);
 
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -240,7 +243,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         if (doubleView) {
             const view = elem?.closest('.dp__view-container');
             const previous = view?.previousElementSibling;
-            secondViewTransition = previous?.classList?.contains('dp__view-container');
+            secondViewTransition = previous?.classList?.contains('dp__view-container') ?? false;
         }
 
         return {
@@ -331,22 +334,40 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         show(props.visible);
     }, [props.visible]);
 
+    const currentDate = (state.doubleView && state.secondViewTransition)
+        ? getPrevViewDate(state.date, state.viewType)
+        : state.date;
+
+    const nextDate = (state.secondViewTransition)
+        ? state.date
+        : getNextViewDate(state.date, state.viewType);
+
     // Header
     const { Header } = state.components;
 
     const title = getHeaderTitle({
         viewType: state.viewType,
-        date: state.date,
+        date: currentDate,
         locales: state.locales,
     });
 
+    const headerProps = {
+        ...headerEvents,
+        doubleView: doubleView && !vertical,
+        focusable: keyboardNavigation,
+        title,
+    };
+
+    if (doubleView) {
+        headerProps.secondTitle = getHeaderTitle({
+            viewType: state.viewType,
+            date: nextDate,
+            locales: state.locales,
+        });
+    }
+
     const header = (
-        <Header
-            doubleView={doubleView && !vertical}
-            {...headerEvents}
-            focusable={keyboardNavigation}
-            title={title}
-        />
+        <Header {...headerProps} />
     );
 
     // Weekdays header
@@ -362,12 +383,17 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     }
 
     // Content
-    const currentView = renderDateView(state.date, state, currViewRef);
+    const currentView = renderDateView(currentDate, state, currViewRef);
+
+    const secondView = state.doubleView && (
+        renderDateView(nextDate, state, secondViewRef)
+    );
 
     const cellsContainer = (
         <div className='dp__view'>
             <div className='dp__slider'>
                 {currentView}
+                {secondView}
             </div>
         </div>
     );

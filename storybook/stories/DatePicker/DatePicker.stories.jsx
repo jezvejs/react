@@ -273,3 +273,22 @@ export const RangeSelect = {
         );
     },
 };
+
+/**
+ * Shows two views if screen width at least 724px.
+ */
+export const DoubleView = {
+    args: {
+        range: true,
+        doubleView: true,
+        animated: true,
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: (args) => (
+        <DatePickerInputGroup {...args} />
+    ),
+};

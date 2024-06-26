@@ -48,7 +48,7 @@ export const DatePickerHeader = (props) => {
         const isTitle = e.target.closest('.dp__header_title');
         const isSecondTitle = doubleView && e.target.closest('.dp__header_sec-title');
         if (isTitle || isSecondTitle) {
-            props.onClickTitle?.({ e, secondViewTransition: isSecondTitle });
+            props.onClickTitle?.({ e, secondViewTransition: !!isSecondTitle });
             return;
         }
 
