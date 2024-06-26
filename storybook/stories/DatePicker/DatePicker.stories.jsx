@@ -41,7 +41,6 @@ export const Default = {
         inline: true,
         animated: true,
     },
-    decorators: [heightDecorator],
     render: function Render(args) {
         const [state, setState] = useState({
             value: '',
@@ -80,7 +79,6 @@ export const FixedHeight = {
         animated: true,
         fixedHeight: true,
     },
-    decorators: [heightDecorator],
 };
 
 /**
@@ -94,7 +92,7 @@ export const FullWidth = {
     parameters: {
         layout: 'fullscreen',
     },
-    decorators: [widthDecorator, heightDecorator],
+    decorators: [widthDecorator],
 };
 
 export const Popup = {
@@ -644,5 +642,51 @@ export const RangePart = {
                 </DatePicker>
             </div>
         );
+    },
+};
+
+export const FirstDayMonday = {
+    args: {
+        inline: true,
+        locales: ['en-US'],
+        firstDay: 1,
+    },
+};
+
+export const FirstDaySunday = {
+    args: {
+        inline: true,
+        locales: ['en-US'],
+        firstDay: 7,
+    },
+};
+
+/**
+ * en-US locale
+ */
+export const EnLocale = {
+    args: {
+        inline: true,
+        locales: ['en-US'],
+    },
+};
+
+/**
+ * fr locale
+ */
+export const FrLocale = {
+    args: {
+        inline: true,
+        locales: ['fr'],
+    },
+};
+
+/**
+ * ru locale
+ */
+export const RuLocale = {
+    args: {
+        inline: true,
+        locales: ['ru'],
     },
 };
