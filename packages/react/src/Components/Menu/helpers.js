@@ -455,7 +455,7 @@ export const createMenuItem = (props, state) => {
     };
 
     const { type } = res;
-    const checkboxAvail = res.selectable && state.multiple;
+    const checkboxAvail = !!res.selectable && state.multiple;
     if (
         !checkboxAvail
         && (type === 'checkbox' || type === 'checkbox-link')
