@@ -8,9 +8,21 @@ import './Collapsible.scss';
  * Collapsible component
  */
 export const Collapsible = (props) => {
-    const { onStateChange } = props;
+    const {
+        expanded = false,
+        animated = false,
+        toggleOnClick = true,
+        header = 'Show',
+        onStateChange = null,
+        ...rest
+    } = props;
+
     const [state, setState] = useState({
-        ...props,
+        expanded,
+        animated,
+        toggleOnClick,
+        header,
+        ...rest,
         /* Content measured flag */
         animationReady: false,
         animationInProgress: false,
@@ -124,13 +136,4 @@ Collapsible.propTypes = {
         PropTypes.elementType,
     ]),
     onStateChange: PropTypes.func,
-};
-
-Collapsible.defaultProps = {
-    expanded: false,
-    animated: false,
-    toggleOnClick: true,
-    header: 'Show',
-    content: null,
-    onStateChange: null,
 };

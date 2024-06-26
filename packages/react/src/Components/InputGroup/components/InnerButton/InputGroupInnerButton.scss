@@ -1,0 +1,14 @@
+/* Inner button */
+.btn.input-group__inner-btn {
+  --btn-background: var(--ig-input-bg);
+  --btn-padding: 0 0.25rem;
+  --btn-icon-size: 14px;
+  --btn-icon-color: var(--ig-inner-button-color);
+  --btn-border-color: var(--ig-border-color);
+  --btn-hover-border-color: var(--ig-border-color);
+  --btn-hover-background: var(--ig-input-bg);
+  --btn-hover-icon-color: var(--ig-inner-button-active-color);
+  --btn-focus-icon-color: var(--ig-inner-button-active-color);
+  --btn-focus-border-color: var(--ig-border-color);
+  --btn-focus-background: var(--ig-input-bg);
+}

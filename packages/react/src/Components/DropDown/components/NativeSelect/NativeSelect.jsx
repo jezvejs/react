@@ -31,8 +31,20 @@ const renderListItem = ({ type, ...props }) => (
         : <Option key={`opt_${Date.now()}${props.id}`} {...props} />
 );
 
+const defaultProps = {
+    tabIndex: 0,
+    disabled: false,
+    multiple: false,
+    onChange: null,
+};
+
 // eslint-disable-next-line react/display-name
-export const DropDownNativeSelect = forwardRef((props, ref) => {
+export const DropDownNativeSelect = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         id,
         multiple,
@@ -65,11 +77,4 @@ DropDownNativeSelect.propTypes = {
     multiple: PropTypes.bool,
     onChange: PropTypes.func,
     items: PropTypes.array,
-};
-
-DropDownNativeSelect.defaultProps = {
-    tabIndex: 0,
-    disabled: false,
-    multiple: false,
-    onChange: null,
 };

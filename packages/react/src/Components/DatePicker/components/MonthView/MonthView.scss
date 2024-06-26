@@ -46,7 +46,7 @@
   border: 1px solid var(--dp-active-border-color);
 }
 
-.dp__cell_hl {
+.dp__cell.dp__cell_hl {
   background-color: var(--dp-hl-bg-color);
   border: 1px solid var(--dp-hl-border-color);
   color: var(--dp-hl-color);
@@ -81,7 +81,7 @@
 
 .dp__cell_hl.dp__cell_hl-range-start::after,
 .dp__cell_hl.dp__cell_hl-range-end::after {
-  content: attr(data-date);
+  content: attr(data-value);
   text-align: center;
   left: 0;
   right: 0;

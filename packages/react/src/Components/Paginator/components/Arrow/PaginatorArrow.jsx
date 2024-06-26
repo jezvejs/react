@@ -9,7 +9,16 @@ const defaultArrowIcon = () => (
     </svg>
 );
 
-export const PaginatorArrow = (props) => {
+const defaultProps = {
+    isNext: false,
+};
+
+export const PaginatorArrow = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const Icon = defaultArrowIcon;
 
     const commonProps = {
@@ -34,8 +43,4 @@ export const PaginatorArrow = (props) => {
 PaginatorArrow.propTypes = {
     navigation: PropTypes.string,
     page: PropTypes.number,
-};
-
-PaginatorArrow.defaultProps = {
-    isNext: false,
 };

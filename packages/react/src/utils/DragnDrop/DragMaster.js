@@ -467,6 +467,7 @@ export class DragMaster {
                 this.dropTarget.onDragEnd?.({ avatar: this.avatar, e });
             } else {
                 this.avatar.onDragCancel?.({ e });
+                this.dropTarget?.onDragCancel?.({ avatar: this.avatar, e });
             }
         }
 

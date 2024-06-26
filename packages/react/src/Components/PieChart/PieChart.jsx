@@ -134,8 +134,9 @@ export const PieChart = (props) => {
 
                     return (
                         <PieChartSector
-                            key={`${props.id}${ind}`}
                             {...sectorProps}
+                            id={sectorProps.id?.toString()}
+                            key={`${props.id}${ind}`}
                         />
                     );
                 })}

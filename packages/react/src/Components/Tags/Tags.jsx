@@ -10,10 +10,25 @@ export const TagsHelpers = {
     removeItemsById,
 };
 
+const defaultProps = {
+    ItemComponent: Tag,
+    activeItemId: null,
+    closeable: false,
+    disabled: false,
+    sortModeClass: 'tags_sort',
+    onItemClick: null,
+    onCloseItem: null,
+};
+
 /**
  * Tags list components
  */
-export const Tags = (props) => {
+export const Tags = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         disabled,
         ItemComponent,
@@ -91,14 +106,4 @@ Tags.propTypes = {
     onCloseItem: PropTypes.func,
     items: PropTypes.array,
     className: PropTypes.string,
-};
-
-Tags.defaultProps = {
-    ItemComponent: Tag,
-    activeItemId: null,
-    closeable: false,
-    disabled: false,
-    sortModeClass: 'tags_sort',
-    onItemClick: null,
-    onCloseItem: null,
 };

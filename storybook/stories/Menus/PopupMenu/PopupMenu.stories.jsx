@@ -46,6 +46,7 @@ const heightDecorator = (Story) => (
 export const Default = {
     args: {
         items: getDefaultItems(),
+        multiple: true,
     },
     render: PopupMenuDemo,
 };
@@ -53,6 +54,7 @@ export const Default = {
 export const AbsolutePosition = {
     args: {
         items: getDefaultItems(),
+        multiple: true,
         fixed: false,
     },
     decorators: [heightDecorator],
@@ -62,6 +64,7 @@ export const AbsolutePosition = {
 export const HideOnScroll = {
     args: {
         items: getDefaultItems(),
+        multiple: true,
         hideOnScroll: false,
     },
     decorators: [heightDecorator],
@@ -71,6 +74,7 @@ export const HideOnScroll = {
 export const HideOnSelect = {
     args: {
         items: getDefaultItems(),
+        multiple: true,
         hideOnSelect: false,
     },
     decorators: [heightDecorator],

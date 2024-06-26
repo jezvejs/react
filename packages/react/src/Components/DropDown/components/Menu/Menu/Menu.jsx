@@ -7,11 +7,54 @@ import { Menu, MenuHelpers } from '../../../../Menu/Menu.jsx';
 import { componentPropType } from '../../../helpers.js';
 import './Menu.scss';
 
+const defaultProps = {
+    parentId: null,
+    items: [],
+    showInput: false,
+    getItemById: null,
+    onItemActivate: null,
+    onItemClick: null,
+    onPlaceholderClick: null,
+    multiple: false,
+    filtered: false,
+    getPlaceholderProps: null,
+    header: {
+        inputElem: null,
+        inputString: '',
+        inputPlaceholder: '',
+        useSingleSelectionAsPlaceholder: false,
+        onInput: null,
+    },
+    components: {
+        Header: null,
+        Input: null,
+        MenuList: null,
+        ListItem: null,
+        Check: null,
+        Checkbox: null,
+        ListPlaceholder: null,
+        GroupItem: null,
+    },
+};
+
 /**
  * DropDown Menu container component
  */
 // eslint-disable-next-line react/display-name
-export const DropDownMenu = forwardRef((props, ref) => {
+export const DropDownMenu = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        header: {
+            ...defaultProps.header,
+            ...(p?.header ?? {}),
+        },
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const { multiple, filtered } = props;
     const defaultItemType = (multiple) ? 'checkbox' : 'button';
 
@@ -82,35 +125,4 @@ DropDownMenu.propTypes = {
         ListPlaceholder: componentPropType,
         GroupItem: componentPropType,
     }),
-};
-
-DropDownMenu.defaultProps = {
-    ...Menu.defaultProps,
-    parentId: null,
-    items: [],
-    showInput: false,
-    getItemById: null,
-    onItemActivate: null,
-    onItemClick: null,
-    onPlaceholderClick: null,
-    multiple: false,
-    filtered: false,
-    getPlaceholderProps: null,
-    header: {
-        inputElem: null,
-        inputString: '',
-        inputPlaceholder: '',
-        useSingleSelectionAsPlaceholder: false,
-        onInput: null,
-    },
-    components: {
-        Header: null,
-        Input: null,
-        MenuList: null,
-        ListItem: null,
-        Check: null,
-        Checkbox: null,
-        ListPlaceholder: null,
-        GroupItem: null,
-    },
 };

@@ -5,7 +5,7 @@ import './WeekDaysHeader.scss';
 const DatePickerWeekDaysHeaderItem = (props) => {
     const {
         weekday,
-        locales,
+        locales = [],
     } = props;
 
     const itemProps = {
@@ -29,7 +29,10 @@ DatePickerWeekDaysHeaderItem.propTypes = {
 };
 
 export const DatePickerWeekDaysHeader = (props) => {
-    const { locales, firstDay } = props;
+    const {
+        locales = [],
+        firstDay = null,
+    } = props;
 
     const params = {
         locales,
@@ -61,9 +64,4 @@ DatePickerWeekDaysHeader.propTypes = {
         PropTypes.arrayOf(PropTypes.string),
     ]),
     firstDay: PropTypes.number,
-};
-
-DatePickerWeekDaysHeader.defaultProps = {
-    locales: [],
-    firstDay: null,
 };

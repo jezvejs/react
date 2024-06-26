@@ -6,7 +6,21 @@ import MinusIcon from '../../../../../../assets/icons/minus.svg';
 
 import './CollapsibleMenuGroupHeader.scss';
 
-export const DropDownCollapsibleMenuGroupHeader = (props) => {
+const defaultProps = {
+    title: null,
+    expanded: true,
+};
+
+export const DropDownCollapsibleMenuGroupHeader = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const Icon = (props.expanded) ? MinusIcon : PlusIcon;
 
     return (
@@ -29,10 +43,4 @@ DropDownCollapsibleMenuGroupHeader.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     expanded: PropTypes.bool,
-};
-
-DropDownCollapsibleMenuGroupHeader.defaultProps = {
-    ...DropDownGroupHeader.defaultProps,
-    title: null,
-    expanded: true,
 };

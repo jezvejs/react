@@ -108,7 +108,8 @@
 
   .dp__slider {
     flex-flow: row nowrap;
-    left: -100%;
+
+    /* left: -100%; */
   }
 }
 
@@ -141,15 +142,18 @@
         );
       }
 
+      /*
       .dp__slider {
         left: -50%;
       }
+      */
     }
   }
 
   .dp__vertical {
     .dp__double-view .dp__slider {
-      top: -50%;
+      /* top: -50%; */
+      top: -2rem;
     }
   }
 }

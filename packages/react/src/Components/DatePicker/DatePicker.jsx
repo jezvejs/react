@@ -4,6 +4,7 @@ import {
     useMemo,
 } from 'react';
 
+import { StoreProvider } from '../../utils/Store/StoreProvider.jsx';
 import { combineReducers } from '../../utils/combineReducers.js';
 
 // Local components
@@ -14,7 +15,7 @@ import { DatePickerYearRangeView } from './components/YearRangeView/YearRangeVie
 import { DatePickerHeader } from './components/Header/Header.jsx';
 import { DatePickerWeekDaysHeader } from './components/WeekDaysHeader/WeekDaysHeader.jsx';
 
-import { DatePickerContextProvider } from './context.jsx';
+import { defaultProps } from './defaultProps.js';
 import { reducer } from './reducer.js';
 import * as DatePickerHelpers from './helpers.js';
 import './DatePicker.scss';
@@ -39,25 +40,20 @@ export const DatePicker = forwardRef((props, ref) => {
             : reducer;
     }, [props.reducers]);
 
-    const init = (initialArg) => (
-        DatePickerHelpers.getInitialState(initialArg, DatePicker.defaultProps)
+    const initialState = (
+        DatePickerHelpers.getInitialState(props, defaultProps)
     );
 
     return (
-        <DatePickerContextProvider
+        <StoreProvider
             reducer={reducers}
-            initialState={props}
-            init={init}
+            initialState={initialState}
         >
-            <DatePickerContainer ref={ref} {...props} />
-        </DatePickerContextProvider>
+            <DatePickerContainer ref={ref} {...initialState} />
+        </StoreProvider>
     );
 });
 
 DatePicker.propTypes = {
     ...DatePickerContainer.propTypes,
-};
-
-DatePicker.defaultProps = {
-    ...DatePickerContainer.defaultProps,
 };

@@ -10,7 +10,25 @@ import './CustomControlsSelect.scss';
 
 const { toggleLoading } = actions;
 
-export const CustomControlsSelect = (props) => {
+const defaultProps = {
+    loading: false,
+    components: {
+        ComboBoxControls: CustomComboBoxControls,
+        Loading: Spinner,
+        ComboMenuButton: MenuButton,
+    },
+};
+
+export const CustomControlsSelect = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const onClick = (e) => {
         if (e.target.closest('.menu-btn')) {
             e.preventDefault();
@@ -37,15 +55,4 @@ export const CustomControlsSelect = (props) => {
 CustomControlsSelect.propTypes = {
     ...DropDown.propTypes,
     loading: PropTypes.bool,
-};
-
-CustomControlsSelect.defaultProps = {
-    ...DropDown.defaultProps,
-    loading: false,
-    components: {
-        ...DropDown.defaultProps.components,
-        ComboBoxControls: CustomComboBoxControls,
-        Loading: Spinner,
-        ComboMenuButton: MenuButton,
-    },
 };

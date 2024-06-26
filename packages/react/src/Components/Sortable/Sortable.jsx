@@ -1,4 +1,3 @@
-import { asArray } from '@jezvejs/types';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useCallback, forwardRef, useImperativeHandle } from 'react';
@@ -9,18 +8,17 @@ import { useSortableDragZone } from './useSortableDragZone.jsx';
 import { useSortableDropTarget } from './useSortableDropTarget.jsx';
 import { SortableDragAvatar } from './SortableDragAvatar.jsx';
 import {
-    filterTreeItems,
     findTreeItemIndex,
+    getDragZoneItems,
     getTreeItemById,
-    isTreeContains,
-    mapTreeItems,
+    moveTreeItem,
 } from './helpers.js';
 
 // eslint-disable-next-line react/display-name
 export const Sortable = forwardRef((props, ref) => {
     const {
         className,
-        onSort,
+        onSort = null,
         components,
         ...commonProps
     } = props;
@@ -28,10 +26,6 @@ export const Sortable = forwardRef((props, ref) => {
     const Avatar = components.Avatar ?? ListItem;
 
     const { setState, getState } = useDragnDrop();
-
-    const getDragZoneItems = (dragZoneId, state) => (
-        state[dragZoneId]?.items ?? []
-    );
 
     const getItems = (dragZoneId = props.id) => {
         const state = getState();
@@ -48,7 +42,7 @@ export const Sortable = forwardRef((props, ref) => {
         return (
             state.dragging
             && (state.itemId ?? null) !== null
-            && (props.id === state.origSortPos?.parentZoneId)
+            && (props.id === state.origSortPos?.zoneId)
         );
     };
 
@@ -58,7 +52,7 @@ export const Sortable = forwardRef((props, ref) => {
         }
 
         const state = getState();
-        return findItemById(state.itemId, state.sortPosition?.parentZoneId);
+        return findItemById(state.itemId, state.sortPosition?.zoneId);
     };
 
     const {
@@ -67,10 +61,10 @@ export const Sortable = forwardRef((props, ref) => {
     } = useSortableDragZone({
         ...commonProps,
 
-        onDragStart({ itemId, parentId, parentZoneId }) {
+        onDragStart({ itemId, parentId, zoneId }) {
             setState((prev) => {
-                const dragZoneItems = getDragZoneItems(parentZoneId, prev);
-                const index = findTreeItemIndex(dragZoneItems, (item) => item.id === itemId);
+                const dragZoneItems = getDragZoneItems(zoneId, prev);
+                const index = findTreeItemIndex(dragZoneItems, (item) => item?.id === itemId);
                 return {
                     ...prev,
                     itemId,
@@ -78,13 +72,13 @@ export const Sortable = forwardRef((props, ref) => {
                         id: itemId,
                         parentId,
                         index,
-                        parentZoneId,
+                        zoneId,
                     },
                     sortPosition: {
                         id: itemId,
                         parentId,
                         index,
-                        parentZoneId,
+                        zoneId,
                     },
                 };
             });
@@ -96,88 +90,38 @@ export const Sortable = forwardRef((props, ref) => {
     } = useSortableDropTarget({
         ...commonProps,
 
-        onDragMove({ targetId, parentId, targetZoneId }) {
+        onDragMove({
+            targetId,
+            parentId,
+            targetZoneId,
+            swapWithPlaceholder,
+        }) {
             if (targetId === parentId) {
                 return;
             }
 
-            setState((prev) => {
-                if (prev.itemId === targetId) {
-                    return prev;
-                }
-
-                const dragZoneItems = getDragZoneItems(targetZoneId, prev);
-
-                // Prevent to move parent subtree into own child
-                if (isTreeContains(prev.itemId, targetId, dragZoneItems)) {
-                    return prev;
-                }
-
-                const index = (targetId !== null)
-                    ? findTreeItemIndex(dragZoneItems, (item) => item.id === targetId)
-                    : 0;
-
-                if (
-                    index === -1
-                    || (
-                        index === prev.sortPosition.index
-                        && parentId === prev.sortPosition.parentId
-                        && targetZoneId === prev.sortPosition.parentZoneId
-                    )
-                ) {
-                    return prev;
-                }
-
-                const newState = {
-                    ...prev,
-                    targetId,
-                    sortPosition: {
-                        id: targetId,
-                        index,
-                        parentId,
-                        parentZoneId: targetZoneId,
+            setState((prev) => (
+                moveTreeItem(prev, {
+                    source: {
+                        id: prev.origSortPos.id,
+                        index: prev.sortPosition.index,
+                        parentId: prev.sortPosition.parentId,
+                        zoneId: prev.sortPosition.zoneId,
                     },
-                };
-
-                // Remove item from source list
-                const sourceZoneId = prev.sortPosition.parentZoneId;
-                const sourceItems = prev[sourceZoneId].items;
-
-                newState[sourceZoneId] = {
-                    ...newState[sourceZoneId],
-                    items: filterTreeItems(sourceItems, (item) => item?.id !== newState.itemId),
-                };
-
-                // Insert item to destination list
-                const movingItem = getTreeItemById(newState.itemId, sourceItems);
-                const destItems = getDragZoneItems(targetZoneId, newState);
-
-                newState[targetZoneId] = {
-                    ...newState[targetZoneId],
-                    items: (parentId === targetZoneId)
-                        ? destItems.toSpliced(index, 0, movingItem)
-                        : (
-                            mapTreeItems(destItems, (item) => {
-                                if (item.id !== parentId) {
-                                    return item;
-                                }
-
-                                return {
-                                    ...item,
-                                    items: asArray(item.items).toSpliced(index, 0, movingItem),
-                                };
-                            })
-                        ),
-                };
-
-                return newState;
-            });
+                    target: {
+                        id: targetId,
+                        parentId,
+                        zoneId: targetZoneId,
+                    },
+                    swapWithPlaceholder,
+                })
+            ));
         },
 
         onSortEnd() {
             const state = getState();
             const sortParams = {
-                id: state.itemId,
+                id: state.origSortPos.id,
                 parentId: state.origSortPos.parentId,
                 targetPos: state.sortPosition.index,
                 targetParentId: state.sortPosition.parentId,
@@ -192,6 +136,33 @@ export const Sortable = forwardRef((props, ref) => {
             }));
 
             onSort?.(sortParams);
+        },
+
+        onSortCancel() {
+            setState((prev) => {
+                const newState = moveTreeItem(prev, {
+                    source: {
+                        id: prev.origSortPos.id,
+                        index: prev.sortPosition.index,
+                        parentId: prev.sortPosition.parentId,
+                        zoneId: prev.sortPosition.zoneId,
+                    },
+                    target: {
+                        index: prev.origSortPos.index,
+                        parentId: prev.origSortPos.parentId,
+                        zoneId: prev.origSortPos.zoneId,
+                    },
+                    swapWithPlaceholder: prev.swapWithPlaceholder,
+                });
+
+                return {
+                    ...newState,
+                    origSortPos: null,
+                    sortPosition: null,
+                    itemId: null,
+                    targetId: null,
+                };
+            });
         },
     });
 
@@ -222,7 +193,7 @@ export const Sortable = forwardRef((props, ref) => {
             || (
                 state.dragging
                 && item.id === state.itemId
-                && props.id === state.sortPosition.parentZoneId
+                && props.id === state.sortPosition.zoneId
             )
         );
 
@@ -256,6 +227,11 @@ export const Sortable = forwardRef((props, ref) => {
     );
 });
 
+const isComponent = PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.func,
+]);
+
 Sortable.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
@@ -263,11 +239,7 @@ Sortable.propTypes = {
     copyWidth: PropTypes.bool,
     onSort: PropTypes.func,
     components: PropTypes.shape({
-        ListItem: PropTypes.object,
-        Avatar: PropTypes.object,
+        ListItem: isComponent,
+        Avatar: isComponent,
     }),
-};
-
-Sortable.defaultProps = {
-    onSort: null,
 };

@@ -36,10 +36,10 @@ DatePickerHeaderTitle.propTypes = {
 
 export const DatePickerHeader = (props) => {
     const {
-        doubleView,
-        focusable,
-        title,
-        secondTitle,
+        doubleView = false,
+        focusable = false,
+        title = null,
+        secondTitle = null,
     } = props;
 
     const onClick = (e) => {
@@ -48,7 +48,7 @@ export const DatePickerHeader = (props) => {
         const isTitle = e.target.closest('.dp__header_title');
         const isSecondTitle = doubleView && e.target.closest('.dp__header_sec-title');
         if (isTitle || isSecondTitle) {
-            props.onClickTitle?.({ e, secondViewTransition: isSecondTitle });
+            props.onClickTitle?.({ e, secondViewTransition: !!isSecondTitle });
             return;
         }
 
@@ -107,14 +107,4 @@ DatePickerHeader.propTypes = {
     onClickTitle: PropTypes.func,
     onClickPrev: PropTypes.func,
     onClickNext: PropTypes.func,
-};
-
-DatePickerHeader.defaultProps = {
-    title: null,
-    secondTitle: null,
-    doubleView: false,
-    focusable: false,
-    onClickTitle: null,
-    onClickPrev: null,
-    onClickNext: null,
 };

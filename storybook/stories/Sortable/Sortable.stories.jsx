@@ -8,6 +8,8 @@ import {
 } from '@jezvejs/react';
 
 // Local components
+import { ListItemWithHandle } from './components/ListItemWithHandle/ListItemWithHandle.jsx';
+import { ListItemWithInput } from './components/ListItemWithInput/ListItemWithInput.jsx';
 import { SortableListItem } from './components/SortableListItem/SortableListItem.jsx';
 import { SortableTile } from './components/SortableTile/SortableTile.jsx';
 import { SortableTreeItem } from './components/SortableTreeItem/SortableTreeItem.jsx';
@@ -345,6 +347,96 @@ export const TreeExchange = {
                     <Sortable {...argsSrc} container={portalElement} />
                     <Sortable {...argsDest} container={portalElement} />
                 </div>
+            </DragnDropProvider>
+        );
+    },
+};
+
+export const OnlyRootHandle = {
+    args: {
+        id: 'onlyRootHandle',
+        items: getListItems(),
+        className: 'list-area',
+        selector: '.list_item',
+        placeholderClass: 'list_item_placeholder',
+        group: 'list_root',
+        onlyRootHandle: true,
+        copyWidth: true,
+        components: {
+            ListItem: ListItemWithInput,
+        },
+    },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        const initialState = {
+            left: 0,
+            top: 0,
+            shiftX: 0,
+            shiftY: 0,
+            dragging: false,
+            onlyRootHandle: {
+                items: args.items,
+            },
+        };
+
+        const slice = createSlice({
+        });
+
+        return (
+            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+                <Sortable {...args} container={portalElement} />
+            </DragnDropProvider>
+        );
+    },
+};
+
+export const QueryHandles = {
+    args: {
+        id: 'listHandle',
+        items: getListItems(),
+        className: 'list-area',
+        selector: '.list_item',
+        placeholderClass: 'list_item_placeholder',
+        group: 'list_hnd',
+        handles: [{ query: '.drag-handle', includeChilds: true }],
+        copyWidth: true,
+        components: {
+            ListItem: ListItemWithHandle,
+        },
+    },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        const initialState = {
+            left: 0,
+            top: 0,
+            shiftX: 0,
+            shiftY: 0,
+            dragging: false,
+            listHandle: {
+                items: args.items,
+            },
+        };
+
+        const slice = createSlice({
+        });
+
+        return (
+            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+                <Sortable {...args} container={portalElement} />
             </DragnDropProvider>
         );
     },

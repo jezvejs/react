@@ -17,7 +17,3 @@ DropDownGroupHeader.propTypes = {
     title: PropTypes.string,
     className: PropTypes.string,
 };
-
-DropDownGroupHeader.defaultProps = {
-    title: null,
-};

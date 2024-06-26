@@ -35,8 +35,4 @@ CollapsibleMenuGroupHeader.propTypes = {
     ...MenuGroupHeader.propTypes,
 };
 
-CollapsibleMenuGroupHeader.defaultProps = {
-    ...MenuGroupHeader.defaultProps,
-};
-
 CollapsibleMenuGroupHeader.selector = '.menu-group__header';

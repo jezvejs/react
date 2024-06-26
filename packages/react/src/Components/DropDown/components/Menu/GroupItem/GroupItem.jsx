@@ -13,6 +13,3 @@ export const DropDownGroupItem = (props) => (
 DropDownGroupItem.propTypes = {
     className: PropTypes.string,
 };
-
-DropDownGroupItem.defaultProps = {
-};

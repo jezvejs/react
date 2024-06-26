@@ -53,7 +53,3 @@ export const CheckboxGroupsMenu = (props) => {
 CheckboxGroupsMenu.propTypes = {
     ...Menu.propTypes,
 };
-
-CheckboxGroupsMenu.defaultProps = {
-    ...Menu.defaultProps,
-};

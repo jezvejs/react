@@ -7,7 +7,21 @@ import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.js';
 
 import './Offcanvas.scss';
 
-export const Offcanvas = (props) => {
+const defaultProps = {
+    placement: 'left',
+    closed: true,
+    useScrollLock: true,
+    onOpened: null,
+    onClosed: null,
+    onToggle: null,
+};
+
+export const Offcanvas = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const [state, setState] = useState(props);
     const showBackground = state.transitionInProgress || state.closed === false;
 
@@ -91,13 +105,4 @@ Offcanvas.propTypes = {
         PropTypes.elementType,
     ]),
     container: PropTypes.object,
-};
-
-Offcanvas.defaultProps = {
-    placement: 'left',
-    closed: true,
-    useScrollLock: true,
-    onOpened: null,
-    onClosed: null,
-    onToggle: null,
 };

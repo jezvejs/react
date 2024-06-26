@@ -18,8 +18,9 @@ export function useDragZone(props) {
     const animationFrameRef = useRef(null);
     const currentTargetElemRef = useRef(null);
 
-    const { state, getState, setState } = useDragnDrop();
+    const { getState, setState } = useDragnDrop();
 
+    const state = getState();
     const showOriginal = !state.dragging || !dragOriginal;
     const showAvatar = state.dragging && state.draggingId === props.id;
 
@@ -30,12 +31,14 @@ export function useDragZone(props) {
 
         const dragZone = {
             makeAvatar() {
+                const { id } = props;
+
                 return {
-                    id: props.id,
+                    id,
                     elem: avatarRef.current,
                     getDragInfo() {
                         return {
-                            id: props.id,
+                            id,
                             mouseShift: {
                                 x: getState().shiftX,
                                 y: getState().shiftY,
@@ -57,13 +60,23 @@ export function useDragZone(props) {
 
                         return true;
                     },
+                    cancelAnimation() {
+                        if (animationFrameRef.current) {
+                            cancelAnimationFrame(animationFrameRef.current);
+                            animationFrameRef.current = 0;
+                        }
+                    },
                     onDragMove(e) {
+                        this.cancelAnimation();
+
                         const page = DragMaster.getEventPageCoordinates(e);
                         const client = DragMaster.getEventClientCoordinates(e);
 
-                        if (animationFrameRef.current) {
-                            cancelAnimationFrame(animationFrameRef.current);
-                        }
+                        currentTargetElemRef.current = DragMaster.getElementUnderClientXY(
+                            avatarRef?.current,
+                            client.x,
+                            client.y,
+                        );
 
                         animationFrameRef.current = requestAnimationFrame(() => {
                             animationFrameRef.current = 0;
@@ -75,21 +88,20 @@ export function useDragZone(props) {
                                 dragging: true,
                                 draggingId: props.id,
                             }));
-
-                            currentTargetElemRef.current = DragMaster.getElementUnderClientXY(
-                                avatarRef?.current,
-                                client.x,
-                                client.y,
-                            );
                         });
                     },
                     onDragCancel() {
+                        this.cancelAnimation();
+
                         setState((prev) => ({
                             ...prev,
                             left: prev.origLeft,
                             top: prev.origTop,
                             dragging: false,
                         }));
+                    },
+                    onDragEnd() {
+                        this.cancelAnimation();
                     },
                 };
             },

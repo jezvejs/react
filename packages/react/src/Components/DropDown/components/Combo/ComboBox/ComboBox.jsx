@@ -15,8 +15,46 @@ import { DropDownPlaceholder } from '../Placeholder/Placeholder.jsx';
 import { getSelectedItems, componentPropType } from '../../../helpers.js';
 import './ComboBox.scss';
 
+const defaultProps = {
+    inputRef: null,
+    multiple: false,
+    editable: false,
+    enableFilter: false,
+    disabled: false,
+    placeholder: null,
+    useSingleSelectionAsPlaceholder: false,
+    showMultipleSelection: true,
+    showClearButton: true,
+    showToggleButton: true,
+    items: [],
+    actSelItemIndex: -1,
+    onInput: null,
+    onDeleteSelectedItem: null,
+    onClearSelection: null,
+    onToggle: null,
+    components: {
+        Input: DropDownInput,
+        Placeholder: DropDownPlaceholder,
+        SingleSelection: DropDownSingleSelection,
+        MultipleSelection: DropDownMultipleSelection,
+        MultiSelectionItem: DropDownMultiSelectionItem,
+        ComboBoxControls: DropDownComboBoxControls,
+        ToggleButton: DropDownToggleButton,
+        ClearButton: DropDownClearButton,
+    },
+};
+
 // eslint-disable-next-line react/display-name
-export const DropDownComboBox = forwardRef((props, ref) => {
+export const DropDownComboBox = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         onInput,
         disabled,
@@ -124,33 +162,4 @@ DropDownComboBox.propTypes = {
         ToggleButton: componentPropType,
         ClearButton: componentPropType,
     }),
-};
-
-DropDownComboBox.defaultProps = {
-    inputRef: null,
-    multiple: false,
-    editable: false,
-    enableFilter: false,
-    disabled: false,
-    placeholder: null,
-    useSingleSelectionAsPlaceholder: false,
-    showMultipleSelection: true,
-    showClearButton: true,
-    showToggleButton: true,
-    items: [],
-    actSelItemIndex: -1,
-    onInput: null,
-    onDeleteSelectedItem: null,
-    onClearSelection: null,
-    onToggle: null,
-    components: {
-        Input: DropDownInput,
-        Placeholder: DropDownPlaceholder,
-        SingleSelection: DropDownSingleSelection,
-        MultipleSelection: DropDownMultipleSelection,
-        MultiSelectionItem: DropDownMultiSelectionItem,
-        ComboBoxControls: DropDownComboBoxControls,
-        ToggleButton: DropDownToggleButton,
-        ClearButton: DropDownClearButton,
-    },
 };

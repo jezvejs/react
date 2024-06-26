@@ -20,7 +20,12 @@ import {
 
 const { getInputContent } = ControlledInputHelpers;
 
-export const DateInput = (props) => {
+export const DateInput = (p) => {
+    const props = {
+        guideChar: '_',
+        locales: [],
+        ...p,
+    };
     const [state, setState] = useState(getInitialState(props));
 
     const deleteSelection = () => {
@@ -362,10 +367,4 @@ DateInput.propTypes = {
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
     ]),
-};
-
-DateInput.defaultProps = {
-    ...ControlledInput.defaultProps,
-    guideChar: '_',
-    locales: [],
 };

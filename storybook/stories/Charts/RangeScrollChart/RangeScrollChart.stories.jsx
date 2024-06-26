@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { RangeScrollChart } from '@jezvejs/react';
-import { chartData, chartMultiData } from '../../assets/data/index.js';
+import { chartData, chartMultiData } from '../../../assets/data/index.js';
 import './RangeScrollChart.stories.scss';
 
 export default {

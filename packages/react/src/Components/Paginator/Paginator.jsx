@@ -8,7 +8,26 @@ import { PaginatorItem } from './components/Item/PaginatorItem.jsx';
 import { getItems } from './helpers.js';
 import './Paginator.scss';
 
-export const Paginator = (props) => {
+const defaultProps = {
+    id: undefined,
+    breakLimit: 5,
+    groupLimit: 3,
+    pageNum: 1,
+    pagesCount: 0,
+    allowActiveLink: false,
+    showSingleItem: false,
+    arrows: false,
+    pageParam: 'page',
+    url: window.location.href,
+    onChange: null,
+};
+
+export const Paginator = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const [state, setState] = useState(props);
     const items = getItems(state);
 
@@ -71,18 +90,4 @@ Paginator.propTypes = {
     pageParam: PropTypes.string,
     url: PropTypes.string,
     onChange: PropTypes.func,
-};
-
-Paginator.defaultProps = {
-    id: undefined,
-    breakLimit: 5,
-    groupLimit: 3,
-    pageNum: 1,
-    pagesCount: 0,
-    allowActiveLink: false,
-    showSingleItem: false,
-    arrows: false,
-    pageParam: 'page',
-    url: window.location.href,
-    onChange: null,
 };

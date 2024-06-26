@@ -1,0 +1,13 @@
+/* Input group text */
+.input-group__text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: var(--ig-height);
+  margin: 0;
+  padding: 0 var(--ig-hor-padding);
+  color: var(--ig-text-color);
+  border-color: var(--ig-text-border);
+  background-color: var(--ig-text-bg);
+}

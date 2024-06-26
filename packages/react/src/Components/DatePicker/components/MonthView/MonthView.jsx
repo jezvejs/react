@@ -11,15 +11,22 @@ import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { useStore } from '../../../../utils/Store/StoreProvider.jsx';
+
 import { MONTH_VIEW } from '../../constants.js';
-import { getHeaderTitle } from '../../helpers.js';
+import { getHeaderTitle, inRange, includesDate } from '../../helpers.js';
 import './MonthView.scss';
 
 const DatePickerMonthViewItem = (props) => {
     const {
         date,
         isOtherMonth,
+        isActive,
+        highlight,
+        isRangeStart,
+        isRangeEnd,
         isToday,
+        disabled,
         focusable,
         showOtherMonthDays,
     } = props;
@@ -30,14 +37,20 @@ const DatePickerMonthViewItem = (props) => {
         className: classNames(
             'dp__cell dp__month-view_cell dp__day-cell',
             {
-                'dp__today-cell': isToday,
-                'dp__other-month-cell': isOtherMonth,
+                'dp__today-cell': !!isToday,
+                'dp__other-month-cell': !!isOtherMonth,
+                dp__cell_act: !!isActive,
+                dp__cell_hl: !!highlight,
+                'dp__cell_hl-range-start': !!isRangeStart,
+                'dp__cell_hl-range-end': !!isRangeEnd,
             },
         ),
+        disabled,
     };
 
     if (showOtherMonthDays || !isOtherMonth) {
         itemProps['data-date'] = shiftDate(date, 0).getTime();
+        itemProps['data-value'] = itemDate;
     }
 
     const content = (showOtherMonthDays || !isOtherMonth) && itemDate;
@@ -63,14 +76,47 @@ DatePickerMonthViewItem.propTypes = {
         PropTypes.number,
     ]),
     isOtherMonth: PropTypes.bool,
+    isActive: PropTypes.bool,
+    highlight: PropTypes.bool,
     isToday: PropTypes.bool,
+    isRangeStart: PropTypes.bool,
+    isRangeEnd: PropTypes.bool,
     disabled: PropTypes.bool,
     focusable: PropTypes.bool,
     showOtherMonthDays: PropTypes.bool,
 };
 
+const defaultProps = {
+    date: null,
+    title: null,
+    nav: null,
+    locales: [],
+    firstDay: null,
+    doubleView: false,
+    renderWeekdays: true,
+    renderHeader: false,
+    showOtherMonthDays: true,
+    fixedHeight: false,
+    header: null,
+    focusable: false,
+    disabledDateFilter: null,
+    components: {
+        Header: null,
+        WeekDaysHeader: null,
+    },
+};
+
 // eslint-disable-next-line react/display-name
-export const DatePickerMonthView = forwardRef((props, ref) => {
+export const DatePickerMonthView = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         date,
         locales,
@@ -83,6 +129,8 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
     const rMonth = date.getMonth();
     const rYear = date.getFullYear();
 
+    const { state } = useStore();
+
     // month header
     const title = getHeaderTitle({
         viewType: MONTH_VIEW,
@@ -92,6 +140,7 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
 
     const header = props.renderHeader && (
         <Header
+            {...(props.header ?? {})}
             locales={locales}
             title={title}
             focusable={focusable}
@@ -143,6 +192,31 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
             const isOtherMonth = !isSameYearMonth(date, weekday);
             const isToday = isSameDate(weekday, today) && (!doubleView || !isOtherMonth);
 
+            const isActive = (
+                includesDate(state.actDate, weekday)
+                && !isOtherMonth
+            );
+
+            const highlight = (
+                state.range
+                && !isOtherMonth
+                && inRange(weekday, state.curRange)
+            );
+
+            const startDate = state.curRange?.start ?? null;
+            const isRangeStart = (
+                !!startDate
+                && !isOtherMonth
+                && isSameDate(weekday, startDate)
+            );
+
+            const endDate = state.curRange?.end ?? null;
+            const isRangeEnd = (
+                !!endDate
+                && !isOtherMonth
+                && isSameDate(weekday, endDate)
+            );
+
             const disabled = (
                 (!showOtherMonthDays && isOtherMonth)
                 || (!!disabledFilter && props.disabledDateFilter(weekday))
@@ -151,6 +225,10 @@ export const DatePickerMonthView = forwardRef((props, ref) => {
             const item = {
                 date: weekday,
                 isOtherMonth,
+                isActive,
+                highlight,
+                isRangeStart,
+                isRangeEnd,
                 isToday,
                 disabled,
                 focusable,
@@ -210,24 +288,4 @@ DatePickerMonthView.propTypes = {
         Header: PropTypes.func,
         WeekDaysHeader: PropTypes.func,
     }),
-};
-
-DatePickerMonthView.defaultProps = {
-    date: null,
-    title: null,
-    nav: null,
-    locales: [],
-    firstDay: null,
-    doubleView: false,
-    renderWeekdays: true,
-    renderHeader: false,
-    showOtherMonthDays: true,
-    fixedHeight: false,
-    header: null,
-    focusable: false,
-    disabledDateFilter: null,
-    components: {
-        Header: null,
-        WeekDaysHeader: null,
-    },
 };

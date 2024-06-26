@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { Menu, MenuHelpers } from '../Menu/Menu.jsx';
+import { Menu, MenuHelpers, MenuProps } from '../Menu/Menu.jsx';
 
 import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.js';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.js';
@@ -11,7 +11,38 @@ import { PopupPosition } from '../../hooks/usePopupPosition/PopupPosition.js';
 
 import './PopupMenu.scss';
 
-export const PopupMenu = (props) => {
+const defaultProps = {
+    toggleOnClick: true,
+    hideOnScroll: true,
+    hideOnSelect: true,
+    fixed: true,
+    position: {
+        allowChangeAxis: true,
+        updateProps: {
+            scrollOnOverflow: false,
+        },
+    },
+};
+
+const menuProps = MenuProps.getDefaultProps();
+
+export const PopupMenu = (p) => {
+    const props = {
+        ...menuProps,
+        ...defaultProps,
+        ...p,
+        position: {
+            ...menuProps.position,
+            ...defaultProps.position,
+            ...(p?.position ?? {}),
+            updateProps: {
+                ...(menuProps.position?.updateProps ?? {}),
+                ...(defaultProps.position?.updateProps ?? {}),
+                ...(p?.position?.updateProps ?? {}),
+            },
+        },
+    };
+
     const [state, setState] = useState({
         ...props,
         open: false,
@@ -29,7 +60,12 @@ export const PopupMenu = (props) => {
         setState((prev) => ({ ...prev, open: false }));
     };
 
-    const { referenceRef, elementRef, elem } = usePopupPosition({
+    const {
+        referenceRef,
+        elementRef,
+        elem,
+        reference,
+    } = usePopupPosition({
         ...state.position,
         open: state.open,
         onScrollDone: () => {
@@ -106,7 +142,17 @@ export const PopupMenu = (props) => {
         };
     }, [state.open, state.listenScroll]);
 
-    useEmptyClick(closeMenu, elem, state.open);
+    useEmptyClick(() => {
+        closeMenu();
+    }, [elem, reference], state.open);
+
+    useEffect(() => {
+        setState((prev) => ({
+            ...prev,
+            items: MenuHelpers.createItems(props.items, prev),
+            activeItem: props.activeItem,
+        }));
+    }, [props.items, props.activeItem]);
 
     if (!props.children) {
         return null;
@@ -147,18 +193,4 @@ PopupMenu.propTypes = {
         PropTypes.elementType,
     ]),
     container: PropTypes.object,
-};
-
-PopupMenu.defaultProps = {
-    toggleOnClick: true,
-    hideOnScroll: true,
-    hideOnSelect: true,
-    fixed: true,
-    position: {
-        ...PopupPosition.defaultProps,
-        allowChangeAxis: true,
-        updateProps: {
-            scrollOnOverflow: false,
-        },
-    },
 };

@@ -3,10 +3,30 @@ import classNames from 'classnames';
 
 import './MenuItem.scss';
 
+const defaultProps = {
+    type: 'button',
+    selectable: true,
+    selected: false,
+    disabled: false,
+    renderNotSelected: false,
+    components: {
+        Check: null,
+    },
+};
+
 /**
  * MenuItem component
  */
-export const MenuItem = (props) => {
+export const MenuItem = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         type,
         title,
@@ -134,17 +154,6 @@ MenuItem.propTypes = {
     components: PropTypes.shape({
         Check: PropTypes.func,
     }),
-};
-
-MenuItem.defaultProps = {
-    type: 'button',
-    selectable: true,
-    selected: false,
-    disabled: false,
-    renderNotSelected: false,
-    components: {
-        Check: null,
-    },
 };
 
 MenuItem.selector = '.menu-item';

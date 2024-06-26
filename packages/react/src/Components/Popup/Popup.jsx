@@ -2,16 +2,34 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+// Common hooks
 import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.js';
 
+// Common components
 import { CloseButton } from '../CloseButton/CloseButton.jsx';
 
 import './Popup.scss';
 
+const defaultProps = {
+    className: null,
+    title: null,
+    footer: null,
+    closeButton: false,
+    show: false,
+    nodim: false,
+    scrollMessage: false,
+    onClose: null,
+};
+
 /**
  * Popup component
  */
-export const Popup = (props) => {
+export const Popup = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const attrs = {
         id: props.id,
     };
@@ -78,15 +96,4 @@ Popup.propTypes = {
         PropTypes.elementType,
     ]),
     container: PropTypes.object,
-};
-
-Popup.defaultProps = {
-    className: null,
-    title: null,
-    footer: null,
-    closeButton: false,
-    show: false,
-    nodim: false,
-    scrollMessage: false,
-    onClose: null,
 };

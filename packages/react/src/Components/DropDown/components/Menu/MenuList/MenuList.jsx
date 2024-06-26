@@ -10,7 +10,3 @@ export const DropDownMenuList = (props) => (
 DropDownMenuList.propTypes = {
     ...MenuList.propTypes,
 };
-
-DropDownMenuList.defaultProps = {
-    ...MenuList.defaultProps,
-};

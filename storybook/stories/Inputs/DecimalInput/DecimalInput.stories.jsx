@@ -1,19 +1,29 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { DecimalInput } from '@jezvejs/react';
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
+import { useInputState } from '../../../hooks/useInputState.js';
 
 const TempInputDecorator = (Story) => (
     <div>
-        <div style={{ marginBottom: '1rem' }} >
-            <Story />
-        </div>
-        <input className="input tmp-input" placeholder="Temporary input" type="text" />
+        <Story />
+        <SectionControls>
+            <input className="input tmp-input" placeholder="Temporary input" type="text" />
+        </SectionControls>
     </div>
 );
 
+const InputWithState = (props) => {
+    const { inputProps } = useInputState(props);
+
+    return (
+        <DecimalInput {...inputProps} />
+    );
+};
+
 export default {
     title: 'Input/DecimalInput',
-    component: DecimalInput,
+    component: InputWithState,
     parameters: {
         layout: 'centered',
     },
@@ -31,8 +41,8 @@ export const Default = {
         };
 
         return (
-            <form style={{ marginBottom: '1rem' }} onSubmit={onSubmit}>
-                <DecimalInput {...args} />
+            <form onSubmit={onSubmit}>
+                <InputWithState {...args} />
                 <input type="submit" hidden />
             </form>
         );

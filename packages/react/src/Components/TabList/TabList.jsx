@@ -2,15 +2,25 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { Menu, MenuList } from '../Menu/Menu.jsx';
+import { MenuProps, MenuList, MenuHelpers } from '../Menu/Menu.jsx';
 
 import { selectItem } from './helpers.js';
 import './TabList.scss';
 
+const defaultProps = {
+    items: [],
+    selectedId: null,
+};
+
 /**
  * Tabs list component
  */
-export const TabList = (props) => {
+export const TabList = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const { items } = props;
     let { selectedId } = props;
     if (items.length === 0) {
@@ -20,7 +30,6 @@ export const TabList = (props) => {
     }
 
     const initialState = selectItem({
-        ...TabList.defaultProps,
         ...props,
     }, selectedId);
     const [state, setState] = useState(initialState);
@@ -31,18 +40,24 @@ export const TabList = (props) => {
 
     const tabContentItem = state.items.find((item) => item.id === state.selectedId);
 
+    const menuDefaultProps = MenuProps.getDefaultProps();
+
+    const listProps = {
+        ...props,
+        className: 'tab-list_header',
+        items: MenuHelpers.createItems(state.items, state),
+        getItemProps: MenuHelpers.getItemProps,
+        onItemClick: onChange,
+        components: {
+            ...menuDefaultProps.components,
+        },
+    };
+
     return (
         <div
             className={classNames('tab-list', props.className)}
         >
-            <MenuList
-                className='tab-list_header'
-                items={state.items}
-                onItemClick={onChange}
-                components={{
-                    ...Menu.defaultProps.components,
-                }}
-            />
+            <MenuList {...listProps} />
             <div className='tab-list__content'>{tabContentItem?.content}</div>
         </div>
     );
@@ -66,9 +81,4 @@ TabList.propTypes = {
             PropTypes.elementType,
         ]),
     })),
-};
-
-TabList.defaultProps = {
-    items: [],
-    selectedId: null,
 };

@@ -51,8 +51,26 @@ DatePickerYearRangeItem.propTypes = {
     focusable: PropTypes.bool,
 };
 
+const defaultProps = {
+    renderHeader: false,
+    header: null,
+    focusable: false,
+    components: {
+        Header: null,
+    },
+};
+
 // eslint-disable-next-line react/display-name
-export const DatePickerYearRangeView = forwardRef((props, ref) => {
+export const DatePickerYearRangeView = forwardRef((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         date,
         locales,
@@ -69,6 +87,7 @@ export const DatePickerYearRangeView = forwardRef((props, ref) => {
     // year range header
     const header = props.renderHeader && (
         <Header
+            {...(props.header ?? {})}
             locales={locales}
             title={title}
             focusable={focusable}
@@ -118,13 +137,4 @@ DatePickerYearRangeView.propTypes = {
     components: PropTypes.shape({
         Header: PropTypes.func,
     }),
-};
-
-DatePickerYearRangeView.defaultProps = {
-    renderHeader: false,
-    header: null,
-    focusable: false,
-    components: {
-        Header: null,
-    },
 };

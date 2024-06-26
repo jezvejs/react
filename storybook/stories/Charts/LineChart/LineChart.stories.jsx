@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { useState } from 'react';
-import { Histogram, px } from '@jezvejs/react';
+import { LineChart, px } from '@jezvejs/react';
 
 import {
     chartData,
@@ -16,33 +16,34 @@ import {
     negPosData,
     posData,
     singleNegData,
-} from '../../assets/data/index.js';
-import { largeData } from '../../assets/data/largeData.js';
+} from '../../../assets/data/index.js';
+import { largeData } from '../../../assets/data/largeData.js';
 
 // Global components
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
-import { ChartCategoriesPopup } from '../../Components/ChartCategoriesPopup/ChartCategoriesPopup.jsx';
-import { ChartCustomLegend } from '../../Components/ChartCustomLegend/ChartCustomLegend.jsx';
-import { ChartMultiColumnPopup } from '../../Components/ChartMultiColumnPopup/ChartMultiColumnPopup.jsx';
-import { RadioFieldset } from '../../Components/RadioFieldset/RadioFieldset.jsx';
-import { RangeInputField } from '../../Components/RangeInputField/RangeInputField.jsx';
+import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
+import { ChartCustomLegend } from '../../../Components/ChartCustomLegend/ChartCustomLegend.jsx';
+import { ChartMultiColumnPopup } from '../../../Components/ChartMultiColumnPopup/ChartMultiColumnPopup.jsx';
+import { RadioFieldset } from '../../../Components/RadioFieldset/RadioFieldset.jsx';
+import { RangeInputField } from '../../../Components/RangeInputField/RangeInputField.jsx';
+
+// Common components
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
 // Local components
-import { CustomActiveGroup } from './components/CustomActiveGroup/CustomActiveGroup.jsx';
+import { CustomLineChartActiveGroup } from './components/CustomActiveGroup/CustomLineChartActiveGroup.jsx';
 
 import {
-    chartGroupedCategoriesData,
-    chartGroupedData,
+    eurData,
     gapData,
     legendCategoriesData,
     maxColumnWidthData,
 } from './data.js';
 import { formatAsUSD, formatDecimalValue } from './helpers.js';
-import './Histogram.stories.scss';
+import './LineChart.stories.scss';
 
 export default {
-    title: 'Charts/Histogram',
-    component: Histogram,
+    title: 'Charts/LineChart',
+    component: LineChart,
     parameters: {
         layout: 'fullscreen',
     },
@@ -96,11 +97,11 @@ export const Default = {
 
         return (
             <>
-                <Histogram {...chartProps} />
-                <div className="section-controls">
+                <LineChart {...chartProps} />
+                <SectionControls>
                     <RangeInputField {...colWidthProps} />
                     <RangeInputField {...grGapProps} />
-                </div>
+                </SectionControls>
             </>
         );
     },
@@ -170,27 +171,15 @@ export const AutoHeight = {
 
         return (
             <>
-                <div className="section-controls">
+                <SectionControls>
                     <RangeInputField {...heightProps} />
-                </div>
+                </SectionControls>
                 <div {...wrapperProps}>
-                    <Histogram {...chartProps} />
+                    <LineChart {...chartProps} />
                 </div>
             </>
         );
     },
-};
-
-/**
- * 'maxColumnWidth' option
- */
-export const MaxColumnWidth = {
-    args: {
-        data: maxColumnWidthData,
-        maxColumnWidth: 75,
-        fitToWidth: true,
-    },
-    decorators: [chartContainerDecorator],
 };
 
 const xAxisMap = {
@@ -274,12 +263,12 @@ export const ChartAxes = {
 
         return (
             <div>
-                <Histogram {...chartProps} />
-                <div className="section-controls">
+                <LineChart {...chartProps} />
+                <SectionControls>
                     {items.map((item) => (
                         <RadioFieldset {...item} key={item.radioName} />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },
@@ -298,12 +287,14 @@ export const XAxisGrid = {
 };
 
 /**
- * 'autoScale' option
+ * 'autoScale' and 'drawNodeCircles' options
  */
 export const AutoScale = {
     args: {
-        data: chartData2,
+        data: eurData,
         autoScale: true,
+        autoScaleTimeout: 0,
+        drawNodeCircles: true,
         className: 'histogram_autoscale',
     },
     decorators: [chartContainerDecorator],
@@ -321,26 +312,29 @@ export const Callbacks = {
         autoScale: true,
         animate: true,
         showPopupOnClick: true,
-        activateOnClick: true,
         renderPopup: (target) => formatAsUSD(target.item.value),
         renderXAxisLabel: formatDecimalValue,
         renderYAxisLabel: formatDecimalValue,
+        activateOnHover: true,
     },
     decorators: [chartContainerDecorator],
 };
 
 /**
- * Multi column + Legend + 'showPopupOnHover' and 'activateOnHover' options
+ * Multiple series + Legend + 'showPopupOnHover' and 'activateOnHover' options
  */
-export const MultiColumn = {
+export const MultipleSeries = {
     args: {
         data: chartMultiData,
         height: 320,
         marginTop: 35,
         autoScale: true,
-        showPopupOnHover: true,
+        showPopupOnClick: true,
         activateOnHover: true,
         showLegend: true,
+        components: {
+            ChartPopup: ChartMultiColumnPopup,
+        },
     },
     decorators: [chartContainerDecorator],
 };
@@ -396,12 +390,12 @@ export const AlignColumns = {
 
         return (
             <div>
-                <Histogram {...chartProps} />
-                <div className="section-controls">
+                <LineChart {...chartProps} />
+                <SectionControls>
                     {items.map((item) => (
-                        <RadioFieldset {...item} key={item.id} />
+                        <RadioFieldset {...item} key={item.radioName} />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },
@@ -438,7 +432,7 @@ export const CustomActiveGroupComponent = {
         activateOnClick: true,
         activateOnHover: true,
         components: {
-            ActiveGroup: CustomActiveGroup,
+            ActiveGroup: CustomLineChartActiveGroup,
         },
     },
     decorators: [chartContainerDecorator],
@@ -479,60 +473,6 @@ export const StackedNegative = {
         components: {
             Legend: ChartCustomLegend,
             ChartPopup: ChartMultiColumnPopup,
-        },
-    },
-    decorators: [chartContainerDecorator],
-};
-
-/**
- * Stacked and grouped + 'animatePopup' and 'pinPopupOnClick' options
- */
-export const StackedGrouped = {
-    args: {
-        data: chartGroupedData,
-        height: 320,
-        marginTop: 35,
-        columnWidth: 25,
-        groupsGap: 15,
-        columnGap: 2,
-        autoScale: true,
-        showPopupOnClick: true,
-        activateOnClick: true,
-        activateOnHover: true,
-        animatePopup: true,
-        pinPopupOnClick: true,
-        showLegend: true,
-        components: {
-            Legend: ChartCustomLegend,
-            ChartPopup: ChartMultiColumnPopup,
-        },
-    },
-    decorators: [chartContainerDecorator],
-};
-
-/**
- * Stacked and grouped with custom categories.
- * 'showPopupOnHover', 'animatePopup' and 'pinPopupOnClick' options
- */
-export const StackedCategories = {
-    args: {
-        data: chartGroupedCategoriesData,
-        height: 320,
-        marginTop: 35,
-        columnWidth: 25,
-        groupsGap: 15,
-        columnGap: 2,
-        autoScale: true,
-        showPopupOnClick: true,
-        showPopupOnHover: true,
-        animatePopup: true,
-        pinPopupOnClick: true,
-        activateOnClick: true,
-        activateOnHover: true,
-        showLegend: true,
-        components: {
-            Legend: ChartCustomLegend,
-            ChartPopup: ChartCategoriesPopup,
         },
     },
     decorators: [chartContainerDecorator],
@@ -616,10 +556,6 @@ export const SetData = {
             title: 'Stacked',
             data: chartStackedData,
         }, {
-            id: 'stackedGroupedDataBtn',
-            title: 'Stacked and grouped',
-            data: chartGroupedCategoriesData,
-        }, {
             id: 'largeDataBtn',
             title: 'Large data set',
             data: largeData,
@@ -636,8 +572,8 @@ export const SetData = {
 
         return (
             <div>
-                <Histogram {...chartProps} />
-                <div className="section-controls">
+                <LineChart {...chartProps} />
+                <SectionControls>
                     {items.map((item) => (
                         <ActionButton
                             {...item}
@@ -645,7 +581,7 @@ export const SetData = {
                             key={item.id}
                         />
                     ))}
-                </div>
+                </SectionControls>
             </div>
         );
     },

@@ -1,11 +1,20 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { Input } from '@jezvejs/react';
+import { useInputState } from '../../../hooks/useInputState.js';
 import './Input.stories.scss';
+
+const InputWithState = (props) => {
+    const { inputProps } = useInputState(props);
+
+    return (
+        <Input {...inputProps} />
+    );
+};
 
 export default {
     title: 'Input/Input',
-    component: Input,
+    component: InputWithState,
     parameters: {
         layout: 'centered',
     },

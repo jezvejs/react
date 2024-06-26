@@ -19,7 +19,25 @@ const isAvailableItem = (item, state) => {
     return true;
 };
 
-export const CollapsibleGroupsSelect = (props) => {
+const defaultProps = {
+    allowActiveGroupHeader: true,
+    components: {
+        Menu: DropDownCollapsibleGroupsMenu,
+        GroupHeader: DropDownCollapsibleMenuGroupHeader,
+        GroupItem: DropDownCollapsibleMenuGroupItem,
+    },
+};
+
+export const CollapsibleGroupsSelect = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const onGroupHeaderClick = ({ item, dispatch }) => {
         dispatch(actions.toggleGroup(item.id));
     };
@@ -37,15 +55,4 @@ export const CollapsibleGroupsSelect = (props) => {
 
 CollapsibleGroupsSelect.propTypes = {
     ...DropDown.propTypes,
-};
-
-CollapsibleGroupsSelect.defaultProps = {
-    ...DropDown.defaultProps,
-    allowActiveGroupHeader: true,
-    components: {
-        ...DropDown.defaultProps.components,
-        Menu: DropDownCollapsibleGroupsMenu,
-        GroupHeader: DropDownCollapsibleMenuGroupHeader,
-        GroupItem: DropDownCollapsibleMenuGroupItem,
-    },
 };

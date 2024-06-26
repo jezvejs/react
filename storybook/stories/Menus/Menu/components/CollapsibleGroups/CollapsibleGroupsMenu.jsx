@@ -50,7 +50,3 @@ export const CollapsibleGroupsMenu = (props) => {
 CollapsibleGroupsMenu.propTypes = {
     ...Menu.propTypes,
 };
-
-CollapsibleGroupsMenu.defaultProps = {
-    ...Menu.defaultProps,
-};

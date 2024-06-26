@@ -11,7 +11,7 @@ import './CloseButton.scss';
 /**
  * CloseButton component
  */
-export const CloseButton = ({ small, ...props }) => (
+export const CloseButton = ({ small = true, ...props }) => (
     <Button
         {...props}
         className={classNames('close-btn', props.className)}
@@ -22,9 +22,4 @@ export const CloseButton = ({ small, ...props }) => (
 CloseButton.propTypes = {
     ...Button.propTypes,
     small: PropTypes.bool,
-};
-
-CloseButton.defaultProps = {
-    ...Button.defaultProps,
-    small: true,
 };

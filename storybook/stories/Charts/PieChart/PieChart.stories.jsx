@@ -3,7 +3,9 @@ import '@jezvejs/react/style';
 import { useState } from 'react';
 import { PieChart } from '@jezvejs/react';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+// Common components
+import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
 import './PieChart.stories.scss';
 
@@ -201,7 +203,7 @@ export const NoData = {
             <div>
                 <PieChart {...chartProps} />
 
-                <div className="section-controls">
+                <SectionControls>
                     <ActionButton
                         title="Set no data"
                         onClick={setNoData}
@@ -210,7 +212,7 @@ export const NoData = {
                         title="Set data"
                         onClick={setData}
                     />
-                </div>
+                </SectionControls>
             </div>
         );
     },

@@ -13,7 +13,7 @@ export const toCSSValue = (val) => (+val.toFixed(4));
 
 /** Returns initial state object for specified props */
 export const getInitialState = (props, defaultProps) => {
-    const { mode } = props;
+    const mode = props.mode ?? defaultProps?.mode;
     if (!(mode in viewTypesMap)) {
         throw new Error('Invalid mode');
     }
@@ -22,6 +22,7 @@ export const getInitialState = (props, defaultProps) => {
         ...(defaultProps ?? {}),
         ...props,
         visible: !!props.inline,
+        fixed: false,
         viewType: viewTypesMap[mode],
         date: isDate(props.date) ? props.date : new Date(),
         curRange: { start: null, end: null },
@@ -29,6 +30,10 @@ export const getInitialState = (props, defaultProps) => {
         actDate: null,
         transition: null,
         secondViewTransition: false,
+        position: {
+            ...(defaultProps?.position ?? {}),
+            ...(props.position ?? {}),
+        },
         components: {
             ...(defaultProps?.components ?? {}),
             ...props.components,
@@ -131,3 +136,16 @@ export const getHeaderTitle = (state) => {
 export const getComponentHeight = (component) => (
     component?.offsetHeight ?? 0
 );
+
+/**
+ * Check specified date is in range
+ * @param {Date} date - date to check
+ * @param {object} range - date range object
+ */
+export const inRange = (date, range) => {
+    if (!isDate(date) || !isDate(range?.start) || !isDate(range?.end)) {
+        return false;
+    }
+
+    return (date - range.start >= 0 && date - range.end <= 0);
+};

@@ -1,15 +1,23 @@
 import PropTypes from 'prop-types';
-
-import { DropDownClearButton } from '../ClearButton/ClearButton.jsx';
-import { DropDownToggleButton } from '../ToggleButton/ToggleButton.jsx';
-
 import { componentPropType, getSelectedItems } from '../../../helpers.js';
+import { comboControlsDefaultProps } from '../../../comboControlsDefaultProps.js';
 import './ComboBoxControls.scss';
+
+const defaultProps = comboControlsDefaultProps;
 
 /**
  * Combo box controls container
  */
-export const DropDownComboBoxControls = (props) => {
+export const DropDownComboBoxControls = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         disabled,
         showToggleButton,
@@ -54,18 +62,4 @@ DropDownComboBoxControls.propTypes = {
         ToggleButton: componentPropType,
         ClearButton: componentPropType,
     }),
-};
-
-DropDownComboBoxControls.defaultProps = {
-    multiple: false,
-    disabled: false,
-    showClearButton: true,
-    showToggleButton: true,
-    actSelItemIndex: -1,
-    onClearSelection: null,
-    onToggle: null,
-    components: {
-        ToggleButton: DropDownToggleButton,
-        ClearButton: DropDownClearButton,
-    },
 };

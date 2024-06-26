@@ -10,7 +10,21 @@ import PropTypes from 'prop-types';
 
 import { ControlledInput } from '../ControlledInput/ControlledInput.jsx';
 
-export const DecimalInput = (props) => {
+const defaultProps = {
+    value: '',
+    min: null,
+    max: null,
+    digits: undefined,
+    allowNegative: true,
+    allowMultipleLeadingZeros: false,
+};
+
+export const DecimalInput = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const isValidValue = (value) => {
         if (value === '') {
             return true;
@@ -64,6 +78,8 @@ export const DecimalInput = (props) => {
         onBlur: props.onBlur,
         onChange: props.onChange,
         id: props.id,
+        className: props.className,
+        value: props.value,
     };
 
     return (
@@ -80,13 +96,4 @@ DecimalInput.propTypes = {
     digits: PropTypes.number,
     allowNegative: PropTypes.bool,
     allowMultipleLeadingZeros: PropTypes.bool,
-};
-
-DecimalInput.defaultProps = {
-    ...ControlledInput.defaultProps,
-    min: null,
-    max: null,
-    digits: undefined,
-    allowNegative: true,
-    allowMultipleLeadingZeros: false,
 };

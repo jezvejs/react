@@ -30,7 +30,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
     } = store;
 
     useEffect(() => {
-        props?.onStoreReady(store);
+        props?.onStoreReady?.(store);
     }, [store]);
 
     const innerRef = useRef(null);

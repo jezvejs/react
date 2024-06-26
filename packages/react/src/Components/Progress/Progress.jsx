@@ -3,10 +3,20 @@ import classNames from 'classnames';
 
 import './Progress.scss';
 
+const defaultProps = {
+    disabled: false,
+    value: 0,
+};
+
 /**
  * Progress component
  */
-export const Progress = (props) => {
+export const Progress = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         className,
         value,
@@ -33,9 +43,4 @@ Progress.propTypes = {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     value: PropTypes.number,
-};
-
-Progress.defaultProps = {
-    disabled: false,
-    value: 0,
 };

@@ -5,10 +5,31 @@ import { componentPropType, getSelectedItems } from '../../../helpers.js';
 
 import './MenuHeader.scss';
 
+const defaultProps = {
+    inputRef: null,
+    inputString: '',
+    inputPlaceholder: null,
+    useSingleSelectionAsPlaceholder: true,
+    multiple: false,
+    onInput: null,
+    components: {
+        Input: null,
+    },
+};
+
 /**
  * Custom Menu header with Input component
  */
-export const DropDownMenuHeader = (props) => {
+export const DropDownMenuHeader = (p) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+        components: {
+            ...defaultProps.components,
+            ...(p?.components ?? {}),
+        },
+    };
+
     const {
         onInput,
         disabled,
@@ -52,16 +73,4 @@ DropDownMenuHeader.propTypes = {
     components: PropTypes.shape({
         Input: componentPropType,
     }),
-};
-
-DropDownMenuHeader.defaultProps = {
-    inputRef: null,
-    inputString: '',
-    inputPlaceholder: null,
-    useSingleSelectionAsPlaceholder: true,
-    multiple: false,
-    onInput: null,
-    components: {
-        Input: null,
-    },
 };
