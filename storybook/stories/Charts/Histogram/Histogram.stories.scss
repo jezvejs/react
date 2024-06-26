@@ -1,6 +1,6 @@
 @use "sass:list";
 
-@use "../../assets/colors/colors";
+@use "../../../assets/colors/colors";
 
 .histogram {
   @for $i from 1 through list.length(colors.$colors) {

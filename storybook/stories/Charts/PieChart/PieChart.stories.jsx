@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { PieChart } from '@jezvejs/react';
 
 // Common components
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
-import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
+import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
 
 import './PieChart.stories.scss';
 
