@@ -178,6 +178,14 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         dispatch(actions.clearSelection());
     };
 
+    const setDisabledDateFilter = (disabledDateFilter) => {
+        if (state.waitingForAnimation) {
+            return;
+        }
+
+        dispatch(actions.setDisabledDateFilter(disabledDateFilter));
+    };
+
     /** Range select inner callback */
     const onRangeSelect = (date) => {
         if (state.waitingForAnimation) {
@@ -356,6 +364,11 @@ export const DatePickerContainer = forwardRef((props, ref) => {
             setSelection(props.startDate, props.endDate);
         }
     }, [props.startDate, props.endDate]);
+
+    // Update disabled date filter
+    useEffect(() => {
+        setDisabledDateFilter(props.disabledDateFilter);
+    }, [props.disabledDateFilter]);
 
     const currentDate = (state.doubleView && state.secondViewTransition)
         ? getPrevViewDate(state.date, state.viewType)

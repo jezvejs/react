@@ -11,7 +11,7 @@ import { DatePickerInputGroup } from './components/DatePickerInputGroup/DatePick
 import { DateInputGroup } from './components/DateInputGroup/DateInputGroup.jsx';
 
 import './DatePicker.stories.scss';
-import { formatDateRange, formatDates } from './helpers.js';
+import { disabledOutsideRange, formatDateRange, formatDates } from './helpers.js';
 import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
 
 export default {
@@ -462,6 +462,86 @@ export const SetSelection = {
                         id="clearSelectionBtn"
                         title="Clear"
                         onClick={onClear}
+                    />
+                </SectionControls>
+            </div>
+        );
+    },
+};
+
+export const DisabledDateFilter = {
+    args: {
+        range: true,
+        startDate: new Date(Date.UTC(2010, 1, 10)),
+        disabledDateFilter: disabledOutsideRange,
+        position: {
+            margin: 5,
+            screenPadding: 5,
+        },
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const {
+            inputId = null,
+            ...rest
+        } = args;
+
+        const [state, setState] = useState({
+            value: '',
+            open: false,
+            startDate: rest.startDate,
+            endDate: rest.endDate,
+            disabledDateFilter: rest.disabledDateFilter,
+        });
+
+        const onSetDisabled = () => {
+            setState((prev) => ({
+                ...prev,
+                disabledDateFilter: disabledOutsideRange,
+            }));
+        };
+
+        const onClearDisabled = () => {
+            setState((prev) => ({
+                ...prev,
+                disabledDateFilter: null,
+            }));
+        };
+
+        const inputProps = {
+            id: inputId,
+            value: state.value,
+            onButtonClick: () => {
+                setState((prev) => ({ ...prev, open: !prev.open }));
+            },
+        };
+
+        const datePickerProps = {
+            ...rest,
+            visible: state.open,
+            startDate: state.startDate,
+            endDate: state.endDate,
+            disabledDateFilter: state.disabledDateFilter,
+            onRangeSelect: (range) => {
+                setState((prev) => ({ ...prev, value: formatDateRange(range) }));
+            },
+        };
+
+        return (
+            <div>
+                <DatePicker {...datePickerProps} >
+                    <DateInputGroup {...inputProps} />
+                </DatePicker>
+                <SectionControls>
+                    <ActionButton
+                        id="setSelectionBtn"
+                        title="Set disabled days"
+                        onClick={onSetDisabled}
+                    />
+                    <ActionButton
+                        id="clearSelectionBtn"
+                        title="Clear disabled days"
+                        onClick={onClearDisabled}
                     />
                 </SectionControls>
             </div>

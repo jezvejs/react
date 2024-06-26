@@ -26,6 +26,7 @@ const DatePickerMonthViewItem = (props) => {
         isRangeStart,
         isRangeEnd,
         isToday,
+        disabled,
         focusable,
         showOtherMonthDays,
     } = props;
@@ -44,6 +45,7 @@ const DatePickerMonthViewItem = (props) => {
                 'dp__cell_hl-range-end': !!isRangeEnd,
             },
         ),
+        disabled,
     };
 
     if (showOtherMonthDays || !isOtherMonth) {
