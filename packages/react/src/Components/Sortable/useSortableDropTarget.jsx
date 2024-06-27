@@ -96,6 +96,7 @@ export function useSortableDropTarget(props) {
             const targetParentZone = targetDragZone.itemIdFromElem(parentElem);
             let parentId = targetParentZone ?? targetZoneId;
 
+            let animateElems = [];
             let swapWithPlaceholder = false;
 
             // check drop target is already a placeholder
@@ -118,8 +119,10 @@ export function useSortableDropTarget(props) {
                 targetId = null;
             } else if (dragZoneBeforeTarget && !dragZoneContainsTarget) {
                 /* drag zone element is before new drop target */
+                animateElems = this.getMovingItems(dragZoneElem, newTargetElem);
             } else if (dragZoneAfterTarget && !dragZoneContainsTarget) {
                 /* drag zone element is after new drop target */
+                animateElems = this.getMovingItems(dragZoneElem, newTargetElem);
             }
 
             // Skip move item to parent container without target item
@@ -141,7 +144,50 @@ export function useSortableDropTarget(props) {
                 targetZoneId,
                 parentId,
                 swapWithPlaceholder,
+                animateElems,
             });
+        },
+
+        getMovingItems(sourceEl, targetEl) {
+            if (!sourceEl || !targetEl || !props.animated) {
+                return [];
+            }
+
+            const nodeCmp = comparePosition(sourceEl, targetEl);
+            const sourceAfterTarget = hasFlag(nodeCmp, 2);
+            const sourceBeforeTarget = hasFlag(nodeCmp, 4);
+            if (!sourceAfterTarget && !sourceBeforeTarget) {
+                return [];
+            }
+
+            const res = [];
+            const lastElem = (sourceBeforeTarget) ? targetEl : sourceEl;
+            let elem = (sourceBeforeTarget) ? sourceEl : targetEl;
+            let prevItem = null;
+
+            while (elem) {
+                const item = {
+                    id: elem.dataset.id,
+                    rect: elem.getBoundingClientRect(),
+                };
+
+                if (prevItem) {
+                    item.targetRect = DOMRect.fromRect(prevItem.rect);
+                }
+
+                res.push(item);
+                prevItem = item;
+                if (elem === lastElem) {
+                    break;
+                }
+
+                elem = elem.nextElementSibling;
+            }
+
+            const [firstItem] = res;
+            firstItem.targetRect = DOMRect.fromRect(prevItem.rect);
+
+            return res;
         },
 
         finishDrag() {

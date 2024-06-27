@@ -1,5 +1,12 @@
 import { isFunction, asArray } from '@jezvejs/types';
 
+export const AnimationStages = {
+    entering: 1,
+    entered: 2,
+    exiting: 3,
+    exited: 4,
+};
+
 /**
  * Searches for first tree item for which callback function return true
  *
@@ -158,6 +165,16 @@ export const filterTreeItems = (items, callback) => {
 
     return res;
 };
+
+/**
+ * Returns list items for specified drag zone
+ * @param {string} dragZoneId
+ * @param {object} state
+ * @returns {object}
+ */
+export const getDragZone = (dragZoneId, state) => (
+    state[dragZoneId]
+);
 
 /**
  * Returns list items for specified drag zone

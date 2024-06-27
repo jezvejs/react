@@ -8,6 +8,7 @@ export const SortableListItem = forwardRef((props, ref) => {
     const itemProps = {
         className: classNames('sortable-list-item', props.className),
         'data-id': props.id,
+        style: props.style,
     };
 
     if (props.group) {
@@ -26,4 +27,5 @@ SortableListItem.propTypes = {
     group: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
+    style: PropTypes.object,
 };
