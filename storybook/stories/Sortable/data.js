@@ -2,12 +2,12 @@ import TileCardIcon from '../../assets/icons/tile-card.svg';
 import { initItems } from '../../utils/utils.js';
 
 export const getTiles = () => ([
-    { id: '1', title: 'Item 1' },
-    { id: '2', placeholder: true },
-    { id: '3', title: 'Item 3', icon: TileCardIcon },
-    { id: '4', title: 'Item 4' },
-    { id: '5', title: 'Item 5' },
-    { id: '6', title: 'Item 6' },
+    { id: 'tile_1', title: 'Item 1' },
+    { id: 'tile_2', placeholder: true },
+    { id: 'tile_3', title: 'Item 3', icon: TileCardIcon },
+    { id: 'tile_4', title: 'Item 4' },
+    { id: 'tile_5', title: 'Item 5' },
+    { id: 'tile_6', title: 'Item 6' },
 ]);
 
 export const getListItems = () => (

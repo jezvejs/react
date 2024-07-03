@@ -135,6 +135,7 @@ export const SortableListItem = forwardRef((props, ref) => {
     const isExiting = animation.stage === AnimationStages.exiting;
 
     const listItemProps = useMemo(() => ({
+        ...props,
         id: props.id,
         group: props.group,
         title: props.title,
