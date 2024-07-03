@@ -22,6 +22,8 @@ export const SortableListItem = forwardRef((props, ref) => {
     );
 });
 
+SortableListItem.selector = '.sortable-list-item';
+
 SortableListItem.propTypes = {
     id: PropTypes.string,
     group: PropTypes.string,

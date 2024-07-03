@@ -90,6 +90,11 @@ export function useSortableDragZone(props) {
             return props?.placeholderClass ?? null;
         },
 
+        /** Returns CSS class for animated element */
+        getAnimatedClass() {
+            return props?.animatedClass ?? null;
+        },
+
         /** Returns selector for sortable item element */
         getItemSelector() {
             return props?.selector ?? null;

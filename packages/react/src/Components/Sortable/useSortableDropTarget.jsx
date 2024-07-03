@@ -1,15 +1,22 @@
-import { comparePosition } from '@jezvejs/dom';
 import { isFunction } from '@jezvejs/types';
 import { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import { DragMaster, useDragnDrop, useDropTarget } from '../../utils/DragnDrop/index.js';
-import { hasFlag } from '../../utils/common.js';
+import {
+    findTreeItemIndexById,
+    getAnimationBox,
+    getDragZone,
+    getNextZoneItems,
+    getTreeItemById,
+    isTreeContains,
+} from './helpers.js';
 
 export function useSortableDropTarget(props) {
+    const prevTargetElem = useRef(null);
     const targetElem = useRef(null);
 
-    const { getState } = useDragnDrop();
+    const { getState, setState } = useDragnDrop();
 
     const dropTarget = useDropTarget({
         ...props,
@@ -57,11 +64,14 @@ export function useSortableDropTarget(props) {
 
         onDragMove(avatar, e) {
             const newTargetElem = this.getTargetElem(avatar, e);
-            if (!newTargetElem || targetElem.current === newTargetElem) {
+            if (targetElem.current === newTargetElem) {
                 return;
             }
 
             this.applyNewTarget(avatar, newTargetElem);
+            if (!newTargetElem) {
+                return;
+            }
 
             const dragMaster = DragMaster.getInstance();
             const { dragZone } = dragMaster;
@@ -79,14 +89,21 @@ export function useSortableDropTarget(props) {
                 return;
             }
 
-            const nodeCmp = comparePosition(newTargetElem, dragZoneElem);
-            if (!nodeCmp) {
+            if (!prevTargetElem.current) {
+                prevTargetElem.current = dragZoneElem;
+            }
+
+            const state = getState();
+            if (!state.origSortPos || !state.sortPosition) {
                 return;
             }
 
-            const dragZoneBeforeTarget = hasFlag(nodeCmp, 2);
-            const dragZoneAfterTarget = hasFlag(nodeCmp, 4);
-            const dragZoneContainsTarget = hasFlag(nodeCmp, 8);
+            const sourceId = state.origSortPos.id ?? null;
+            const sourceZoneId = state.sortPosition.zoneId ?? null;
+            if (sourceId === null || sourceZoneId === null) {
+                return;
+            }
+
             const { containerSelector } = dragZone;
             const targetContainer = newTargetElem.querySelector(containerSelector);
 
@@ -96,15 +113,33 @@ export function useSortableDropTarget(props) {
             const targetParentZone = targetDragZone.itemIdFromElem(parentElem);
             let parentId = targetParentZone ?? targetZoneId;
 
+            const sourceZoneItems = getNextZoneItems(sourceZoneId, state);
+            const sourceIndex = findTreeItemIndexById(sourceZoneItems, sourceId);
+
+            const targetZoneItems = getNextZoneItems(targetZoneId, state);
+            const targetIndex = findTreeItemIndexById(targetZoneItems, targetId);
+
+            const isSameParent = (
+                state.origSortPos.parentId === state.sortPosition.parentId
+                && state.origSortPos.zoneId === state.sortPosition.zoneId
+            );
+
+            const dragZoneBeforeTarget = isSameParent && sourceIndex < targetIndex;
+            const dragZoneAfterTarget = isSameParent && sourceIndex > targetIndex;
+            const dragZoneContainsTarget = isTreeContains(sourceId, targetId, sourceZoneItems);
+            const targetContainsDragZone = isTreeContains(targetId, sourceId, targetZoneItems);
+
+            const isPlaceholder = newTargetElem.classList.contains(dragZone.getPlaceholder());
+
             let animateElems = [];
             let swapWithPlaceholder = false;
 
             // check drop target is already a placeholder
-            if (newTargetElem.classList.contains(dragZone.getPlaceholder())) {
+            if (isPlaceholder) {
                 // swap drag zone with drop target
                 swapWithPlaceholder = true;
             } else if (
-                dragZoneElem.parentNode !== newTargetElem.parentNode
+                prevTargetElem.current?.parentNode !== newTargetElem.parentNode
                 && !dragZoneContainsTarget
             ) {
                 // move between containers
@@ -117,30 +152,34 @@ export function useSortableDropTarget(props) {
                 /* new target element has empty container */
                 parentId = targetId;
                 targetId = null;
-            } else if (dragZoneBeforeTarget && !dragZoneContainsTarget) {
-                /* drag zone element is before new drop target */
-                animateElems = this.getMovingItems(dragZoneElem, newTargetElem);
-            } else if (dragZoneAfterTarget && !dragZoneContainsTarget) {
-                /* drag zone element is after new drop target */
-                animateElems = this.getMovingItems(dragZoneElem, newTargetElem);
+            } else if (
+                (dragZoneBeforeTarget || dragZoneAfterTarget)
+                && !dragZoneContainsTarget
+                && !targetContainsDragZone
+            ) {
+                animateElems = this.getMovingItems(
+                    sourceIndex,
+                    targetIndex,
+                    targetZoneId,
+                    parentId,
+                );
             }
 
-            // Skip move item to parent container without target item
-            // if current target item is already at this container
-            const state = getState();
             if (
-                targetId === null
-                && state.targetId !== null
-                && parentId === state.sortPosition.parentId
-                && targetZoneId === state.sortPosition.zoneId
+                (dragZoneBeforeTarget || dragZoneAfterTarget)
+                && !dragZoneContainsTarget
+                && !targetContainsDragZone
+                && targetId
+                && newTargetElem !== prevTargetElem.current
             ) {
-                return;
+                prevTargetElem.current = newTargetElem;
             }
 
             props.onDragMove?.({
                 avatar,
                 e,
                 targetId,
+                targetIndex,
                 targetZoneId,
                 parentId,
                 swapWithPlaceholder,
@@ -148,44 +187,79 @@ export function useSortableDropTarget(props) {
             });
         },
 
-        getMovingItems(sourceEl, targetEl) {
-            if (!sourceEl || !targetEl || !props.animated) {
+        getItemElementById(id) {
+            return this.elem?.querySelector?.(`[data-id="${id}"]`) ?? null;
+        },
+
+        getMovingItems(sourceIndex, targetIndex, zoneId, parentId) {
+            if (sourceIndex === -1 || targetIndex === -1 || !props.animated) {
                 return [];
             }
 
-            const nodeCmp = comparePosition(sourceEl, targetEl);
-            const sourceAfterTarget = hasFlag(nodeCmp, 2);
-            const sourceBeforeTarget = hasFlag(nodeCmp, 4);
+            const sourceAfterTarget = sourceIndex > targetIndex;
+            const sourceBeforeTarget = sourceIndex < targetIndex;
             if (!sourceAfterTarget && !sourceBeforeTarget) {
                 return [];
             }
 
-            const res = [];
-            const lastElem = (sourceBeforeTarget) ? targetEl : sourceEl;
-            let elem = (sourceBeforeTarget) ? sourceEl : targetEl;
-            let prevItem = null;
-
-            while (elem) {
-                const item = {
-                    id: elem.dataset.id,
-                    rect: elem.getBoundingClientRect(),
-                };
-
-                if (prevItem) {
-                    item.targetRect = DOMRect.fromRect(prevItem.rect);
-                }
-
-                res.push(item);
-                prevItem = item;
-                if (elem === lastElem) {
-                    break;
-                }
-
-                elem = elem.nextElementSibling;
+            const state = getState();
+            const zone = getDragZone(zoneId, state);
+            const parent = (parentId === zoneId)
+                ? zone
+                : getTreeItemById(parentId, zone.next);
+            if (!parent) {
+                return [];
             }
 
-            const [firstItem] = res;
-            firstItem.targetRect = DOMRect.fromRect(prevItem.rect);
+            const res = [];
+
+            const positionCache = zone.positionCache ?? {};
+
+            const parentItems = parent.next ?? parent.items ?? [];
+            const firstIndex = Math.min(sourceIndex, targetIndex);
+            const lastIndex = Math.max(sourceIndex, targetIndex);
+            for (let index = firstIndex; index <= lastIndex; index += 1) {
+                const item = parentItems[index];
+                const elem = this.getItemElementById(item?.id);
+                if (!elem) {
+                    return [];
+                }
+
+                let siblingIndex;
+                if (index === sourceIndex) {
+                    siblingIndex = targetIndex;
+                } else {
+                    siblingIndex = (sourceBeforeTarget)
+                        ? (index - 1)
+                        : (index + 1);
+                }
+                const sibling = parentItems[siblingIndex];
+                const siblingElem = this.getItemElementById(sibling?.id);
+
+                if (!positionCache[index]) {
+                    positionCache[index] = getAnimationBox(elem);
+                }
+                if (!positionCache[siblingIndex]) {
+                    positionCache[siblingIndex] = getAnimationBox(siblingElem);
+                }
+
+                res.push({
+                    id: elem.dataset.id,
+                    index,
+                    zoneId: props.id,
+                    targetId: siblingElem.dataset.id,
+                    rect: positionCache[index],
+                    targetRect: positionCache[siblingIndex],
+                });
+            }
+
+            setState((prev) => ({
+                ...prev,
+                [zoneId]: {
+                    ...prev[zoneId],
+                    positionCache,
+                },
+            }));
 
             return res;
         },
@@ -193,6 +267,8 @@ export function useSortableDropTarget(props) {
         finishDrag() {
             const dragMaster = DragMaster.getInstance();
             const { dragZone } = dragMaster;
+
+            prevTargetElem.current = null;
 
             dragZone.finishDrag();
         },

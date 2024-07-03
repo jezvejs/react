@@ -4,64 +4,123 @@ import {
     forwardRef,
     useEffect,
     useImperativeHandle,
+    useMemo,
     useRef,
+    useState,
 } from 'react';
 import { afterTransition } from '@jezvejs/dom';
 
 import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.jsx';
-
-import { AnimationStages, mapTreeItems } from '../../helpers.js';
+import { AnimationStages } from '../../helpers.js';
 
 // eslint-disable-next-line react/display-name
 export const SortableListItem = forwardRef((props, ref) => {
-    const { placeholderClass, animatedClass } = props;
+    const {
+        placeholderClass,
+        animatedClass,
+    } = props;
 
-    const { setState, getState } = useDragnDrop();
+    const [animation, setAnimation] = useState({
+        stage: AnimationStages.exited,
+        initialTransform: props.initialTransform,
+        offsetTransform: props.offsetTransform,
+    });
+
+    const { getState } = useDragnDrop();
 
     const innerRef = useRef(0);
     useImperativeHandle(ref, () => innerRef.current);
 
-    const removeTransitionHandlerRef = useRef(0);
+    const animationFrameRef = useRef(0);
+    const clearTransitionRef = useRef(0);
 
-    const onAnimationDone = () => {
-        const { zoneId } = props;
+    const setAnimationStage = (stage) => {
+        setAnimation((prev) => ({ ...prev, stage }));
+    };
 
-        setState((prev) => ({
-            ...prev,
-            [zoneId]: {
-                ...prev[zoneId],
-                items: mapTreeItems(prev[zoneId].items, (item) => {
-                    if (item.id !== props.id) {
-                        return item;
-                    }
-
-                    return {
-                        ...item,
-                        animationStage: AnimationStages.exiting,
-                    };
-                }),
-            },
-        }));
+    const setAnimationTransform = ({ initialTransform, offsetTransform }) => {
+        setAnimation((prev) => ({ ...prev, initialTransform, offsetTransform }));
     };
 
     useEffect(() => {
-        if (innerRef.current) {
-            removeTransitionHandlerRef.current = afterTransition(
+        if (
+            animation.initialTransform === props.initialTransform
+            && animation.offsetTransform === props.offsetTransform
+        ) {
+            return;
+        }
+
+        if (props.offsetTransform) {
+            setAnimationStage(AnimationStages.exited);
+
+            setAnimationTransform({
+                initialTransform: animation.offsetTransform,
+                offsetTransform: props.offsetTransform,
+            });
+        } else {
+            setAnimationTransform({
+                initialTransform: props.initialTransform,
+                offsetTransform: props.offsetTransform,
+            });
+        }
+    }, [props.initialTransform, props.offsetTransform]);
+
+    useEffect(() => {
+        if (!innerRef.current) {
+            return;
+        }
+
+        // Exiting -> Exited
+        if (
+            animation.stage === AnimationStages.exiting
+            && !animation.offsetTransform
+        ) {
+            setAnimationStage(AnimationStages.exited);
+            return;
+        }
+
+        // Exited -> Entering
+        if (
+            animation.stage === AnimationStages.exited
+            && animation.offsetTransform
+        ) {
+            setAnimationStage(AnimationStages.entering);
+            return;
+        }
+
+        // Entering -> Entered
+        if (
+            animation.stage === AnimationStages.entering
+            && animationFrameRef.current === 0
+        ) {
+            animationFrameRef.current = requestAnimationFrame(() => {
+                animationFrameRef.current = 0;
+                setAnimationStage(AnimationStages.entered);
+            });
+
+            return;
+        }
+
+        // Entered -> Exiting
+        if (
+            !clearTransitionRef.current
+            && animation.stage === AnimationStages.entered
+        ) {
+            clearTransitionRef.current = afterTransition(
                 innerRef.current.parentNode,
                 {
                     elem: innerRef.current,
                     duration: props.transitionTimeout,
                     property: 'transform',
                 },
-                () => onAnimationDone(),
+                () => {
+                    clearTransitionRef.current = null;
+
+                    setAnimationStage(AnimationStages.exiting);
+                },
             );
         }
-
-        return () => {
-            removeTransitionHandlerRef.current?.();
-            removeTransitionHandlerRef.current = null;
-        };
-    }, [props.animationStage]);
+    }, [animation.stage, animation.initialTransform, animation.offsetTransform]);
 
     const state = getState();
     const isPlaceholder = (
@@ -72,30 +131,44 @@ export const SortableListItem = forwardRef((props, ref) => {
         )
     );
 
-    const isAnimationEntering = props.animationStage === AnimationStages.entering;
-    const isAnimationEntered = props.animationStage === AnimationStages.entered;
+    const isEntered = animation.stage === AnimationStages.entered;
+    const isExiting = animation.stage === AnimationStages.exiting;
 
-    const listItemProps = {
-        ...props,
+    const listItemProps = useMemo(() => ({
+        id: props.id,
+        group: props.group,
+        title: props.title,
         className: classNames(
             props.className,
             {
                 [placeholderClass]: isPlaceholder,
-                [animatedClass]: (!!props.animated && isAnimationEntered),
+                [animatedClass]: (!!props.animated && isEntered),
             },
         ),
-        style: {},
-    };
-
-    listItemProps.style.transitionProperty = (isAnimationEntering || isAnimationEntered)
-        ? 'transform'
-        : '';
-
-    listItemProps.style.transform = (props.transformMatrix && isAnimationEntering)
-        ? `matrix(${props.transformMatrix.join()})`
-        : '';
+        style: {
+            transitionProperty: (isEntered || isExiting) ? 'transform' : '',
+            transform: (
+                (animation.offsetTransform && (isEntered || isExiting))
+                    ? animation.offsetTransform
+                    : animation.initialTransform
+            ),
+        },
+    }), [
+        props.title,
+        props.group,
+        props.id,
+        props.animated,
+        props.className,
+        animation.initialTransform,
+        animation.offsetTransform,
+        animation.stage,
+        isPlaceholder,
+    ]);
 
     const { ListItem } = props.components;
+    if (!ListItem) {
+        return null;
+    }
 
     return (
         <ListItem {...listItemProps} ref={innerRef} />
@@ -115,11 +188,11 @@ SortableListItem.propTypes = {
     placeholderClass: PropTypes.string,
     animatedClass: PropTypes.string,
     title: PropTypes.string,
-    placeholder: PropTypes.string,
+    placeholder: PropTypes.bool,
     animated: PropTypes.bool,
-    animationStage: PropTypes.number,
     transitionTimeout: PropTypes.number,
-    transformMatrix: PropTypes.array,
+    initialTransform: PropTypes.string,
+    offsetTransform: PropTypes.string,
     style: PropTypes.object,
     components: PropTypes.shape({
         ListItem: isComponent,

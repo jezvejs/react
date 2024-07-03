@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import {
     useCallback,
     forwardRef,
     useImperativeHandle,
-    useRef,
-    useEffect,
+    useMemo,
 } from 'react';
 
 import { useDragnDrop } from '../../utils/DragnDrop/index.js';
@@ -14,11 +14,13 @@ import { useSortableDragZone } from './useSortableDragZone.jsx';
 import { useSortableDropTarget } from './useSortableDropTarget.jsx';
 import { SortableDragAvatar } from './SortableDragAvatar.jsx';
 import {
-    AnimationStages,
+    clearTransform,
     findTreeItemIndex,
+    formatOffsetMatrix,
+    getAnimationBox,
     getDragZoneItems,
     getTreeItemById,
-    mapTreeItems,
+    mapZoneItems,
     moveTreeItem,
 } from './helpers.js';
 
@@ -28,6 +30,7 @@ export const Sortable = forwardRef((p, ref) => {
         onSort: null,
         animatedClass: 'animated',
         transitionTimeout: 300,
+        dragClass: 'drag',
         ...p,
     };
 
@@ -73,18 +76,139 @@ export const Sortable = forwardRef((p, ref) => {
         return findItemById(state.itemId, state.sortPosition?.zoneId);
     };
 
+    const saveItemMove = (move, setTransform) => {
+        setState((prev) => {
+            const sourceZoneId = prev.origSortPos.zoneId;
+            const targetZoneId = prev.sortPosition.zoneId;
+
+            let newState = {
+                ...prev,
+            };
+
+            newState[sourceZoneId] = {
+                ...(prev[sourceZoneId] ?? {}),
+                items: [
+                    ...(prev[sourceZoneId].next ?? prev[sourceZoneId].items),
+                ],
+            };
+
+            if (targetZoneId !== sourceZoneId) {
+                newState[targetZoneId] = {
+                    ...(prev[targetZoneId] ?? {}),
+                    items: [
+                        ...(prev[targetZoneId].next ?? prev[targetZoneId].items),
+                    ],
+                };
+            }
+
+            newState = moveTreeItem(newState, {
+                source: {
+                    id: newState.origSortPos.id,
+                    index: newState.sortPosition.index,
+                    parentId: newState.sortPosition.parentId,
+                    zoneId: newState.sortPosition.zoneId,
+                },
+                target: {
+                    id: move.sortPosition.id,
+                    index: move.sortPosition.index,
+                    parentId: move.sortPosition.parentId,
+                    zoneId: move.sortPosition.zoneId,
+                },
+                swapWithPlaceholder: move.swapWithPlaceholder,
+            });
+
+            newState = mapZoneItems(newState, sourceZoneId, setTransform);
+            if (targetZoneId !== sourceZoneId) {
+                newState = mapZoneItems(newState, targetZoneId, setTransform);
+            }
+
+            const res = {
+                ...prev,
+                [sourceZoneId]: {
+                    ...(prev[sourceZoneId] ?? {}),
+                    next: [...(newState[sourceZoneId].items ?? [])],
+                },
+            };
+
+            if (targetZoneId !== sourceZoneId) {
+                res[targetZoneId] = {
+                    ...(prev[targetZoneId] ?? {}),
+                    next: [...(newState[targetZoneId].items ?? [])],
+                };
+            }
+
+            return res;
+        });
+    };
+
+    const moveItem = () => {
+        setState((prev) => {
+            const sourceZoneId = prev.origSortPos.zoneId;
+            const targetZoneId = prev.sortPosition.zoneId;
+
+            const newState = {
+                ...prev,
+                [sourceZoneId]: {
+                    ...(prev[sourceZoneId] ?? {}),
+                    items: [
+                        ...(prev[sourceZoneId].next ?? prev[sourceZoneId].items),
+                    ],
+                },
+            };
+
+            if (targetZoneId !== sourceZoneId) {
+                newState[targetZoneId] = {
+                    ...(prev[targetZoneId] ?? {}),
+                    items: [
+                        ...(prev[targetZoneId].next ?? prev[targetZoneId].items),
+                    ],
+                };
+            }
+
+            return newState;
+        });
+    };
+
+    const clearItemsTransform = () => {
+        setState((prev) => {
+            let newState = {
+                ...prev,
+            };
+
+            const sourceZoneId = prev.origSortPos.zoneId;
+            const targetZoneId = prev.sortPosition.zoneId;
+
+            newState = mapZoneItems(newState, sourceZoneId, clearTransform);
+            if (targetZoneId !== sourceZoneId) {
+                newState = mapZoneItems(newState, targetZoneId, clearTransform);
+            }
+
+            return newState;
+        });
+    };
+
     const {
         dragZoneRef,
         avatarRef,
     } = useSortableDragZone({
         ...commonProps,
+        placeholderClass,
+        animatedClass,
 
         onDragStart({ itemId, parentId, zoneId }) {
+            if (!dragZoneRef.current) {
+                return;
+            }
+
+            const elems = Array.from(dragZoneRef.current.querySelectorAll(ListItem.selector));
+            const boxes = elems.map((el) => getAnimationBox(el));
+
             setState((prev) => {
                 const dragZoneItems = getDragZoneItems(zoneId, prev);
                 const index = findTreeItemIndex(dragZoneItems, (item) => item?.id === itemId);
                 return {
                     ...prev,
+                    boxes,
                     itemId,
                     origSortPos: {
                         id: itemId,
@@ -110,77 +234,97 @@ export const Sortable = forwardRef((p, ref) => {
 
         onDragMove({
             targetId,
+            targetIndex,
             parentId,
             targetZoneId,
             swapWithPlaceholder,
             animateElems,
         }) {
-            if (targetId === parentId) {
+            const state = getState();
+            const sourceId = state.origSortPos.id ?? null;
+
+            if (targetId === sourceId || targetId === parentId) {
                 return;
             }
 
-            const setTransformIfNeeded = (item) => {
+            // Skip move item to parent container without target item
+            // if current target item is already at this container
+            if (
+                targetId === null
+                && state.targetId !== null
+                && parentId === state.sortPosition.parentId
+                && targetZoneId === state.sortPosition.zoneId
+            ) {
+                return;
+            }
+
+            // Skip handling same target as the current one
+            const targetItem = findItemById(targetId, targetZoneId);
+            if (!targetItem) {
+                return;
+            }
+
+            const setTransform = (item) => {
                 const found = animateElems.find((i) => i.id === item.id);
                 if (!found) {
                     return item;
                 }
 
-                if (
-                    item.animationStage
-                    && item.animationStage !== AnimationStages.exiting
-                ) {
-                    return item;
-                }
+                const initialOffset = item.initialOffset ?? ({ x: 0, y: 0 });
+                const initialTransform = formatOffsetMatrix(initialOffset);
 
-                const distX = found.rect.left - found.targetRect.left;
-                const distY = found.rect.top - found.targetRect.top;
+                const { targetRect } = found;
 
-                const transformMatrix = [1, 0, 0, 1, distX, distY];
+                const rect = (item.animationInProgress && item.rect)
+                    ? item.rect
+                    : found.rect;
+
+                const offset = {
+                    x: (targetRect.left - rect.left) + initialOffset.x,
+                    y: (targetRect.top - rect.top) + initialOffset.y,
+                };
+                const offsetTransform = formatOffsetMatrix(offset);
 
                 return {
                     ...item,
-                    transformMatrix,
-                    animationStage: AnimationStages.entering,
+                    animationInProgress: true,
+                    initialOffset,
+                    initialTransform,
+                    offset,
+                    offsetTransform,
+                    rect,
+                    targetRect,
                 };
             };
 
+            saveItemMove({
+                sortPosition: {
+                    id: targetId,
+                    index: targetIndex,
+                    parentId,
+                    zoneId: targetZoneId,
+                },
+                swapWithPlaceholder,
+            }, clearTransform);
+
             setState((prev) => {
-                const newState = moveTreeItem(prev, {
-                    source: {
-                        id: prev.origSortPos.id,
-                        index: prev.sortPosition.index,
-                        parentId: prev.sortPosition.parentId,
-                        zoneId: prev.sortPosition.zoneId,
-                    },
-                    target: {
+                const sourceZoneId = prev.sortPosition.zoneId;
+
+                let newState = {
+                    ...prev,
+                    sortPosition: {
                         id: targetId,
+                        index: targetIndex,
                         parentId,
                         zoneId: targetZoneId,
                     },
                     swapWithPlaceholder,
-                });
-
-                const sourceZoneId = prev.sortPosition.zoneId;
-
-                newState[sourceZoneId] = {
-                    ...newState[sourceZoneId],
-                    items: mapTreeItems(
-                        newState[sourceZoneId].items,
-                        setTransformIfNeeded,
-                    ),
                 };
 
+                newState = mapZoneItems(newState, sourceZoneId, setTransform);
                 if (targetZoneId !== sourceZoneId) {
-                    newState[targetZoneId] = {
-                        ...newState[targetZoneId],
-                        items: mapTreeItems(
-                            newState[targetZoneId].items,
-                            setTransformIfNeeded,
-                        ),
-                    };
+                    newState = mapZoneItems(newState, targetZoneId, setTransform);
                 }
-
-                newState.animation = Date.now();
 
                 return newState;
             });
@@ -194,6 +338,9 @@ export const Sortable = forwardRef((p, ref) => {
                 targetPos: state.sortPosition.index,
                 targetParentId: state.sortPosition.parentId,
             };
+
+            moveItem();
+            clearItemsTransform();
 
             setState((prev) => ({
                 ...prev,
@@ -231,6 +378,8 @@ export const Sortable = forwardRef((p, ref) => {
                     targetId: null,
                 };
             });
+
+            clearItemsTransform();
         },
     });
 
@@ -248,51 +397,16 @@ export const Sortable = forwardRef((p, ref) => {
     }, []);
     useImperativeHandle(ref, () => innerRef.current);
 
-    // Animation
-    const animationFrameRef = useRef(0);
-
-    /** Cancels previously requested animation frame */
-    const cancelAnimation = () => {
-        if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = 0;
-        }
-    };
-
-    const animationState = getState();
-
-    useEffect(() => {
-        if (animationFrameRef.current) {
-            return undefined;
-        }
-
-        animationFrameRef.current = requestAnimationFrame(() => {
-            animationFrameRef.current = 0;
-
-            setState((prev) => ({
-                ...prev,
-                [props.id]: {
-                    ...prev[props.id],
-                    items: mapTreeItems(prev[props.id].items, (item) => {
-                        if (item.animationStage === AnimationStages.entering) {
-                            return {
-                                ...item,
-                                transformMatrix: null,
-                                animationStage: AnimationStages.entered,
-                            };
-                        }
-
-                        return item;
-                    }),
-                },
-            }));
-        });
-
-        return () => cancelAnimation();
-    }, [animationState.animation]);
-
     const draggingItem = getDraggingItem();
-    const avatarProps = draggingItem && { ...draggingItem };
+    const avatarProps = draggingItem && ({
+        ...draggingItem,
+        className: classNames(
+            (props.dragClass === true)
+                ? 'drag'
+                : props.dragClass,
+            draggingItem.className,
+        ),
+    });
 
     const avatar = (draggingItem && (
         <SortableDragAvatar copyWidth={props.copyWidth} >
@@ -304,7 +418,7 @@ export const Sortable = forwardRef((p, ref) => {
         className,
     };
 
-    const common = {
+    const common = useMemo(() => ({
         ...commonProps,
         placeholderClass,
         animatedClass,
@@ -312,15 +426,19 @@ export const Sortable = forwardRef((p, ref) => {
         draggingId: props.draggingId,
         animated: props.animated,
         placeholder: props.placeholder,
-        itemId: props.itemId,
         zoneId: props.id,
         components: { ...props.components },
-    };
+    }), []);
+
+    const zoneItems = getItems();
+    const listItems = useMemo(() => zoneItems, [zoneItems]);
+
+    const ItemComponent = SortableListItem;
 
     return (
         <div {...containerProps} ref={innerRef}>
-            {getItems().map((item) => (
-                <SortableListItem
+            {listItems.map((item) => (
+                <ItemComponent
                     {...common}
                     {...item}
                     key={`srtlist_${item.zoneId}_${item.id}`}
@@ -342,6 +460,10 @@ Sortable.propTypes = {
     itemId: PropTypes.string,
     placeholderClass: PropTypes.string,
     animatedClass: PropTypes.string,
+    dragClass: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.string,
+    ]),
     dragging: PropTypes.bool,
     draggingId: PropTypes.bool,
     placeholder: PropTypes.bool,

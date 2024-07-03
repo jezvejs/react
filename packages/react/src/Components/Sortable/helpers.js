@@ -4,7 +4,7 @@ export const AnimationStages = {
     entering: 1,
     entered: 2,
     exiting: 3,
-    exited: 4,
+    exited: 0,
 };
 
 /**
@@ -100,6 +100,17 @@ export const findTreeItemIndex = (items, callback) => {
 };
 
 /**
+ * Returns index of tree item inside it parent subtree
+ *
+ * @param {Array} items array of items to search in
+ * @param {string} id item id
+ */
+export const findTreeItemIndexById = (items, id) => {
+    const strId = id?.toString();
+    return findTreeItemIndex(items, (item) => item?.id?.toString() === strId);
+};
+
+/**
  * Returns list of tree items transformed with callback function
  * @param {Array} items
  * @param {Function} callback
@@ -187,6 +198,16 @@ export const getDragZoneItems = (dragZoneId, state) => (
 );
 
 /**
+ * Returns list next items for specified drag zone
+ * @param {string} dragZoneId
+ * @param {object} state
+ * @returns {Array}
+ */
+export const getNextZoneItems = (dragZoneId, state) => (
+    state[dragZoneId]?.next ?? getDragZoneItems(dragZoneId, state)
+);
+
+/**
  * Moves tree item from one position to another
  * If 'swapWithPlaceholder' option is enabled then swaps source and target items
  *
@@ -228,9 +249,12 @@ export const moveTreeItem = (state, options) => {
     const insertToEnd = true;
     const indexAtNewZone = (insertToEnd) ? dragZoneItems.length : 0;
 
-    const index = (targetId !== null)
-        ? findTreeItemIndex(dragZoneItems, (item) => item?.id === target.id)
-        : indexAtNewZone;
+    let index = target.index ?? null;
+    if (index === null) {
+        index = (targetId !== null)
+            ? findTreeItemIndexById(dragZoneItems, target.id)
+            : indexAtNewZone;
+    }
 
     if (
         index === -1
@@ -303,3 +327,67 @@ export const moveTreeItem = (state, options) => {
 
     return newState;
 };
+
+/**
+ * Returns matrix transform string for specified array
+ * @param {Array} transform
+ * @returns {string}
+ */
+export const formatMatrixTransform = (transform) => (
+    `matrix(${asArray(transform).join(', ')})`
+);
+
+/**
+ * Returns offset matrix transform string for specified offset
+ * @param {*} param0
+ * @returns
+ */
+export const formatOffsetMatrix = ({ x, y }) => (
+    formatMatrixTransform([1, 0, 0, 1, x, y])
+);
+
+/**
+ * Cleans up the state of sortable item and returns result
+ * @param {object} item
+ * @returns {object}
+ */
+export const clearTransform = (item) => ({
+    ...item,
+    initialOffset: null,
+    initialTransform: null,
+    offset: null,
+    offsetTransform: null,
+});
+
+/**
+ * Applies callback function to each item inside specified zone and returns new state object
+ *
+ * @param {object} state
+ * @param {string} zoneId
+ * @param {Function} callback
+ * @returns
+ */
+export const mapZoneItems = (state, zoneId, callback) => ({
+    ...state,
+    [zoneId]: {
+        ...state[zoneId],
+        items: mapTreeItems(
+            state[zoneId].items,
+            callback,
+        ),
+    },
+});
+
+/**
+ * Returns dimensions of element
+ * @param {HTMLElement} elem
+ * @returns {object}
+ */
+export const getAnimationBox = (elem) => (
+    elem?.getBoundingClientRect() ?? {
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+    }
+);
