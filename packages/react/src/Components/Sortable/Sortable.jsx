@@ -19,6 +19,7 @@ import {
     formatOffsetMatrix,
     getAnimationBox,
     getDragZoneItems,
+    getNextZoneItems,
     getTreeItemById,
     mapZoneItems,
     moveTreeItem,
@@ -73,13 +74,20 @@ export const Sortable = forwardRef((p, ref) => {
         }
 
         const state = getState();
-        return findItemById(state.itemId, state.sortPosition?.zoneId);
+
+        const items = getItems(state.sortPosition?.zoneId);
+        const itemsRes = getTreeItemById(state.itemId, items);
+
+        const next = getNextZoneItems(state.sortPosition?.zoneId, state);
+        const nextRes = getTreeItemById(state.itemId, next);
+
+        return itemsRes ?? nextRes;
     };
 
     const saveItemMove = (move, setTransform) => {
         setState((prev) => {
-            const sourceZoneId = prev.origSortPos.zoneId;
-            const targetZoneId = prev.sortPosition.zoneId;
+            const sourceZoneId = prev.sortPosition.zoneId;
+            const targetZoneId = move.sortPosition.zoneId;
 
             let newState = {
                 ...prev,
@@ -334,7 +342,7 @@ export const Sortable = forwardRef((p, ref) => {
             const state = getState();
             const sortParams = {
                 id: state.origSortPos.id,
-                parentId: state.origSortPos.parentId,
+                parentId: state.sortPosition.parentId,
                 targetPos: state.sortPosition.index,
                 targetParentId: state.sortPosition.parentId,
             };

@@ -30,6 +30,8 @@ export const SortableTile = forwardRef((props, ref) => {
     );
 });
 
+SortableTile.selector = '.sortable-tile';
+
 SortableTile.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,

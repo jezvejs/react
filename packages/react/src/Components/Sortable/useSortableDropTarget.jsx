@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { DragMaster, useDragnDrop, useDropTarget } from '../../utils/DragnDrop/index.js';
 import {
     findTreeItemIndexById,
-    getAnimationBox,
     getDragZone,
     getNextZoneItems,
     getTreeItemById,
@@ -16,7 +15,7 @@ export function useSortableDropTarget(props) {
     const prevTargetElem = useRef(null);
     const targetElem = useRef(null);
 
-    const { getState, setState } = useDragnDrop();
+    const { getState } = useDragnDrop();
 
     const dropTarget = useDropTarget({
         ...props,
@@ -213,7 +212,7 @@ export function useSortableDropTarget(props) {
 
             const res = [];
 
-            const positionCache = zone.positionCache ?? {};
+            const positionCache = state.boxes ?? [];
 
             const parentItems = parent.next ?? parent.items ?? [];
             const firstIndex = Math.min(sourceIndex, targetIndex);
@@ -236,30 +235,15 @@ export function useSortableDropTarget(props) {
                 const sibling = parentItems[siblingIndex];
                 const siblingElem = this.getItemElementById(sibling?.id);
 
-                if (!positionCache[index]) {
-                    positionCache[index] = getAnimationBox(elem);
-                }
-                if (!positionCache[siblingIndex]) {
-                    positionCache[siblingIndex] = getAnimationBox(siblingElem);
-                }
-
                 res.push({
                     id: elem.dataset.id,
                     index,
                     zoneId: props.id,
-                    targetId: siblingElem.dataset.id,
+                    targetId: siblingElem?.dataset.id,
                     rect: positionCache[index],
                     targetRect: positionCache[siblingIndex],
                 });
             }
-
-            setState((prev) => ({
-                ...prev,
-                [zoneId]: {
-                    ...prev[zoneId],
-                    positionCache,
-                },
-            }));
 
             return res;
         },

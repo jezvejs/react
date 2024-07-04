@@ -38,6 +38,8 @@ export const SortableTreeItem = forwardRef((props, ref) => {
     );
 });
 
+SortableTreeItem.selector = '.tree-item';
+
 SortableTreeItem.propTypes = {
     id: PropTypes.string,
     group: PropTypes.string,
