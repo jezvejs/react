@@ -208,6 +208,16 @@ export const getNextZoneItems = (dragZoneId, state) => (
 );
 
 /**
+ * Returns list of cached item positions for specified drag zone
+ * @param {string} zoneId
+ * @param {object} state
+ * @returns {Array}
+ */
+export const getPositionsCache = (zoneId, state) => (
+    state.boxes[zoneId] ?? []
+);
+
+/**
  * Moves tree item from one position to another
  * If 'swapWithPlaceholder' option is enabled then swaps source and target items
  *

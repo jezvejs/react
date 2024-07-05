@@ -216,7 +216,10 @@ export const Sortable = forwardRef((p, ref) => {
                 const index = findTreeItemIndex(dragZoneItems, (item) => item?.id === itemId);
                 return {
                     ...prev,
-                    boxes,
+                    boxes: {
+                        ...(prev.boxes ?? {}),
+                        [zoneId]: boxes,
+                    },
                     itemId,
                     origSortPos: {
                         id: itemId,
@@ -239,6 +242,7 @@ export const Sortable = forwardRef((p, ref) => {
         dropTargetRef,
     } = useSortableDropTarget({
         ...commonProps,
+        components,
 
         onDragMove({
             targetId,
@@ -286,6 +290,10 @@ export const Sortable = forwardRef((p, ref) => {
                 const rect = (item.animationInProgress && item.rect)
                     ? item.rect
                     : found.rect;
+
+                if (!rect || !targetRect) {
+                    return item;
+                }
 
                 const offset = {
                     x: (targetRect.left - rect.left) + initialOffset.x,

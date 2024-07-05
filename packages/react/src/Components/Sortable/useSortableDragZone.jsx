@@ -167,7 +167,7 @@ export function useSortableDragZone(props) {
             this.removeSourceNode();
         },
 
-        /* Drag start event handler */
+        /** Drag start event handler */
         onDragStart(params) {
             const { e } = params;
             const itemEl = this.findDragZoneItem(e.target);

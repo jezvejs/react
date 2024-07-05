@@ -5,8 +5,10 @@ import PropTypes from 'prop-types';
 import { DragMaster, useDragnDrop, useDropTarget } from '../../utils/DragnDrop/index.js';
 import {
     findTreeItemIndexById,
+    getAnimationBox,
     getDragZone,
     getNextZoneItems,
+    getPositionsCache,
     getTreeItemById,
     isTreeContains,
 } from './helpers.js';
@@ -15,7 +17,7 @@ export function useSortableDropTarget(props) {
     const prevTargetElem = useRef(null);
     const targetElem = useRef(null);
 
-    const { getState } = useDragnDrop();
+    const { getState, setState } = useDragnDrop();
 
     const dropTarget = useDropTarget({
         ...props,
@@ -133,6 +135,9 @@ export function useSortableDropTarget(props) {
             let animateElems = [];
             let swapWithPlaceholder = false;
 
+            this.checkPositionsCache(sourceZoneId, dragZoneElem.parentNode);
+            this.checkPositionsCache(targetZoneId, newTargetElem.parentNode);
+
             // check drop target is already a placeholder
             if (isPlaceholder) {
                 // swap drag zone with drop target
@@ -142,6 +147,27 @@ export function useSortableDropTarget(props) {
                 && !dragZoneContainsTarget
             ) {
                 // move between containers
+                const sourceItem = this.getAnimatedItem(
+                    sourceId,
+                    sourceIndex,
+                    sourceZoneId,
+                    parentId,
+                );
+
+                const [, ...sourceItems] = this.getMovingItems(
+                    sourceIndex,
+                    sourceZoneItems?.length - 1,
+                    sourceZoneId,
+                    state.sortPosition.parentId,
+                );
+                const targetItems = this.getMovingItems(
+                    targetZoneItems?.length - 1,
+                    targetIndex,
+                    targetZoneId,
+                    parentId,
+                );
+
+                animateElems = [sourceItem, ...sourceItems, ...targetItems];
             } else if (
                 props.tree
                 && targetContainer
@@ -186,8 +212,53 @@ export function useSortableDropTarget(props) {
             });
         },
 
+        checkPositionsCache(zoneId, elem) {
+            if (!elem) {
+                return;
+            }
+            const state = getState();
+            if (state?.boxes[zoneId]) {
+                return;
+            }
+
+            const { ListItem } = props.components;
+            const elems = Array.from(elem.querySelectorAll(ListItem?.selector));
+            const boxes = elems.map((el) => getAnimationBox(el));
+
+            setState((prev) => ({
+                ...prev,
+                boxes: {
+                    ...(prev.boxes ?? {}),
+                    [zoneId]: boxes,
+                },
+            }));
+        },
+
         getItemElementById(id) {
             return this.elem?.querySelector?.(`[data-id="${id}"]`) ?? null;
+        },
+
+        getAnimatedItem(id, index, zoneId, parentId) {
+            if (
+                ((id ?? null) === null)
+                || index === -1
+                || ((zoneId ?? null) === null)
+                || !props.animated
+            ) {
+                return [];
+            }
+
+            const state = getState();
+            const positionCache = getPositionsCache(zoneId, state);
+
+            return {
+                id,
+                index,
+                zoneId: props.id,
+                parentId,
+                rect: positionCache[index],
+                targetRect: positionCache[index],
+            };
         },
 
         getMovingItems(sourceIndex, targetIndex, zoneId, parentId) {
@@ -211,16 +282,14 @@ export function useSortableDropTarget(props) {
             }
 
             const res = [];
-
-            const positionCache = state.boxes ?? [];
+            const positionCache = getPositionsCache(zoneId, state);
 
             const parentItems = parent.next ?? parent.items ?? [];
             const firstIndex = Math.min(sourceIndex, targetIndex);
             const lastIndex = Math.max(sourceIndex, targetIndex);
             for (let index = firstIndex; index <= lastIndex; index += 1) {
                 const item = parentItems[index];
-                const elem = this.getItemElementById(item?.id);
-                if (!elem) {
+                if (!item) {
                     return [];
                 }
 
@@ -233,13 +302,13 @@ export function useSortableDropTarget(props) {
                         : (index + 1);
                 }
                 const sibling = parentItems[siblingIndex];
-                const siblingElem = this.getItemElementById(sibling?.id);
 
                 res.push({
-                    id: elem.dataset.id,
+                    id: item?.id,
                     index,
                     zoneId: props.id,
-                    targetId: siblingElem?.dataset.id,
+                    parentId,
+                    targetId: sibling?.id,
                     rect: positionCache[index],
                     targetRect: positionCache[siblingIndex],
                 });
