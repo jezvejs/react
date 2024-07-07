@@ -174,12 +174,12 @@ export function useSortableDropTarget(props) {
 
                 const [, ...sourceItems] = this.getMovingItems(
                     sourceIndex,
-                    sourceZoneItems?.length - 1,
+                    sourceZoneItems.length - 1,
                     sourceZoneId,
                     state.sortPosition.parentId,
                 );
                 const targetItems = this.getMovingItems(
-                    targetZoneItems?.length - 1,
+                    targetZoneItems.length - 1,
                     targetIndex,
                     targetZoneId,
                     parentId,
