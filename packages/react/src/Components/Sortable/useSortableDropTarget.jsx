@@ -142,6 +142,24 @@ export function useSortableDropTarget(props) {
             if (isPlaceholder) {
                 // swap drag zone with drop target
                 swapWithPlaceholder = true;
+
+                const sourceItem = this.getAnimatedItem(
+                    sourceId,
+                    sourceIndex,
+                    sourceZoneId,
+                    parentId,
+                );
+                const targetItem = this.getAnimatedItem(
+                    targetId,
+                    targetIndex,
+                    targetZoneId,
+                    parentId,
+                );
+
+                sourceItem.targetRect = targetItem.rect;
+                targetItem.targetRect = sourceItem.rect;
+
+                animateElems = [sourceItem, targetItem];
             } else if (
                 prevTargetElem.current?.parentNode !== newTargetElem.parentNode
                 && !dragZoneContainsTarget

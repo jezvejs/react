@@ -301,7 +301,7 @@ export const Sortable = forwardRef((p, ref) => {
                 };
                 const offsetTransform = formatOffsetMatrix(offset);
 
-                return {
+                const res = {
                     ...item,
                     animationInProgress: true,
                     initialOffset,
@@ -311,6 +311,12 @@ export const Sortable = forwardRef((p, ref) => {
                     rect,
                     targetRect,
                 };
+
+                if (swapWithPlaceholder) {
+                    res.animated = false;
+                }
+
+                return res;
             };
 
             saveItemMove({

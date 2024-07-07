@@ -143,11 +143,11 @@ export const SortableListItem = forwardRef((props, ref) => {
             props.className,
             {
                 [placeholderClass]: isPlaceholder,
-                [animatedClass]: (!!props.animated && isEntered),
+                [animatedClass]: (props.animated && isEntered),
             },
         ),
         style: {
-            transitionProperty: (isEntered || isExiting) ? 'transform' : '',
+            transitionProperty: (props.animated && (isEntered || isExiting)) ? 'transform' : '',
             transform: (
                 (animation.offsetTransform && (isEntered || isExiting))
                     ? animation.offsetTransform
