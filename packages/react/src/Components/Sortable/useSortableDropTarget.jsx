@@ -263,7 +263,6 @@ export function useSortableDropTarget(props) {
                 ((id ?? null) === null)
                 || index === -1
                 || ((zoneId ?? null) === null)
-                || !props.animated
             ) {
                 return [];
             }
@@ -282,7 +281,7 @@ export function useSortableDropTarget(props) {
         },
 
         getMovingItems(sourceIndex, targetIndex, zoneId, parentId) {
-            if (sourceIndex === -1 || targetIndex === -1 || !props.animated) {
+            if (sourceIndex === -1 || targetIndex === -1) {
                 return [];
             }
 
