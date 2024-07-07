@@ -208,7 +208,8 @@ export const Sortable = forwardRef((p, ref) => {
                 return;
             }
 
-            const elems = Array.from(dragZoneRef.current.querySelectorAll(ListItem.selector));
+            const selector = ListItem.selector ?? this.selector;
+            const elems = Array.from(dragZoneRef.current.querySelectorAll(selector));
             const boxes = elems.map((el) => getAnimationBox(el));
 
             setState((prev) => {

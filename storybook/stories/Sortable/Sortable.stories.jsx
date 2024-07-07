@@ -360,6 +360,7 @@ export const OnlyRootHandle = {
         selector: '.list_item',
         placeholderClass: 'list_item_placeholder',
         group: 'list_root',
+        animated: true,
         onlyRootHandle: true,
         copyWidth: true,
         components: {
@@ -407,6 +408,7 @@ export const QueryHandles = {
         group: 'list_hnd',
         handles: [{ query: '.drag-handle', includeChilds: true }],
         copyWidth: true,
+        animated: true,
         components: {
             ListItem: ListItemWithHandle,
         },
