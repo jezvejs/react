@@ -121,6 +121,10 @@ export function useDragZone(props) {
                     },
 
                     onDragCancel() {
+                        this.onDragEnd();
+                    },
+
+                    onDragEnd() {
                         this.cancelAnimation();
 
                         setState((prev) => ({
@@ -129,10 +133,6 @@ export function useDragZone(props) {
                             top: prev.origTop,
                             dragging: false,
                         }));
-                    },
-
-                    onDragEnd() {
-                        this.cancelAnimation();
                     },
                 };
             },
