@@ -362,8 +362,8 @@ export const Sortable = forwardRef((p, ref) => {
                 targetParentId: state.sortPosition.parentId,
             };
 
-            moveItem();
             clearItemsTransform();
+            moveItem();
 
             setState((prev) => ({
                 ...prev,

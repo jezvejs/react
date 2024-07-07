@@ -42,6 +42,13 @@ export const SortableListItem = forwardRef((props, ref) => {
         setAnimation((prev) => ({ ...prev, initialTransform, offsetTransform }));
     };
 
+    const clearTransition = () => {
+        if (clearTransitionRef.current) {
+            clearTransitionRef.current();
+            clearTransitionRef.current = null;
+        }
+    };
+
     useEffect(() => {
         if (
             animation.initialTransform === props.initialTransform
@@ -50,9 +57,10 @@ export const SortableListItem = forwardRef((props, ref) => {
             return;
         }
 
-        if (props.offsetTransform) {
-            setAnimationStage(AnimationStages.exited);
+        clearTransition();
+        setAnimationStage(AnimationStages.exited);
 
+        if (props.offsetTransform) {
             setAnimationTransform({
                 initialTransform: animation.offsetTransform,
                 offsetTransform: props.offsetTransform,
@@ -106,6 +114,11 @@ export const SortableListItem = forwardRef((props, ref) => {
             !clearTransitionRef.current
             && animation.stage === AnimationStages.entered
         ) {
+            if (!props.animated) {
+                setAnimationStage(AnimationStages.exiting);
+                return;
+            }
+
             clearTransitionRef.current = afterTransition(
                 innerRef.current.parentNode,
                 {
@@ -134,32 +147,44 @@ export const SortableListItem = forwardRef((props, ref) => {
     const isEntered = animation.stage === AnimationStages.entered;
     const isExiting = animation.stage === AnimationStages.exiting;
 
-    const listItemProps = useMemo(() => ({
-        ...props,
-        id: props.id,
-        group: props.group,
-        title: props.title,
-        className: classNames(
-            props.className,
-            {
-                [placeholderClass]: isPlaceholder,
-                [animatedClass]: (props.animated && isEntered),
+    const listItemProps = useMemo(() => {
+        const res = {
+            ...props,
+            id: props.id,
+            group: props.group,
+            title: props.title,
+            className: classNames(
+                props.className,
+                {
+                    [placeholderClass]: isPlaceholder,
+                    [animatedClass]: (props.animated && isEntered),
+                },
+            ),
+            style: {
             },
-        ),
-        style: {
-            transitionProperty: (props.animated && (isEntered || isExiting)) ? 'transform' : '',
-            transform: (
+        };
+
+        if (props.initialTransform && props.offsetTransform) {
+            if (props.animated && (isEntered || isExiting)) {
+                res.style.transitionProperty = 'transform';
+            }
+
+            res.style.transform = (
                 (animation.offsetTransform && (isEntered || isExiting))
                     ? animation.offsetTransform
                     : animation.initialTransform
-            ),
-        },
-    }), [
+            );
+        }
+
+        return res;
+    }, [
         props.title,
         props.group,
         props.id,
         props.animated,
         props.className,
+        props.initialTransform,
+        props.offsetTransform,
         animation.initialTransform,
         animation.offsetTransform,
         animation.stage,
