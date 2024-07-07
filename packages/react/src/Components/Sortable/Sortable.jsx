@@ -132,6 +132,9 @@ export const Sortable = forwardRef((p, ref) => {
 
             const res = {
                 ...prev,
+                prevPosition: {
+                    ...prev.sortPosition,
+                },
                 [sourceZoneId]: {
                     ...(prev[sourceZoneId] ?? {}),
                     next: [...(newState[sourceZoneId].items ?? [])],
@@ -151,7 +154,7 @@ export const Sortable = forwardRef((p, ref) => {
 
     const moveItem = () => {
         setState((prev) => {
-            const sourceZoneId = prev.origSortPos.zoneId;
+            const sourceZoneId = prev.prevPosition?.zoneId ?? prev.origSortPos.zoneId;
             const targetZoneId = prev.sortPosition.zoneId;
 
             const newState = {
@@ -228,6 +231,12 @@ export const Sortable = forwardRef((p, ref) => {
                         index,
                         zoneId,
                     },
+                    prevPosition: {
+                        id: itemId,
+                        parentId,
+                        index,
+                        zoneId,
+                    },
                     sortPosition: {
                         id: itemId,
                         parentId,
@@ -256,7 +265,15 @@ export const Sortable = forwardRef((p, ref) => {
             const state = getState();
             const sourceId = state.origSortPos.id ?? null;
 
-            if (targetId === sourceId || targetId === parentId) {
+            if (
+                targetId === sourceId
+                && parentId === state.sortPosition.parentId
+                && targetZoneId === state.sortPosition.zoneId
+            ) {
+                return;
+            }
+
+            if (targetId === parentId) {
                 return;
             }
 
@@ -335,6 +352,9 @@ export const Sortable = forwardRef((p, ref) => {
 
                 let newState = {
                     ...prev,
+                    prevPosition: {
+                        ...prev.sortPosition,
+                    },
                     sortPosition: {
                         id: targetId,
                         index: targetIndex,
@@ -351,6 +371,11 @@ export const Sortable = forwardRef((p, ref) => {
 
                 return newState;
             });
+
+            if (swapWithPlaceholder) {
+                clearItemsTransform();
+                moveItem();
+            }
         },
 
         onSortEnd() {
@@ -368,6 +393,7 @@ export const Sortable = forwardRef((p, ref) => {
             setState((prev) => ({
                 ...prev,
                 origSortPos: null,
+                prevPosition: null,
                 sortPosition: null,
                 itemId: null,
                 targetId: null,

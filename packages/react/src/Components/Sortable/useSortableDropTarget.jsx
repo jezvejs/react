@@ -119,6 +119,9 @@ export function useSortableDropTarget(props) {
 
             const targetZoneItems = getNextZoneItems(targetZoneId, state);
             const targetIndex = findTreeItemIndexById(targetZoneItems, targetId);
+            if (targetIndex === -1) {
+                return;
+            }
 
             const isSameParent = (
                 state.origSortPos.parentId === state.sortPosition.parentId
@@ -149,12 +152,19 @@ export function useSortableDropTarget(props) {
                     sourceZoneId,
                     parentId,
                 );
+                if (!sourceItem) {
+                    return;
+                }
+
                 const targetItem = this.getAnimatedItem(
                     targetId,
                     targetIndex,
                     targetZoneId,
                     parentId,
                 );
+                if (!targetItem) {
+                    return;
+                }
 
                 sourceItem.targetRect = targetItem.rect;
                 targetItem.targetRect = sourceItem.rect;
@@ -171,6 +181,9 @@ export function useSortableDropTarget(props) {
                     sourceZoneId,
                     parentId,
                 );
+                if (!sourceItem) {
+                    return;
+                }
 
                 const [, ...sourceItems] = this.getMovingItems(
                     sourceIndex,
@@ -264,7 +277,7 @@ export function useSortableDropTarget(props) {
                 || index === -1
                 || ((zoneId ?? null) === null)
             ) {
-                return [];
+                return null;
             }
 
             const state = getState();
@@ -368,6 +381,11 @@ export function useSortableDropTarget(props) {
             } else {
                 this.applySort(params);
             }
+        },
+
+        onDragLeave() {
+            this.hideHoverIndication?.();
+            targetElem.current = null;
         },
 
         showHoverIndication(avatar) {
