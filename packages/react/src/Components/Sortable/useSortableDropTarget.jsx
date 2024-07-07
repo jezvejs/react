@@ -228,6 +228,8 @@ export function useSortableDropTarget(props) {
                 swapWithPlaceholder,
                 animateElems,
             });
+
+            avatar.saveSortTarget?.(this);
         },
 
         checkPositionsCache(zoneId, elem) {

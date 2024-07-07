@@ -167,6 +167,30 @@ export function useSortableDragZone(props) {
             this.removeSourceNode();
         },
 
+        makeSortableAvatar() {
+            const avatar = this.makeAvatar();
+            if (!avatar) {
+                return false;
+            }
+
+            return {
+                ...avatar,
+                dropTarget: null,
+
+                onDragCancel(params = {}) {
+                    avatar.onDragCancel();
+
+                    if (this.dropTarget) {
+                        this.dropTarget.onDragCancel({ ...params, avatar: this });
+                    }
+                },
+
+                saveSortTarget(target) {
+                    this.dropTarget = target;
+                },
+            };
+        },
+
         /** Drag start event handler */
         onDragStart(params) {
             const { e } = params;
@@ -176,7 +200,7 @@ export function useSortableDragZone(props) {
                 return false;
             }
 
-            const avatar = this.makeAvatar();
+            const avatar = this.makeSortableAvatar();
             if (!avatar) {
                 return false;
             }
