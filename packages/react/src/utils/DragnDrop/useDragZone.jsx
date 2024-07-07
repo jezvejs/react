@@ -36,6 +36,7 @@ export function useDragZone(props) {
                 return {
                     id,
                     elem: avatarRef.current,
+                    scrollRequested: false,
                     getDragInfo() {
                         return {
                             id,
@@ -45,9 +46,11 @@ export function useDragZone(props) {
                             },
                         };
                     },
+
                     getTargetElem() {
                         return currentTargetElemRef.current;
                     },
+
                     initFromEvent({ downX, downY }) {
                         const offset = getOffset(dragZoneRef.current);
                         setState((prev) => ({
@@ -60,12 +63,36 @@ export function useDragZone(props) {
 
                         return true;
                     },
+
                     cancelAnimation() {
                         if (animationFrameRef.current) {
                             cancelAnimationFrame(animationFrameRef.current);
                             animationFrameRef.current = 0;
                         }
                     },
+
+                    /** Scroll document if needed on drag avatar to top or bottom of screen */
+                    scrollDocument(coords) {
+                        const scrollMargin = 30;
+                        const docElem = document.documentElement;
+
+                        if (coords.y > docElem.clientHeight - scrollMargin) {
+                            if (docElem.scrollTop + docElem.clientHeight === docElem.scrollHeight) {
+                                return;
+                            }
+
+                            this.scrollRequested = true;
+                            docElem.scrollTop += scrollMargin;
+                        } else if (coords.y < scrollMargin) {
+                            if (docElem.scrollTop === 0) {
+                                return;
+                            }
+
+                            this.scrollRequested = true;
+                            docElem.scrollTop -= scrollMargin;
+                        }
+                    },
+
                     onDragMove(e) {
                         this.cancelAnimation();
 
@@ -88,8 +115,11 @@ export function useDragZone(props) {
                                 dragging: true,
                                 draggingId: props.id,
                             }));
+
+                            this.scrollDocument(client);
                         });
                     },
+
                     onDragCancel() {
                         this.cancelAnimation();
 
@@ -100,6 +130,7 @@ export function useDragZone(props) {
                             dragging: false,
                         }));
                     },
+
                     onDragEnd() {
                         this.cancelAnimation();
                     },
