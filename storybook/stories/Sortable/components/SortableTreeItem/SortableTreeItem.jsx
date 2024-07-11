@@ -8,18 +8,28 @@ export const SortableTreeItem = forwardRef((props, ref) => {
     const itemProps = {
         className: classNames('tree-item', props.className),
         'data-id': props.id,
+        style: props.style,
     };
 
     if (props.group) {
         itemProps['data-group'] = props.group;
     }
 
+    const { ItemWrapper } = props.components;
+
     const renderItem = (item) => (
         (props.renderItem)
             ? props.renderItem(item)
             : (
-                <SortableTreeItem
-                    {...item}
+                <ItemWrapper
+                    {...({
+                        ...item,
+                        components: {
+                            ...(props.components ?? {}),
+                            ...(item.components ?? {}),
+                            ListItem: SortableTreeItem,
+                        },
+                    })}
                     renderItem={renderItem}
                     key={`srtlist_${props.id}_${item.id}`}
                 />
@@ -40,11 +50,20 @@ export const SortableTreeItem = forwardRef((props, ref) => {
 
 SortableTreeItem.selector = '.tree-item';
 
+const isComponent = PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.func,
+]);
+
 SortableTreeItem.propTypes = {
     id: PropTypes.string,
+    style: PropTypes.object,
     group: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
     items: PropTypes.array,
     renderItem: PropTypes.func,
+    components: PropTypes.shape({
+        ItemWrapper: isComponent,
+    }),
 };

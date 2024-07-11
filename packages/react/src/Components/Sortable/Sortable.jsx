@@ -9,7 +9,7 @@ import {
 
 import { useDragnDrop } from '../../utils/DragnDrop/index.js';
 
-import { SortableListItem } from './components/ListItem/SortableListItem.jsx';
+import { SortableItemWrapper } from './components/ItemWrapper/SortableItemWrapper.jsx';
 import { useSortableDragZone } from './useSortableDragZone.jsx';
 import { useSortableDropTarget } from './useSortableDropTarget.jsx';
 import { SortableDragAvatar } from './SortableDragAvatar.jsx';
@@ -23,7 +23,12 @@ import {
     getTreeItemById,
     moveTreeItem,
     mapZones,
+    mapNextZones,
 } from './helpers.js';
+
+export {
+    SortableItemWrapper,
+};
 
 // eslint-disable-next-line react/display-name
 export const Sortable = forwardRef((p, ref) => {
@@ -84,6 +89,22 @@ export const Sortable = forwardRef((p, ref) => {
         return itemsRes ?? nextRes;
     };
 
+    const getSource = (state) => {
+        let sourcePosition = state.origSortPos;
+        let sourceZone = getDragZoneItems(sourcePosition.zoneId, state);
+        let movingItem = getTreeItemById(state.itemId, sourceZone);
+        if (!movingItem) {
+            sourcePosition = state.prevPosition;
+            sourceZone = getDragZoneItems(sourcePosition.zoneId, state);
+            movingItem = getTreeItemById(state.itemId, sourceZone);
+        }
+        if (!movingItem) {
+            return null;
+        }
+
+        return { ...sourcePosition };
+    };
+
     const saveItemMove = (move) => {
         setState((prev) => {
             const sourceZoneId = prev.sortPosition.zoneId;
@@ -125,7 +146,9 @@ export const Sortable = forwardRef((p, ref) => {
                 swapWithPlaceholder: move.swapWithPlaceholder,
             });
 
-            newState = mapZones(newState, [sourceZoneId, targetZoneId], clearTransform);
+            const zoneIds = [sourceZoneId, targetZoneId];
+            newState = mapZones(newState, zoneIds, clearTransform);
+            newState = mapNextZones(newState, zoneIds, clearTransform);
 
             const res = {
                 ...prev,
@@ -155,7 +178,12 @@ export const Sortable = forwardRef((p, ref) => {
 
     const moveItem = () => {
         setState((prev) => {
-            const sourceZoneId = prev.origSortPos.zoneId;
+            const source = getSource(prev);
+            if (!source) {
+                return prev;
+            }
+
+            const sourceZoneId = source.zoneId;
             const targetZoneId = prev.sortPosition.zoneId;
 
             const newState = {
@@ -182,17 +210,16 @@ export const Sortable = forwardRef((p, ref) => {
     };
 
     const clearItemsTransform = () => {
-        setState((prev) => (
-            mapZones(
-                prev,
-                [
-                    prev.origSortPos?.zoneId,
-                    prev.prevPosition?.zoneId,
-                    prev.sortPosition?.zoneId,
-                ],
-                clearTransform,
-            )
-        ));
+        setState((prev) => {
+            const zoneIds = [
+                prev.origSortPos?.zoneId,
+                prev.prevPosition?.zoneId,
+                prev.sortPosition?.zoneId,
+            ];
+
+            const newState = mapZones(prev, zoneIds, clearTransform);
+            return mapNextZones(newState, zoneIds, clearTransform);
+        });
     };
 
     const {
@@ -337,17 +364,17 @@ export const Sortable = forwardRef((p, ref) => {
                 swapWithPlaceholder,
             });
 
-            setState((prev) => {
-                const sourceZoneId = prev.prevPosition.zoneId;
-
-                let newState = {
-                    ...prev,
-                };
-
-                newState = mapZones(newState, [sourceZoneId, targetZoneId], setTransform);
-
-                return newState;
-            });
+            setState((prev) => (
+                mapZones(
+                    prev,
+                    [
+                        prev.origSortPos?.zoneId,
+                        prev.prevPosition?.zoneId,
+                        prev.sortPosition?.zoneId,
+                    ],
+                    setTransform,
+                )
+            ));
 
             if (swapWithPlaceholder) {
                 clearItemsTransform();
@@ -357,21 +384,26 @@ export const Sortable = forwardRef((p, ref) => {
 
         onSortEnd() {
             const state = getState();
+            const source = getSource(state);
+            if (!source) {
+                return;
+            }
 
-            const sourcePosition = state.prevPosition ?? state.origSortPos;
-            const sourceZoneId = sourcePosition?.zoneId;
-            const sourceParentId = sourcePosition?.parentId;
+            const sourceZoneId = source.zoneId;
+            const sourceParentId = source.parentId;
+
             const targetZoneId = state.sortPosition.zoneId;
+            const targetParentId = state.sortPosition.parentId;
 
             const sortParams = {
                 id: state.origSortPos.id,
-                sourceIndex: sourcePosition?.index,
+                sourceIndex: source?.index,
                 sourceZoneId,
                 sourceParentId,
                 targetId: state.sortPosition.id,
                 targetIndex: state.sortPosition.index,
                 targetZoneId,
-                targetParentId: state.sortPosition.parentId,
+                targetParentId,
             };
 
             clearItemsTransform();
@@ -379,6 +411,7 @@ export const Sortable = forwardRef((p, ref) => {
 
             setState((prev) => ({
                 ...prev,
+                boxes: {},
                 origSortPos: null,
                 prevPosition: null,
                 sortPosition: null,
@@ -410,7 +443,9 @@ export const Sortable = forwardRef((p, ref) => {
 
                 return {
                     ...newState,
+                    boxes: {},
                     origSortPos: null,
+                    prevPosition: null,
                     sortPosition: null,
                     itemId: null,
                     targetId: null,
@@ -442,6 +477,10 @@ export const Sortable = forwardRef((p, ref) => {
                 : props.dragClass,
             draggingItem.className,
         ),
+        components: {
+            ...props.components,
+            ItemWrapper: SortableItemWrapper,
+        },
     });
 
     const avatar = (draggingItem && (
@@ -454,22 +493,30 @@ export const Sortable = forwardRef((p, ref) => {
         className,
     };
 
+    const state = getState();
     const common = useMemo(() => ({
         ...commonProps,
         placeholderClass,
         animatedClass,
-        dragging: props.dragging,
-        draggingId: props.draggingId,
+        dragging: state.dragging,
+        draggingId: state.draggingId,
         animated: props.animated,
-        placeholder: props.placeholder,
         zoneId: props.id,
-        components: { ...props.components },
-    }), []);
+        components: {
+            ...props.components,
+            ItemWrapper: SortableItemWrapper,
+        },
+    }), [
+        state.dragging,
+        state.draggingId,
+        props.animated,
+        props.id,
+    ]);
 
     const zoneItems = getItems();
-    const listItems = useMemo(() => zoneItems, [zoneItems]);
+    const listItems = useMemo(() => zoneItems, [zoneItems, state.dragging]);
 
-    const ItemComponent = SortableListItem;
+    const ItemComponent = SortableItemWrapper;
 
     return (
         <div {...containerProps} ref={innerRef}>
@@ -477,6 +524,7 @@ export const Sortable = forwardRef((p, ref) => {
                 <ItemComponent
                     {...common}
                     {...item}
+                    items={item.items ?? null}
                     key={`srtlist_${item.zoneId}_${item.id}`}
                 />
             ))}
@@ -500,9 +548,7 @@ Sortable.propTypes = {
         PropTypes.bool,
         PropTypes.string,
     ]),
-    dragging: PropTypes.bool,
-    draggingId: PropTypes.bool,
-    placeholder: PropTypes.bool,
+    tree: PropTypes.bool,
     vertical: PropTypes.bool,
     animated: PropTypes.bool,
     copyWidth: PropTypes.bool,

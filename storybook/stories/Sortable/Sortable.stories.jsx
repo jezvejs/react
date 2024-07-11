@@ -44,7 +44,6 @@ const containerDecorator = (Story) => (
 export const Default = {
     args: {
         id: 'tiles',
-        items: getTiles(),
         className: 'sortable-tiles',
         selector: '.sortable-tile',
         placeholderClass: 'sortable-tile_placeholder',
@@ -71,7 +70,7 @@ export const Default = {
             shiftY: 0,
             dragging: false,
             tiles: {
-                items: args.items,
+                items: getTiles(),
             },
         };
 
@@ -89,7 +88,6 @@ export const Default = {
 export const List = {
     args: {
         id: 'list',
-        items: getListItems(),
         className: 'list-area',
         selector: '.sortable-list-item',
         placeholderClass: 'sortable-list-item__placeholder',
@@ -116,7 +114,7 @@ export const List = {
             shiftY: 0,
             dragging: false,
             list: {
-                items: args.items,
+                items: getListItems(),
             },
         };
 
@@ -157,13 +155,11 @@ export const Exchange = {
         const argsSrc = {
             ...args,
             id: 'exchSource',
-            items: getListItems(),
         };
 
         const argsDest = {
             ...args,
             id: 'exchDest',
-            items: getDestListItems(),
             dragClass: 'list_item_drag',
         };
 
@@ -174,10 +170,10 @@ export const Exchange = {
             shiftY: 0,
             dragging: false,
             exchSource: {
-                items: argsSrc.items,
+                items: getListItems(),
             },
             exchDest: {
-                items: argsDest.items,
+                items: getDestListItems(),
             },
         };
 
@@ -198,7 +194,6 @@ export const Exchange = {
 export const CustomGroups = {
     args: {
         id: 'list',
-        items: getCustomGroupItems(),
         className: 'list-area',
         selector: '.sortable-list-item',
         placeholderClass: 'sortable-list-item__placeholder',
@@ -225,7 +220,7 @@ export const CustomGroups = {
             shiftY: 0,
             dragging: false,
             list: {
-                items: args.items,
+                items: getCustomGroupItems(),
             },
         };
 
@@ -243,12 +238,12 @@ export const CustomGroups = {
 export const Tree = {
     args: {
         id: 'tree',
-        items: getTreeItems(),
         className: 'tree',
         selector: '.tree-item',
         containerSelector: '.tree-item__content',
         placeholderClass: 'tree-item__placeholder',
         dragClass: true,
+        animated: true,
         group: 'tree',
         copyWidth: true,
         tree: true,
@@ -272,7 +267,7 @@ export const Tree = {
             shiftY: 0,
             dragging: false,
             tree: {
-                items: args.items,
+                items: getTreeItems(),
             },
         };
 

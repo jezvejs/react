@@ -11,10 +11,10 @@ import {
 import { afterTransition } from '@jezvejs/dom';
 
 import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.jsx';
-import { AnimationStages } from '../../helpers.js';
+import { AnimationStages, isPlaceholder } from '../../helpers.js';
 
 // eslint-disable-next-line react/display-name
-export const SortableListItem = forwardRef((props, ref) => {
+export const SortableItemWrapper = forwardRef((props, ref) => {
     const {
         placeholderClass,
         animatedClass,
@@ -136,34 +136,35 @@ export const SortableListItem = forwardRef((props, ref) => {
     }, [animation.stage, animation.initialTransform, animation.offsetTransform]);
 
     const state = getState();
-    const isPlaceholder = (
-        props.placeholder
-        || (
-            state.dragging
-            && props.id === state.itemId
-        )
-    );
 
     const isEntered = animation.stage === AnimationStages.entered;
     const isExiting = animation.stage === AnimationStages.exiting;
 
     const listItemProps = useMemo(() => {
-        const res = {
+        const getItemState = (item) => ({
+            ...item,
+            className: classNames(
+                item.className,
+                {
+                    [placeholderClass]: isPlaceholder(item, state),
+                    [animatedClass]: (item.animated && isEntered),
+                },
+            ),
+            items: (
+                Array.isArray(item.items)
+                    ? item.items.map(getItemState)
+                    : item.items
+            ),
+        });
+
+        const res = getItemState({
             ...props,
             id: props.id,
             group: props.group,
-            items: props.items,
             title: props.title,
-            className: classNames(
-                props.className,
-                {
-                    [placeholderClass]: isPlaceholder,
-                    [animatedClass]: (props.animated && isEntered),
-                },
-            ),
             style: {
             },
-        };
+        });
 
         if (props.initialTransform && props.offsetTransform) {
             if (props.animated && (isEntered || isExiting)) {
@@ -187,10 +188,10 @@ export const SortableListItem = forwardRef((props, ref) => {
         props.className,
         props.initialTransform,
         props.offsetTransform,
+        state.dragging,
         animation.initialTransform,
         animation.offsetTransform,
         animation.stage,
-        isPlaceholder,
     ]);
 
     const { ListItem } = props.components;
@@ -208,7 +209,7 @@ const isComponent = PropTypes.oneOfType([
     PropTypes.func,
 ]);
 
-SortableListItem.propTypes = {
+SortableItemWrapper.propTypes = {
     id: PropTypes.string,
     zoneId: PropTypes.string,
     group: PropTypes.string,

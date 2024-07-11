@@ -218,6 +218,17 @@ export const getPositionsCache = (zoneId, state) => (
 );
 
 /**
+ * Returns cached position for specified item at drag zone
+ * @param {string} id
+ * @param {string} zoneId
+ * @param {object} state
+ * @returns {object}
+ */
+export const getPositionCacheById = (id, zoneId, state) => (
+    getPositionsCache(zoneId, state).find((item) => item.id === id)
+);
+
+/**
  * Moves tree item from one position to another
  * If 'swapWithPlaceholder' option is enabled then swaps source and target items
  *
@@ -295,7 +306,7 @@ export const moveTreeItem = (state, options) => {
 
     const movingItem = getTreeItemById(source.id, sourceItems);
     const targetItem = getTreeItemById(target.id, destItems);
-    const origIndex = state.sortPosition?.index ?? null;
+    const sourceIndex = findTreeItemIndexById(sourceItems, source.id);
 
     if (!movingItem) {
         return state;
@@ -309,7 +320,7 @@ export const moveTreeItem = (state, options) => {
         newState[source.zoneId] = {
             ...newState[source.zoneId],
             items: (swapWithPlaceholder)
-                ? sourceItems.toSpliced(origIndex, 1, targetItem)
+                ? sourceItems.toSpliced(sourceIndex, 1, targetItem)
                 : filterTreeItems(sourceItems, (item) => item?.id !== source.id),
         };
     }
@@ -382,7 +393,27 @@ export const mapZoneItems = (state, zoneId, callback) => ({
     [zoneId]: {
         ...state[zoneId],
         items: mapTreeItems(
-            state[zoneId].items,
+            getDragZoneItems(zoneId, state),
+            callback,
+        ),
+    },
+});
+
+/**
+ * Applies callback function to each item of the next state inside specified zone
+ * and returns new state object
+ *
+ * @param {object} state
+ * @param {string} zoneId
+ * @param {Function} callback
+ * @returns {object}
+ */
+export const mapNextZoneItems = (state, zoneId, callback) => ({
+    ...state,
+    [zoneId]: {
+        ...state[zoneId],
+        next: mapTreeItems(
+            getNextZoneItems(zoneId, state),
             callback,
         ),
     },
@@ -412,15 +443,58 @@ export const mapZones = (state, zoneIds, callback) => {
 };
 
 /**
+ * Applies callback function to each item of the next state of multiple drag zones
+ * and returns new state object
+ *
+ * @param {object} state
+ * @param {string} zoneIds
+ * @param {Function} callback
+ * @returns {object}
+ */
+export const mapNextZones = (state, zoneIds, callback) => {
+    const ids = [];
+    let newState = state;
+
+    asArray(zoneIds).forEach((zoneId) => {
+        const id = zoneId ?? null;
+        if (id !== null && !ids.includes(id)) {
+            newState = mapNextZoneItems(newState, id, callback);
+            ids.push(id);
+        }
+    });
+
+    return newState;
+};
+
+/**
  * Returns dimensions of element
  * @param {HTMLElement} elem
  * @returns {object}
  */
-export const getAnimationBox = (elem) => (
-    elem?.getBoundingClientRect() ?? {
-        left: 0,
-        top: 0,
-        width: 0,
-        height: 0,
-    }
+export const getAnimationBox = (elem) => {
+    const rect = elem?.getBoundingClientRect();
+
+    return {
+        id: elem?.dataset?.id,
+        x: rect?.x ?? 0,
+        y: rect?.y ?? 0,
+        left: rect?.left ?? 0,
+        top: rect?.top ?? 0,
+        width: rect?.width ?? 0,
+        height: rect?.height ?? 0,
+    };
+};
+
+/**
+ * Returns true if specified item is placeholder
+ * @param {object} props
+ * @param {object} state
+ * @returns {boolean}
+ */
+export const isPlaceholder = (props, state) => (
+    props.placeholder
+    || (
+        state.dragging
+        && props.id === state.itemId
+    )
 );

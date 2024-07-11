@@ -8,13 +8,16 @@ import {
     getAnimationBox,
     getDragZone,
     getNextZoneItems,
+    getPositionCacheById,
     getPositionsCache,
     getTreeItemById,
     isTreeContains,
+    mapTreeItems,
 } from './helpers.js';
 
 export function useSortableDropTarget(props) {
     const targetElem = useRef(null);
+    const tmpPlaceholderId = useRef(null);
 
     const { getState, setState } = useDragnDrop();
 
@@ -114,28 +117,51 @@ export function useSortableDropTarget(props) {
             const sourceIndex = findTreeItemIndexById(sourceZoneItems, sourceId);
 
             const targetZoneItems = getNextZoneItems(targetZoneId, state);
-            const targetIndex = findTreeItemIndexById(targetZoneItems, targetId);
+            let targetIndex = findTreeItemIndexById(targetZoneItems, targetId);
             if (targetIndex === -1) {
-                return;
+                if (targetId !== null) {
+                    return;
+                }
+
+                targetIndex = targetZoneItems.length;
             }
 
             const isSameParent = (
                 targetParentId === state.sortPosition.parentId
                 && targetZoneId === state.sortPosition.zoneId
             );
+            const isZoneTarget = targetId === null || targetId === targetZoneId;
 
             const dragZoneBeforeTarget = isSameParent && sourceIndex < targetIndex;
             const dragZoneAfterTarget = isSameParent && sourceIndex > targetIndex;
             const dragZoneContainsTarget = isTreeContains(sourceId, targetId, sourceZoneItems);
             const targetContainsDragZone = isTreeContains(targetId, sourceId, targetZoneItems);
 
-            const isPlaceholder = newTargetElem.classList.contains(dragZone.getPlaceholder());
+            const placeholderClass = dragZone.getPlaceholder();
+            const isPlaceholder = newTargetElem.classList.contains(placeholderClass);
 
             let animateElems = [];
             let swapWithPlaceholder = false;
 
             this.checkPositionsCache(sourceZoneId, dragZoneElem.parentNode);
-            this.checkPositionsCache(targetZoneId, newTargetElem.parentNode);
+
+            // Temporarily append item to the target container to save position of
+            // item next after current last item
+            const tmpPlaceholder = dragZoneElem.cloneNode(true);
+            tmpPlaceholder.classList.add(placeholderClass);
+            tmpPlaceholderId.current = `placeholder_${Date.now()}`;
+            tmpPlaceholder.dataset.id = tmpPlaceholderId.current;
+
+            const targetParentElem = (isZoneTarget)
+                ? newTargetElem
+                : newTargetElem.parentNode;
+            if (targetParentElem) {
+                targetParentElem.append(tmpPlaceholder);
+            }
+
+            this.checkPositionsCache(targetZoneId, targetParentElem);
+
+            tmpPlaceholder.remove();
 
             // check drop target is already a placeholder
             if (isPlaceholder) {
@@ -167,10 +193,10 @@ export function useSortableDropTarget(props) {
 
                 animateElems = [sourceItem, targetItem];
             } else if (
-                sourceZoneId !== targetZoneId
+                sourceParentId !== targetParentId
                 && !dragZoneContainsTarget
             ) {
-                // move between containers
+                /* move between containers */
                 animateElems = this.getMovingItems({
                     sourceIndex,
                     sourceZoneId,
@@ -229,13 +255,34 @@ export function useSortableDropTarget(props) {
 
             const { ListItem } = props.components;
             const elems = Array.from(elem.querySelectorAll(ListItem?.selector));
-            const boxes = elems.map((el) => getAnimationBox(el));
+            const boxes = Object.fromEntries(
+                elems.map((el) => {
+                    const box = getAnimationBox(el);
+                    return [box.id, box];
+                }),
+            );
+
+            const getItemBox = (item) => ({
+                ...(boxes[item.id] ?? {}),
+                id: item.id,
+                items: (
+                    (item.items?.length > 0)
+                        ? item.items.map(getItemBox)
+                        : item.items
+                ),
+            });
 
             setState((prev) => ({
                 ...prev,
                 boxes: {
                     ...(prev.boxes ?? {}),
-                    [zoneId]: boxes,
+                    [zoneId]: [
+                        ...mapTreeItems(
+                            prev[zoneId].next ?? prev[zoneId].items ?? [],
+                            getItemBox,
+                        ),
+                        boxes[tmpPlaceholderId.current],
+                    ],
                 },
             }));
         },
@@ -301,9 +348,8 @@ export function useSortableDropTarget(props) {
                     return [];
                 }
 
-                const positionCache = getPositionsCache(sourceZoneId, state);
-
                 const parentItems = parent.next ?? parent.items ?? [];
+                const sourcePositionCache = getPositionsCache(sourceZoneId, state);
                 const firstIndex = Math.min(sourceIndex, targetIndex);
                 const lastIndex = Math.max(sourceIndex, targetIndex);
 
@@ -322,6 +368,8 @@ export function useSortableDropTarget(props) {
                             : (index + 1);
                     }
                     const sibling = parentItems[siblingIndex];
+                    const rect = sourcePositionCache[index];
+                    const targetRect = sourcePositionCache[siblingIndex];
 
                     res.push({
                         id: item?.id,
@@ -329,8 +377,8 @@ export function useSortableDropTarget(props) {
                         zoneId: props.id,
                         parentId: sourceParentId,
                         targetId: sibling?.id,
-                        rect: positionCache[index],
-                        targetRect: positionCache[siblingIndex],
+                        rect,
+                        targetRect,
                     });
                 }
             } else {
@@ -367,6 +415,8 @@ export function useSortableDropTarget(props) {
 
                     const siblingIndex = index - 1;
                     const sibling = sourceParentItems[siblingIndex];
+                    const rect = sourcePositionCache[index];
+                    const targetRect = sourcePositionCache[siblingIndex];
 
                     res.push({
                         id: item?.id,
@@ -374,42 +424,49 @@ export function useSortableDropTarget(props) {
                         zoneId: sourceZoneId,
                         parentId: sourceParentId,
                         targetId: sibling?.id,
-                        rect: sourcePositionCache[index],
-                        targetRect: sourcePositionCache[siblingIndex],
+                        rect,
+                        targetRect,
                     });
                 }
 
                 // Add moving item
                 const sourceItem = sourceParentItems[sourceIndex];
                 const targetItem = targetParentItems[targetIndex];
+
+                const sourcePosition = sourcePositionCache[sourceIndex];
+                const targetPosition = targetPositionCache[sourceIndex];
                 res.push({
                     id: sourceItem?.id,
                     index: sourceIndex,
                     zoneId: sourceZoneId,
                     parentId: sourceParentId,
                     targetId: targetItem?.id,
-                    rect: sourcePositionCache[sourceIndex],
-                    targetRect: sourcePositionCache[sourceIndex],
+                    rect: sourcePosition,
+                    targetRect: targetPosition,
                 });
 
                 // Move items at target list down by the size of moving item
-                for (let target = firstTargetIndex; target <= lastTargetIndex; target += 1) {
-                    const item = targetParentItems[target];
+                for (let index = firstTargetIndex; index <= lastTargetIndex; index += 1) {
+                    const item = targetParentItems[index];
                     if (!item) {
                         return [];
                     }
 
-                    const siblingIndex = target + 1;
+                    const siblingIndex = index + 1;
                     const sibling = targetParentItems[siblingIndex];
+                    const rect = targetPositionCache[index];
+                    const targetRect = targetPositionCache[siblingIndex] ?? (
+                        getPositionCacheById(tmpPlaceholderId.current, targetZoneId, state)
+                    );
 
                     res.push({
                         id: item?.id,
-                        index: target,
+                        index,
                         zoneId: targetZoneId,
                         parentId: targetParentId,
                         targetId: sibling?.id,
-                        rect: targetPositionCache[target],
-                        targetRect: targetPositionCache[siblingIndex],
+                        rect,
+                        targetRect,
                     });
                 }
             }
