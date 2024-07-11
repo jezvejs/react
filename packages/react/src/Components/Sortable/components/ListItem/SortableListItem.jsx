@@ -152,6 +152,7 @@ export const SortableListItem = forwardRef((props, ref) => {
             ...props,
             id: props.id,
             group: props.group,
+            items: props.items,
             title: props.title,
             className: classNames(
                 props.className,
@@ -181,6 +182,7 @@ export const SortableListItem = forwardRef((props, ref) => {
         props.title,
         props.group,
         props.id,
+        props.items,
         props.animated,
         props.className,
         props.initialTransform,
@@ -210,6 +212,7 @@ SortableListItem.propTypes = {
     id: PropTypes.string,
     zoneId: PropTypes.string,
     group: PropTypes.string,
+    items: PropTypes.array,
     className: PropTypes.string,
     placeholderClass: PropTypes.string,
     animatedClass: PropTypes.string,
