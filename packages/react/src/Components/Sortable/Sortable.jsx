@@ -135,6 +135,10 @@ export const Sortable = forwardRef((p, ref) => {
                 prevPosition: {
                     ...prev.sortPosition,
                 },
+                sortPosition: {
+                    ...move.sortPosition,
+                },
+                swapWithPlaceholder: move.swapWithPlaceholder,
                 [sourceZoneId]: {
                     ...(prev[sourceZoneId] ?? {}),
                     next: [...(newState[sourceZoneId].items ?? [])],
@@ -154,7 +158,7 @@ export const Sortable = forwardRef((p, ref) => {
 
     const moveItem = () => {
         setState((prev) => {
-            const sourceZoneId = prev.prevPosition?.zoneId ?? prev.origSortPos.zoneId;
+            const sourceZoneId = prev.origSortPos.zoneId;
             const targetZoneId = prev.sortPosition.zoneId;
 
             const newState = {
@@ -218,6 +222,13 @@ export const Sortable = forwardRef((p, ref) => {
             setState((prev) => {
                 const dragZoneItems = getDragZoneItems(zoneId, prev);
                 const index = findTreeItemIndex(dragZoneItems, (item) => item?.id === itemId);
+                const sortPosition = {
+                    id: itemId,
+                    parentId,
+                    index,
+                    zoneId,
+                };
+
                 return {
                     ...prev,
                     boxes: {
@@ -225,24 +236,9 @@ export const Sortable = forwardRef((p, ref) => {
                         [zoneId]: boxes,
                     },
                     itemId,
-                    origSortPos: {
-                        id: itemId,
-                        parentId,
-                        index,
-                        zoneId,
-                    },
-                    prevPosition: {
-                        id: itemId,
-                        parentId,
-                        index,
-                        zoneId,
-                    },
-                    sortPosition: {
-                        id: itemId,
-                        parentId,
-                        index,
-                        zoneId,
-                    },
+                    origSortPos: { ...sortPosition },
+                    prevPosition: { ...sortPosition },
+                    sortPosition,
                 };
             });
         },
@@ -265,6 +261,7 @@ export const Sortable = forwardRef((p, ref) => {
             const state = getState();
             const sourceId = state.origSortPos.id ?? null;
 
+            // Skip the same item
             if (
                 targetId === sourceId
                 && parentId === state.sortPosition.parentId
@@ -290,7 +287,7 @@ export const Sortable = forwardRef((p, ref) => {
 
             // Skip handling same target as the current one
             const targetItem = findItemById(targetId, targetZoneId);
-            if (!targetItem) {
+            if (targetId !== null && !targetItem) {
                 return;
             }
 
@@ -348,20 +345,10 @@ export const Sortable = forwardRef((p, ref) => {
             }, clearTransform);
 
             setState((prev) => {
-                const sourceZoneId = prev.sortPosition.zoneId;
+                const sourceZoneId = prev.prevPosition.zoneId;
 
                 let newState = {
                     ...prev,
-                    prevPosition: {
-                        ...prev.sortPosition,
-                    },
-                    sortPosition: {
-                        id: targetId,
-                        index: targetIndex,
-                        parentId,
-                        zoneId: targetZoneId,
-                    },
-                    swapWithPlaceholder,
                 };
 
                 newState = mapZoneItems(newState, sourceZoneId, setTransform);
@@ -380,10 +367,20 @@ export const Sortable = forwardRef((p, ref) => {
 
         onSortEnd() {
             const state = getState();
+
+            const sourcePosition = state.prevPosition ?? state.origSortPos;
+            const sourceZoneId = sourcePosition?.zoneId;
+            const sourceParentId = sourcePosition?.parentId;
+            const targetZoneId = state.sortPosition.zoneId;
+
             const sortParams = {
                 id: state.origSortPos.id,
-                parentId: state.sortPosition.parentId,
-                targetPos: state.sortPosition.index,
+                sourceIndex: sourcePosition?.index,
+                sourceZoneId,
+                sourceParentId,
+                targetId: state.sortPosition.id,
+                targetIndex: state.sortPosition.index,
+                targetZoneId,
                 targetParentId: state.sortPosition.parentId,
             };
 
@@ -403,6 +400,8 @@ export const Sortable = forwardRef((p, ref) => {
         },
 
         onSortCancel() {
+            clearItemsTransform();
+
             setState((prev) => {
                 const newState = moveTreeItem(prev, {
                     source: {
@@ -427,8 +426,6 @@ export const Sortable = forwardRef((p, ref) => {
                     targetId: null,
                 };
             });
-
-            clearItemsTransform();
         },
     });
 

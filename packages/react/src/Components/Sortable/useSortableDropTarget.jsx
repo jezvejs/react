@@ -14,7 +14,6 @@ import {
 } from './helpers.js';
 
 export function useSortableDropTarget(props) {
-    const prevTargetElem = useRef(null);
     const targetElem = useRef(null);
 
     const { getState, setState } = useDragnDrop();
@@ -90,10 +89,6 @@ export function useSortableDropTarget(props) {
                 return;
             }
 
-            if (!prevTargetElem.current) {
-                prevTargetElem.current = dragZoneElem;
-            }
-
             const state = getState();
             if (!state.origSortPos || !state.sortPosition) {
                 return;
@@ -101,7 +96,8 @@ export function useSortableDropTarget(props) {
 
             const sourceId = state.origSortPos.id ?? null;
             const sourceZoneId = state.sortPosition.zoneId ?? null;
-            if (sourceId === null || sourceZoneId === null) {
+            const sourceParentId = state.sortPosition.parentId ?? null;
+            if (sourceId === null || sourceZoneId === null || sourceParentId === null) {
                 return;
             }
 
@@ -112,7 +108,7 @@ export function useSortableDropTarget(props) {
             let targetId = targetDragZone.itemIdFromElem(newTargetElem);
             const parentElem = targetDragZone.findDragZoneItem(newTargetElem.parentNode);
             const targetParentZone = targetDragZone.itemIdFromElem(parentElem);
-            let parentId = targetParentZone ?? targetZoneId;
+            let targetParentId = targetParentZone ?? targetZoneId;
 
             const sourceZoneItems = getNextZoneItems(sourceZoneId, state);
             const sourceIndex = findTreeItemIndexById(sourceZoneItems, sourceId);
@@ -124,8 +120,8 @@ export function useSortableDropTarget(props) {
             }
 
             const isSameParent = (
-                state.origSortPos.parentId === state.sortPosition.parentId
-                && state.origSortPos.zoneId === state.sortPosition.zoneId
+                targetParentId === state.sortPosition.parentId
+                && targetZoneId === state.sortPosition.zoneId
             );
 
             const dragZoneBeforeTarget = isSameParent && sourceIndex < targetIndex;
@@ -150,7 +146,7 @@ export function useSortableDropTarget(props) {
                     sourceId,
                     sourceIndex,
                     sourceZoneId,
-                    parentId,
+                    sourceParentId,
                 );
                 if (!sourceItem) {
                     return;
@@ -160,7 +156,7 @@ export function useSortableDropTarget(props) {
                     targetId,
                     targetIndex,
                     targetZoneId,
-                    parentId,
+                    targetParentId,
                 );
                 if (!targetItem) {
                     return;
@@ -171,34 +167,18 @@ export function useSortableDropTarget(props) {
 
                 animateElems = [sourceItem, targetItem];
             } else if (
-                prevTargetElem.current?.parentNode !== newTargetElem.parentNode
+                sourceZoneId !== targetZoneId
                 && !dragZoneContainsTarget
             ) {
                 // move between containers
-                const sourceItem = this.getAnimatedItem(
-                    sourceId,
+                animateElems = this.getMovingItems({
                     sourceIndex,
                     sourceZoneId,
-                    parentId,
-                );
-                if (!sourceItem) {
-                    return;
-                }
-
-                const [, ...sourceItems] = this.getMovingItems(
-                    sourceIndex,
-                    sourceZoneItems.length - 1,
-                    sourceZoneId,
-                    state.sortPosition.parentId,
-                );
-                const targetItems = this.getMovingItems(
-                    targetZoneItems.length - 1,
+                    sourceParentId,
                     targetIndex,
                     targetZoneId,
-                    parentId,
-                );
-
-                animateElems = [sourceItem, ...sourceItems, ...targetItems];
+                    targetParentId,
+                });
             } else if (
                 props.tree
                 && targetContainer
@@ -206,29 +186,22 @@ export function useSortableDropTarget(props) {
                 && !dragZoneContainsTarget
             ) {
                 /* new target element has empty container */
-                parentId = targetId;
+                targetParentId = targetId;
                 targetId = null;
             } else if (
                 (dragZoneBeforeTarget || dragZoneAfterTarget)
                 && !dragZoneContainsTarget
                 && !targetContainsDragZone
             ) {
-                animateElems = this.getMovingItems(
+                /* move inside the same container */
+                animateElems = this.getMovingItems({
                     sourceIndex,
+                    sourceZoneId,
+                    sourceParentId,
                     targetIndex,
                     targetZoneId,
-                    parentId,
-                );
-            }
-
-            if (
-                (dragZoneBeforeTarget || dragZoneAfterTarget)
-                && !dragZoneContainsTarget
-                && !targetContainsDragZone
-                && targetId
-                && newTargetElem !== prevTargetElem.current
-            ) {
-                prevTargetElem.current = newTargetElem;
+                    targetParentId,
+                });
             }
 
             props.onDragMove?.({
@@ -237,7 +210,7 @@ export function useSortableDropTarget(props) {
                 targetId,
                 targetIndex,
                 targetZoneId,
-                parentId,
+                parentId: targetParentId,
                 swapWithPlaceholder,
                 animateElems,
             });
@@ -293,57 +266,152 @@ export function useSortableDropTarget(props) {
             };
         },
 
-        getMovingItems(sourceIndex, targetIndex, zoneId, parentId) {
+        getMovingItems({
+            sourceIndex,
+            sourceZoneId,
+            sourceParentId,
+            targetIndex,
+            targetZoneId,
+            targetParentId,
+        }) {
             if (sourceIndex === -1 || targetIndex === -1) {
                 return [];
             }
 
             const sourceAfterTarget = sourceIndex > targetIndex;
             const sourceBeforeTarget = sourceIndex < targetIndex;
-            if (!sourceAfterTarget && !sourceBeforeTarget) {
+            const isSameParent = (
+                sourceZoneId === targetZoneId
+                && sourceParentId === targetParentId
+            );
+
+            if (isSameParent && !sourceAfterTarget && !sourceBeforeTarget) {
                 return [];
             }
 
             const state = getState();
-            const zone = getDragZone(zoneId, state);
-            const parent = (parentId === zoneId)
-                ? zone
-                : getTreeItemById(parentId, zone.next);
-            if (!parent) {
-                return [];
-            }
-
             const res = [];
-            const positionCache = getPositionsCache(zoneId, state);
 
-            const parentItems = parent.next ?? parent.items ?? [];
-            const firstIndex = Math.min(sourceIndex, targetIndex);
-            const lastIndex = Math.max(sourceIndex, targetIndex);
-            for (let index = firstIndex; index <= lastIndex; index += 1) {
-                const item = parentItems[index];
-                if (!item) {
+            if (isSameParent) {
+                const zone = getDragZone(sourceZoneId, state);
+                const parent = (sourceParentId === sourceZoneId)
+                    ? zone
+                    : getTreeItemById(sourceParentId, getNextZoneItems(sourceZoneId, state));
+                if (!parent) {
                     return [];
                 }
 
-                let siblingIndex;
-                if (index === sourceIndex) {
-                    siblingIndex = targetIndex;
-                } else {
-                    siblingIndex = (sourceBeforeTarget)
-                        ? (index - 1)
-                        : (index + 1);
-                }
-                const sibling = parentItems[siblingIndex];
+                const positionCache = getPositionsCache(sourceZoneId, state);
 
+                const parentItems = parent.next ?? parent.items ?? [];
+                const firstIndex = Math.min(sourceIndex, targetIndex);
+                const lastIndex = Math.max(sourceIndex, targetIndex);
+
+                for (let index = firstIndex; index <= lastIndex; index += 1) {
+                    const item = parentItems[index];
+                    if (!item) {
+                        return [];
+                    }
+
+                    let siblingIndex;
+                    if (index === sourceIndex) {
+                        siblingIndex = targetIndex;
+                    } else {
+                        siblingIndex = (sourceBeforeTarget)
+                            ? (index - 1)
+                            : (index + 1);
+                    }
+                    const sibling = parentItems[siblingIndex];
+
+                    res.push({
+                        id: item?.id,
+                        index,
+                        zoneId: props.id,
+                        parentId: sourceParentId,
+                        targetId: sibling?.id,
+                        rect: positionCache[index],
+                        targetRect: positionCache[siblingIndex],
+                    });
+                }
+            } else {
+                const sourceParent = (sourceParentId === sourceZoneId)
+                    ? getDragZone(sourceZoneId, state)
+                    : getTreeItemById(sourceParentId, getNextZoneItems(sourceZoneId, state));
+                if (!sourceParent) {
+                    return [];
+                }
+
+                const targetParent = (targetParentId === targetZoneId)
+                    ? getDragZone(targetZoneId, state)
+                    : getTreeItemById(targetParentId, getNextZoneItems(targetZoneId, state));
+                if (!targetParent) {
+                    return [];
+                }
+
+                const sourcePositionCache = getPositionsCache(sourceZoneId, state);
+                const targetPositionCache = getPositionsCache(targetZoneId, state);
+                const sourceParentItems = sourceParent.next ?? sourceParent.items ?? [];
+                const targetParentItems = targetParent.next ?? targetParent.items ?? [];
+
+                const firstSourceIndex = sourceIndex + 1;
+                const lastSourceIndex = sourceParentItems.length - 1;
+                const firstTargetIndex = targetIndex;
+                const lastTargetIndex = targetParentItems.length - 1;
+
+                // Move items at source list up by the size of moving item
+                for (let index = firstSourceIndex; index <= lastSourceIndex; index += 1) {
+                    const item = sourceParentItems[index];
+                    if (!item) {
+                        return [];
+                    }
+
+                    const siblingIndex = index - 1;
+                    const sibling = sourceParentItems[siblingIndex];
+
+                    res.push({
+                        id: item?.id,
+                        index,
+                        zoneId: sourceZoneId,
+                        parentId: sourceParentId,
+                        targetId: sibling?.id,
+                        rect: sourcePositionCache[index],
+                        targetRect: sourcePositionCache[siblingIndex],
+                    });
+                }
+
+                // Add moving item
+                const sourceItem = sourceParentItems[sourceIndex];
+                const targetItem = targetParentItems[targetIndex];
                 res.push({
-                    id: item?.id,
-                    index,
-                    zoneId: props.id,
-                    parentId,
-                    targetId: sibling?.id,
-                    rect: positionCache[index],
-                    targetRect: positionCache[siblingIndex],
+                    id: sourceItem?.id,
+                    index: sourceIndex,
+                    zoneId: sourceZoneId,
+                    parentId: sourceParentId,
+                    targetId: targetItem?.id,
+                    rect: sourcePositionCache[sourceIndex],
+                    targetRect: sourcePositionCache[sourceIndex],
                 });
+
+                // Move items at target list down by the size of moving item
+                for (let target = firstTargetIndex; target <= lastTargetIndex; target += 1) {
+                    const item = targetParentItems[target];
+                    if (!item) {
+                        return [];
+                    }
+
+                    const siblingIndex = target + 1;
+                    const sibling = targetParentItems[siblingIndex];
+
+                    res.push({
+                        id: item?.id,
+                        index: target,
+                        zoneId: targetZoneId,
+                        parentId: targetParentId,
+                        targetId: sibling?.id,
+                        rect: targetPositionCache[target],
+                        targetRect: targetPositionCache[siblingIndex],
+                    });
+                }
             }
 
             return res;
@@ -352,8 +420,6 @@ export function useSortableDropTarget(props) {
         finishDrag() {
             const dragMaster = DragMaster.getInstance();
             const { dragZone } = dragMaster;
-
-            prevTargetElem.current = null;
 
             dragZone.finishDrag();
         },
