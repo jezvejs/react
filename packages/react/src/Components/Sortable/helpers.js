@@ -375,7 +375,7 @@ export const clearTransform = (item) => ({
  * @param {object} state
  * @param {string} zoneId
  * @param {Function} callback
- * @returns
+ * @returns {object}
  */
 export const mapZoneItems = (state, zoneId, callback) => ({
     ...state,
@@ -387,6 +387,29 @@ export const mapZoneItems = (state, zoneId, callback) => ({
         ),
     },
 });
+
+/**
+ * Applies callback function to each item inside multiple drag zones and returns new state object
+ *
+ * @param {object} state
+ * @param {string} zoneIds
+ * @param {Function} callback
+ * @returns {object}
+ */
+export const mapZones = (state, zoneIds, callback) => {
+    const ids = [];
+    let newState = state;
+
+    asArray(zoneIds).forEach((zoneId) => {
+        const id = zoneId ?? null;
+        if (id !== null && !ids.includes(id)) {
+            newState = mapZoneItems(newState, id, callback);
+            ids.push(id);
+        }
+    });
+
+    return newState;
+};
 
 /**
  * Returns dimensions of element

@@ -21,8 +21,8 @@ import {
     getDragZoneItems,
     getNextZoneItems,
     getTreeItemById,
-    mapZoneItems,
     moveTreeItem,
+    mapZones,
 } from './helpers.js';
 
 // eslint-disable-next-line react/display-name
@@ -84,7 +84,7 @@ export const Sortable = forwardRef((p, ref) => {
         return itemsRes ?? nextRes;
     };
 
-    const saveItemMove = (move, setTransform) => {
+    const saveItemMove = (move) => {
         setState((prev) => {
             const sourceZoneId = prev.sortPosition.zoneId;
             const targetZoneId = move.sortPosition.zoneId;
@@ -125,10 +125,7 @@ export const Sortable = forwardRef((p, ref) => {
                 swapWithPlaceholder: move.swapWithPlaceholder,
             });
 
-            newState = mapZoneItems(newState, sourceZoneId, setTransform);
-            if (targetZoneId !== sourceZoneId) {
-                newState = mapZoneItems(newState, targetZoneId, setTransform);
-            }
+            newState = mapZones(newState, [sourceZoneId, targetZoneId], clearTransform);
 
             const res = {
                 ...prev,
@@ -185,21 +182,17 @@ export const Sortable = forwardRef((p, ref) => {
     };
 
     const clearItemsTransform = () => {
-        setState((prev) => {
-            let newState = {
-                ...prev,
-            };
-
-            const sourceZoneId = prev.origSortPos.zoneId;
-            const targetZoneId = prev.sortPosition.zoneId;
-
-            newState = mapZoneItems(newState, sourceZoneId, clearTransform);
-            if (targetZoneId !== sourceZoneId) {
-                newState = mapZoneItems(newState, targetZoneId, clearTransform);
-            }
-
-            return newState;
-        });
+        setState((prev) => (
+            mapZones(
+                prev,
+                [
+                    prev.origSortPos?.zoneId,
+                    prev.prevPosition?.zoneId,
+                    prev.sortPosition?.zoneId,
+                ],
+                clearTransform,
+            )
+        ));
     };
 
     const {
@@ -342,7 +335,7 @@ export const Sortable = forwardRef((p, ref) => {
                     zoneId: targetZoneId,
                 },
                 swapWithPlaceholder,
-            }, clearTransform);
+            });
 
             setState((prev) => {
                 const sourceZoneId = prev.prevPosition.zoneId;
@@ -351,10 +344,7 @@ export const Sortable = forwardRef((p, ref) => {
                     ...prev,
                 };
 
-                newState = mapZoneItems(newState, sourceZoneId, setTransform);
-                if (targetZoneId !== sourceZoneId) {
-                    newState = mapZoneItems(newState, targetZoneId, setTransform);
-                }
+                newState = mapZones(newState, [sourceZoneId, targetZoneId], setTransform);
 
                 return newState;
             });
