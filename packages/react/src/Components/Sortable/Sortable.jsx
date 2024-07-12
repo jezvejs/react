@@ -89,6 +89,10 @@ export const Sortable = forwardRef((p, ref) => {
     };
 
     const getSource = (state) => {
+        if (!state.dragging) {
+            return null;
+        }
+
         let sourcePosition = state.origSortPos;
         let sourceZone = getDragZoneItems(sourcePosition.zoneId, state);
         let movingItem = getTreeItemById(state.itemId, sourceZone);
