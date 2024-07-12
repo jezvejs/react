@@ -17,7 +17,6 @@ import {
     clearTransform,
     findTreeItemIndex,
     formatOffsetMatrix,
-    getAnimationBox,
     getDragZoneItems,
     getNextZoneItems,
     getTreeItemById,
@@ -235,10 +234,6 @@ export const Sortable = forwardRef((p, ref) => {
                 return;
             }
 
-            const selector = ListItem.selector ?? this.selector;
-            const elems = Array.from(dragZoneRef.current.querySelectorAll(selector));
-            const boxes = elems.map((el) => getAnimationBox(el));
-
             setState((prev) => {
                 const dragZoneItems = getDragZoneItems(zoneId, prev);
                 const index = findTreeItemIndex(dragZoneItems, (item) => item?.id === itemId);
@@ -251,10 +246,7 @@ export const Sortable = forwardRef((p, ref) => {
 
                 return {
                     ...prev,
-                    boxes: {
-                        ...(prev.boxes ?? {}),
-                        [zoneId]: boxes,
-                    },
+                    boxes: {},
                     itemId,
                     origSortPos: { ...sortPosition },
                     prevPosition: { ...sortPosition },

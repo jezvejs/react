@@ -17,7 +17,7 @@ import {
 
 export function useSortableDropTarget(props) {
     const targetElem = useRef(null);
-    const tmpPlaceholderId = useRef(null);
+    const tmpPlaceholderIds = useRef({});
 
     const { getState, setState } = useDragnDrop();
 
@@ -92,7 +92,7 @@ export function useSortableDropTarget(props) {
                 return;
             }
 
-            const state = getState();
+            let state = getState();
             if (!state.origSortPos || !state.sortPosition) {
                 return;
             }
@@ -107,7 +107,7 @@ export function useSortableDropTarget(props) {
             const { containerSelector } = dragZone;
             const targetContainer = newTargetElem.querySelector(containerSelector);
 
-            const targetZoneId = targetDragZone.id;
+            const targetZoneId = targetDragZone?.id ?? null;
             let targetId = targetDragZone.itemIdFromElem(newTargetElem);
             const parentElem = targetDragZone.findDragZoneItem(newTargetElem.parentNode);
             const targetParentZone = targetDragZone.itemIdFromElem(parentElem);
@@ -143,25 +143,48 @@ export function useSortableDropTarget(props) {
             let animateElems = [];
             let swapWithPlaceholder = false;
 
-            this.checkPositionsCache(sourceZoneId, dragZoneElem.parentNode);
+            // Temporarily append item to the source container to save position of
+            // item next after current last item
+            if (!state.boxes[sourceZoneId]) {
+                const tmpSrcPlaceholder = dragZoneElem.cloneNode(true);
+                tmpSrcPlaceholder.classList.add(placeholderClass);
+
+                const sourcePlaceholderId = `src_placeholder_${Date.now()}`;
+                tmpPlaceholderIds.current[sourceZoneId] = sourcePlaceholderId;
+                tmpSrcPlaceholder.dataset.id = sourcePlaceholderId;
+
+                const sourceParentElem = dragZoneElem.parentNode;
+                if (sourceParentElem) {
+                    sourceParentElem.append(tmpSrcPlaceholder);
+                }
+
+                this.checkPositionsCache(sourceZoneId, sourceParentElem);
+
+                tmpSrcPlaceholder.remove();
+                state = getState();
+            }
 
             // Temporarily append item to the target container to save position of
             // item next after current last item
-            const tmpPlaceholder = dragZoneElem.cloneNode(true);
-            tmpPlaceholder.classList.add(placeholderClass);
-            tmpPlaceholderId.current = `placeholder_${Date.now()}`;
-            tmpPlaceholder.dataset.id = tmpPlaceholderId.current;
+            if (targetZoneId !== sourceZoneId && !state.boxes[targetZoneId]) {
+                const tmpTargetPlaceholder = dragZoneElem.cloneNode(true);
+                tmpTargetPlaceholder.classList.add(placeholderClass);
 
-            const targetParentElem = (isZoneTarget)
-                ? newTargetElem
-                : newTargetElem.parentNode;
-            if (targetParentElem) {
-                targetParentElem.append(tmpPlaceholder);
+                const targetPlaceholderId = `target_placeholder_${Date.now()}`;
+                tmpPlaceholderIds.current[targetZoneId] = targetPlaceholderId;
+                tmpTargetPlaceholder.dataset.id = targetPlaceholderId;
+
+                const targetParentElem = (isZoneTarget)
+                    ? newTargetElem
+                    : newTargetElem.parentNode;
+                if (targetParentElem) {
+                    targetParentElem.append(tmpTargetPlaceholder);
+                }
+
+                this.checkPositionsCache(targetZoneId, targetParentElem);
+
+                tmpTargetPlaceholder.remove();
             }
-
-            this.checkPositionsCache(targetZoneId, targetParentElem);
-
-            tmpPlaceholder.remove();
 
             // check drop target is already a placeholder
             if (isPlaceholder) {
@@ -272,6 +295,8 @@ export function useSortableDropTarget(props) {
                 ),
             });
 
+            const placeholderId = tmpPlaceholderIds.current[zoneId] ?? null;
+
             setState((prev) => ({
                 ...prev,
                 boxes: {
@@ -281,7 +306,7 @@ export function useSortableDropTarget(props) {
                             prev[zoneId].next ?? prev[zoneId].items ?? [],
                             getItemBox,
                         ),
-                        boxes[tmpPlaceholderId.current],
+                        (boxes[placeholderId] ?? {}),
                     ],
                 },
             }));
@@ -369,7 +394,11 @@ export function useSortableDropTarget(props) {
                     }
                     const sibling = parentItems[siblingIndex];
                     const rect = sourcePositionCache[index];
-                    const targetRect = sourcePositionCache[siblingIndex];
+
+                    const placeholderId = tmpPlaceholderIds.current[sourceZoneId] ?? null;
+                    const targetRect = sourcePositionCache[siblingIndex] ?? (
+                        getPositionCacheById(placeholderId, sourceZoneId, state)
+                    );
 
                     res.push({
                         id: item?.id,
@@ -455,8 +484,10 @@ export function useSortableDropTarget(props) {
                     const siblingIndex = index + 1;
                     const sibling = targetParentItems[siblingIndex];
                     const rect = targetPositionCache[index];
+
+                    const placeholderId = tmpPlaceholderIds.current[targetZoneId] ?? null;
                     const targetRect = targetPositionCache[siblingIndex] ?? (
-                        getPositionCacheById(tmpPlaceholderId.current, targetZoneId, state)
+                        getPositionCacheById(placeholderId, targetZoneId, state)
                     );
 
                     res.push({
@@ -479,6 +510,8 @@ export function useSortableDropTarget(props) {
             const { dragZone } = dragMaster;
 
             dragZone.finishDrag();
+
+            tmpPlaceholderIds.current = {};
         },
 
         onDragEnd(params) {
@@ -551,4 +584,5 @@ export function useSortableDropTarget(props) {
 
 useSortableDropTarget.propTypes = {
     selector: PropTypes.string,
+    tree: PropTypes.bool,
 };
