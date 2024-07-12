@@ -42,6 +42,13 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         setAnimation((prev) => ({ ...prev, initialTransform, offsetTransform }));
     };
 
+    const cancelAnimation = () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = 0;
+        }
+    };
+
     const clearTransition = () => {
         if (clearTransitionRef.current) {
             clearTransitionRef.current();
@@ -73,11 +80,7 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         }
     }, [props.initialTransform, props.offsetTransform]);
 
-    useEffect(() => {
-        if (!innerRef.current) {
-            return;
-        }
-
+    const handleAnimationState = () => {
         // Exiting -> Exited
         if (
             animation.stage === AnimationStages.exiting
@@ -133,6 +136,19 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
                 },
             );
         }
+    };
+
+    useEffect(() => {
+        if (!innerRef.current) {
+            return;
+        }
+
+        handleAnimationState();
+
+        return () => {
+            cancelAnimation();
+            clearTransition();
+        };
     }, [animation.stage, animation.initialTransform, animation.offsetTransform]);
 
     const state = getState();
