@@ -5,6 +5,11 @@ import './SortableTreeItem.scss';
 
 // eslint-disable-next-line react/display-name
 export const SortableTreeItem = forwardRef((props, ref) => {
+    const {
+        items,
+        ...commonProps
+    } = props;
+
     const itemProps = {
         className: classNames('tree-item', props.className),
         'data-id': props.id,
@@ -23,6 +28,7 @@ export const SortableTreeItem = forwardRef((props, ref) => {
             : (
                 <ItemWrapper
                     {...({
+                        ...commonProps,
                         ...item,
                         components: {
                             ...(props.components ?? {}),
@@ -40,7 +46,7 @@ export const SortableTreeItem = forwardRef((props, ref) => {
         <div {...itemProps} ref={ref} >
             <span className="tree-item__title">{props.title}</span>
             <div className="tree-item__content">
-                {props.items?.map((item) => (
+                {items?.map((item) => (
                     renderItem(item)
                 ))}
             </div>
