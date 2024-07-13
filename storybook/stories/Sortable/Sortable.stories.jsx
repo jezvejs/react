@@ -235,6 +235,11 @@ export const CustomGroups = {
     },
 };
 
+const treeTitleHandle = {
+    query: '.tree-item > .tree-item__title',
+    includeChilds: true,
+};
+
 export const Tree = {
     args: {
         id: 'tree',
@@ -247,6 +252,7 @@ export const Tree = {
         group: 'tree',
         copyWidth: true,
         tree: true,
+        handles: treeTitleHandle,
         components: {
             ListItem: SortableTreeItem,
         },
@@ -292,6 +298,7 @@ export const TreeExchange = {
         group: 'treeExch',
         copyWidth: true,
         tree: true,
+        handles: treeTitleHandle,
         allowSingleItemSort: true,
         components: {
             ListItem: SortableTreeItem,
