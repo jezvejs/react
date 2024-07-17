@@ -193,7 +193,7 @@ export const Exchange = {
 
 export const CustomGroups = {
     args: {
-        id: 'list',
+        id: 'customGroups',
         className: 'list-area',
         selector: '.sortable-list-item',
         placeholderClass: 'sortable-list-item__placeholder',
@@ -219,7 +219,7 @@ export const CustomGroups = {
             shiftX: 0,
             shiftY: 0,
             dragging: false,
-            list: {
+            customGroups: {
                 items: getCustomGroupItems(),
             },
         };
