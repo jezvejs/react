@@ -328,6 +328,16 @@ export class DragMaster {
         return null;
     }
 
+    /** Search for drag zone object */
+    findDragZoneById(id) {
+        const strId = id?.toString() ?? null;
+        if (strId === null) {
+            return null;
+        }
+
+        return this.dragZoneRegistry.find((item) => item?.id?.toString() === strId);
+    }
+
     /** Searches for drag zone by specified element */
     findDropTargetByElement(elem) {
         if (!elem) {

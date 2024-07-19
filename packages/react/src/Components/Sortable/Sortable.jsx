@@ -24,6 +24,7 @@ import {
     mapZones,
     mapNextZones,
 } from './helpers.js';
+import './Sortable.scss';
 
 export {
     SortableItemWrapper,
@@ -89,17 +90,13 @@ export const Sortable = forwardRef((p, ref) => {
     };
 
     const getSource = (state) => {
-        if (!state.dragging) {
-            return null;
-        }
-
-        let sourcePosition = state.origSortPos;
-        let sourceZone = getDragZoneItems(sourcePosition.zoneId, state);
-        let movingItem = getTreeItemById(state.itemId, sourceZone);
+        let sourcePosition = state?.origSortPos;
+        let sourceZone = getDragZoneItems(sourcePosition?.zoneId, state);
+        let movingItem = getTreeItemById(state?.itemId, sourceZone);
         if (!movingItem) {
-            sourcePosition = state.prevPosition;
-            sourceZone = getDragZoneItems(sourcePosition.zoneId, state);
-            movingItem = getTreeItemById(state.itemId, sourceZone);
+            sourcePosition = state?.prevPosition;
+            sourceZone = getDragZoneItems(sourcePosition?.zoneId, state);
+            movingItem = getTreeItemById(state?.itemId, sourceZone);
         }
         if (!movingItem) {
             return null;
@@ -148,10 +145,6 @@ export const Sortable = forwardRef((p, ref) => {
                 },
                 swapWithPlaceholder: move.swapWithPlaceholder,
             });
-
-            const zoneIds = [sourceZoneId, targetZoneId];
-            newState = mapZones(newState, zoneIds, clearTransform);
-            newState = mapNextZones(newState, zoneIds, clearTransform);
 
             const res = {
                 ...prev,
@@ -251,6 +244,7 @@ export const Sortable = forwardRef((p, ref) => {
                 return {
                     ...prev,
                     boxes: {},
+                    targetBoxes: {},
                     itemId,
                     origSortPos: { ...sortPosition },
                     prevPosition: { ...sortPosition },
@@ -316,12 +310,7 @@ export const Sortable = forwardRef((p, ref) => {
                 const initialOffset = item.initialOffset ?? ({ x: 0, y: 0 });
                 const initialTransform = formatOffsetMatrix(initialOffset);
 
-                const { targetRect } = found;
-
-                const rect = (item.animationInProgress && item.rect)
-                    ? item.rect
-                    : found.rect;
-
+                const { rect, targetRect } = found;
                 if (!rect || !targetRect) {
                     return item;
                 }
@@ -375,6 +364,10 @@ export const Sortable = forwardRef((p, ref) => {
             if (swapWithPlaceholder) {
                 clearItemsTransform();
                 moveItem();
+                setState((prev) => ({
+                    ...prev,
+                    boxes: {},
+                }));
             }
         },
 
@@ -408,6 +401,7 @@ export const Sortable = forwardRef((p, ref) => {
             setState((prev) => ({
                 ...prev,
                 boxes: {},
+                targetBoxes: {},
                 origSortPos: null,
                 prevPosition: null,
                 sortPosition: null,
@@ -440,6 +434,7 @@ export const Sortable = forwardRef((p, ref) => {
                 return {
                     ...newState,
                     boxes: {},
+                    targetBoxes: {},
                     origSortPos: null,
                     prevPosition: null,
                     sortPosition: null,

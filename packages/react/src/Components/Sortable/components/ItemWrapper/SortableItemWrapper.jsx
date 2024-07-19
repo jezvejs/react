@@ -12,6 +12,7 @@ import { afterTransition } from '@jezvejs/dom';
 
 import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.jsx';
 import { AnimationStages, isPlaceholder } from '../../helpers.js';
+import { px } from '../../../../utils/common.js';
 
 // eslint-disable-next-line react/display-name
 export const SortableItemWrapper = forwardRef((props, ref) => {
@@ -81,6 +82,10 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
     }, [props.initialTransform, props.offsetTransform]);
 
     const handleAnimationState = () => {
+        if (!innerRef.current) {
+            return;
+        }
+
         // Exiting -> Exited
         if (
             animation.stage === AnimationStages.exiting
@@ -139,10 +144,6 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
     };
 
     useEffect(() => {
-        if (!innerRef.current) {
-            return;
-        }
-
         handleAnimationState();
 
         return () => {
@@ -194,6 +195,10 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
             );
         }
 
+        if (props.targetRect) {
+            res.style.width = px(props.targetRect.width);
+        }
+
         return res;
     }, [
         props.title,
@@ -202,6 +207,7 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         props.items,
         props.animated,
         props.className,
+        props.targetRect,
         props.initialTransform,
         props.offsetTransform,
         state.dragging,
@@ -240,6 +246,7 @@ SortableItemWrapper.propTypes = {
     initialTransform: PropTypes.string,
     offsetTransform: PropTypes.string,
     style: PropTypes.object,
+    targetRect: PropTypes.object,
     components: PropTypes.shape({
         ListItem: isComponent,
     }),

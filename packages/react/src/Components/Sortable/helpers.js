@@ -1,3 +1,4 @@
+import { getOffsetSum } from '@jezvejs/dom';
 import { isFunction, asArray } from '@jezvejs/types';
 
 export const AnimationStages = {
@@ -5,6 +6,31 @@ export const AnimationStages = {
     entered: 2,
     exiting: 3,
     exited: 0,
+};
+
+/**
+ * Converts tree to flat array of items and returns result
+ *
+ * @param {Array} items
+ * @returns {Array}
+ */
+export const toFlatList = (items) => {
+    const res = [];
+
+    for (let index = 0; index < items.length; index += 1) {
+        const item = items[index] ?? {};
+
+        if (Array.isArray(item?.items)) {
+            res.push(
+                { ...item },
+                ...toFlatList(item.items),
+            );
+        } else {
+            res.push({ ...item });
+        }
+    }
+
+    return res;
 };
 
 /**
@@ -108,6 +134,48 @@ export const findTreeItemIndex = (items, callback) => {
 export const findTreeItemIndexById = (items, id) => {
     const strId = id?.toString();
     return findTreeItemIndex(items, (item) => item?.id?.toString() === strId);
+};
+
+/**
+ * Searches for first tree item for which callback function return true
+ *
+ * @param {Array} items array of items to search in
+ * @param {Function} callback function to
+ */
+export const findTreeItemParent = (items, callback) => {
+    if (!Array.isArray(items)) {
+        throw new Error('Invalid items parameter');
+    }
+    if (!isFunction(callback)) {
+        throw new Error('Invalid callback parameter');
+    }
+
+    for (let index = 0; index < items.length; index += 1) {
+        const item = items[index];
+        if (callback(item)) {
+            return true;
+        }
+
+        if (Array.isArray(item?.items)) {
+            const childRes = findTreeItemParent(item.items, callback);
+            if (childRes) {
+                return (childRes === true) ? item : childRes;
+            }
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Returns parent of tree item
+ *
+ * @param {Array} items array of items to search in
+ * @param {string} id item id
+ */
+export const findTreeItemParentById = (items, id) => {
+    const strId = id?.toString();
+    return findTreeItemParent(items, (item) => item?.id?.toString() === strId);
 };
 
 /**
@@ -218,15 +286,56 @@ export const getPositionsCache = (zoneId, state) => (
 );
 
 /**
+ * Returns list of target item positions for specified drag zone
+ * @param {string} zoneId
+ * @param {object} state
+ * @returns {Array}
+ */
+export const getTargetPositions = (zoneId, state) => (
+    state.targetBoxes?.[zoneId] ?? []
+);
+
+/**
  * Returns cached position for specified item at drag zone
  * @param {string} id
- * @param {string} zoneId
+ * @param {string} zoneIds
  * @param {object} state
  * @returns {object}
  */
-export const getPositionCacheById = (id, zoneId, state) => (
-    getPositionsCache(zoneId, state).find((item) => item.id === id)
-);
+export const getPositionCacheById = (id, zoneIds, state) => {
+    const ids = asArray(zoneIds);
+
+    for (let index = 0; index < ids.length; index += 1) {
+        const zoneId = ids[index];
+        const item = getTreeItemById(id, getPositionsCache(zoneId, state));
+        if (item) {
+            return { ...item };
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Returns target position for specified item at drag zone
+ * @param {string} id
+ * @param {string} zoneIds
+ * @param {object} state
+ * @returns {object}
+ */
+export const getTargetPositionById = (id, zoneIds, state) => {
+    const ids = asArray(zoneIds);
+
+    for (let index = 0; index < ids.length; index += 1) {
+        const zoneId = ids[index];
+        const item = getTreeItemById(id, getTargetPositions(zoneId, state));
+        if (item) {
+            return { ...item };
+        }
+    }
+
+    return null;
+};
 
 /**
  * Moves tree item from one position to another
@@ -472,17 +581,22 @@ export const mapNextZones = (state, zoneIds, callback) => {
  * @returns {object}
  */
 export const getAnimationBox = (elem) => {
-    const rect = elem?.getBoundingClientRect();
+    if (!elem) {
+        return null;
+    }
 
-    return {
-        id: elem?.dataset?.id,
-        x: rect?.x ?? 0,
-        y: rect?.y ?? 0,
-        left: rect?.left ?? 0,
-        top: rect?.top ?? 0,
-        width: rect?.width ?? 0,
-        height: rect?.height ?? 0,
+    const { top, left } = getOffsetSum(elem);
+    const res = {
+        id: elem.dataset?.id,
+        top,
+        left,
+        x: left,
+        y: top,
+        width: elem.offsetWidth,
+        height: elem.offsetHeight,
     };
+
+    return res;
 };
 
 /**
