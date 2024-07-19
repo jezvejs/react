@@ -5,6 +5,7 @@ import {
     Sortable,
     DragnDropProvider,
     createSlice,
+    DragMaster,
 } from '@jezvejs/react';
 
 // Local components
@@ -41,6 +42,34 @@ const containerDecorator = (Story) => (
     </div>
 );
 
+/**
+ * Returns requestedId if no drag zone registered for this id
+ * Otherwise generates new availble id for drag zone and returns result
+ *
+ * @param {string} requestedId
+ * @returns {string}
+ */
+const useUniqueDragZoneId = (requestedId) => (
+    useMemo(() => {
+        const generateRandom = () => (
+            (Date.now() + Math.round(Math.random() * 1000000000000)).toString(36)
+        );
+
+        const getAvailableZoneId = (initialId) => {
+            const dragMaster = DragMaster.getInstance();
+            let id = initialId;
+
+            while (dragMaster.findDragZoneById(id)) {
+                id = `${initialId}_${generateRandom()}`;
+            }
+
+            return id;
+        };
+
+        return getAvailableZoneId(requestedId);
+    }, [requestedId])
+);
+
 export const Default = {
     args: {
         id: 'tiles',
@@ -63,13 +92,17 @@ export const Default = {
             document.getElementById('custom-root')
         ), []);
 
+        const props = {
+            ...args,
+            id: useUniqueDragZoneId(args.id),
+        };
         const initialState = {
             left: 0,
             top: 0,
             shiftX: 0,
             shiftY: 0,
             dragging: false,
-            tiles: {
+            [props.id]: {
                 items: getTiles(),
             },
         };
@@ -79,7 +112,7 @@ export const Default = {
 
         return (
             <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
+                <Sortable {...props} container={portalElement} />
             </DragnDropProvider>
         );
     },
