@@ -5,10 +5,15 @@ import './SortableTreeItem.scss';
 
 // eslint-disable-next-line react/display-name
 export const SortableTreeItem = forwardRef((props, ref) => {
-    const {
-        items,
-        ...commonProps
-    } = props;
+    const commonProps = {
+        group: props.group,
+        zoneId: props.zoneId,
+        animated: props.animated,
+        placeholderClass: props.placeholderClass,
+        animatedClass: props.animatedClass,
+        transitionTimeout: props.transitionTimeout,
+        components: props.components,
+    };
 
     const itemProps = {
         className: classNames('tree-item', props.className),
@@ -46,7 +51,7 @@ export const SortableTreeItem = forwardRef((props, ref) => {
         <div {...itemProps} ref={ref} >
             <span className="tree-item__title">{props.title}</span>
             <div className="tree-item__content">
-                {items?.map((item) => (
+                {props.items?.map((item) => (
                     renderItem(item)
                 ))}
             </div>
@@ -65,6 +70,11 @@ SortableTreeItem.propTypes = {
     id: PropTypes.string,
     style: PropTypes.object,
     group: PropTypes.string,
+    zoneId: PropTypes.string,
+    animated: PropTypes.bool,
+    transitionTimeout: PropTypes.number,
+    placeholderClass: PropTypes.string,
+    animatedClass: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
     items: PropTypes.array,
