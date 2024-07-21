@@ -456,6 +456,7 @@ export const TableSingleBody = {
         placeholderClass: 'list_item_placeholder',
         group: 'tbl2',
         table: true,
+        wrapInTbody: true,
         copyWidth: true,
         components: {
             ListItem: SortableTableRow,

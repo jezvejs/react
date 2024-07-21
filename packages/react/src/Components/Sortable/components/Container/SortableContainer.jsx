@@ -5,6 +5,7 @@ import { forwardRef } from 'react';
 export const SortableContainer = forwardRef((props, ref) => {
     const {
         table = false,
+        wrapInTbody = false,
         children,
         ...containerProps
     } = props;
@@ -12,7 +13,10 @@ export const SortableContainer = forwardRef((props, ref) => {
     if (table) {
         return (
             <table {...containerProps} ref={ref}>
-                {children}
+                {(wrapInTbody)
+                    ? (<tbody>{children}</tbody>)
+                    : children
+                }
             </table>
         );
     }
@@ -27,6 +31,7 @@ export const SortableContainer = forwardRef((props, ref) => {
 SortableContainer.propTypes = {
     className: PropTypes.string,
     table: PropTypes.bool,
+    wrapInTbody: PropTypes.bool,
     children: PropTypes.oneOfType([
         PropTypes.node,
         PropTypes.elementType,

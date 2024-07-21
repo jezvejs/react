@@ -40,6 +40,7 @@ export const Sortable = forwardRef((p, ref) => {
         transitionTimeout: 300,
         dragClass: 'drag',
         table: false,
+        wrapInTbody: false,
     };
 
     const props = {
@@ -512,6 +513,7 @@ export const Sortable = forwardRef((p, ref) => {
     const containerProps = {
         className,
         table: props.table,
+        wrapInTbody: props.wrapInTbody,
     };
 
     const common = useMemo(() => ({
@@ -570,6 +572,7 @@ Sortable.propTypes = {
         PropTypes.string,
     ]),
     table: PropTypes.bool,
+    wrapInTbody: PropTypes.bool,
     tree: PropTypes.bool,
     vertical: PropTypes.bool,
     animated: PropTypes.bool,

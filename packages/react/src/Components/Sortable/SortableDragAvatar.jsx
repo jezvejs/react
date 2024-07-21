@@ -41,7 +41,7 @@ export const SortableDragAvatar = (props) => {
     };
 
     const content = (props.table)
-        ? (<table {...contentProps} >{props.children}</table>)
+        ? (<table {...contentProps} ><tbody>{props.children}</tbody></table>)
         : (<div {...contentProps} >{props.children}</div>);
 
     return (
