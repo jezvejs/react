@@ -21,7 +21,7 @@ export const getInitialState = (props, defaultProps) => {
     const res = {
         ...(defaultProps ?? {}),
         ...props,
-        visible: !!props.inline,
+        visible: !!props.inline || props.visible,
         fixed: false,
         viewType: viewTypesMap[mode],
         date: isDate(props.date) ? props.date : new Date(),
