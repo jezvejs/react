@@ -171,7 +171,6 @@ export const Exchange = {
         animated: true,
         copyWidth: true,
         allowSingleItemSort: true,
-        hoverClass: 'dbg-hover',
         components: {
             ListItem: SortableListItem,
         },
