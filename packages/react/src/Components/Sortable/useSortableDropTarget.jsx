@@ -202,11 +202,17 @@ export function useSortableDropTarget(props) {
                 }
             };
 
+            const toggleMeasureMode = (elem, value) => {
+                const { style } = elem ?? {};
+                if (style) {
+                    style.pointerEvents = (value) ? 'none' : '';
+                }
+            };
+
             const dragZoneNodes = getElementPosition(dragZoneElem);
 
-            const measureClass = 'sortable-measure';
-            dragZone.elem.classList.add(measureClass);
-            targetDragZone.elem.classList.add(measureClass);
+            toggleMeasureMode(dragZone.elem, true);
+            toggleMeasureMode(targetDragZone.elem, true);
 
             // Temporarily append item to the target container to save position of
             // item next after current last item
@@ -269,8 +275,8 @@ export function useSortableDropTarget(props) {
                 insertAtElementPosition(dragZoneElem, dragZoneNodes);
             }
 
-            dragZone.elem.classList.remove(measureClass);
-            targetDragZone.elem.classList.remove(measureClass);
+            toggleMeasureMode(dragZone.elem, false);
+            toggleMeasureMode(targetDragZone.elem, false);
 
             // check drop target is already a placeholder
             if (isPlaceholder) {

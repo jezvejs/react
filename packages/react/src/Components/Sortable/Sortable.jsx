@@ -25,7 +25,6 @@ import {
     mapNextZones,
     getSourcePosition,
 } from './helpers.js';
-import './Sortable.scss';
 
 export {
     SortableItemWrapper,
