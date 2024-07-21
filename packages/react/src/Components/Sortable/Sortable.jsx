@@ -9,7 +9,9 @@ import {
 
 import { useDragnDrop } from '../../utils/DragnDrop/index.js';
 
+import { SortableContainer } from './components/Container/SortableContainer.jsx';
 import { SortableItemWrapper } from './components/ItemWrapper/SortableItemWrapper.jsx';
+
 import { useSortableDragZone } from './useSortableDragZone.jsx';
 import { useSortableDropTarget } from './useSortableDropTarget.jsx';
 import { SortableDragAvatar } from './SortableDragAvatar.jsx';
@@ -37,6 +39,7 @@ export const Sortable = forwardRef((p, ref) => {
         animatedClass: 'animated',
         transitionTimeout: 300,
         dragClass: 'drag',
+        table: false,
     };
 
     const props = {
@@ -48,7 +51,7 @@ export const Sortable = forwardRef((p, ref) => {
         className,
         placeholderClass,
         animatedClass,
-        onSort = null,
+        onSort,
         components,
         ...commonProps
     } = props;
@@ -469,6 +472,8 @@ export const Sortable = forwardRef((p, ref) => {
     }, []);
     useImperativeHandle(ref, () => innerRef.current);
 
+    const state = getState();
+
     const draggingItem = getDraggingItem();
     const avatarProps = draggingItem && ({
         ...draggingItem,
@@ -478,23 +483,37 @@ export const Sortable = forwardRef((p, ref) => {
                 : props.dragClass,
             draggingItem.className,
         ),
+        table: props.table,
         components: {
             ...props.components,
             ItemWrapper: SortableItemWrapper,
         },
     });
 
+    if (draggingItem && props.table) {
+        const { avatarState } = state;
+        avatarProps.columns = avatarState.columns.map((item, index) => ({
+            ...(draggingItem.columns[index] ?? {}),
+            ...item,
+        }));
+    }
+
+    const avatarWrapperProps = {
+        copyWidth: props.copyWidth,
+        table: props.table,
+    };
+
     const avatar = (draggingItem && (
-        <SortableDragAvatar copyWidth={props.copyWidth} >
+        <SortableDragAvatar {...avatarWrapperProps} >
             <Avatar {...avatarProps} ref={avatarRef} />
         </SortableDragAvatar>
     ));
 
     const containerProps = {
         className,
+        table: props.table,
     };
 
-    const state = getState();
     const common = useMemo(() => ({
         ...commonProps,
         placeholderClass,
@@ -518,9 +537,10 @@ export const Sortable = forwardRef((p, ref) => {
     const listItems = useMemo(() => zoneItems, [zoneItems, state.dragging]);
 
     const ItemComponent = SortableItemWrapper;
+    const Container = SortableContainer;
 
     return (
-        <div {...containerProps} ref={innerRef}>
+        <Container {...containerProps} ref={innerRef}>
             {listItems.map((item) => (
                 <ItemComponent
                     {...common}
@@ -530,7 +550,7 @@ export const Sortable = forwardRef((p, ref) => {
                 />
             ))}
             {avatar}
-        </div>
+        </Container>
     );
 });
 
@@ -549,6 +569,7 @@ Sortable.propTypes = {
         PropTypes.bool,
         PropTypes.string,
     ]),
+    table: PropTypes.bool,
     tree: PropTypes.bool,
     vertical: PropTypes.bool,
     animated: PropTypes.bool,

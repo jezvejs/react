@@ -1,6 +1,16 @@
 import TileCardIcon from '../../assets/icons/tile-card.svg';
 import { initItems } from '../../utils/utils.js';
 
+export const getTableData = () => ([
+    [1, 10000, 'some text'],
+    [2, 354, 'some text'],
+    [3, 850110, 'some long long text'],
+    [4, 6000, 'some text'],
+    [5, 7860, 'some short text'],
+    [6, 4500, 'some text'],
+    [7, 200, 'some text'],
+]);
+
 export const getTiles = () => ([
     { id: 'tile_1', title: 'Item 1' },
     { id: 'tile_2', placeholder: true },

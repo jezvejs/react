@@ -14,6 +14,8 @@ import { ListItemWithInput } from './components/ListItemWithInput/ListItemWithIn
 import { SortableListItem } from './components/SortableListItem/SortableListItem.jsx';
 import { SortableTile } from './components/SortableTile/SortableTile.jsx';
 import { SortableTreeItem } from './components/SortableTreeItem/SortableTreeItem.jsx';
+import { SortableTableRow } from './components/TableRow/SortableTableRow.jsx';
+import { SortableTableTbodyRow } from './components/TableRow/SortableTableTbodyRow.jsx';
 
 import {
     getCustomGroupItems,
@@ -21,6 +23,7 @@ import {
     getDestTreeItems,
     getListItems,
     getSingleItemList,
+    getTableData,
     getTiles,
     getTreeItems,
 } from './data.js';
@@ -381,6 +384,116 @@ export const TreeExchange = {
                     <Sortable {...argsSrc} container={portalElement} />
                     <Sortable {...argsDest} container={portalElement} />
                 </div>
+            </DragnDropProvider>
+        );
+    },
+};
+
+/**
+ * Sortable table with TBODY rows
+ */
+export const TableWithWrappedRows = {
+    args: {
+        id: 'table1',
+        items: getTableData(),
+        className: 'sortable_tbl',
+        selector: '.tbl_list_item',
+        placeholderClass: 'list_item_placeholder',
+        group: 'tbl',
+        table: true,
+        copyWidth: true,
+        components: {
+            ListItem: SortableTableTbodyRow,
+        },
+    },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        const initialState = {
+            left: 0,
+            top: 0,
+            shiftX: 0,
+            shiftY: 0,
+            dragging: false,
+            table1: {
+                items: args.items.map((item, index) => ({
+                    id: `${args.id}_${index}`,
+                    group: args.group,
+                    columns: item.map((value, valIndex) => ({
+                        id: `${args.id}_${index}_${valIndex}`,
+                        content: value,
+                    })),
+                })),
+            },
+        };
+
+        const slice = createSlice({
+        });
+
+        return (
+            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+                <Sortable {...args} container={portalElement} />
+            </DragnDropProvider>
+        );
+    },
+};
+
+/**
+ * Sortable table with TBODY rows
+ */
+export const TableSingleBody = {
+    args: {
+        id: 'table2',
+        items: getTableData(),
+        className: 'sortable_tbl',
+        selector: '.tbl_list_item',
+        placeholderClass: 'list_item_placeholder',
+        group: 'tbl2',
+        table: true,
+        copyWidth: true,
+        components: {
+            ListItem: SortableTableRow,
+        },
+    },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: function Render(args) {
+        const portalElement = useMemo(() => (
+            document.getElementById('custom-root')
+        ), []);
+
+        const initialState = {
+            left: 0,
+            top: 0,
+            shiftX: 0,
+            shiftY: 0,
+            dragging: false,
+            table2: {
+                items: args.items.map((item, index) => ({
+                    id: `${args.id}_${index}`,
+                    group: args.group,
+                    columns: item.map((value, valIndex) => ({
+                        id: `${args.id}_${index}_${valIndex}`,
+                        content: value,
+                    })),
+                })),
+            },
+        };
+
+        const slice = createSlice({
+        });
+
+        return (
+            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+                <Sortable {...args} container={portalElement} />
             </DragnDropProvider>
         );
     },

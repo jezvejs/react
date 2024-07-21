@@ -78,12 +78,17 @@
 }
 
 /* Sortable table */
-.sortable_tbl td > div {
-  color: #000000;
-  background-color: #ffffff;
-  padding: 10px;
-  height: 40px;
-  line-height: 20px;
+.sortable_tbl {
+  width: 100%;
+  background-color: #f5f5f5;
+
+  td > div {
+    color: #000000;
+    background-color: #ffffff;
+    padding: 10px;
+    height: 40px;
+    line-height: 20px;
+  }
 }
 
 .drag_item {

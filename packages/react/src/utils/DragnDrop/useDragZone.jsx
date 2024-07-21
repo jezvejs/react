@@ -37,6 +37,7 @@ export function useDragZone(props) {
                     id,
                     elem: avatarRef.current,
                     scrollRequested: false,
+                    dragZone,
                     getDragInfo() {
                         return {
                             id,

@@ -27,17 +27,33 @@ export const SortableDragAvatar = (props) => {
         style.width = px(state.width);
     }
 
+    const avatarState = {
+        ...(state.avatarState ?? {}),
+    };
+    delete avatarState.columns;
+
+    const contentProps = {
+        ...avatarState,
+        style: {
+            ...(avatarState.style ?? {}),
+            ...style,
+        },
+    };
+
+    const content = (props.table)
+        ? (<table {...contentProps} >{props.children}</table>)
+        : (<div {...contentProps} >{props.children}</div>);
+
     return (
         <PopupDragAvatarContainer container={props.container}>
-            <div style={style} >
-                {props.children}
-            </div>
+            {content}
         </PopupDragAvatarContainer>
     );
 };
 
 SortableDragAvatar.propTypes = {
     id: PropTypes.string,
+    table: PropTypes.bool,
     copyWidth: PropTypes.bool,
     children: PropTypes.oneOfType([
         PropTypes.node,

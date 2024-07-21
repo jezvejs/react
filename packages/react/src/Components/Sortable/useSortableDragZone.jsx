@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { useDragZone } from '../../utils/DragnDrop/useDragZone.jsx';
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.js';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.jsx';
+import { px } from '../../utils/common.js';
 
 export function useSortableDragZone(props) {
     const { setState } = useDragnDrop();
@@ -167,7 +168,90 @@ export function useSortableDragZone(props) {
             this.removeSourceNode();
         },
 
+        makeSortableTableAvatar() {
+            const avatar = this.makeAvatar();
+            if (!avatar) {
+                return false;
+            }
+
+            return {
+                ...avatar,
+                dropTarget: null,
+
+                initFromEvent({ downX, downY, e }) {
+                    if (!avatar.dragZone) {
+                        return false;
+                    }
+
+                    const dragZoneElem = avatar.dragZone.findDragZoneItem(e.target);
+                    if (!dragZoneElem) {
+                        return false;
+                    }
+
+                    const tbl = dragZoneElem.closest('table');
+                    if (!tbl) {
+                        return false;
+                    }
+
+                    const avatarState = {
+                        className: tbl.className,
+                        style: {
+                            width: px(dragZoneElem.offsetWidth),
+                        },
+                        columns: [],
+                    };
+
+                    const tableStyles = Array.from(tbl.style);
+                    tableStyles.forEach((propName) => {
+                        avatarState.style[propName] = tbl.style[propName];
+                    });
+
+                    if (avatar.dragZone.copyWidth) {
+                        let srcCell = dragZoneElem.querySelector('td');
+                        while (srcCell) {
+                            const box = srcCell.getBoundingClientRect();
+                            avatarState.columns.push({
+                                innerStyle: {
+                                    width: `${box.width}px`,
+                                },
+                            });
+
+                            srcCell = srcCell.nextElementSibling;
+                        }
+                    }
+
+                    const offset = getOffset(avatar.dragZone.elem);
+                    setState((prev) => ({
+                        ...prev,
+                        avatarState,
+                        origLeft: prev.left,
+                        origTop: prev.top,
+                        shiftX: downX - offset.left,
+                        shiftY: downY - offset.top,
+                    }));
+
+                    return true;
+                },
+
+                onDragCancel(params = {}) {
+                    avatar.onDragCancel();
+
+                    if (this.dropTarget) {
+                        this.dropTarget.onDragCancel({ ...params, avatar: this });
+                    }
+                },
+
+                saveSortTarget(target) {
+                    this.dropTarget = target;
+                },
+            };
+        },
+
         makeSortableAvatar() {
+            if (props.table) {
+                return this.makeSortableTableAvatar();
+            }
+
             const avatar = this.makeAvatar();
             if (!avatar) {
                 return false;
@@ -201,6 +285,7 @@ export function useSortableDragZone(props) {
             }
 
             const avatar = this.makeSortableAvatar();
+            avatar?.initFromEvent?.(params);
             if (!avatar) {
                 return false;
             }
