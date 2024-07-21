@@ -32,11 +32,15 @@ export {
 
 // eslint-disable-next-line react/display-name
 export const Sortable = forwardRef((p, ref) => {
-    const props = {
+    const defaultProps = {
         onSort: null,
         animatedClass: 'animated',
         transitionTimeout: 300,
         dragClass: 'drag',
+    };
+
+    const props = {
+        ...defaultProps,
         ...p,
     };
 
@@ -138,7 +142,6 @@ export const Sortable = forwardRef((p, ref) => {
                 sortPosition: {
                     ...move.sortPosition,
                 },
-                swapWithPlaceholder: move.swapWithPlaceholder,
                 [sourceZoneId]: {
                     ...(prev[sourceZoneId] ?? {}),
                     next: [...(newState[sourceZoneId].items ?? [])],
@@ -435,7 +438,6 @@ export const Sortable = forwardRef((p, ref) => {
                         parentId: prev.origSortPos.parentId,
                         zoneId: prev.origSortPos.zoneId,
                     },
-                    swapWithPlaceholder: prev.swapWithPlaceholder,
                 });
 
                 return {
