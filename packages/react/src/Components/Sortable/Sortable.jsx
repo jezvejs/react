@@ -23,6 +23,7 @@ import {
     moveTreeItem,
     mapZones,
     mapNextZones,
+    getSourcePosition,
 } from './helpers.js';
 import './Sortable.scss';
 
@@ -87,22 +88,6 @@ export const Sortable = forwardRef((p, ref) => {
         const nextRes = getTreeItemById(state.itemId, next);
 
         return itemsRes ?? nextRes;
-    };
-
-    const getSource = (state) => {
-        let sourcePosition = state?.origSortPos;
-        let sourceZone = getDragZoneItems(sourcePosition?.zoneId, state);
-        let movingItem = getTreeItemById(state?.itemId, sourceZone);
-        if (!movingItem) {
-            sourcePosition = state?.prevPosition;
-            sourceZone = getDragZoneItems(sourcePosition?.zoneId, state);
-            movingItem = getTreeItemById(state?.itemId, sourceZone);
-        }
-        if (!movingItem) {
-            return null;
-        }
-
-        return { ...sourcePosition };
     };
 
     const saveItemMove = (move) => {
@@ -174,7 +159,7 @@ export const Sortable = forwardRef((p, ref) => {
 
     const moveItem = () => {
         setState((prev) => {
-            const source = getSource(prev);
+            const source = getSourcePosition(prev);
             if (!source) {
                 return prev;
             }
@@ -182,7 +167,7 @@ export const Sortable = forwardRef((p, ref) => {
             const sourceZoneId = source.zoneId;
             const targetZoneId = prev.sortPosition.zoneId;
 
-            const newState = {
+            let newState = {
                 ...prev,
                 [sourceZoneId]: {
                     ...(prev[sourceZoneId] ?? {}),
@@ -193,11 +178,17 @@ export const Sortable = forwardRef((p, ref) => {
             };
 
             if (targetZoneId !== sourceZoneId) {
-                newState[targetZoneId] = {
-                    ...(prev[targetZoneId] ?? {}),
-                    items: [
-                        ...(prev[targetZoneId].next ?? prev[targetZoneId].items),
-                    ],
+                newState = {
+                    ...newState,
+                    [targetZoneId]: {
+                        ...(prev[targetZoneId] ?? {}),
+                        items: [
+                            ...(prev[targetZoneId].next ?? prev[targetZoneId].items),
+                        ],
+                    },
+                    sourcePosition: {
+                        ...newState.sortPosition,
+                    },
                 };
             }
 
@@ -209,6 +200,7 @@ export const Sortable = forwardRef((p, ref) => {
         setState((prev) => {
             const zoneIds = [
                 prev.origSortPos?.zoneId,
+                prev.sourcePosition?.zoneId,
                 prev.prevPosition?.zoneId,
                 prev.sortPosition?.zoneId,
             ];
@@ -246,8 +238,13 @@ export const Sortable = forwardRef((p, ref) => {
                     boxes: {},
                     targetBoxes: {},
                     itemId,
+                    /** Position of moving item where drag started */
                     origSortPos: { ...sortPosition },
+                    /** Position where moving item is currently rendered */
+                    sourcePosition: { ...sortPosition },
+                    /** Previous position of moving item */
                     prevPosition: { ...sortPosition },
+                    /** Current target position of source item */
                     sortPosition,
                 };
             });
@@ -269,13 +266,14 @@ export const Sortable = forwardRef((p, ref) => {
             animateElems,
         }) {
             const state = getState();
-            const sourceId = state.origSortPos.id ?? null;
+            const sourceId = state.origSortPos?.id ?? null;
+            const sourceZoneId = state.sortPosition?.zoneId;
 
             // Skip the same item
             if (
                 targetId === sourceId
-                && parentId === state.sortPosition.parentId
-                && targetZoneId === state.sortPosition.zoneId
+                && parentId === state.sortPosition?.parentId
+                && targetZoneId === sourceZoneId
             ) {
                 return;
             }
@@ -289,8 +287,8 @@ export const Sortable = forwardRef((p, ref) => {
             if (
                 targetId === null
                 && state.targetId !== null
-                && parentId === state.sortPosition.parentId
-                && targetZoneId === state.sortPosition.zoneId
+                && parentId === state.sortPosition?.parentId
+                && targetZoneId === sourceZoneId
             ) {
                 return;
             }
@@ -339,6 +337,14 @@ export const Sortable = forwardRef((p, ref) => {
                 return res;
             };
 
+            if (
+                swapWithPlaceholder
+                && (state.sourcePosition.zoneId === targetZoneId)
+                && (state.sourcePosition.zoneId !== sourceZoneId)
+            ) {
+                moveItem();
+            }
+
             saveItemMove({
                 sortPosition: {
                     id: targetId,
@@ -354,6 +360,7 @@ export const Sortable = forwardRef((p, ref) => {
                     prev,
                     [
                         prev.origSortPos?.zoneId,
+                        prev.sourcePosition?.zoneId,
                         prev.prevPosition?.zoneId,
                         prev.sortPosition?.zoneId,
                     ],
@@ -373,7 +380,7 @@ export const Sortable = forwardRef((p, ref) => {
 
         onSortEnd() {
             const state = getState();
-            const source = getSource(state);
+            const source = getSourcePosition(state);
             if (!source) {
                 return;
             }
@@ -403,6 +410,7 @@ export const Sortable = forwardRef((p, ref) => {
                 boxes: {},
                 targetBoxes: {},
                 origSortPos: null,
+                sourcePosition: null,
                 prevPosition: null,
                 sortPosition: null,
                 itemId: null,
@@ -436,6 +444,7 @@ export const Sortable = forwardRef((p, ref) => {
                     boxes: {},
                     targetBoxes: {},
                     origSortPos: null,
+                    sourcePosition: null,
                     prevPosition: null,
                     sortPosition: null,
                     itemId: null,

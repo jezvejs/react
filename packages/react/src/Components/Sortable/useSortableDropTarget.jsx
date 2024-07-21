@@ -11,7 +11,8 @@ import {
     getDragZoneItems,
     getNextZoneItems,
     getPositionCacheById,
-    getPositionsCache,
+    getPossibleZoneIds,
+    getSourcePosition,
     getTargetPositionById,
     getTreeItemById,
     isTreeContains,
@@ -79,9 +80,35 @@ export function useSortableDropTarget(props) {
                 return;
             }
 
+            const state = getState();
+            if (!state.origSortPos || !state.sortPosition) {
+                return;
+            }
+
+            const sourceId = state.origSortPos.id ?? null;
+            const sourceZoneId = state.sortPosition.zoneId ?? null;
+            const sourceParentId = state.sortPosition.parentId ?? null;
+            if (sourceId === null || sourceZoneId === null || sourceParentId === null) {
+                return;
+            }
+
             const dragMaster = DragMaster.getInstance();
-            const { dragZone } = dragMaster;
-            const dragZoneElem = dragZone.getDragItemElement();
+            if (!dragMaster) {
+                return;
+            }
+
+            const sourcePosition = getSourcePosition(state);
+            if (!sourcePosition) {
+                return;
+            }
+
+            const sourceDragZone = dragMaster.findDragZoneById(sourcePosition.zoneId);
+            const dragZone = sourceDragZone;
+            const dragZoneElem = this.getItemElementById(sourceId, dragZone.elem);
+            if (!dragZoneElem) {
+                return;
+            }
+
             const currentGroup = dragZone.getGroup(dragZoneElem);
 
             const targetDragZone = dragMaster.findDragZone(newTargetElem);
@@ -95,19 +122,6 @@ export function useSortableDropTarget(props) {
                 return;
             }
 
-            const state = getState();
-            if (!state.origSortPos || !state.sortPosition) {
-                return;
-            }
-
-            const sourceId = state.origSortPos.id ?? null;
-            const sourceZoneId = state.sortPosition.zoneId ?? null;
-            const sourceParentId = state.sortPosition.parentId ?? null;
-            if (sourceId === null || sourceZoneId === null || sourceParentId === null) {
-                return;
-            }
-
-            const sourceDragZone = dragMaster.findDragZoneById(sourceZoneId);
             const { containerSelector, selector } = dragZone;
             const targetContainer = newTargetElem.querySelector(containerSelector);
 
@@ -164,18 +178,31 @@ export function useSortableDropTarget(props) {
             let animateElems = [];
             let swapWithPlaceholder = false;
 
-            this.checkPositionsCache(
+            const zoneIds = [
                 sourceZoneId,
-                sourceDragZone.elem,
                 targetZoneId,
-                targetDragZone.elem,
-            );
+                ...getPossibleZoneIds(state),
+            ];
 
-            const dragZoneNodes = {
-                parent: dragZoneElem.parentNode,
-                prev: dragZoneElem.previousSibling,
-                next: dragZoneElem.nextSibling,
+            this.checkPositionsCache(zoneIds);
+
+            const getElementPosition = (elem) => ({
+                parent: elem?.parentNode,
+                prev: elem?.previousSibling,
+                next: elem?.nextSibling,
+            });
+
+            const insertAtElementPosition = (elem, pos) => {
+                if (pos.prev && pos.prev.parentNode) {
+                    pos.prev.after(elem);
+                } else if (pos.next && pos.next.parentNode) {
+                    pos.next.before(elem);
+                } else {
+                    pos.parent?.append(elem);
+                }
             };
+
+            const dragZoneNodes = getElementPosition(dragZoneElem);
 
             const measureClass = 'sortable-measure';
             dragZone.elem.classList.add(measureClass);
@@ -183,13 +210,20 @@ export function useSortableDropTarget(props) {
 
             // Temporarily append item to the target container to save position of
             // item next after current last item
-            const tmpTargetPlaceholder = dragZoneElem.cloneNode(true);
+            const tmpSourceClone = dragZoneElem.cloneNode(true);
+            let tmpPlaceholder = null;
 
-            dragZoneElem.remove();
+            if (!isPlaceholder) {
+                dragZoneElem.remove();
+            }
 
             const isTargetDragZoneRoot = targetDragZone.elem === newTargetElem;
 
-            if (
+            if (isPlaceholder) {
+                tmpPlaceholder = newTargetElem.cloneNode(true);
+                dragZoneElem.replaceWith(tmpPlaceholder);
+                newTargetElem.replaceWith(tmpSourceClone);
+            } else if (
                 sourceParentId !== targetParentId
                 && !dragZoneContainsTarget
             ) {
@@ -202,43 +236,37 @@ export function useSortableDropTarget(props) {
                     if (parentItem && parentItem !== newTargetElem) {
                         const rect = parentItem.getBoundingClientRect();
                         if (e.clientY >= rect.bottom) {
-                            parentItem.after(tmpTargetPlaceholder);
+                            parentItem.after(tmpSourceClone);
                         } else if (e.clientY <= rect.top) {
-                            parentItem.before(tmpTargetPlaceholder);
+                            parentItem.before(tmpSourceClone);
                         }
                     }
                 } else if (!isTargetDragZoneRoot) {
                     if (props.tree && targetIsContainer) {
                         if (newTargetElem.childElementCount === 0) {
-                            newTargetElem.append(tmpTargetPlaceholder);
+                            newTargetElem.append(tmpSourceClone);
                         }
                     } else if (dragZoneBeforeTarget) {
-                        newTargetElem.after(tmpTargetPlaceholder);
+                        newTargetElem.after(tmpSourceClone);
                     } else {
-                        newTargetElem.before(tmpTargetPlaceholder);
+                        newTargetElem.before(tmpSourceClone);
                     }
                 }
             } else if (dragZoneBeforeTarget && !dragZoneContainsTarget) {
-                newTargetElem.after(tmpTargetPlaceholder);
+                newTargetElem.after(tmpSourceClone);
             } else if (dragZoneAfterTarget && !dragZoneContainsTarget) {
-                newTargetElem.before(tmpTargetPlaceholder);
+                newTargetElem.before(tmpSourceClone);
             }
 
-            this.getTargetPositions(
-                sourceZoneId,
-                sourceDragZone.elem,
-                targetZoneId,
-                targetDragZone.elem,
-            );
+            this.getTargetPositions(zoneIds);
 
-            tmpTargetPlaceholder.remove();
             // Restore drag zone element
-            if (dragZoneNodes.prev) {
-                dragZoneNodes.prev.after(dragZoneElem);
-            } else if (dragZoneNodes.next) {
-                dragZoneNodes.next.before(dragZoneElem);
+            if (isPlaceholder) {
+                tmpPlaceholder.replaceWith(dragZoneElem);
+                tmpSourceClone.replaceWith(newTargetElem);
             } else {
-                dragZoneNodes.parent?.append(dragZoneElem);
+                tmpSourceClone.remove();
+                insertAtElementPosition(dragZoneElem, dragZoneNodes);
             }
 
             dragZone.elem.classList.remove(measureClass);
@@ -252,7 +280,7 @@ export function useSortableDropTarget(props) {
                 const sourceItem = this.getAnimatedItem(
                     sourceId,
                     sourceIndex,
-                    sourceZoneId,
+                    zoneIds,
                     sourceParentId,
                 );
                 if (!sourceItem) {
@@ -262,15 +290,15 @@ export function useSortableDropTarget(props) {
                 const targetItem = this.getAnimatedItem(
                     targetId,
                     targetIndex,
-                    targetZoneId,
+                    zoneIds,
                     targetParentId,
                 );
                 if (!targetItem) {
                     return;
                 }
 
-                sourceItem.targetRect = targetItem.rect;
-                targetItem.targetRect = sourceItem.rect;
+                sourceItem.targetRect = { ...targetItem.rect };
+                targetItem.targetRect = { ...sourceItem.rect };
 
                 animateElems = [sourceItem, targetItem];
             } else if (
@@ -355,22 +383,33 @@ export function useSortableDropTarget(props) {
         updatePositions(options) {
             const {
                 name = 'boxes',
-                sourceZoneId,
-                sourceZoneElem,
-                targetZoneId,
-                targetZoneElem,
+                zoneIds,
             } = options;
 
-            const sourceBoxes = this.getItemsPositions(sourceZoneElem);
-            const targetBoxes = (sourceZoneId !== targetZoneId)
-                ? this.getItemsPositions(targetZoneElem)
-                : sourceBoxes;
-            if (!sourceBoxes || !targetBoxes) {
-                return;
+            const dragMaster = DragMaster.getInstance();
+            const newBoxes = {};
+
+            const zones = asArray(zoneIds);
+            for (let index = 0; index < zones.length; index += 1) {
+                const id = zones[index];
+                if (id in newBoxes) {
+                    continue;
+                }
+
+                const dragZone = dragMaster.findDragZoneById(id);
+                newBoxes[id] = this.getItemsPositions(dragZone.elem);
+                if (!newBoxes[id]) {
+                    return;
+                }
             }
 
+            const findItemBox = (itemId) => {
+                const zoneId = zones.find((id) => newBoxes[id][itemId]);
+                return newBoxes[zoneId]?.[itemId] ?? {};
+            };
+
             const getItemBox = (item) => ({
-                ...(sourceBoxes[item.id] ?? targetBoxes[item.id] ?? {}),
+                ...findItemBox(item.id),
                 id: item.id,
                 ...(
                     (item.items?.length > 0)
@@ -379,9 +418,12 @@ export function useSortableDropTarget(props) {
                 ),
             });
 
+            const useNextItems = (name !== 'boxes');
             const mapZoneBoxes = (zoneId, state) => (
                 mapTreeItems(
-                    state[zoneId]?.next ?? state[zoneId]?.items ?? [],
+                    (useNextItems)
+                        ? getNextZoneItems(zoneId, state)
+                        : getDragZoneItems(zoneId, state),
                     getItemBox,
                 )
             );
@@ -391,68 +433,55 @@ export function useSortableDropTarget(props) {
                     ...prev,
                     [name]: {
                         ...(prev[name] ?? {}),
-                        [sourceZoneId]: mapZoneBoxes(sourceZoneId, prev),
                     },
                 };
 
-                if (sourceZoneId !== targetZoneId) {
-                    newState[name][targetZoneId] = mapZoneBoxes(targetZoneId, newState);
-                }
+                Object.keys(newBoxes).forEach((id) => {
+                    newState[name][id] = mapZoneBoxes(id, newState);
+                });
 
                 return newState;
             });
         },
 
         /** Updates cache of positions if needed */
-        checkPositionsCache(sourceZoneId, sourceZoneElem, targetZoneId, targetZoneElem) {
+        checkPositionsCache(zoneIds) {
             const state = getState();
-            if (state?.boxes[sourceZoneId] && state?.boxes[targetZoneId]) {
+            if (asArray(zoneIds).every((id) => !!state?.boxes[id])) {
                 return;
             }
 
             this.updatePositions({
                 name: 'boxes',
-                sourceZoneId,
-                sourceZoneElem,
-                targetZoneId,
-                targetZoneElem,
+                zoneIds,
             });
         },
 
         /** Updates target positions */
-        getTargetPositions(sourceZoneId, sourceZoneElem, targetZoneId, targetZoneElem) {
+        getTargetPositions(zoneIds) {
             this.updatePositions({
                 name: 'targetBoxes',
-                sourceZoneId,
-                sourceZoneElem,
-                targetZoneId,
-                targetZoneElem,
+                zoneIds,
             });
         },
 
-        getItemElementById(id) {
-            return this.elem?.querySelector?.(`[data-id="${id}"]`) ?? null;
+        getItemElementById(id, elem = this.elem) {
+            return elem?.querySelector?.(`[data-id="${id}"]`) ?? null;
         },
 
-        getAnimatedItem(id, index, zoneId, parentId) {
-            if (
-                ((id ?? null) === null)
-                || index === -1
-                || ((zoneId ?? null) === null)
-            ) {
+        getAnimatedItem(id, index, zoneIds, parentId) {
+            const state = getState();
+            const itemRects = this.getItemRects(id, zoneIds, state);
+            if (!itemRects) {
                 return null;
             }
-
-            const state = getState();
-            const positionCache = getPositionsCache(zoneId, state);
 
             return {
                 id,
                 index,
-                zoneId: props.id,
                 parentId,
-                rect: positionCache[index],
-                targetRect: positionCache[index],
+                ...itemRects,
+                targetRect: { ...itemRects.rect },
             };
         },
 
@@ -498,14 +527,16 @@ export function useSortableDropTarget(props) {
             };
         },
 
-        getMovingItems({
-            sourceIndex,
-            sourceZoneId,
-            sourceParentId,
-            targetIndex,
-            targetZoneId,
-            targetParentId,
-        }) {
+        getMovingItems(options) {
+            const {
+                sourceIndex,
+                sourceZoneId,
+                sourceParentId,
+                targetIndex,
+                targetZoneId,
+                targetParentId,
+            } = options;
+
             if (sourceIndex === -1 || targetIndex === -1) {
                 return [];
             }
@@ -573,6 +604,12 @@ export function useSortableDropTarget(props) {
                 return [];
             }
 
+            const zoneIds = [
+                sourceZoneId,
+                targetZoneId,
+                ...getPossibleZoneIds(state),
+            ];
+
             if (isSameZone) {
                 const flatSourceItems = toFlatList(getNextZoneItems(sourceZoneId, state));
                 const globalSourceIndex = flatSourceItems.findIndex((item) => (
@@ -599,7 +636,6 @@ export function useSortableDropTarget(props) {
                         continue;
                     }
 
-                    const zoneIds = [sourceZoneId, state.origSortPos.zoneId];
                     const itemRects = this.getItemRects(item.id, zoneIds, state);
                     if (!itemRects) {
                         return [];
@@ -660,7 +696,6 @@ export function useSortableDropTarget(props) {
                 const lastSourceIndex = sourceParentItems.length - 1;
                 const firstTargetIndex = globalTargetIndex;
                 const lastTargetIndex = targetParentItems.length - 1;
-                const zoneIds = [sourceZoneId, targetZoneId, state.origSortPos.zoneId];
 
                 // Move items at source list up by the size of moving item
                 for (let index = firstSourceIndex; index <= lastSourceIndex; index += 1) {

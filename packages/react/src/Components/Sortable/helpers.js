@@ -612,3 +612,48 @@ export const isPlaceholder = (props, state) => (
         && props.id === state.itemId
     )
 );
+
+/**
+ * Returns array of ids of drag zones affected by current drag
+ * @param {object} state
+ * @returns {Array}
+ */
+export const getPossibleZoneIds = (state) => ([
+    state.origSortPos?.zoneId,
+    state.sourcePosition?.zoneId,
+    state.prevPosition?.zoneId,
+    state.sortPosition?.zoneId,
+]);
+
+/**
+ * Returns position of source item
+ * @param {object} state
+ * @returns {object|null}
+ */
+export const getSourcePosition = (state) => {
+    if (!state) {
+        return null;
+    }
+
+    const positions = [
+        state.origSortPos,
+        state.sourcePosition,
+        state.prevPosition,
+        state.sortPosition,
+    ];
+
+    for (let index = 0; index < positions.length; index += 1) {
+        const position = positions[index];
+        if (!position) {
+            continue;
+        }
+
+        const sourceZone = getDragZoneItems(position?.zoneId, state);
+        const item = getTreeItemById(state?.itemId, sourceZone);
+        if (item) {
+            return { ...position };
+        }
+    }
+
+    return null;
+};
