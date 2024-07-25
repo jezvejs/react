@@ -41,3 +41,7 @@
     visibility: hidden;
   }
 }
+
+.tree-item.drag:first-child {
+  margin: 0;
+}
