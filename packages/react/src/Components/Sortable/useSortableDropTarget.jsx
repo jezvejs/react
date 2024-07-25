@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { DragMaster, useDragnDrop, useDropTarget } from '../../utils/DragnDrop/index.js';
 import {
+    distinctValues,
     findTreeItemIndexById,
     findTreeItemParentById,
     getAnimationBox,
@@ -178,11 +179,11 @@ export function useSortableDropTarget(props) {
             let animateElems = [];
             let swapWithPlaceholder = false;
 
-            const zoneIds = [
+            const zoneIds = distinctValues([
                 sourceZoneId,
                 targetZoneId,
                 ...getPossibleZoneIds(state),
-            ];
+            ]);
 
             this.checkPositionsCache(zoneIds);
 
@@ -610,11 +611,11 @@ export function useSortableDropTarget(props) {
                 return [];
             }
 
-            const zoneIds = [
+            const zoneIds = distinctValues([
                 sourceZoneId,
                 targetZoneId,
                 ...getPossibleZoneIds(state),
-            ];
+            ]);
 
             if (isSameZone) {
                 const flatSourceItems = toFlatList(getNextZoneItems(sourceZoneId, state));

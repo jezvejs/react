@@ -26,6 +26,7 @@ import {
     mapZones,
     mapNextZones,
     getSourcePosition,
+    distinctValues,
 } from './helpers.js';
 
 export {
@@ -204,12 +205,12 @@ export const Sortable = forwardRef((p, ref) => {
 
     const clearItemsTransform = () => {
         setState((prev) => {
-            const zoneIds = [
+            const zoneIds = distinctValues([
                 prev.origSortPos?.zoneId,
                 prev.sourcePosition?.zoneId,
                 prev.prevPosition?.zoneId,
                 prev.sortPosition?.zoneId,
-            ];
+            ]);
 
             const newState = mapZones(prev, zoneIds, clearTransform);
             return mapNextZones(newState, zoneIds, clearTransform);

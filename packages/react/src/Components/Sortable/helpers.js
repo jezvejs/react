@@ -9,6 +9,21 @@ export const AnimationStages = {
 };
 
 /**
+ * Returns new array with only distinct(unique) values from specified array
+ *
+ * @param {Array} arr
+ * @returns {Array}
+ */
+export const distinctValues = (arr) => (
+    asArray(arr).reduce((res, item) => (
+        (res.includes(item))
+            ? res
+            : [...res, item]
+    ), []
+    )
+);
+
+/**
  * Converts tree to flat array of items and returns result
  *
  * @param {Array} items
@@ -618,7 +633,7 @@ export const isPlaceholder = (props, state) => (
  * @param {object} state
  * @returns {Array}
  */
-export const getPossibleZoneIds = (state) => ([
+export const getPossibleZoneIds = (state) => distinctValues([
     state.origSortPos?.zoneId,
     state.sourcePosition?.zoneId,
     state.prevPosition?.zoneId,
