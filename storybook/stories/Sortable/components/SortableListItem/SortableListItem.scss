@@ -34,4 +34,5 @@
 
 .sortable-list-item.drag {
   opacity: 0.5;
+  pointer-events: none;
 }
