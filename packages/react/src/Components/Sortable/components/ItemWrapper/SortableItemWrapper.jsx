@@ -185,7 +185,7 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
 
         if (props.initialTransform && props.offsetTransform) {
             if (props.animated && (isEntered || isExiting)) {
-                res.style.transitionProperty = 'transform';
+                res.style.transitionProperty = 'transform, width';
             }
 
             res.style.transform = (
@@ -199,6 +199,16 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
             res.style.width = px(props.targetRect.width);
         }
 
+        const targetChild = props.targetRect?.childContainer;
+        const origChild = props.rect?.childContainer;
+        if (targetChild) {
+            res.childContainer = { ...targetChild };
+
+            if (origChild) {
+                res.childContainer.height = origChild.height;
+            }
+        }
+
         return res;
     }, [
         props.title,
@@ -207,9 +217,11 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         props.items,
         props.animated,
         props.className,
+        props.rect,
         props.targetRect,
         props.initialTransform,
         props.offsetTransform,
+        props.childContainer,
         state.dragging,
         animation.initialTransform,
         animation.offsetTransform,
@@ -246,7 +258,9 @@ SortableItemWrapper.propTypes = {
     initialTransform: PropTypes.string,
     offsetTransform: PropTypes.string,
     style: PropTypes.object,
+    rect: PropTypes.object,
     targetRect: PropTypes.object,
+    childContainer: PropTypes.object,
     components: PropTypes.shape({
         ListItem: isComponent,
     }),

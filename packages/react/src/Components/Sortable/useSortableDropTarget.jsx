@@ -370,16 +370,23 @@ export function useSortableDropTarget(props) {
             avatar.saveSortTarget?.(this);
         },
 
-        getItemsPositions(elem) {
-            if (!elem) {
+        getItemsPositions(dragZone) {
+            if (!dragZone?.elem) {
                 return null;
             }
-
+            const { containerSelector } = dragZone;
             const { ListItem } = props.components;
-            const elems = Array.from(elem.querySelectorAll(ListItem?.selector));
+
+            const elems = Array.from(dragZone.elem.querySelectorAll(ListItem?.selector));
             const res = Object.fromEntries(
                 elems.map((el) => {
                     const box = getAnimationBox(el);
+
+                    const container = el?.querySelector(containerSelector);
+                    if (container) {
+                        box.childContainer = getAnimationBox(container);
+                    }
+
                     return [box.id, box];
                 }),
             );
@@ -404,7 +411,7 @@ export function useSortableDropTarget(props) {
                 }
 
                 const dragZone = dragMaster.findDragZoneById(id);
-                newBoxes[id] = this.getItemsPositions(dragZone.elem);
+                newBoxes[id] = this.getItemsPositions(dragZone);
                 if (!newBoxes[id]) {
                     return;
                 }

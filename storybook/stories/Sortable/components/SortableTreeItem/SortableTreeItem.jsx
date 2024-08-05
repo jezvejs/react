@@ -1,6 +1,8 @@
 import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { px } from '@jezvejs/react';
+
 import './SortableTreeItem.scss';
 
 // eslint-disable-next-line react/display-name
@@ -47,10 +49,21 @@ export const SortableTreeItem = forwardRef((props, ref) => {
             )
     );
 
+    const childContentProps = {
+    };
+
+    if (props.childContainer) {
+        const { width, height } = props.childContainer;
+        childContentProps.style = {
+            width: px(width),
+            height: px(height),
+        };
+    }
+
     return (
         <div {...itemProps} ref={ref} >
             <span className="tree-item__title">{props.title}</span>
-            <div className="tree-item__content">
+            <div className="tree-item__content" {...childContentProps}>
                 {props.items?.map((item) => (
                     renderItem(item)
                 ))}
@@ -69,6 +82,7 @@ const isComponent = PropTypes.oneOfType([
 SortableTreeItem.propTypes = {
     id: PropTypes.string,
     style: PropTypes.object,
+    childContainer: PropTypes.object,
     group: PropTypes.string,
     zoneId: PropTypes.string,
     animated: PropTypes.bool,
