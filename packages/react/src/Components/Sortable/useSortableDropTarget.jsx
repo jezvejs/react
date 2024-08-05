@@ -10,15 +10,18 @@ import {
     getAnimationBox,
     getDragZone,
     getDragZoneItems,
+    getElementPosition,
     getNextZoneItems,
     getPositionCacheById,
     getPossibleZoneIds,
     getSourcePosition,
     getTargetPositionById,
     getTreeItemById,
+    insertAtElementPosition,
     isTreeContains,
     mapTreeItems,
     toFlatList,
+    toggleMeasureMode,
 } from './helpers.js';
 
 export function useSortableDropTarget(props) {
@@ -38,10 +41,12 @@ export function useSortableDropTarget(props) {
             } = props;
 
             const dragZone = DragMaster.getInstance().findDragZone(el);
+            const ownerDocument = el?.ownerDocument ?? null;
 
-            while (el && el !== document && el !== dragZone?.elem) {
+            while (el && el !== ownerDocument) {
                 if (
-                    el.matches?.(selector)
+                    el === dragZone?.elem
+                    || el.matches?.(selector)
                     || el.matches?.(containerSelector)
                     || el.classList?.contains(placeholderClass)
                 ) {
@@ -51,7 +56,7 @@ export function useSortableDropTarget(props) {
                 el = el.parentNode;
             }
 
-            return (el === dragZone?.elem) ? el : null;
+            return null;
         },
 
         /** Returns sortable group */
@@ -186,29 +191,6 @@ export function useSortableDropTarget(props) {
             ]);
 
             this.checkPositionsCache(zoneIds);
-
-            const getElementPosition = (elem) => ({
-                parent: elem?.parentNode,
-                prev: elem?.previousSibling,
-                next: elem?.nextSibling,
-            });
-
-            const insertAtElementPosition = (elem, pos) => {
-                if (pos.prev && pos.prev.parentNode) {
-                    pos.prev.after(elem);
-                } else if (pos.next && pos.next.parentNode) {
-                    pos.next.before(elem);
-                } else {
-                    pos.parent?.append(elem);
-                }
-            };
-
-            const toggleMeasureMode = (elem, value) => {
-                const { style } = elem ?? {};
-                if (style) {
-                    style.pointerEvents = (value) ? 'none' : '';
-                }
-            };
 
             const dragZoneNodes = getElementPosition(dragZoneElem);
 

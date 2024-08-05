@@ -19,8 +19,7 @@ export const distinctValues = (arr) => (
         (res.includes(item))
             ? res
             : [...res, item]
-    ), []
-    )
+    ), [])
 );
 
 /**
@@ -106,7 +105,7 @@ export const isTreeContains = (id, childId, items) => {
         return !!item;
     }
 
-    return Array.isArray(item?.items) && getTreeItemById(childId, item.items);
+    return Array.isArray(item?.items) && !!getTreeItemById(childId, item.items);
 };
 
 /**
@@ -671,4 +670,43 @@ export const getSourcePosition = (state) => {
     }
 
     return null;
+};
+
+/**
+ * Returns parent and closest siblings elements of specified element
+ * @param {Element} elem
+ * @returns {object}
+ */
+export const getElementPosition = (elem) => ({
+    parent: elem?.parentNode,
+    prev: elem?.previousSibling,
+    next: elem?.nextSibling,
+});
+
+/**
+ * Inserts element to the specified position
+ * Position object is returned by getElementPosition() function
+ * @param {Element} elem
+ * @param {object} pos
+ */
+export const insertAtElementPosition = (elem, pos) => {
+    if (pos.prev && pos.prev.parentNode) {
+        pos.prev.after(elem);
+    } else if (pos.next && pos.next.parentNode) {
+        pos.next.before(elem);
+    } else {
+        pos.parent?.append(elem);
+    }
+};
+
+/**
+ * Toggles measure mode on specified element
+ * @param {Element} elem
+ * @param {boolean} value
+ */
+export const toggleMeasureMode = (elem, value) => {
+    const { style } = elem ?? {};
+    if (style) {
+        style.pointerEvents = (value) ? 'none' : '';
+    }
 };
