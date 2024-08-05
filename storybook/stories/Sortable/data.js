@@ -11,6 +11,18 @@ export const getTableData = () => ([
     [7, 200, 'some text'],
 ]);
 
+export const getTableDataItems = (args) => ({
+    ...args,
+    items: args?.items?.map?.((item, index) => ({
+        id: `${args.id}_${index}`,
+        group: args.group,
+        columns: item.map((value, valIndex) => ({
+            id: `${args.id}_${index}_${valIndex}`,
+            content: value,
+        })),
+    })),
+});
+
 export const getTiles = () => ([
     { id: 'tile_1', title: 'Item 1' },
     { id: 'tile_2', placeholder: true },
