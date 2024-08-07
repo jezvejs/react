@@ -50,14 +50,18 @@ export const SortableTreeItem = forwardRef((props, ref) => {
     );
 
     const childContentProps = {
+        style: {},
     };
 
     if (props.childContainer) {
         const { width, height } = props.childContainer;
-        childContentProps.style = {
-            width: px(width),
-            height: px(height),
-        };
+        const { style } = childContentProps;
+        if (width > 0) {
+            style.width = px(width);
+        }
+        if (height > 0) {
+            style.height = px(height);
+        }
     }
 
     return (

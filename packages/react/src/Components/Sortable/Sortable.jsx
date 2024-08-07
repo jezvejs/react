@@ -285,7 +285,7 @@ export const Sortable = forwardRef((p, ref) => {
                 return;
             }
 
-            if (targetId === parentId) {
+            if (targetId === parentId && !props.tree) {
                 return;
             }
 
@@ -315,7 +315,7 @@ export const Sortable = forwardRef((p, ref) => {
                 const initialOffset = item.initialOffset ?? ({ x: 0, y: 0 });
                 const initialTransform = formatOffsetMatrix(initialOffset);
 
-                const { rect, targetRect } = found;
+                const { rect, targetRect, parent } = found;
                 if (!rect || !targetRect) {
                     return item;
                 }
@@ -335,6 +335,7 @@ export const Sortable = forwardRef((p, ref) => {
                     offsetTransform,
                     rect,
                     targetRect,
+                    parent,
                 };
 
                 if (swapWithPlaceholder) {

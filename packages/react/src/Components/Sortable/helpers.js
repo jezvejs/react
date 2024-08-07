@@ -1,5 +1,6 @@
 import { getOffsetSum } from '@jezvejs/dom';
 import { isFunction, asArray } from '@jezvejs/types';
+import { DragMaster } from '../../utils/DragnDrop/DragMaster.js';
 
 export const AnimationStages = {
     entering: 1,
@@ -598,17 +599,31 @@ export const getAnimationBox = (elem) => {
     if (!elem) {
         return null;
     }
+    const { style } = elem;
+
+    const prevWidth = style.width;
+    const prevHeight = style.height;
+
+    style.width = '';
+    style.height = '';
 
     const { top, left } = getOffsetSum(elem);
+    const width = elem.offsetWidth;
+    const height = elem.offsetHeight;
     const res = {
         id: elem.dataset?.id,
         top,
         left,
         x: left,
         y: top,
-        width: elem.offsetWidth,
-        height: elem.offsetHeight,
+        width,
+        height,
+        bottom: top + height,
+        right: left + width,
     };
+
+    style.width = prevWidth;
+    style.height = prevHeight;
 
     return res;
 };
@@ -670,6 +685,18 @@ export const getSourcePosition = (state) => {
     }
 
     return null;
+};
+
+/**
+ * Returns source drag zone for specified state
+ * @param {object} state
+ * @returns {object|null}
+ */
+export const getSourceDragZone = (state) => {
+    const dragMaster = DragMaster.getInstance();
+    const position = getSourcePosition(state);
+
+    return dragMaster?.findDragZoneById?.(position?.zoneId) ?? null;
 };
 
 /**
