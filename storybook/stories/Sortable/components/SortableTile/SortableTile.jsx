@@ -5,6 +5,12 @@ import './SortableTile.scss';
 
 // eslint-disable-next-line react/display-name
 export const SortableTile = forwardRef((props, ref) => {
+    const itemProps = {
+        className: classNames('sortable-tile', props.className),
+        'data-id': props.id,
+        style: props.style,
+    };
+
     const title = props.title && (
         <span className='sortable-tile__title'>{props.title}</span>
     );
@@ -17,20 +23,19 @@ export const SortableTile = forwardRef((props, ref) => {
     );
 
     return (
-        <div
-            className={classNames('sortable-tile', props.className)}
-            data-id={props.id}
-            ref={ref}
-        >
+        <div {...itemProps} ref={ref} >
             {title}
             {icon}
         </div>
     );
 });
 
+SortableTile.selector = '.sortable-tile';
+
 SortableTile.propTypes = {
     id: PropTypes.string,
     className: PropTypes.string,
+    style: PropTypes.object,
     title: PropTypes.string,
     icon: PropTypes.oneOfType([
         PropTypes.node,

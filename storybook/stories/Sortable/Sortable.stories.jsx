@@ -1,18 +1,17 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
-import { useMemo } from 'react';
-import {
-    Sortable,
-    DragnDropProvider,
-    createSlice,
-} from '@jezvejs/react';
+import { Sortable } from '@jezvejs/react';
 
 // Local components
 import { ListItemWithHandle } from './components/ListItemWithHandle/ListItemWithHandle.jsx';
 import { ListItemWithInput } from './components/ListItemWithInput/ListItemWithInput.jsx';
+import { ProvidedExchangeable } from './components/ProvidedExchangeable/ProvidedExchangeable.jsx';
+import { ProvidedSortable } from './components/ProvidedSortable/ProvidedSortable.jsx';
 import { SortableListItem } from './components/SortableListItem/SortableListItem.jsx';
 import { SortableTile } from './components/SortableTile/SortableTile.jsx';
 import { SortableTreeItem } from './components/SortableTreeItem/SortableTreeItem.jsx';
+import { SortableTableRow } from './components/TableRow/SortableTableRow.jsx';
+import { SortableTableTbodyRow } from './components/TableRow/SortableTableTbodyRow.jsx';
 
 import {
     getCustomGroupItems,
@@ -20,6 +19,8 @@ import {
     getDestTreeItems,
     getListItems,
     getSingleItemList,
+    getTableData,
+    getTableDataItems,
     getTiles,
     getTreeItems,
 } from './data.js';
@@ -59,31 +60,7 @@ export const Default = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            tiles: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };
 
 export const List = {
@@ -104,31 +81,7 @@ export const List = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            list: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };
 
 export const Exchange = {
@@ -140,7 +93,15 @@ export const Exchange = {
         animated: true,
         copyWidth: true,
         allowSingleItemSort: true,
-        hoverClass: 'dbg-hover',
+        source: {
+            id: 'exchSource',
+            items: getListItems(),
+        },
+        destination: {
+            id: 'exchDest',
+            items: getDestListItems(),
+            dragClass: 'list_item_drag',
+        },
         components: {
             ListItem: SortableListItem,
         },
@@ -149,55 +110,12 @@ export const Exchange = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const argsSrc = {
-            ...args,
-            id: 'exchSource',
-            items: getListItems(),
-        };
-
-        const argsDest = {
-            ...args,
-            id: 'exchDest',
-            items: getDestListItems(),
-            dragClass: 'list_item_drag',
-        };
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            exchSource: {
-                items: argsSrc.items,
-            },
-            exchDest: {
-                items: argsDest.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <div className="exch-lists-container">
-                    <Sortable {...argsSrc} container={portalElement} />
-                    <Sortable {...argsDest} container={portalElement} />
-                </div>
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedExchangeable,
 };
 
 export const CustomGroups = {
     args: {
-        id: 'list',
+        id: 'customGroups',
         items: getCustomGroupItems(),
         className: 'list-area',
         selector: '.sortable-list-item',
@@ -213,31 +131,12 @@ export const CustomGroups = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+    render: ProvidedSortable,
+};
 
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            list: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+const treeTitleHandle = {
+    query: '.tree-item > .tree-item__title',
+    includeChilds: true,
 };
 
 export const Tree = {
@@ -249,9 +148,11 @@ export const Tree = {
         containerSelector: '.tree-item__content',
         placeholderClass: 'tree-item__placeholder',
         dragClass: true,
+        animated: true,
         group: 'tree',
         copyWidth: true,
         tree: true,
+        handles: treeTitleHandle,
         components: {
             ListItem: SortableTreeItem,
         },
@@ -260,31 +161,7 @@ export const Tree = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            tree: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };
 
 export const TreeExchange = {
@@ -297,7 +174,17 @@ export const TreeExchange = {
         group: 'treeExch',
         copyWidth: true,
         tree: true,
+        handles: treeTitleHandle,
         allowSingleItemSort: true,
+        source: {
+            id: 'treeExchSource',
+            items: getTreeItems(),
+        },
+        destination: {
+            id: 'treeExchDest',
+            items: getDestTreeItems(),
+            dragClass: 'list_item_drag',
+        },
         components: {
             ListItem: SortableTreeItem,
         },
@@ -306,50 +193,60 @@ export const TreeExchange = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+    render: ProvidedExchangeable,
+};
 
-        const argsSrc = {
-            ...args,
-            id: 'treeExchSource',
-            items: getTreeItems(),
-        };
-
-        const argsDest = {
-            ...args,
-            id: 'treeExchDest',
-            items: getDestTreeItems(),
-            dragClass: 'list_item_drag',
-        };
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            treeExchSource: {
-                items: argsSrc.items,
-            },
-            treeExchDest: {
-                items: argsDest.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <div className="exch-lists-container">
-                    <Sortable {...argsSrc} container={portalElement} />
-                    <Sortable {...argsDest} container={portalElement} />
-                </div>
-            </DragnDropProvider>
-        );
+/**
+ * Sortable table with TBODY rows
+ */
+export const TableWithWrappedRows = {
+    args: {
+        ...getTableDataItems({
+            id: 'table1',
+            group: 'tbl',
+            items: getTableData(),
+        }),
+        className: 'sortable_tbl',
+        selector: '.tbl_list_item',
+        placeholderClass: 'list_item_placeholder',
+        table: true,
+        copyWidth: true,
+        components: {
+            ListItem: SortableTableTbodyRow,
+        },
     },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: ProvidedSortable,
+};
+
+/**
+ * Sortable table with TBODY rows
+ */
+export const TableSingleBody = {
+    args: {
+        ...getTableDataItems({
+            id: 'table2',
+            group: 'tbl2',
+            items: getTableData(),
+        }),
+        className: 'sortable_tbl',
+        selector: '.tbl_list_item',
+        placeholderClass: 'list_item_placeholder',
+        table: true,
+        wrapInTbody: true,
+        copyWidth: true,
+        components: {
+            ListItem: SortableTableRow,
+        },
+    },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: ProvidedSortable,
 };
 
 export const OnlyRootHandle = {
@@ -370,31 +267,7 @@ export const OnlyRootHandle = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            onlyRootHandle: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };
 
 export const QueryHandles = {
@@ -415,31 +288,7 @@ export const QueryHandles = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            listHandle: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };
 
 export const DisabledSingleItemSort = {
@@ -460,31 +309,7 @@ export const DisabledSingleItemSort = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            disabledSingleItem: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };
 
 export const EnabledSingleItemSort = {
@@ -506,29 +331,5 @@ export const EnabledSingleItemSort = {
         layout: 'fullscreen',
     },
     decorators: [containerDecorator],
-    render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
-
-        const initialState = {
-            left: 0,
-            top: 0,
-            shiftX: 0,
-            shiftY: 0,
-            dragging: false,
-            enabledSingleItem: {
-                items: args.items,
-            },
-        };
-
-        const slice = createSlice({
-        });
-
-        return (
-            <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <Sortable {...args} container={portalElement} />
-            </DragnDropProvider>
-        );
-    },
+    render: ProvidedSortable,
 };

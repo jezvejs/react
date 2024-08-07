@@ -8,6 +8,7 @@ export const SortableListItem = forwardRef((props, ref) => {
     const itemProps = {
         className: classNames('sortable-list-item', props.className),
         'data-id': props.id,
+        style: props.style,
     };
 
     if (props.group) {
@@ -21,9 +22,12 @@ export const SortableListItem = forwardRef((props, ref) => {
     );
 });
 
+SortableListItem.selector = '.sortable-list-item';
+
 SortableListItem.propTypes = {
     id: PropTypes.string,
     group: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
+    style: PropTypes.object,
 };

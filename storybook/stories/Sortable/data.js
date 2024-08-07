@@ -1,13 +1,35 @@
 import TileCardIcon from '../../assets/icons/tile-card.svg';
 import { initItems } from '../../utils/utils.js';
 
+export const getTableData = () => ([
+    [1, 10000, 'some text'],
+    [2, 354, 'some text'],
+    [3, 850110, 'some long long text'],
+    [4, 6000, 'some text'],
+    [5, 7860, 'some short text'],
+    [6, 4500, 'some text'],
+    [7, 200, 'some text'],
+]);
+
+export const getTableDataItems = (args) => ({
+    ...args,
+    items: args?.items?.map?.((item, index) => ({
+        id: `${args.id}_${index}`,
+        group: args.group,
+        columns: item.map((value, valIndex) => ({
+            id: `${args.id}_${index}_${valIndex}`,
+            content: value,
+        })),
+    })),
+});
+
 export const getTiles = () => ([
-    { id: '1', title: 'Item 1' },
-    { id: '2', placeholder: true },
-    { id: '3', title: 'Item 3', icon: TileCardIcon },
-    { id: '4', title: 'Item 4' },
-    { id: '5', title: 'Item 5' },
-    { id: '6', title: 'Item 6' },
+    { id: 'tile_1', title: 'Item 1' },
+    { id: 'tile_2', placeholder: true },
+    { id: 'tile_3', title: 'Item 3', icon: TileCardIcon },
+    { id: 'tile_4', title: 'Item 4' },
+    { id: 'tile_5', title: 'Item 5' },
+    { id: 'tile_6', title: 'Item 6' },
 ]);
 
 export const getListItems = () => (
