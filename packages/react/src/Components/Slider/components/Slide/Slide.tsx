@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import { SlideProps } from '../../types.ts';
 import './Slide.scss';
 
-export const Slide = (props) => {
+export const Slide = (props: SlideProps) => {
     const { content } = props;
 
     const slideProps = {
@@ -25,15 +25,4 @@ export const Slide = (props) => {
             {content}
         </div>
     );
-};
-
-Slide.propTypes = {
-    id: PropTypes.string,
-    name: PropTypes.string,
-    width: PropTypes.number,
-    height: PropTypes.number,
-    content: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
 };

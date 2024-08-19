@@ -1,13 +1,22 @@
 import { asArray, isFunction } from '@jezvejs/types';
+import {
+    MenuItemCallback,
+    MenuItemProps,
+    MenuListProps,
+    MenuLoopParam,
+    MenuProps,
+    MenuState,
+    ToFlatListParam,
+} from './types.ts';
 
 const checkboxTypes = ['checkbox', 'checkbox-link'];
 
 /**
- * Returns true if type of specified item
- * @param {Object} state
+ * Returns true if specified item is checkbox
+ * @param {MenuItemProps} item
  * @returns {boolean}
  */
-export const isCheckbox = (item) => (
+export const isCheckbox = (item: MenuItemProps | null): boolean => (
     typeof item?.type === 'string'
     && checkboxTypes.includes(item.type.toLowerCase())
 );
@@ -15,26 +24,31 @@ export const isCheckbox = (item) => (
 /**
  * Converts multilevel menu list to flat array of items and returns result
  *
- * @param {Array} items source multilevel array of menu items
- * @returns {Array}
+ * @param {<T = MenuItemProps>[]} items
+ * @param {ToFlatListParam} options
+ * @returns {T[]}
  */
-export const toFlatList = (items, options = {}) => {
-    const res = [];
+export function toFlatList<T extends MenuItemProps = MenuItemProps>(
+    items: T[],
+    options?: ToFlatListParam,
+): T[] {
+    const res: T[] = [];
+
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
         const disabled = options?.disabled || item.disabled;
 
         if (item.type === 'group') {
-            if (options.includeGroupItems) {
+            if (options?.includeGroupItems) {
                 res.push({ ...item, disabled });
             }
 
             res.push(
-                ...toFlatList(
-                    item.items,
+                ...toFlatList<T>(
+                    asArray(item.items),
                     {
                         disabled,
-                        includeGroupItems: options.includeGroupItems,
+                        includeGroupItems: options?.includeGroupItems,
                     },
                 ),
             );
@@ -44,15 +58,18 @@ export const toFlatList = (items, options = {}) => {
     }
 
     return res;
-};
+}
 
 /**
  * Searches for first menu item for which callback function return true
  *
- * @param {Array} items array of items to search in
- * @param {Function} callback function to
+ * @param {<T = MenuItemProps>[]} items array of items to search in
+ * @param {MenuItemCallback<T>} callback
  */
-export const findMenuItem = (items, callback) => {
+export function findMenuItem<T extends MenuItemProps = MenuItemProps>(
+    items: T[],
+    callback: MenuItemCallback<T>,
+): T | null {
     if (!Array.isArray(items)) {
         throw new Error('Invalid items parameter');
     }
@@ -61,13 +78,13 @@ export const findMenuItem = (items, callback) => {
     }
 
     for (let index = 0; index < items.length; index += 1) {
-        let item = items[index];
+        let item: T | null = items[index];
         if (callback(item)) {
             return item;
         }
 
-        if (item.type === 'group') {
-            item = findMenuItem(item.items, callback);
+        if (item.type === 'group' && Array.isArray(item.items)) {
+            item = findMenuItem<T>((item.items ?? []) as T[], callback);
             if (item) {
                 return item;
             }
@@ -75,16 +92,20 @@ export const findMenuItem = (items, callback) => {
     }
 
     return null;
-};
+}
 
 /**
  * Searches for last menu item for which callback function return true
  *
- * @param {Array} items array of items to search in
- * @param {Function} callback function to
- * @param {Object} options
+ * @param {<T = MenuItemProps>[]} items array of items to search in
+ * @param {MenuItemCallback<T>} callback function to
+ * @param {ToFlatListParam} options
  */
-export const findLastMenuItem = (items, callback, options = {}) => {
+export function findLastMenuItem<T extends MenuItemProps = MenuItemProps>(
+    items: T[],
+    callback: MenuItemCallback<T>,
+    options?: ToFlatListParam,
+): T | null {
     if (!Array.isArray(items)) {
         throw new Error('Invalid items parameter');
     }
@@ -92,7 +113,7 @@ export const findLastMenuItem = (items, callback, options = {}) => {
         throw new Error('Invalid callback parameter');
     }
 
-    const flatList = toFlatList(items, options);
+    const flatList = toFlatList<T>(items, options);
     for (let index = flatList.length - 1; index >= 0; index -= 1) {
         const item = flatList[index];
         if (callback(item)) {
@@ -101,77 +122,84 @@ export const findLastMenuItem = (items, callback, options = {}) => {
     }
 
     return null;
-};
+}
 
 /**
  * Returns menu item for specified id
  *
- * @param {String} id item id
- * @param {Array} items array of items to search in
+ * @param {string} id item id
+ * @param {<T = MenuItemProps>[]} items array of items to search in
  */
-export const getItemById = (id, items) => {
-    const strId = id?.toString() ?? null;
-    if (strId === null) {
+export function getItemById<T extends MenuItemProps = MenuItemProps>(
+    id: string | null,
+    items: T[],
+): T | null {
+    if (id === null) {
         return null;
     }
 
-    return findMenuItem(items, (item) => item.id?.toString() === strId);
-};
+    return findMenuItem<T>(items, (item: T) => item.id?.toString() === id);
+}
 
 /**
  * Returns menu group item for specified id
  *
- * @param {String} id item id
- * @param {Array} items array of items to search in
+ * @param {string} id item id
+ * @param {<T = MenuItemProps>[]} items array of items to search in
  */
-export const getGroupById = (id, items) => {
-    const strId = id?.toString() ?? null;
-    if (strId === null) {
+export function getGroupById<T extends MenuItemProps = MenuItemProps>(
+    id: string | null,
+    items: T[],
+): T | null {
+    if (id === null) {
         return null;
     }
 
-    return findMenuItem(items, (item) => (
-        item.id?.toString() === strId
+    return findMenuItem<T>(items, (item) => (
+        item.id?.toString() === id
         && item.type === 'group'
     ));
-};
+}
 
 /**
  * Returns new identifier not existing in the specified list of items
  *
- * @param {Array} items array of items to search in
- * @param {String} prefix optional string to prepend id with
+ * @param {<T = MenuItemProps>[]} items array of items to search in
+ * @param {string} prefix optional string to prepend id with
  */
-export const generateItemId = (items, prefix = '') => {
-    let found;
+export const generateItemId = (items: MenuItemProps[], prefix: string = ''): string => {
+    let found: MenuItemProps | null = null;
+    let id: string;
 
     do {
-        const id = `${prefix}${Date.now()}${Math.random() * 10000}`;
+        id = `${prefix}${Date.now()}${Math.random() * 10000}`;
         found = getItemById(id, items);
-        if (!found) {
-            return id;
-        }
     } while (found);
 
-    return null;
+    return id;
 };
 
 /**
  * Returns active menu item
  *
- * @param {Array} items array of items to search in
+ * @param {MenuState} state
+ * @returns {MenuItemProps}
  */
-export const getActiveItem = (state) => (
-    getItemById(state.activeItem, state.items)
+export const getActiveItem = (state: MenuState): MenuItemProps | null => (
+    getItemById(state.activeItem ?? null, state.items ?? [])
 );
 
 /**
  * Iterates list of menu items with callback function
- * @param {Array} items menu items array
- * @param {Function} callback
- * @param {Object} options
+ * @param {<T = MenuItemProps>[]} items menu items array
+ * @param {MenuItemCallback} callback
+ * @param {MenuLoopParam} options
  */
-export const forItems = (items, callback, options = {}) => {
+export function forItems<T extends MenuItemProps = MenuItemProps>(
+    items: T[],
+    callback: MenuItemCallback<T, void>,
+    options: MenuLoopParam<T> | null = null,
+): T[] {
     if (!isFunction(callback)) {
         throw new Error('Invalid callback parameter');
     }
@@ -181,49 +209,57 @@ export const forItems = (items, callback, options = {}) => {
         const item = items[index];
 
         if (item.type === 'group') {
-            if (options.includeGroupItems) {
+            if (options?.includeGroupItems) {
                 callback(item, index, items);
             }
 
-            forItems(item.items, callback);
+            forItems<T>((item.items ?? []) as T[], callback, options);
         } else {
             callback(item, index, items);
         }
     }
 
     return res;
-};
+}
 
 /**
  * Returns list of menu items transformed with callback function
- * @param {Array} items menu items array
- * @param {Function} callback
- * @param {Object} options
- * @returns {Array}
+ * @param {T[]} items menu items array
+ * @param {MenuItemCallback<T, T>} callback
+ * @param {MenuLoopParam<T>} options
+ * @returns {T[]}
  */
-export const mapItems = (items, callback, options = {}) => {
+export function mapItems<T extends MenuItemProps = MenuItemProps>(
+    items: T[],
+    callback: MenuItemCallback<T, T>,
+    options: MenuLoopParam<T> | null = null,
+): T[] {
     if (!isFunction(callback)) {
         throw new Error('Invalid callback parameter');
     }
 
-    const res = [];
+    const res: T[] = [];
+
     for (let index = 0; index < items.length; index += 1) {
-        const item = {
+        const item: T = {
             ...items[index],
-            group: options.group?.id,
+            group: options?.group?.id,
         };
 
         if (item.type === 'group') {
-            const group = (options.includeGroupItems)
+            const group = (options?.includeGroupItems)
                 ? callback(item, index, items)
                 : item;
 
             res.push({
                 ...group,
-                items: mapItems(
-                    item.items,
+                items: mapItems<T>(
+                    (item.items ?? []) as T[],
                     callback,
-                    { ...options, group },
+                    {
+                        ...(options ?? {}),
+                        group,
+                    },
                 ),
             });
         } else {
@@ -232,30 +268,35 @@ export const mapItems = (items, callback, options = {}) => {
     }
 
     return res;
-};
+}
 
 /**
  * Returns list of menu items filtered by callback function
- * @param {Array} items menu items array
- * @param {Function} callback
- * @param {Object} options
- * @returns {Array}
+ * @param {T[]} items menu items array
+ * @param {MenuItemCallback<T>} callback
+ * @param {MenuLoopParam<T>} options
+ * @returns {T[]}
  */
-export const filterItems = (items, callback, options = {}) => {
+export function filterItems<T extends MenuItemProps = MenuItemProps>(
+    items: T[],
+    callback: MenuItemCallback<T>,
+    options: MenuLoopParam<T> | null = null,
+): T[] {
     if (!isFunction(callback)) {
         throw new Error('Invalid callback parameter');
     }
 
-    const res = [];
+    const res: T[] = [];
+
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
         if (item.type === 'group') {
             if (
-                !options.includeGroupItems
+                !options?.includeGroupItems
                 || callback(item, index, items)
             ) {
-                const children = filterItems(item.items, callback, options);
+                const children = filterItems<T>((item.items ?? []) as T[], callback, options);
                 if (children.length > 0) {
                     res.push({
                         ...item,
@@ -269,30 +310,34 @@ export const filterItems = (items, callback, options = {}) => {
     }
 
     return res;
-};
+}
 
 /**
  * Returns closest item before specified that satisfies filter
  *
- * @param {String} id identifier of item to start from
- * @param {Array} items array of menu list items
- * @param {Function|null} filterCallback optional callback function to verify
- * @param {Object} options
- * @returns
+ * @param {string|null} id identifier of item to start from
+ * @param {<T = MenuItemProps>[]} items array of menu list items
+ * @param {MenuItemCallback<T>|null} filterCallback optional callback function to verify
+ * @param {ToFlatListParam} options
+ * @returns {T|null}
  */
-export const getPreviousItem = (id, items, filterCallback = null, options = {}) => {
-    const strId = id?.toString() ?? null;
-    if (strId === null) {
+export function getPreviousItem<T extends MenuItemProps = MenuItemProps>(
+    id: string | null,
+    items: T[],
+    filterCallback: MenuItemCallback<T> | null = null,
+    options: ToFlatListParam = {},
+): T | null {
+    if (id === null) {
         return null;
     }
 
     const flatList = toFlatList(items, options);
-    let startItem = null;
-    const callback = isFunction(filterCallback) ? filterCallback : null;
+    let startItem: T | null = null;
+    const callback = (typeof filterCallback === 'function') ? filterCallback : null;
 
     for (let index = flatList.length - 1; index >= 0; index -= 1) {
         const item = flatList[index];
-        if (item.id?.toString() === strId) {
+        if (item.id?.toString() === id) {
             startItem = item;
             continue;
         }
@@ -305,30 +350,34 @@ export const getPreviousItem = (id, items, filterCallback = null, options = {}) 
     }
 
     return null;
-};
+}
 
 /**
  * Returns closest item after specified that satisfies filter
  *
- * @param {String} id identifier of item to start from
- * @param {Array} items array of menu list items
- * @param {Function|null} filterCallback optional callback function to filter returned item
- * @param {Object} options
- * @returns
+ * @param {string|null} id identifier of item to start from
+ * @param {<T = MenuItemProps>[]} items array of menu list items
+ * @param {MenuItemCallback<T>|null} filterCallback optional callback function to verify
+ * @param {ToFlatListParam} options
+ * @returns {T|null}
  */
-export const getNextItem = (id, items, filterCallback = null, options = {}) => {
-    const strId = id?.toString() ?? null;
-    if (strId === null) {
+export function getNextItem<T extends MenuItemProps = MenuItemProps>(
+    id: string | null,
+    items: T[],
+    filterCallback: MenuItemCallback<T> | null = null,
+    options: ToFlatListParam = {},
+): T | null {
+    if (id === null) {
         return null;
     }
 
-    const flatList = toFlatList(items, options);
-    let startItem = null;
-    const callback = isFunction(filterCallback) ? filterCallback : null;
+    const flatList = toFlatList<T>(items, options);
+    let startItem: T | null = null;
+    const callback = (typeof filterCallback === 'function') ? filterCallback : null;
 
     for (let index = 0; index < flatList.length; index += 1) {
         const item = flatList[index];
-        if (item.id?.toString() === strId) {
+        if (item.id?.toString() === id) {
             startItem = item;
             continue;
         }
@@ -341,13 +390,20 @@ export const getNextItem = (id, items, filterCallback = null, options = {}) => {
     }
 
     return null;
-};
+}
 
-export const getClosestItemElement = (elem, props) => (
-    elem?.closest?.(props?.itemSelector ?? props?.components?.ListItem?.selector) ?? null
+export const getItemSelector = (props: MenuState | MenuListProps): string | null => (
+    props?.itemSelector ?? props?.components?.ListItem?.selector ?? null
 );
 
-export const isAvailableItem = (item, state) => (
+export const getClosestItemElement = (
+    elem: HTMLElement | null,
+    selector: string | null,
+): HTMLElement | null => (
+    (selector && elem?.closest?.(selector)) as HTMLElement ?? null
+);
+
+export const isAvailableItem = (item: MenuItemProps, state: MenuState): boolean => !!(
     item
     && !item.hidden
     && !item.disabled
@@ -358,10 +414,10 @@ export const isAvailableItem = (item, state) => (
     )
 );
 
-export const getItemProps = (item, state) => {
+export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuItemProps => {
     const itemDefaultProps = state.getItemDefaultProps?.() ?? {};
 
-    const res = {
+    const res: MenuItemProps = {
         ...itemDefaultProps,
         ...item,
         iconAlign: item.iconAlign || state.iconAlign,
@@ -371,17 +427,12 @@ export const getItemProps = (item, state) => {
         activeItem: state.activeItem,
         tabThrough: state.tabThrough,
         type: item.type ?? state.defaultItemType,
-        components: state.components,
         beforeContent: item.beforeContent || state.beforeContent,
         afterContent: item.afterContent || state.afterContent,
-        onItemClick: state.onItemClick,
-        onMouseEnter: state.onMouseEnter,
-        onMouseLeave: state.onMouseLeave,
+        components: {
+            Check: state.components.Check!,
+        },
     };
-
-    if (item.type === 'group') {
-        res.getItemProps = state.getItemProps;
-    }
 
     return res;
 };
@@ -425,7 +476,7 @@ export const pushItem = (item, items) => {
     if (item.group) {
         const group = getGroupById(item.group, res);
         if (group) {
-            group.items.push(item);
+            group.items?.push(item);
         }
     } else {
         res.push(item);
@@ -435,7 +486,10 @@ export const pushItem = (item, items) => {
 };
 
 /** Returns item object for specified props after applying default values */
-export const createMenuItem = (props, state) => {
+export const createMenuItem = <T extends MenuItemProps, S extends MenuState>(
+    props: T,
+    state: S,
+): T => {
     if (!props) {
         throw new Error('Invalid item object');
     }
@@ -446,7 +500,7 @@ export const createMenuItem = (props, state) => {
     const defaultItemType = state.defaultItemType ?? ((state.multiple) ? 'checkbox' : 'button');
     const itemDefaultProps = state.getItemDefaultProps?.() ?? {};
 
-    const res = {
+    const res: T = {
         ...itemDefaultProps,
         ...props,
         active: false,
@@ -482,12 +536,15 @@ export const createItems = (items, state) => (
 /**
  * Returns initial state object for specified props
  *
- * @param {Object} props
- * @param {Object} defProps
- * @returns {Object}
+ * @param {MenuProps} props
+ * @param {MenuProps} defProps
+ * @returns {MenuState}
  */
-export const getInitialState = (props, defProps) => {
-    const res = {
+export const getInitialState = (
+    props: Partial<MenuProps>,
+    defProps: MenuProps,
+): MenuState => {
+    const res: MenuState = {
         ...(defProps ?? {}),
         ...props,
         activeItem: null,

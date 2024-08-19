@@ -1,7 +1,20 @@
-import PropTypes from 'prop-types';
+import { FunctionComponent, SVGProps } from 'react';
 import classNames from 'classnames';
-
+import {
+    MenuItemComponent,
+    MenuItemProps,
+    NativeButtonType,
+} from '../../types.ts';
 import './MenuItem.scss';
+
+interface MenuItemCommonProps {
+    className?: string;
+    'data-id'?: string;
+    disabled?: boolean;
+    href?: string;
+    type?: string;
+    tabIndex?: number;
+}
 
 const defaultProps = {
     type: 'button',
@@ -17,7 +30,7 @@ const defaultProps = {
 /**
  * MenuItem component
  */
-export const MenuItem = (p) => {
+export const MenuItem: MenuItemComponent = (p: MenuItemProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -44,7 +57,7 @@ export const MenuItem = (p) => {
     const isLink = type === 'link' || type === 'checkbox-link';
     const isCheckbox = type === 'checkbox' || type === 'checkbox-link';
 
-    const commonProps = {
+    const commonProps: MenuItemCommonProps = {
         className: classNames(
             'menu-item',
             {
@@ -70,8 +83,8 @@ export const MenuItem = (p) => {
         commonProps.tabIndex = -1;
     }
 
-    const IconComponent = icon;
-    const iconContent = (icon) ? (<IconComponent className="menu-item__icon" />) : null;
+    const IconComponent = icon as FunctionComponent<SVGProps<SVGSVGElement>>;
+    const iconContent = (icon) ? (<IconComponent className='menu-item__icon' />) : null;
 
     const { Check } = props.components;
     const checkContent = (isCheckbox && Check && (props.selected || props.renderNotSelected))
@@ -117,43 +130,15 @@ export const MenuItem = (p) => {
         return <a {...commonProps}>{content}</a>;
     }
 
-    return <button {...commonProps}>{content}</button>;
-};
-
-MenuItem.propTypes = {
-    id: PropTypes.string,
-    type: PropTypes.string.isRequired,
-    url: PropTypes.string,
-    className: PropTypes.string,
-    title: PropTypes.string,
-    selectable: PropTypes.bool,
-    selected: PropTypes.bool,
-    disabled: PropTypes.bool,
-    tabThrough: PropTypes.bool,
-    renderNotSelected: PropTypes.bool,
-    activeItem: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.oneOf([null]),
-    ]),
-    iconAlign: PropTypes.oneOf(['left', 'right']),
-    checkboxSide: PropTypes.oneOf(['left', 'right']),
-    before: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    beforeContent: PropTypes.bool,
-    after: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    afterContent: PropTypes.bool,
-    icon: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    components: PropTypes.shape({
-        Check: PropTypes.func,
-    }),
+    const btnType = type as NativeButtonType;
+    return (
+        <button
+            {...commonProps}
+            type={btnType}
+        >
+            {content}
+        </button>
+    );
 };
 
 MenuItem.selector = '.menu-item';

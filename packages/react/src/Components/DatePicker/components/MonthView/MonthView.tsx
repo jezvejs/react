@@ -1,4 +1,3 @@
-import { isFunction } from '@jezvejs/types';
 import {
     DAYS_IN_WEEK,
     shiftDate,
@@ -8,16 +7,23 @@ import {
     getDaysInMonth,
 } from '@jezvejs/datetime';
 import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
 import { MONTH_VIEW } from '../../constants.ts';
 import { getHeaderTitle, inRange, includesDate } from '../../helpers.ts';
+import {
+    DatePickerHeaderProps,
+    DatePickerMonthViewItemProps,
+    DatePickerMonthViewProps,
+    DatePickerState,
+} from '../../types.ts';
+
+import { DatePickerWeekDaysParams } from '../WeekDaysHeader/WeekDaysHeader.tsx';
 import './MonthView.scss';
 
-const DatePickerMonthViewItem = (props) => {
+const DatePickerMonthViewItem = (props: DatePickerMonthViewItemProps) => {
     const {
         date,
         isOtherMonth,
@@ -70,22 +76,6 @@ const DatePickerMonthViewItem = (props) => {
     );
 };
 
-DatePickerMonthViewItem.propTypes = {
-    date: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    isOtherMonth: PropTypes.bool,
-    isActive: PropTypes.bool,
-    highlight: PropTypes.bool,
-    isToday: PropTypes.bool,
-    isRangeStart: PropTypes.bool,
-    isRangeEnd: PropTypes.bool,
-    disabled: PropTypes.bool,
-    focusable: PropTypes.bool,
-    showOtherMonthDays: PropTypes.bool,
-};
-
 const defaultProps = {
     date: null,
     title: null,
@@ -106,8 +96,13 @@ const defaultProps = {
     },
 };
 
+type DatePickerMonthViewRef = HTMLDivElement | null;
+
 // eslint-disable-next-line react/display-name
-export const DatePickerMonthView = forwardRef((p, ref) => {
+export const DatePickerMonthView = forwardRef<
+    DatePickerMonthViewRef,
+    DatePickerMonthViewProps
+>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -129,7 +124,12 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
     const rMonth = date.getMonth();
     const rYear = date.getFullYear();
 
-    const { state } = useStore();
+    const store = useStore();
+    if (!store) {
+        return null;
+    }
+
+    const state = store.getState() as DatePickerState;
 
     // month header
     const title = getHeaderTitle({
@@ -138,18 +138,20 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
         locales,
     });
 
-    const header = props.renderHeader && (
-        <Header
-            {...(props.header ?? {})}
-            locales={locales}
-            title={title}
-            focusable={focusable}
-        />
+    const headerProps: DatePickerHeaderProps = {
+        ...(props.header ?? {}),
+        focusable,
+        title,
+    };
+
+    const header = props.renderHeader && Header && (
+        <Header {...headerProps} />
     );
 
     // week days header
     const firstMonthDay = new Date(rYear, rMonth, 1);
-    const weekDayParams = {
+
+    const weekDayParams: DatePickerWeekDaysParams = {
         locales,
     };
     if (typeof firstDay === 'number') {
@@ -158,7 +160,7 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
         };
     }
 
-    let weekdays = null;
+    let weekdays: JSX.Element | null = null;
     if (props.renderWeekdays && WeekDaysHeader) {
         weekdays = <WeekDaysHeader
             locales={locales}
@@ -170,8 +172,7 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
     const { showOtherMonthDays, fixedHeight } = props;
     let week = getWeekDays(firstMonthDay, weekDayParams);
     let weeks = 1;
-    const disabledFilter = isFunction(props.disabledDateFilter);
-    const items = [];
+    const items: DatePickerMonthViewItemProps[] = [];
 
     // Start from previous week if 'fixedHeight' option is enabled
     // and current month is exacly 4 weeks:
@@ -188,12 +189,13 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
     }
 
     do {
-        week.forEach((weekday) => {
+        week.forEach((weekday: Date) => {
             const isOtherMonth = !isSameYearMonth(date, weekday);
             const isToday = isSameDate(weekday, today) && (!doubleView || !isOtherMonth);
 
             const isActive = (
-                includesDate(state.actDate, weekday)
+                !!state.actDate
+                && includesDate(state.actDate, weekday)
                 && !isOtherMonth
             );
 
@@ -219,7 +221,10 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
 
             const disabled = (
                 (!showOtherMonthDays && isOtherMonth)
-                || (!!disabledFilter && props.disabledDateFilter(weekday))
+                || (
+                    typeof props.disabledDateFilter === 'function'
+                    && props.disabledDateFilter(weekday)
+                )
             );
 
             const item = {
@@ -263,29 +268,3 @@ export const DatePickerMonthView = forwardRef((p, ref) => {
         </div>
     );
 });
-
-DatePickerMonthView.propTypes = {
-    date: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    title: PropTypes.string,
-    nav: PropTypes.object,
-    locales: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
-    firstDay: PropTypes.number,
-    doubleView: PropTypes.bool,
-    renderWeekdays: PropTypes.bool,
-    renderHeader: PropTypes.bool,
-    showOtherMonthDays: PropTypes.bool,
-    fixedHeight: PropTypes.bool,
-    header: PropTypes.object,
-    focusable: PropTypes.bool,
-    disabledDateFilter: PropTypes.func,
-    components: PropTypes.shape({
-        Header: PropTypes.func,
-        WeekDaysHeader: PropTypes.func,
-    }),
-};

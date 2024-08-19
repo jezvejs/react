@@ -1,30 +1,52 @@
 import { getOffset } from '@jezvejs/dom';
-import {
-    useEffect,
-    useRef,
-} from 'react';
-import PropTypes from 'prop-types';
+import { useEffect, useRef } from 'react';
+
+// Utils
+import { StoreUpdater } from '../Store/Store.ts';
+import { Point } from '../types.ts';
+
 import { DragMaster } from './DragMaster.ts';
 import { useDragnDrop } from './DragnDropProvider.tsx';
+import {
+    DragAvatarInfo,
+    DragnDropState,
+    DragZone,
+    OnDragStartParams,
+} from './types.ts';
 
-export function useDragZone(props) {
+export interface UseDragZoneProps {
+    id: string;
+    title?: string;
+    left?: number;
+    top?: number;
+    dragOriginal?: boolean;
+    absolutePos?: boolean;
+
+    mouseMoveThreshold?: number;
+    touchMoveTimeout?: number;
+
+    elem?: Element | null;
+}
+
+export function useDragZone(props: UseDragZoneProps) {
     const {
         dragOriginal = false,
         ...dragZoneProps
     } = props;
 
-    const dragZoneRef = useRef<HTMLElement | null>(null);
+    const dragZoneRef = useRef<Element | null>(null);
     const avatarRef = useRef<HTMLElement | null>(null);
     const animationFrameRef = useRef<number>(0);
-    const currentTargetElemRef = useRef<HTMLElement | null>(null);
+    const currentTargetElemRef = useRef<Element | null>(null);
 
     const dragDrop = useDragnDrop();
-    const getState = dragDrop?.getState ?? null;
-    const setState = dragDrop?.setState ?? null;
+
+    const getState = () => ((dragDrop?.getState() as DragnDropState) ?? null);
+    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
 
     const state = getState();
-    const showOriginal = !state.dragging || !dragOriginal;
-    const showAvatar = state.dragging && state.draggingId === props.id;
+    const showOriginal = !!state && (!state.dragging || !dragOriginal);
+    const showAvatar = !!state?.dragging && state.draggingId === props.id;
 
     useEffect(() => {
         if (!dragZoneRef?.current) {
@@ -35,18 +57,19 @@ export function useDragZone(props) {
             makeAvatar() {
                 const { id } = props;
 
-                const state = getState() ?? null;
                 return {
                     id,
                     elem: avatarRef.current,
                     scrollRequested: false,
                     dragZone,
-                    getDragInfo() {
+
+                    getDragInfo(): DragAvatarInfo {
+                        const localState = getState();
                         return {
                             id,
                             mouseShift: {
-                                x: state?.shiftX ?? 0,
-                                y: state?.shiftY ?? 0,
+                                x: localState?.shiftX ?? 0,
+                                y: localState?.shiftY ?? 0,
                             },
                         };
                     },
@@ -57,7 +80,7 @@ export function useDragZone(props) {
 
                     initFromEvent({ downX, downY }) {
                         const offset = getOffset(dragZoneRef.current);
-                        setState((prev) => ({
+                        setState((prev: DragnDropState) => ({
                             ...prev,
                             origLeft: prev.left,
                             origTop: prev.top,
@@ -76,7 +99,7 @@ export function useDragZone(props) {
                     },
 
                     /** Scroll document if needed on drag avatar to top or bottom of screen */
-                    scrollDocument(coords) {
+                    scrollDocument(coords: Point) {
                         const scrollMargin = 30;
                         const docElem = document.documentElement;
 
@@ -97,7 +120,7 @@ export function useDragZone(props) {
                         }
                     },
 
-                    onDragMove(e) {
+                    onDragMove(e: TouchEvent | MouseEvent) {
                         this.cancelAnimation();
 
                         const page = DragMaster.getEventPageCoordinates(e);
@@ -112,7 +135,7 @@ export function useDragZone(props) {
                         animationFrameRef.current = requestAnimationFrame(() => {
                             animationFrameRef.current = 0;
 
-                            setState((prev) => ({
+                            setState((prev: DragnDropState) => ({
                                 ...prev,
                                 left: page.x - prev.shiftX,
                                 top: page.y - prev.shiftY,
@@ -131,7 +154,7 @@ export function useDragZone(props) {
                     onDragEnd() {
                         this.cancelAnimation();
 
-                        setState((prev) => ({
+                        setState((prev: DragnDropState) => ({
                             ...prev,
                             left: prev.origLeft,
                             top: prev.origTop,
@@ -140,17 +163,20 @@ export function useDragZone(props) {
                     },
                 };
             },
-            onDragStart(params) {
+
+            onDragStart(params: OnDragStartParams) {
                 const avatar = dragZone.makeAvatar();
                 avatar?.initFromEvent?.(params);
 
                 return avatar;
             },
+
             ...dragZoneProps,
+
             elem: dragZoneRef.current,
         };
 
-        DragMaster.makeDraggable(dragZone);
+        DragMaster.makeDraggable(dragZone as DragZone);
     }, []);
 
     useEffect(() => {
@@ -171,12 +197,3 @@ export function useDragZone(props) {
         showAvatar,
     };
 }
-
-useDragZone.propTypes = {
-    id: PropTypes.string,
-    title: PropTypes.string,
-    left: PropTypes.number,
-    top: PropTypes.number,
-    dragOriginal: PropTypes.bool,
-    absolutePos: PropTypes.bool,
-};

@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import { ReactNode } from 'react';
 import classNames from 'classnames';
 
 import './Checkbox.scss';
@@ -11,10 +11,27 @@ const defaultCheckIcon = () => (
     </svg>
 );
 
+export interface CheckboxProps {
+    id?: string,
+    name?: string,
+    className?: string,
+    form?: string,
+    tabIndex?: number,
+    checked?: boolean,
+    disabled?: boolean,
+    value?: string,
+    label?: string,
+    tooltip?: string,
+    checkIcon?: ReactNode,
+    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void,
+    onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
+}
+
 /**
  * Checkbox component
  */
-export const Checkbox = (props) => {
+export const Checkbox = (props: CheckboxProps) => {
     const {
         checked = false,
         tooltip = null,
@@ -24,14 +41,22 @@ export const Checkbox = (props) => {
         name,
         tabIndex,
         disabled = false,
-        onFocus = null,
-        onBlur = null,
-        onChange = null,
     } = props;
+
+    const title = (tooltip === null && typeof label === 'string')
+        ? label
+        : (tooltip ?? '');
+
+    const onFocus = (e: React.FocusEvent<HTMLInputElement>) => props.onFocus?.(e);
+
+    const onBlur = (e: React.FocusEvent<HTMLInputElement, Element>) => props.onBlur?.(e);
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange?.(e);
 
     const inputProps = {
         form,
         name,
+        title,
         value,
         tabIndex,
         disabled,
@@ -39,10 +64,6 @@ export const Checkbox = (props) => {
         onBlur,
         onChange,
     };
-
-    inputProps.title = (tooltip === null && typeof label === 'string')
-        ? label
-        : (tooltip ?? '');
 
     return (
         <label className={classNames('checkbox', props.className)}>
@@ -57,24 +78,4 @@ export const Checkbox = (props) => {
             {props.label && (<span className='checkbox__label'>{props.label}</span>)}
         </label>
     );
-};
-
-Checkbox.propTypes = {
-    id: PropTypes.string,
-    name: PropTypes.string,
-    className: PropTypes.string,
-    form: PropTypes.string,
-    tabIndex: PropTypes.number,
-    checked: PropTypes.bool,
-    disabled: PropTypes.bool,
-    value: PropTypes.string,
-    label: PropTypes.string,
-    tooltip: PropTypes.string,
-    checkIcon: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
 };

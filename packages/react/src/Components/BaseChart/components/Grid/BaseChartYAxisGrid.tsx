@@ -1,4 +1,14 @@
-import PropTypes from 'prop-types';
+export interface BaseChartYAxisGridProps {
+    grid: object,
+    chartWidth: number,
+    height: number,
+}
+
+export interface BaseChartYAxisGridItemProps {
+    id: string,
+    className: string,
+    d: string,
+}
 
 /**
  * BaseChartYAxisGrid component
@@ -9,7 +19,7 @@ export const BaseChartYAxisGrid = (props) => {
         return null;
     }
 
-    const items = [];
+    const items: BaseChartYAxisGridItemProps[] = [];
     const width = props.chartWidth ?? 0;
     if (!width) {
         return null;
@@ -26,7 +36,7 @@ export const BaseChartYAxisGrid = (props) => {
             rY += 0.5;
         }
 
-        const gridLine = {
+        const gridLine: BaseChartYAxisGridItemProps = {
             id: `ygrid_${step}`,
             className: 'chart__grid-line',
             d: `M0,${rY}L${width},${rY}`,
@@ -40,15 +50,9 @@ export const BaseChartYAxisGrid = (props) => {
 
     return (
         <g>
-            {items.map(({ id, ...item }) => (
-                <path {...item} key={id} />
+            {items.map((item) => (
+                <path {...item} key={item.id} />
             ))}
         </g>
     );
-};
-
-BaseChartYAxisGrid.propTypes = {
-    grid: PropTypes.object,
-    chartWidth: PropTypes.number,
-    height: PropTypes.number,
 };

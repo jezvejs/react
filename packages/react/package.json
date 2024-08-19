@@ -19,7 +19,8 @@
     "homepage": "https://github.com/jezvejs/react#readme",
     "scripts": {
         "dev": "vite",
-        "build": "(tsc -b || exit 0) && vite build",
+        "prebuild": "tsc -b",
+        "build": "vite build",
         "preview": "vite preview"
     },
     "dependencies": {

@@ -1,13 +1,28 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './Switch.scss';
 
+export interface SwitchProps {
+    id: string,
+    name: string,
+    className: string,
+    form: string,
+    tabIndex: number,
+    checked: boolean,
+    disabled: boolean,
+    value: string,
+    label: string,
+    tooltip: string,
+    onFocus: (e: React.FocusEvent<HTMLInputElement>) => void,
+    onBlur: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+}
+
 /**
  * Switch component
  */
-export const Switch = (props) => {
+export const Switch = (props: SwitchProps) => {
     const [state, setState] = useState({
         animated: false,
     });
@@ -23,14 +38,22 @@ export const Switch = (props) => {
         name,
         tabIndex,
         disabled = false,
-        onFocus = null,
-        onBlur = null,
-        onChange = null,
     } = props;
+
+    const title = (tooltip === null && typeof label === 'string')
+        ? label
+        : (tooltip ?? '');
+
+    const onFocus = (e: React.FocusEvent<HTMLInputElement>) => props.onFocus?.(e);
+
+    const onBlur = (e: React.FocusEvent<HTMLInputElement, Element>) => props.onBlur?.(e);
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange?.(e);
 
     const inputProps = {
         form,
         name,
+        title,
         value,
         tabIndex,
         disabled,
@@ -39,12 +62,8 @@ export const Switch = (props) => {
         onChange,
     };
 
-    inputProps.title = (tooltip === null && typeof label === 'string')
-        ? label
-        : (tooltip ?? '');
-
-    const onTouchStart = (e) => {
-        if (e?.touches) {
+    const onTouchStart = (event: React.TouchEvent<HTMLLabelElement>) => {
+        if (event?.touches) {
             setState((prev) => ({
                 ...prev,
                 animated: true,
@@ -78,20 +97,4 @@ export const Switch = (props) => {
             {props.label && (<span className='switch__label'>{props.label}</span>)}
         </label>
     );
-};
-
-Switch.propTypes = {
-    id: PropTypes.string,
-    name: PropTypes.string,
-    className: PropTypes.string,
-    form: PropTypes.string,
-    tabIndex: PropTypes.number,
-    checked: PropTypes.bool,
-    disabled: PropTypes.bool,
-    value: PropTypes.string,
-    label: PropTypes.string,
-    tooltip: PropTypes.string,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
 };

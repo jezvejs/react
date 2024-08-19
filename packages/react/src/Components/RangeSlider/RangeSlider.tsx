@@ -5,11 +5,14 @@ import { createSlice } from '../../utils/createSlice.ts';
 
 import { getStepPrecision } from './helpers.ts';
 import { RangeSliderContainer } from './RangeSliderContainer.tsx';
+import { RangeSliderProps, RangeSliderState } from './types.ts';
 
 import './RangeSlider.scss';
 
+type RangeSliderRef = HTMLDivElement | null;
+
 // eslint-disable-next-line react/display-name
-export const RangeSlider = forwardRef((props, ref) => {
+export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, ref) => {
     const {
         tabIndex = 0,
         axis = 'x',
@@ -35,14 +38,22 @@ export const RangeSlider = forwardRef((props, ref) => {
         scrollOnClickOutsideRange,
     };
 
+    const defaultOffset = {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+    };
     const commonSliderProps = {
         top: 0,
         left: 0,
         shiftX: 0,
         shiftY: 0,
+        offset: { ...defaultOffset },
+        rect: { ...defaultOffset },
     };
 
-    const initialState = {
+    const initialState: RangeSliderState = {
         ...commonProps,
         startSlider: {
             ...commonSliderProps,
@@ -57,6 +68,7 @@ export const RangeSlider = forwardRef((props, ref) => {
         offset: {},
         rect: {},
         maxPos: 0,
+        precision: getStepPrecision(step),
     };
 
     if (range) {
@@ -69,8 +81,6 @@ export const RangeSlider = forwardRef((props, ref) => {
         initialState.value = initialState.value ?? min;
     }
 
-    initialState.precision = getStepPrecision(step);
-
     const slice = createSlice({
     });
 
@@ -80,7 +90,3 @@ export const RangeSlider = forwardRef((props, ref) => {
         </DragnDropProvider >
     );
 });
-
-RangeSlider.propTypes = {
-    ...RangeSliderContainer.propTypes,
-};

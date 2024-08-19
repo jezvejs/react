@@ -1,13 +1,13 @@
 import { getOffsetSum } from '@jezvejs/dom';
 import { isFunction, asArray } from '@jezvejs/types';
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
-
-export const AnimationStages = {
-    entering: 1,
-    entered: 2,
-    exiting: 3,
-    exited: 0,
-};
+import {
+    AnimationBox,
+    SortableNodePosition,
+    SortableState,
+    SortableTreeFilterCallback,
+    SortableTreeItem,
+} from './types.ts';
 
 /**
  * Returns new array with only distinct(unique) values from specified array
@@ -15,8 +15,8 @@ export const AnimationStages = {
  * @param {Array} arr
  * @returns {Array}
  */
-export const distinctValues = (arr) => (
-    asArray(arr).reduce((res, item) => (
+export const distinctValues = <T = string | null>(arr: T | T[]): T[] => (
+    asArray(arr).reduce((res: T[], item: T) => (
         (res.includes(item))
             ? res
             : [...res, item]
@@ -26,11 +26,11 @@ export const distinctValues = (arr) => (
 /**
  * Converts tree to flat array of items and returns result
  *
- * @param {Array} items
- * @returns {Array}
+ * @param {SortableTreeItem[]} items
+ * @returns {SortableTreeItem[]}
  */
-export const toFlatList = (items) => {
-    const res = [];
+export const toFlatList = (items: SortableTreeItem[]): SortableTreeItem[] => {
+    const res: SortableTreeItem[] = [];
 
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index] ?? {};
@@ -51,10 +51,13 @@ export const toFlatList = (items) => {
 /**
  * Searches for first tree item for which callback function return true
  *
- * @param {Array} items array of items to search in
+ * @param {SortableTreeItem[]} items array of items to search in
  * @param {Function} callback function to
  */
-export const findTreeItem = (items, callback) => {
+export const findTreeItem = (
+    items: SortableTreeItem[],
+    callback: SortableTreeFilterCallback,
+): SortableTreeItem | null => {
     if (!Array.isArray(items)) {
         throw new Error('Invalid items parameter');
     }
@@ -64,7 +67,7 @@ export const findTreeItem = (items, callback) => {
 
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
-        if (callback(item)) {
+        if (callback(item, index, items)) {
             return item;
         }
 
@@ -82,25 +85,34 @@ export const findTreeItem = (items, callback) => {
 /**
  * Returns tree item for specified id
  *
- * @param {String} id item id
- * @param {Array} items array of items to search in
+ * @param {string} id item id
+ * @param {SortableTreeItem[]} items array of items to search in
  */
-export const getTreeItemById = (id, items) => {
+export const getTreeItemById = (id: string | null, items: SortableTreeItem[]) => {
     const strId = id?.toString() ?? null;
     if (strId === null) {
         return null;
     }
 
-    return findTreeItem(items, (item) => item?.id?.toString() === strId);
+    return findTreeItem(items, (item: SortableTreeItem) => item?.id?.toString() === strId);
 };
 
 /**
- * Returns tree item for specified id
+ * Returns true if tree item has specified child item
  *
- * @param {String} id item id
- * @param {Array} items array of items to search in
+ * @param {string} id item id
+ * @param {string} childId child item id
+ * @param {SortableTreeItem[]} items array of items to search in
  */
-export const isTreeContains = (id, childId, items) => {
+export const isTreeContains = (
+    id: string | null,
+    childId: string | null,
+    items: SortableTreeItem[],
+): boolean => {
+    if (id === null || childId === null) {
+        return false;
+    }
+
     const item = getTreeItemById(id, items);
     if (id === childId) {
         return !!item;
@@ -115,7 +127,10 @@ export const isTreeContains = (id, childId, items) => {
  * @param {Array} items array of items to search in
  * @param {Function} callback function to
  */
-export const findTreeItemIndex = (items, callback) => {
+export const findTreeItemIndex = (
+    items: SortableTreeItem[],
+    callback: (item: SortableTreeItem) => boolean,
+) => {
     if (!Array.isArray(items)) {
         throw new Error('Invalid items parameter');
     }
@@ -157,7 +172,10 @@ export const findTreeItemIndexById = (items, id) => {
  * @param {Array} items array of items to search in
  * @param {Function} callback function to
  */
-export const findTreeItemParent = (items, callback) => {
+export const findTreeItemParent = (
+    items: SortableTreeItem[],
+    callback: (item: SortableTreeItem) => boolean,
+): SortableTreeItem | true | null => {
     if (!Array.isArray(items)) {
         throw new Error('Invalid items parameter');
     }
@@ -188,9 +206,18 @@ export const findTreeItemParent = (items, callback) => {
  * @param {Array} items array of items to search in
  * @param {string} id item id
  */
-export const findTreeItemParentById = (items, id) => {
-    const strId = id?.toString();
-    return findTreeItemParent(items, (item) => item?.id?.toString() === strId);
+export const findTreeItemParentById = (
+    items: SortableTreeItem[],
+    id: string | null,
+): SortableTreeItem | null => {
+    const strId = id?.toString() ?? null;
+    if (strId === null) {
+        return null;
+    }
+
+    const res = findTreeItemParent(items, (item) => item?.id?.toString() === strId);
+    // findTreeItemParent() return true if item is found on first level
+    return (res === true) ? null : res;
 };
 
 /**
@@ -199,12 +226,19 @@ export const findTreeItemParentById = (items, id) => {
  * @param {Function} callback
  * @returns {Array}
  */
-export const mapTreeItems = (items, callback) => {
+export const mapTreeItems = (
+    items: SortableTreeItem[],
+    callback: (
+        item: SortableTreeItem,
+        index: number,
+        array: SortableTreeItem[],
+    ) => SortableTreeItem,
+): SortableTreeItem[] => {
     if (!isFunction(callback)) {
         throw new Error('Invalid callback parameter');
     }
 
-    const res = [];
+    const res: SortableTreeItem[] = [];
     for (let index = 0; index < items.length; index += 1) {
         const item = {
             ...items[index],
@@ -233,14 +267,17 @@ export const mapTreeItems = (items, callback) => {
  * @param {Function} callback
  * @returns {Array}
  */
-export const filterTreeItems = (items, callback) => {
+export const filterTreeItems = (
+    items: SortableTreeItem[],
+    callback: SortableTreeFilterCallback,
+): SortableTreeItem[] => {
     if (!isFunction(callback)) {
         throw new Error('Invalid callback parameter');
     }
 
-    const res = [];
+    const res: SortableTreeItem[] = [];
     for (let index = 0; index < items.length; index += 1) {
-        const item = items[index];
+        const item = items[index] as SortableTreeItem;
         const cbRes = callback(item, index, items);
         if (!cbRes) {
             continue;
@@ -266,7 +303,7 @@ export const filterTreeItems = (items, callback) => {
  * @param {object} state
  * @returns {object}
  */
-export const getDragZone = (dragZoneId, state) => (
+export const getDragZone = (dragZoneId, state: SortableState) => (
     state[dragZoneId]
 );
 
@@ -317,7 +354,11 @@ export const getTargetPositions = (zoneId, state) => (
  * @param {object} state
  * @returns {object}
  */
-export const getPositionCacheById = (id, zoneIds, state) => {
+export const getPositionCacheById = (
+    id: string,
+    zoneIds: string | string[],
+    state: SortableState,
+): AnimationBox | null => {
     const ids = asArray(zoneIds);
 
     for (let index = 0; index < ids.length; index += 1) {
@@ -336,9 +377,13 @@ export const getPositionCacheById = (id, zoneIds, state) => {
  * @param {string} id
  * @param {string} zoneIds
  * @param {object} state
- * @returns {object}
+ * @returns {AnimationBox|null}
  */
-export const getTargetPositionById = (id, zoneIds, state) => {
+export const getTargetPositionById = (
+    id: string,
+    zoneIds: string | string[],
+    state: SortableState,
+): AnimationBox | null => {
     const ids = asArray(zoneIds);
 
     for (let index = 0; index < ids.length; index += 1) {
@@ -360,7 +405,7 @@ export const getTargetPositionById = (id, zoneIds, state) => {
  * @param {object} options
  * @returns {object}
  */
-export const moveTreeItem = (state, options) => {
+export const moveTreeItem = (state: SortableState, options): SortableState => {
     const {
         source,
         target,
@@ -385,8 +430,8 @@ export const moveTreeItem = (state, options) => {
         targetId === null
         && target.parentId === target.zoneId
         && dragZoneItems.length > 0
-        && target.parentId === state.sortPosition.parentId
-        && target.zoneId === state.sortPosition.zoneId
+        && target.parentId === state.sortPosition?.parentId
+        && target.zoneId === state.sortPosition?.zoneId
     ) {
         return state;
     }
@@ -404,9 +449,9 @@ export const moveTreeItem = (state, options) => {
     if (
         index === -1
         || (
-            index === state.sortPosition.index
-            && target.parentId === state.sortPosition.parentId
-            && target.zoneId === state.sortPosition.zoneId
+            index === state.sortPosition?.index
+            && target.parentId === state.sortPosition?.parentId
+            && target.zoneId === state.sortPosition?.zoneId
         )
     ) {
         return state;
@@ -547,12 +592,12 @@ export const mapNextZoneItems = (state, zoneId, callback) => ({
  * Applies callback function to each item inside multiple drag zones and returns new state object
  *
  * @param {object} state
- * @param {string} zoneIds
+ * @param {string|string[]} zoneIds
  * @param {Function} callback
  * @returns {object}
  */
 export const mapZones = (state, zoneIds, callback) => {
-    const ids = [];
+    const ids: string[] = [];
     let newState = state;
 
     asArray(zoneIds).forEach((zoneId) => {
@@ -571,15 +616,15 @@ export const mapZones = (state, zoneIds, callback) => {
  * and returns new state object
  *
  * @param {object} state
- * @param {string} zoneIds
+ * @param {string|string[]} zoneIds
  * @param {Function} callback
  * @returns {object}
  */
 export const mapNextZones = (state, zoneIds, callback) => {
-    const ids = [];
+    const ids: string[] = [];
     let newState = state;
 
-    asArray(zoneIds).forEach((zoneId) => {
+    asArray(zoneIds).forEach((zoneId: string) => {
         const id = zoneId ?? null;
         if (id !== null && !ids.includes(id)) {
             newState = mapNextZoneItems(newState, id, callback);
@@ -593,9 +638,9 @@ export const mapNextZones = (state, zoneIds, callback) => {
 /**
  * Returns dimensions of element
  * @param {HTMLElement} elem
- * @returns {object}
+ * @returns {AnimationBox|null}
  */
-export const getAnimationBox = (elem) => {
+export const getAnimationBox = (elem: HTMLElement): AnimationBox | null => {
     if (!elem) {
         return null;
     }
@@ -689,10 +734,10 @@ export const getSourcePosition = (state) => {
 
 /**
  * Returns source drag zone for specified state
- * @param {object} state
+ * @param {SortableState} state
  * @returns {object|null}
  */
-export const getSourceDragZone = (state) => {
+export const getSourceDragZone = (state: SortableState) => {
     const dragMaster = DragMaster.getInstance();
     const position = getSourcePosition(state);
 
@@ -704,10 +749,10 @@ export const getSourceDragZone = (state) => {
  * @param {Element} elem
  * @returns {object}
  */
-export const getElementPosition = (elem) => ({
-    parent: elem?.parentNode,
-    prev: elem?.previousSibling,
-    next: elem?.nextSibling,
+export const getElementPosition = (elem: Element): SortableNodePosition => ({
+    parent: elem?.parentElement,
+    prev: elem?.previousElementSibling,
+    next: elem?.nextElementSibling,
 });
 
 /**
@@ -716,7 +761,7 @@ export const getElementPosition = (elem) => ({
  * @param {Element} elem
  * @param {object} pos
  */
-export const insertAtElementPosition = (elem, pos) => {
+export const insertAtElementPosition = (elem: Element, pos: SortableNodePosition) => {
     if (pos.prev && pos.prev.parentNode) {
         pos.prev.after(elem);
     } else if (pos.next && pos.next.parentNode) {

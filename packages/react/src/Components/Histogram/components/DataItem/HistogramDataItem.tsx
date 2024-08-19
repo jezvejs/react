@@ -1,20 +1,36 @@
-import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
+import { CSSProperties, forwardRef } from 'react';
 import classNames from 'classnames';
 
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
 import { formatCoord } from '../../../BaseChart/helpers.ts';
 
+import {
+    HistogramDataItemComponent,
+    HistogramDataItemProps,
+    HistogramDataItemRef,
+    HistogramState,
+} from '../../types.ts';
 import './HistogramDataItem.scss';
 
 const animateAttributes = ['y', 'height'];
+
+export interface HistogramDataItemAttrs {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    style?: CSSProperties,
+}
 
 /**
  * HistogramDataItem component
  */
 // eslint-disable-next-line react/display-name
-export const HistogramDataItem = forwardRef((props, ref) => {
+export const HistogramDataItem: HistogramDataItemComponent = forwardRef<
+    HistogramDataItemRef,
+    HistogramDataItemProps
+>((props, ref) => {
     const {
         x,
         y,
@@ -22,15 +38,18 @@ export const HistogramDataItem = forwardRef((props, ref) => {
         height,
     } = props;
 
-    const attrs = {
+    const attrs: HistogramDataItemAttrs = {
         x,
         y,
         width,
         height,
     };
 
-    const { getState } = useStore();
-    const state = getState();
+    const store = useStore();
+    if (!store) {
+        return null;
+    }
+    const state = store.getState() as HistogramState;
 
     const isValid = Object.values(attrs).every((value) => value >= 0);
     if (!isValid) {
@@ -83,21 +102,3 @@ export const HistogramDataItem = forwardRef((props, ref) => {
         <rect {...itemProps} ref={ref} />
     );
 });
-
-HistogramDataItem.propTypes = {
-    x: PropTypes.number,
-    y: PropTypes.number,
-    width: PropTypes.number,
-    height: PropTypes.number,
-    columnIndex: PropTypes.number,
-    categoryIndex: PropTypes.number,
-    category: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-    ]),
-    stacked: PropTypes.bool,
-    active: PropTypes.bool,
-    autoScale: PropTypes.bool,
-    animate: PropTypes.bool,
-    animateNow: PropTypes.bool,
-};

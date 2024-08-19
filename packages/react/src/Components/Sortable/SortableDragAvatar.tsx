@@ -1,15 +1,28 @@
-import PropTypes from 'prop-types';
+import { CSSProperties, ReactNode } from 'react';
 
 import { px } from '../../utils/common.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 
 import { PopupDragAvatarContainer } from './PopupDragAvatarContainer.tsx';
+import { SortableState } from './types.ts';
 
-export const SortableDragAvatar = (props) => {
-    const { getState } = useDragnDrop();
-    const state = getState();
+export interface SortableDragAvatarProps {
+    id?: string,
+    table: boolean,
+    copyWidth?: boolean,
+    children: ReactNode,
+    container?: Element | DocumentFragment,
+}
 
-    const style = {
+export const SortableDragAvatar = (props: SortableDragAvatarProps) => {
+    const dragnDrop = useDragnDrop();
+    if (!dragnDrop) {
+        return null;
+    }
+
+    const state = dragnDrop.getState() as SortableState;
+
+    const style: CSSProperties = {
         left: px(state.left),
         top: px(state.top),
     };
@@ -49,15 +62,4 @@ export const SortableDragAvatar = (props) => {
             {content}
         </PopupDragAvatarContainer>
     );
-};
-
-SortableDragAvatar.propTypes = {
-    id: PropTypes.string,
-    table: PropTypes.bool,
-    copyWidth: PropTypes.bool,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    container: PropTypes.object,
 };

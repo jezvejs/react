@@ -1,4 +1,3 @@
-import { ComponentType, ReactNode } from 'react';
 import { ChartGrid } from '../ChartGrid/ChartGrid.ts';
 
 import { BaseChartActiveGroup } from './components/ActiveGroup/BaseChartActiveGroup.tsx';
@@ -22,102 +21,21 @@ import {
     isSameTarget,
     isVerticalScaleNeeded,
 } from './helpers.ts';
-
-export interface BaseChartData {
-    values: any[],
-    series: any[],
-    stacked: boolean,
-};
-
-export interface BaseChartProps {
-    // Layout
-    height?: number,
-    columnWidth?: number,
-    maxColumnWidth?: number,
-    groupsGap?: number,
-    marginTop?: number,
-    alignColumns?: 'left' | 'right' | 'center',
-    visibilityOffset?: number,
-    scaleAroundAxis?: boolean,
-    gridValuesMargin?: number,
-    minGridStep?: number,
-    maxGridStep?: number,
-    xAxisGrid?: boolean,
-    // Render properties
-    fitToWidth?: boolean,
-    allowLastXAxisLabelOverflow?: boolean,
-    scrollToEnd?: boolean,
-    autoScale?: boolean,
-    animate?: boolean,
-    animationEndTimeout?: number,
-    autoScaleTimeout?: number,
-    resizeTimeout?: number,
-    activateOnClick?: boolean,
-    activateOnHover?: boolean,
-    xAxis?: 'bottom' | 'top' | 'none',
-    yAxis?: 'right' | 'left' | 'none',
-    yAxisLabelsAlign?: 'left' | 'right' | 'center',
-    renderXAxisLabel?: (() => ReactNode) | null,
-    renderYAxisLabel?: (() => ReactNode) | null,
-    showLegend?: boolean,
-    renderLegend?: (() => ReactNode) | null,
-    onlyVisibleCategoriesLegend?: boolean,
-    // Active group
-    showActiveGroup?: boolean,
-    // Popup
-    showPopupOnClick?: boolean,
-    pinPopupOnClick?: boolean,
-    showPopupOnHover?: boolean,
-    animatePopup?: boolean,
-    renderPopup?: (() => ReactNode) | null,
-    popupPosition?: 'right',
-    // Callbacks
-    onScroll?: ((e: Event) => void) | null,
-    onResize?: ((e: Event) => void) | null,
-    onItemClick?: ((e: Event) => void) | null,
-    onItemOver?: ((e: Event) => void) | null,
-    onItemOut?: ((e: Event) => void) | null,
-    scrollDone?: (() => void) | null,
-    data?: BaseChartData | any[] | null,
-    reducers?: ((state: object, action: object) => object) | null,
-
-    getGroupOuterWidth: (state: object) => number,
-
-    getCategoriesCount: (state: object) => number,
-    getColumnsInGroupCount: () => number,
-    getGroupsCount: (state: object) => number,
-    getDataSets: (state: object) => any[],
-    getLongestDataSet: (state: object) => any[],
-
-    getStackedGroups: (state: object) => any[],
-    getStackedCategories: (state: object) => any[],
-    getFirstVisibleGroupIndex: (state: object) => number,
-    getVisibleGroupsCount: (firstItemIndex: number, state: object) => number,
-    getSeriesByIndex: (index: number, state: object) => any[],
-    getGroupIndexByX: (x: number, state: object) => any[],
-    isHorizontalScaleNeeded: (state: object, prevState: object) => number,
-    isVerticalScaleNeeded: (state: object, prevState: object) => number,
-    getVisibleCategories: (state: object) => any[],
-    getAllCategories: (state: object) => any[],
-    getVisibleItems: (state: object) => any[],
-
-    findItemByEvent: (...args: any[]) => object | null,
-    findItemByTarget: (target: object, state: object) => object | null,
-    calculateGrid: (values: object, state: object) => object | null,
-
-    components?: {
-        Grid?: ComponentType | null,
-        DataSeries?: ComponentType | null,
-        XAxisLabels?: ComponentType | null,
-        YAxisLabels?: ComponentType | null,
-        Legend?: ComponentType | null,
-        ChartPopup?: ComponentType | null,
-        ActiveGroup?: ComponentType | null,
-    },
-};
+import {
+    BaseChartBaseItem,
+    BaseChartDataCategory,
+    BaseChartDataItemsGroup,
+    BaseChartDataSet,
+    BaseChartProps,
+    BaseChartState,
+    BaseChartTarget,
+} from './types.ts';
 
 /** Default properties */
 export const defaultProps: BaseChartProps = {
+    id: '',
+    className: '',
+
     // Layout
     height: 300,
     columnWidth: 38,
@@ -132,6 +50,7 @@ export const defaultProps: BaseChartProps = {
     minGridStep: 30,
     maxGridStep: 60,
     xAxisGrid: false,
+    yAxisGrid: true,
     // Render properties
     fitToWidth: false,
     allowLastXAxisLabelOverflow: true,
@@ -174,58 +93,63 @@ export const defaultProps: BaseChartProps = {
         stacked: false,
     },
     reducers: null,
+
     // Data methods
-    getGroupOuterWidth: (state) => (
-        state.columnWidth + state.groupsGap
+    getGroupOuterWidth: (state: BaseChartState) => (
+        (state.columnWidth ?? 0) + (state.groupsGap ?? 0)
     ),
 
     /** Returns count of data categories */
-    getCategoriesCount: (state) => state.dataSets.length,
+    getCategoriesCount: (state: BaseChartState) => state.dataSets.length,
 
     /** Returns current count of columns in group */
     getColumnsInGroupCount: () => 1,
 
     /** Returns count of data columns */
-    getGroupsCount: (state) => {
+    getGroupsCount: (state: BaseChartState): number => {
         const valuesLength = state?.dataSets?.map((item) => item.data.length) ?? [];
         return Math.max(0, ...valuesLength);
     },
 
     /** Returns array of data sets */
-    getDataSets: (state) => getDataSets(state),
+    getDataSets: (state: BaseChartState) => getDataSets(state),
 
     /** Returns longest data set */
-    getLongestDataSet: (state) => getLongestDataSet(state),
+    getLongestDataSet: (state: BaseChartState) => getLongestDataSet(state),
 
-    getStackedGroups: (state) => getStackedGroups(state),
+    getStackedGroups: (state: BaseChartState) => getStackedGroups(state),
 
-    getStackedCategories: (state) => getStackedCategories(state),
+    getStackedCategories: (state: BaseChartState) => getStackedCategories(state),
 
     /** Returns index of first visible item */
-    getFirstVisibleGroupIndex: (state) => getFirstVisibleGroupIndex(state),
+    getFirstVisibleGroupIndex: (state: BaseChartState) => getFirstVisibleGroupIndex(state),
 
     /** Returns count of visible items from specified index */
-    getVisibleGroupsCount: (firstItemIndex, state) => (
+    getVisibleGroupsCount: (firstItemIndex: number, state: BaseChartState) => (
         getVisibleGroupsCount(firstItemIndex, state)
     ),
 
     /** Returns series value for specified items group */
-    getSeriesByIndex: (index, state) => getSeriesByIndex(index, state),
+    getSeriesByIndex: (index: number, state: BaseChartState) => getSeriesByIndex(index, state),
 
     /** Returns group index for specified position on x-axis */
-    getGroupIndexByX: (x, state) => getGroupIndexByX(x, state),
+    getGroupIndexByX: (x: number, state: BaseChartState) => getGroupIndexByX(x, state),
 
-    isHorizontalScaleNeeded: (state, prevState = {}) => isHorizontalScaleNeeded(state, prevState),
+    isHorizontalScaleNeeded: (state: BaseChartState, prevState?: BaseChartState) => (
+        isHorizontalScaleNeeded(state, prevState)
+    ),
 
-    isVerticalScaleNeeded: (state, prevState = {}) => isVerticalScaleNeeded(state, prevState),
+    isVerticalScaleNeeded: (state: BaseChartState, prevState?: BaseChartState) => (
+        isVerticalScaleNeeded(state, prevState)
+    ),
 
-    getVisibleCategories(state) {
+    getVisibleCategories(state: BaseChartState) {
         const { dataSets } = state;
         if (dataSets.length === 0) {
             return [];
         }
 
-        const categories = [];
+        const categories: BaseChartDataCategory[] = [];
         const stackedGroups = state.getStackedGroups(state);
         const stackedCategories = state.getStackedCategories(state);
         const firstGroupIndex = state.getFirstVisibleGroupIndex(state);
@@ -234,7 +158,7 @@ export const defaultProps: BaseChartProps = {
         for (let i = 0; i < visibleGroups; i += 1) {
             const groupIndex = firstGroupIndex + i;
 
-            dataSets.forEach((dataSet, dataSetIndex) => {
+            dataSets.forEach((dataSet: BaseChartDataSet, dataSetIndex: number) => {
                 const value = dataSet.data[groupIndex] ?? 0;
                 if (!state.isVisibleValue(value)) {
                     return;
@@ -262,8 +186,8 @@ export const defaultProps: BaseChartProps = {
         return categories;
     },
 
-    getAllCategories: (state) => {
-        const categories = [];
+    getAllCategories: (state: BaseChartState): BaseChartDataCategory[] => {
+        const categories: BaseChartDataCategory[] = [];
 
         state.dataSets.forEach((dataSet, index) => {
             let category = (state.data.stacked)
@@ -283,35 +207,48 @@ export const defaultProps: BaseChartProps = {
         return categories;
     },
 
-    getVisibleItems: (state) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    isVisibleValue: (_) => true,
+
+    getVisibleItems: (state: BaseChartState) => {
         const firstItem = state.getFirstVisibleGroupIndex(state);
         const itemsOnWidth = state.getVisibleGroupsCount(firstItem, state);
         const lastItem = firstItem + itemsOnWidth - 1;
 
-        return state.dataSeries.items.filter((item) => (
-            item?.length > 0
-            && item[0].groupIndex >= firstItem
-            && item[0].groupIndex <= lastItem
+        return state.dataSeries.items.filter((item: BaseChartDataItemsGroup) => (
+            (item?.length > 0)
+            && (!!item[0] && item[0].groupIndex >= firstItem)
+            && (!!item[0] && item[0].groupIndex <= lastItem)
         ));
     },
 
-    findItemByEvent: (...args) => findItemByEvent(...args),
+    findItemByEvent: (
+        e: React.MouseEvent,
+        state: BaseChartState,
+        elem: Element,
+    ) => findItemByEvent(e, state, elem),
 
-    findItemByTarget: (target, state) => {
+    findItemByTarget: (
+        target: BaseChartTarget,
+        state: BaseChartState,
+    ): BaseChartBaseItem | null => {
         if (!target) {
             return null;
         }
 
         const items = state.dataSeries.items ?? [];
 
-        return items.flat().find((item) => isSameTarget(item, target));
+        return items.flat().find((item) => isSameTarget(item, target)) ?? null;
     },
 
     /**
      * Calculate grid for specified set of values
      * @param {number[]} values
      */
-    calculateGrid: (values, state) => {
+    calculateGrid: (
+        values: number[] | BaseChartDataSet[],
+        state: BaseChartState,
+    ): ChartGrid | null => {
         if (!state?.dataSets?.length) {
             return null;
         }

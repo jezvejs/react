@@ -1,19 +1,28 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { CloseButton } from '../CloseButton/CloseButton.tsx';
 
 import './Tag.scss';
 
+export interface TagProps {
+    id: string,
+    title: string,
+    active?: boolean,
+    disabled?: boolean,
+    closeable?: boolean,
+    listMode?: string,
+    onClose?: () => void,
+    className?: string,
+}
+
 const defaultProps = {
     active: false,
     disabled: false,
     closeable: false,
     listMode: 'list',
-    onClose: null,
 };
 
-export const Tag = (p) => {
+export const Tag = (p: TagProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -40,10 +49,10 @@ export const Tag = (p) => {
                 {
                     tag_active: !!props.active,
                     tag_sort: props.listMode === 'sort',
+                    tag_disabled: disabled,
                 },
                 props.className,
             )}
-            disabled={disabled}
             data-id={props.id}
         >
             <span className="tag__title">{props.title}</span>
@@ -55,14 +64,3 @@ export const Tag = (p) => {
 Tag.selector = '.tag';
 Tag.buttonClass = 'tag__close-btn';
 Tag.placeholderClass = 'tag_placeholder';
-
-Tag.propTypes = {
-    id: PropTypes.string,
-    title: PropTypes.string,
-    active: PropTypes.bool,
-    disabled: PropTypes.bool,
-    closeable: PropTypes.bool,
-    listMode: PropTypes.string,
-    onClose: PropTypes.func,
-    className: PropTypes.string,
-};

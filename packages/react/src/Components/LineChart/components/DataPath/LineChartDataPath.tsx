@@ -1,13 +1,16 @@
 import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { LineChartDataPathComponent, LineChartDataPathProps, LineChartDataPathRef } from '../../types.ts';
 import './LineChartDataPath.scss';
 
 /**
  * LineChartDataPath component
  */
 // eslint-disable-next-line react/display-name
-export const LineChartDataPath = forwardRef((props, ref) => {
+export const LineChartDataPath: LineChartDataPathComponent = forwardRef<
+    LineChartDataPathRef,
+    LineChartDataPathProps
+>((props, ref) => {
     const {
         shape = null,
     } = props;
@@ -36,18 +39,3 @@ export const LineChartDataPath = forwardRef((props, ref) => {
         <path {...itemProps} ref={ref} />
     );
 });
-
-LineChartDataPath.propTypes = {
-    shape: PropTypes.string,
-    groupIndex: PropTypes.number,
-    categoryIndex: PropTypes.number,
-    category: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-    ]),
-    stacked: PropTypes.bool,
-    active: PropTypes.bool,
-    autoScale: PropTypes.bool,
-    animate: PropTypes.bool,
-    animateNow: PropTypes.bool,
-};

@@ -1,13 +1,23 @@
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 import { isSameTarget } from '../../../BaseChart/helpers.ts';
+import {
+    HistogramComponents,
+    HistogramDataGroup,
+    HistogramDataItemType,
+    HistogramDataSeriesComponent,
+    HistogramDataSeriesProps,
+    HistogramItemProps,
+    HistogramState,
+} from '../../types.ts';
 
 /**
  * HistogramDataSeries component
  */
-export const HistogramDataSeries = (props) => {
-    const { getState, setState } = useStore();
+export const HistogramDataSeries: HistogramDataSeriesComponent = (
+    props: HistogramDataSeriesProps,
+) => {
+    const store = useStore();
 
     const { dataSets, activeTarget, grid } = props;
 
@@ -18,10 +28,10 @@ export const HistogramDataSeries = (props) => {
         const visibleGroups = props.getVisibleGroupsCount(firstGroupIndex, props);
         const activeCategory = props.activeCategory?.toString() ?? null;
 
-        const items = [];
+        const items: HistogramDataGroup[] = [];
         for (let i = 0; i < visibleGroups; i += 1) {
             const groupIndex = firstGroupIndex + i;
-            const group = [];
+            const group: HistogramDataGroup = [];
             const posValueOffset = Array(props.columnsInGroup).fill(0);
             const negValueOffset = Array(props.columnsInGroup).fill(0);
 
@@ -54,7 +64,7 @@ export const HistogramDataSeries = (props) => {
                     )
                 );
 
-                const itemProps = {
+                const itemProps: HistogramItemProps = {
                     value,
                     groupIndex,
                     columnIndex,
@@ -83,7 +93,7 @@ export const HistogramDataSeries = (props) => {
             items.push(group);
         }
 
-        setState((prev) => ({
+        store?.setState((prev: HistogramState) => ({
             ...prev,
             dataSeries: {
                 ...prev.dataSeries,
@@ -111,13 +121,18 @@ export const HistogramDataSeries = (props) => {
         props.pinnedTarget,
     ]);
 
-    if (dataSets.length === 0 || !grid) {
+    if (!store || dataSets.length === 0 || !grid) {
         return null;
     }
 
-    const { DataItem } = props.components;
+    const state = store.getState() as HistogramState;
 
-    const state = getState();
+    const components = state.components as HistogramComponents;
+    const DataItem = components?.DataItem;
+    if (!DataItem) {
+        return null;
+    }
+
     const items = state.dataSeries?.items ?? [];
 
     const commonProps = {
@@ -128,7 +143,11 @@ export const HistogramDataSeries = (props) => {
 
     return (
         <g>
-            {items.flat().map((item, ind) => {
+            {items.flat().map((item: HistogramDataItemType | null, ind) => {
+                if (!item) {
+                    return null;
+                }
+
                 if (isSameTarget(item, state.popupTarget)) {
                     return (
                         <DataItem
@@ -161,38 +180,4 @@ export const HistogramDataSeries = (props) => {
             })}
         </g>
     );
-};
-
-HistogramDataSeries.propTypes = {
-    grid: PropTypes.object,
-    dataSets: PropTypes.array,
-    items: PropTypes.array,
-    data: PropTypes.object,
-    autoScale: PropTypes.bool,
-    animate: PropTypes.bool,
-    animateNow: PropTypes.bool,
-    scrollLeft: PropTypes.number,
-    groupsGap: PropTypes.number,
-    groupsCount: PropTypes.number,
-    columnWidth: PropTypes.number,
-    columnsInGroup: PropTypes.number,
-    chartContentWidth: PropTypes.number,
-    height: PropTypes.number,
-    chartWidth: PropTypes.number,
-    scrollerWidth: PropTypes.number,
-    activeTarget: PropTypes.object,
-    popupTarget: PropTypes.object,
-    pinnedTarget: PropTypes.object,
-    popupTargetRef: PropTypes.func,
-    pinnedPopupTargetRef: PropTypes.func,
-    activeCategory: PropTypes.string,
-    getStackedGroups: PropTypes.func,
-    getStackedCategories: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
-    isVisibleValue: PropTypes.func,
-    createItem: PropTypes.func,
-    components: PropTypes.shape({
-        DataItem: PropTypes.object,
-    }),
 };

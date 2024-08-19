@@ -1,8 +1,12 @@
 import { isFunction, isObject } from '@jezvejs/types';
 import { removeEvents, setEvents, transform } from '@jezvejs/dom';
-import PropTypes from 'prop-types';
 
-import { debounce, minmax, px } from '../../utils/common.ts';
+import {
+    debounce,
+    DebounceReturnResult,
+    minmax,
+    px,
+} from '../../utils/common.ts';
 
 import {
     getFixedParent,
@@ -35,11 +39,19 @@ import {
     changeAxisToHorizontal,
     isVerticalEnd,
     isHorizontalEnd,
+    getElementRect,
 } from './helpers.ts';
+import {
+    EventListener,
+    EventListenerOptions,
+    PopupPositionProps,
+    PopupPositionState,
+    ScreenRectangle,
+} from './types.ts';
 
 const UPDATE_TIMEOUT = 75;
 
-const defaultProps = {
+const defaultProps: PopupPositionProps = {
     elem: null,
     refElem: null,
     updateProps: null,
@@ -54,26 +66,25 @@ const defaultProps = {
     scrollOnOverflow: true,
     allowResize: true,
     minRefHeight: 20,
-    onScrollDone: null,
-    onWindowScroll: null,
-    onViewportResize: null,
 };
 
 export class PopupPosition {
-    static positions = [
-        'top',
-        'top-start',
-        'top-end',
-        'bottom',
-        'bottom-start',
-        'bottom-end',
-        'left',
-        'left-start',
-        'left-end',
-        'right',
-        'right-start',
-        'right-end',
-    ];
+    props: PopupPositionProps;
+
+    viewportEvents: {
+        resize: EventListener,
+    };
+
+    windowEvents: {
+        scroll: {
+            listener: EventListener,
+            options?: EventListenerOptions,
+        },
+    };
+
+    updateHandler: DebounceReturnResult;
+
+    state: PopupPositionState;
 
     static create(props = {}) {
         return new this(props);
@@ -138,21 +149,24 @@ export class PopupPosition {
     }
 
     /** Window 'scroll' event handler */
-    onWindowScroll(e) {
+    onWindowScroll(e: Event) {
+        const target = e?.target as HTMLElement;
         if (
-            this.state.elem
-            && !e.target.contains(this.state.elem)
-            && !e.target.contains(this.state.refElem)
+            !!this.state.elem
+            && (typeof this.state.elem === 'object')
+            && !target?.contains?.(this.state.elem)
+            && this.state.refElem
+            && !target?.contains?.(this.state.refElem)
         ) {
             return;
         }
 
         const updateRequired = isFunction(this.state.onWindowScroll)
-            ? this.state.onWindowScroll(e)
+            ? this.state.onWindowScroll?.(e)
             : true;
 
         if (updateRequired) {
-            if (this.state.scrollRequested) {
+            if (this.state.scrollRequested && typeof this.updateHandler === 'function') {
                 this.updateHandler();
             } else {
                 this.updatePosition();
@@ -161,13 +175,13 @@ export class PopupPosition {
     }
 
     /** viewPort 'resize' event handler */
-    onViewportResize(e) {
-        const updateRequired = isFunction(this.state.onViewportResize)
+    onViewportResize(e: Event) {
+        const updateRequired = (typeof this.state.onViewportResize === 'function')
             ? this.state.onViewportResize(e)
             : true;
 
         if (updateRequired) {
-            if (this.state.scrollRequested) {
+            if (this.state.scrollRequested && typeof this.updateHandler === 'function') {
                 this.updateHandler();
             } else {
                 this.updatePosition();
@@ -176,7 +190,7 @@ export class PopupPosition {
     }
 
     updatePosition() {
-        const updateProps = isFunction(this.state.updateProps)
+        const updateProps = (typeof this.state.updateProps === 'function')
             ? this.state.updateProps()
             : this.state.updateProps;
         const props = isObject(updateProps) ? updateProps : {};
@@ -188,7 +202,7 @@ export class PopupPosition {
 
     /** Calls 'onScrollDone' callback function */
     notifyScrollDone() {
-        if (isFunction(this.props.onScrollDone)) {
+        if (typeof this.props.onScrollDone === 'function') {
             this.props.onScrollDone();
         }
     }
@@ -223,7 +237,11 @@ export class PopupPosition {
     }
 
     calculate() {
-        const { elem } = this.props;
+        if (!this.props.elem || typeof this.props.elem !== 'object') {
+            return;
+        }
+
+        const elem = this.props.elem as HTMLElement;
         const { isInitial } = this.state;
 
         this.state = {
@@ -231,14 +249,14 @@ export class PopupPosition {
             screen: getScreenRect(),
             fixedParent: getFixedParent(elem),
             absoluteParent: isAbsoluteParent(elem),
-            fixedElement: !elem.offsetParent,
+            fixedElement: !!elem && !elem?.offsetParent,
             flip: false,
             crossFlip: false,
             isInitial: false,
         };
 
-        this.state.current.width = elem.offsetWidth;
-        this.state.current.height = elem.offsetHeight;
+        this.state.current.width = elem?.offsetWidth ?? 0;
+        this.state.current.height = elem?.offsetHeight ?? 0;
 
         this.getRefClientRect(isInitial);
         this.getOffsetParentRect();
@@ -267,36 +285,50 @@ export class PopupPosition {
 
     getRefClientRect(isInitial = false) {
         const { state } = this;
-        const refRect = state.refElem.getBoundingClientRect();
+        const refRect = getElementRect(state.refElem);
+        const width = refRect?.width ?? 0;
+        const height = refRect?.height ?? 0;
 
-        if (isInitial || refRect.width > 0 || refRect.height > 0) {
+        if (isInitial || width > 0 || height > 0) {
             state.reference = refRect;
         }
+    }
+
+    getFullScreenRect(): ScreenRectangle {
+        const res = {
+            ...this.state.screen,
+            left: 0,
+            top: 0,
+        };
+
+        return res as ScreenRectangle;
     }
 
     getOffsetParentRect() {
         const { state } = this;
 
+        const elem = state.elem as HTMLElement;
+
         state.offset = (state.fixedElement)
-            ? { ...state.screen, left: 0, top: 0 }
-            : state.elem.offsetParent.getBoundingClientRect();
+            ? this.getFullScreenRect()
+            : getElementRect(elem?.offsetParent);
     }
 
     getScrollParentRect() {
         const { state } = this;
 
-        state.scrollParent = getScrollParent(this.props.elem);
+        state.scrollParent = getScrollParent(this.props.elem) as HTMLElement;
 
         state.scrollParentBox = (state.scrollParent && !state.fixedElement)
-            ? state.scrollParent.getBoundingClientRect()
-            : { ...state.screen, left: 0, top: 0 };
+            ? getElementRect(state.scrollParent)
+            : this.getFullScreenRect();
     }
 
     getBottomSafe() {
         const { state } = this;
         const html = document.documentElement;
 
-        state.bottomSafe = (state.screen.height - html.clientHeight > 50)
+        state.bottomSafe = ((state.screen?.height ?? 0) - html.clientHeight > 50)
             ? state.bottomSafeArea
             : state.screenPadding;
     }
@@ -307,7 +339,7 @@ export class PopupPosition {
             return;
         }
 
-        const { style } = state.elem;
+        const { style } = state.elem as HTMLElement;
         style.left = px(0);
         style.top = px(0);
 
@@ -320,13 +352,13 @@ export class PopupPosition {
             return;
         }
 
-        const { style } = state.elem;
+        const { style } = state.elem as HTMLElement;
         const { left, top } = state.current;
 
         style.left = px(0);
         style.top = px(0);
 
-        transform(state.elem, `translate(${px(left)}, ${px(top)})`);
+        transform(state.elem, `translate(${px(left ?? 0)}, ${px(top ?? 0)})`);
     }
 
     calculateRefScroll() {
@@ -338,15 +370,15 @@ export class PopupPosition {
         } = state;
 
         state.refScrollParent = {
-            left: Math.max(0, scrollParentBox.left),
-            top: Math.max(0, scrollParentBox.top),
-            width: Math.min(screen.width, scrollParentBox.width),
-            height: Math.min(screen.height, scrollParentBox.height),
+            left: Math.max(0, scrollParentBox?.left ?? 0),
+            top: Math.max(0, scrollParentBox?.top ?? 0),
+            width: Math.min(screen?.width ?? 0, scrollParentBox?.width ?? 0),
+            height: Math.min(screen?.height ?? 0, scrollParentBox?.height ?? 0),
         };
 
         state.refScroll = {
-            left: reference.left - state.refScrollParent.left,
-            top: reference.top - state.refScrollParent.top,
+            left: (reference?.left ?? 0) - (state.refScrollParent?.left ?? 0),
+            top: (reference?.top ?? 0) - (state.refScrollParent?.top ?? 0),
         };
     }
 
@@ -358,19 +390,25 @@ export class PopupPosition {
             refScrollParent,
         } = state;
 
-        state.scrollLeft = scrollParent.scrollLeft;
-        state.scrollTop = scrollParent.scrollTop;
-        state.horScrollAvailable = scrollParent.scrollWidth >= scrollParent.clientWidth;
-        state.vertScrollAvailable = scrollParent.scrollHeight >= scrollParent.clientHeight;
+        state.scrollLeft = scrollParent?.scrollLeft ?? 0;
+        state.scrollTop = scrollParent?.scrollTop ?? 0;
+        state.horScrollAvailable = (
+            !!scrollParent
+            && scrollParent.scrollWidth >= scrollParent.clientWidth
+        );
+        state.vertScrollAvailable = (
+            !!scrollParent
+            && scrollParent.scrollHeight >= scrollParent.clientHeight
+        );
 
         state.scrollWidth = (state.horScrollAvailable)
-            ? scrollParent.scrollWidth
-            : screen.right;
+            ? (scrollParent?.scrollWidth ?? 0)
+            : (screen?.right ?? 0);
         state.scrollHeight = (state.vertScrollAvailable)
-            ? scrollParent.scrollHeight
-            : screen.bottom;
-        state.scrollRight = state.scrollLeft + refScrollParent.width;
-        state.scrollBottom = state.scrollTop + refScrollParent.height;
+            ? (scrollParent?.scrollHeight ?? 0)
+            : (screen?.bottom ?? 0);
+        state.scrollRight = state.scrollLeft + (refScrollParent?.width ?? 0);
+        state.scrollBottom = state.scrollTop + (refScrollParent?.height ?? 0);
     }
 
     /**
@@ -388,21 +426,25 @@ export class PopupPosition {
             reference,
         } = this.state;
 
+        if (!refScrollParent || !reference || !refScroll) {
+            return;
+        }
+
         const screenTopDist = refScrollParent.height - refScroll.top;
         const screenBottomDist = reference.bottom - refScrollParent.top;
         const screenLeftDist = refScrollParent.width - refScroll.left;
         const screenRightDist = reference.right - refScrollParent.left;
 
         this.state.dist = {
-            left: Math.min(screenLeftDist, this.state.scrollLeft),
-            top: Math.min(screenTopDist - minRefHeight, this.state.scrollTop),
+            left: Math.min(screenLeftDist, this.state.scrollLeft ?? 0),
+            top: Math.min(screenTopDist - (minRefHeight ?? 0), this.state.scrollTop ?? 0),
             bottom: Math.min(
-                screenBottomDist - minRefHeight,
-                this.state.scrollHeight - this.state.scrollBottom,
+                screenBottomDist - (minRefHeight ?? 0),
+                (this.state.scrollHeight ?? 0) - (this.state.scrollBottom ?? 0),
             ),
             right: Math.min(
                 screenRightDist,
-                this.state.scrollWidth - this.state.scrollRight,
+                (this.state.scrollWidth ?? 0) - (this.state.scrollRight ?? 0),
             ),
         };
     }
@@ -414,13 +456,17 @@ export class PopupPosition {
         } = this.state;
         const html = document.documentElement;
 
-        const left = (fixedParent) ? this.state.scrollLeft : screen.left;
-        const top = (fixedParent) ? this.state.scrollTop : screen.top;
+        if (!screen) {
+            return;
+        }
+
+        const left = (fixedParent) ? (this.state.scrollLeft ?? 0) : screen.left;
+        const top = (fixedParent) ? (this.state.scrollTop ?? 0) : screen.top;
         const width = (fixedParent)
-            ? this.state.scrollWidth
+            ? (this.state.scrollWidth ?? 0)
             : html.scrollWidth;
         const height = (fixedParent)
-            ? this.state.scrollHeight
+            ? (this.state.scrollHeight ?? 0)
             : html.scrollHeight;
         const right = left + screen.width;
         const bottom = top + screen.height;
@@ -436,17 +482,27 @@ export class PopupPosition {
     handleMaxSize() {
         const {
             screen,
-            margin,
             offset,
-            screenPadding,
-            minRefHeight,
             current,
             reference,
         } = this.state;
-        const { style } = this.state.elem;
+        const { style } = this.state.elem as HTMLElement;
+
+        if (
+            !current
+            || !offset
+            || !screen
+            || !reference
+        ) {
+            return;
+        }
+
+        const minRefHeight = this.state.minRefHeight ?? 0;
+        const screenPadding = this.state.screenPadding ?? 0;
+        const margin = this.state.margin ?? 0;
 
         // Check element is taller than screen
-        const minHeight = minRefHeight + margin + screenPadding + current.height;
+        const minHeight = minRefHeight + margin + screenPadding + (current.height ?? 0);
         if (minHeight > screen.height && this.state.allowResize) {
             current.height = screen.height - minRefHeight - screenPadding - margin;
             style.maxHeight = px(current.height);
@@ -456,7 +512,8 @@ export class PopupPosition {
         this.state.minLeft = screenPadding - offset.left;
 
         // Check element is wider than screen
-        if (this.state.width >= this.state.maxWidth) {
+        const width = this.state.width ?? 0;
+        if (width >= this.state.maxWidth) {
             style.width = px(this.state.maxWidth);
             current.left = this.state.minLeft;
             this.renderPosition();
@@ -479,15 +536,20 @@ export class PopupPosition {
         const { state } = this;
         const { reference, current } = state;
         const isVertCenter = isVerticalCenterPosition(state);
+        const refTop = reference?.top ?? 0;
+        const refBottom = reference?.bottom ?? 0;
+        const refHeight = reference?.height ?? 0;
+        const currHeight = current?.height ?? 0;
+        const margin = state.margin ?? 0;
 
-        const vertTop = reference.top - current.height - state.margin;
+        const vertTop = refTop - currHeight - margin;
         const horTop = (isVertCenter)
-            ? (reference.top - (current.height - reference.height) / 2)
-            : (reference.top - current.height + reference.height);
-        const vertBottom = reference.bottom + state.margin + current.height;
+            ? (refTop - (currHeight - refHeight) / 2)
+            : (refTop - currHeight + refHeight);
+        const vertBottom = refBottom + margin + currHeight;
         const horBottom = (isVertCenter)
-            ? (reference.bottom + (current.height - reference.height) / 2)
-            : (reference.top + current.height);
+            ? (refBottom + (currHeight - refHeight) / 2)
+            : (refTop + currHeight);
 
         state.vertOverflowTop = getTopOverflow(vertTop, state);
         state.vertOverflowBottom = getBottomOverflow(vertBottom, state);
@@ -500,15 +562,20 @@ export class PopupPosition {
         const { state } = this;
         const { reference, current } = state;
         const isHorCenter = isHorizontalCenterPosition(state);
+        const refLeft = reference?.left ?? 0;
+        const refRight = reference?.right ?? 0;
+        const refWidth = reference?.width ?? 0;
+        const currWidth = current?.width ?? 0;
+        const margin = state.margin ?? 0;
 
-        const horLeft = reference.left - current.width - state.margin;
+        const horLeft = refLeft - currWidth - margin;
         const vertLeft = (isHorCenter)
-            ? (reference.left - (current.width - reference.width) / 2)
-            : (reference.right - current.width);
-        const horRight = reference.right + state.margin + current.width;
+            ? (refLeft - (currWidth - refWidth) / 2)
+            : (refRight - currWidth);
+        const horRight = refRight + margin + currWidth;
         const vertRight = (isHorCenter)
-            ? (reference.right + (current.width - reference.width) / 2)
-            : (reference.left + current.width);
+            ? (refRight + (currWidth - refWidth) / 2)
+            : (refLeft + currWidth);
 
         state.horOverflowLeft = getLeftOverflow(horLeft, state);
         state.horOverflowRight = getRightOverflow(horRight, state);
@@ -556,8 +623,21 @@ export class PopupPosition {
             reference,
             current,
         } = state;
-        const { style } = state.elem;
+        const { style } = state.elem as HTMLElement;
 
+        if (
+            !screen
+            || !offset
+            || !scrollParent
+            || !reference
+            || !state.refScroll
+            || !state.dist
+            || !state.windowDist
+        ) {
+            return;
+        }
+
+        const screenPadding = state.screenPadding ?? 0;
         const isTopPosition = isTop(state);
         const isBottomPosition = isBottom(state);
         const elemVertOverflow = getElementVerticalOverflow(state);
@@ -579,7 +659,7 @@ export class PopupPosition {
 
         const direction = (topToBottom) ? -1 : 1;
         let overflow = (isRefOverflow) ? refVertOverflow : elemVertOverflow;
-        if (overflow > state.screenPadding && state.vertScrollAvailable && state.scrollOnOverflow) {
+        if (overflow > screenPadding && state.vertScrollAvailable && state.scrollOnOverflow) {
             const maxDistance = (topToBottom) ? state.dist.top : state.dist.bottom;
             const distance = Math.min(overflow, maxDistance) * direction;
             const newScrollTop = scrollParent.scrollTop + distance;
@@ -588,13 +668,13 @@ export class PopupPosition {
                 overflow -= Math.abs(distance);
             }
 
-            if (overflow <= state.screenPadding) {
+            if (overflow <= screenPadding) {
                 overflow = 0;
             }
 
             // Scroll window if overflow is not cleared yet
             let windowScrollDistance = 0;
-            if (overflow > state.screenPadding) {
+            if (overflow > screenPadding) {
                 const maxWindowDistance = (topToBottom)
                     ? state.windowDist.top
                     : state.windowDist.bottom;
@@ -609,10 +689,10 @@ export class PopupPosition {
             if (Math.abs(windowScrollDistance) > 0) {
                 window.scrollTo(window.scrollX, newWindowScrollY);
             }
-        } else if (overflow > state.screenPadding && state.isInitial && !state.scrollOnOverflow) {
-            const minPos = state.screenPadding - offset.top;
-            const maxPos = screen.height - offset.top - current.height - state.screenPadding;
-            current.top = minmax(minPos, maxPos, current.top);
+        } else if (overflow > screenPadding && state.isInitial && !state.scrollOnOverflow) {
+            const minPos = screenPadding - offset.top;
+            const maxPos = screen.height - offset.top - (current.height ?? 0) - screenPadding;
+            current.top = minmax(minPos, maxPos, current.top ?? 0);
             overflow = 0;
             this.renderPosition();
         }
@@ -623,8 +703,8 @@ export class PopupPosition {
         current.top = getInitialTopPosition(state);
 
         // Decrease height of element if overflow is not cleared
-        if (overflow > state.screenPadding && state.isInitial && state.allowResize) {
-            current.height -= overflow;
+        if (overflow > screenPadding && state.isInitial && state.allowResize) {
+            current.height = (current.height ?? 0) - overflow;
             style.maxHeight = px(current.height);
             if (isTopPosition) {
                 current.top += overflow;
@@ -645,10 +725,24 @@ export class PopupPosition {
             current,
         } = state;
 
-        const isLeftPosition = isLeft(this.state);
-        const isRightPosition = isRight(this.state);
-        const elemHorOverflow = getElementHorizontalOverflow(this.state);
-        const refOverflowLeft = -this.state.refScroll.left;
+        if (
+            !screen
+            || !offset
+            || !scrollParent
+            || !windowDist
+            || !reference
+            || !current
+            || !state.refScroll
+            || !state.dist
+        ) {
+            return;
+        }
+
+        const screenPadding = state.screenPadding ?? 0;
+        const isLeftPosition = isLeft(state);
+        const isRightPosition = isRight(state);
+        const elemHorOverflow = getElementHorizontalOverflow(state);
+        const refOverflowLeft = -state.refScroll.left;
         const refOverflowRight = reference.right - screen.width;
 
         let refHorOverflow = 0;
@@ -676,7 +770,7 @@ export class PopupPosition {
 
             // Scroll window if overflow is not cleared yet
             let windowHScrollDistance = 0;
-            if (hOverflow > state.screenPadding) {
+            if (hOverflow > screenPadding) {
                 const maxWindowDistance = (leftToRight) ? windowDist.left : windowDist.right;
                 windowHScrollDistance = (
                     Math.min(hOverflow, maxWindowDistance) * horDirection
@@ -696,17 +790,17 @@ export class PopupPosition {
             this.getScrollParentRect();
             current.left = getInitialLeftPosition(state);
             this.renderPosition();
-        } else if (hOverflow > state.screenPadding && state.isInitial && !state.scrollOnOverflow) {
-            const minPos = state.screenPadding - offset.left;
-            const maxPos = screen.width - offset.left - current.width - state.screenPadding;
-            current.left = minmax(minPos, maxPos, current.left);
+        } else if (hOverflow > screenPadding && state.isInitial && !state.scrollOnOverflow) {
+            const minPos = screenPadding - offset.left;
+            const maxPos = screen.width - offset.left - (current.width ?? 0) - screenPadding;
+            current.left = minmax(minPos, maxPos, current.left ?? 0);
             this.renderPosition();
         }
     }
 
     /* Reset previously applied style properties of element */
     reset() {
-        const { style } = this.props.elem;
+        const { style } = this.props.elem as HTMLElement;
 
         style.top = '';
         style.bottom = '';
@@ -718,29 +812,3 @@ export class PopupPosition {
         setTimeout(() => this.stopWindowEvents());
     }
 }
-
-PopupPosition.propTypes = {
-    elem: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    refElem: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    updateProps: PropTypes.object,
-    position: PropTypes.oneOf(PopupPosition.positions),
-    margin: PropTypes.number,
-    screenPadding: PropTypes.number,
-    bottomSafeArea: PropTypes.number,
-    useRefWidth: PropTypes.bool,
-    allowFlip: PropTypes.bool,
-    allowHorizontalFlip: PropTypes.bool,
-    allowChangeAxis: PropTypes.bool,
-    scrollOnOverflow: PropTypes.bool,
-    allowResize: PropTypes.bool,
-    minRefHeight: PropTypes.number,
-    onScrollDone: PropTypes.func,
-    onWindowScroll: PropTypes.func,
-    onViewportResize: PropTypes.func,
-};

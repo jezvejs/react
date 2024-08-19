@@ -1,10 +1,9 @@
-import PropTypes from 'prop-types';
 import './InputGroupText.scss';
 
-export const InputGroupText = ({ title }) => (
+export interface InputGroupTextProps {
+    title: string,
+}
+
+export const InputGroupText = ({ title }: InputGroupTextProps) => (
     <div className="input-group__text">{title}</div>
 );
-
-InputGroupText.propTypes = {
-    title: PropTypes.string,
-};

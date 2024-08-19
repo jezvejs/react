@@ -1,14 +1,18 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 
 import { Menu, MenuHelpers } from '../../../../Menu/Menu.tsx';
+import { MenuItemProps, MenuItemType, MenuProps } from '../../../../Menu/types.ts';
 
-import { componentPropType } from '../../../helpers.ts';
+import {
+    DropDownMenuComponent,
+    DropDownMenuHeaderProps,
+    DropDownMenuProps,
+    DropDownMenuRef,
+} from '../../../types.ts';
 import './Menu.scss';
 
 const defaultProps = {
-    parentId: null,
     items: [],
     showInput: false,
     getItemById: null,
@@ -23,7 +27,6 @@ const defaultProps = {
         inputString: '',
         inputPlaceholder: '',
         useSingleSelectionAsPlaceholder: false,
-        onInput: null,
     },
     components: {
         Header: null,
@@ -41,7 +44,10 @@ const defaultProps = {
  * DropDown Menu container component
  */
 // eslint-disable-next-line react/display-name
-export const DropDownMenu = forwardRef((p, ref) => {
+export const DropDownMenu: DropDownMenuComponent = forwardRef<
+    DropDownMenuRef,
+    DropDownMenuProps
+>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -56,9 +62,9 @@ export const DropDownMenu = forwardRef((p, ref) => {
     };
 
     const { multiple, filtered } = props;
-    const defaultItemType = (multiple) ? 'checkbox' : 'button';
+    const defaultItemType: MenuItemType = (multiple) ? 'checkbox' : 'button';
 
-    const items = props.items.map((item) => ({
+    const items = props.items.map((item: MenuItemProps) => ({
         ...item,
         type: (item.type !== 'group') ? defaultItemType : item.type,
         multiple,
@@ -67,62 +73,22 @@ export const DropDownMenu = forwardRef((p, ref) => {
     }));
 
     const filteredItems = (props.visible)
-        ? MenuHelpers.filterItems(items, (item) => (
+        ? MenuHelpers.filterItems(items, (item) => !!(
             !item.hidden && (!filtered || item.matchFilter)
         ))
         : [];
 
+    const menuProps: MenuProps<DropDownMenuHeaderProps> = {
+        ...props,
+        defaultItemType,
+        tabThrough: false,
+        className: classNames('dd__list', props.className),
+        items: filteredItems,
+        parentId: props.parentId,
+    };
+    delete menuProps.tabIndex;
+
     return (
-        <Menu
-            {...props}
-            ref={ref}
-            defaultItemType={defaultItemType}
-            tabThrough={false}
-            tabIndex={null}
-            className={classNames('dd__list', props.className)}
-            items={filteredItems}
-            data-parent={props.parentId}
-        />
+        <Menu {...menuProps} ref={ref} />
     );
 });
-
-DropDownMenu.propTypes = {
-    ...Menu.propTypes,
-    parentId: PropTypes.string,
-    visible: PropTypes.bool,
-    showInput: PropTypes.bool,
-    getItemById: PropTypes.func,
-    onItemActivate: PropTypes.func,
-    onItemClick: PropTypes.func,
-    onPlaceholderClick: PropTypes.func,
-    multiple: PropTypes.bool,
-    filtered: PropTypes.bool,
-    getPlaceholderProps: PropTypes.func,
-    className: PropTypes.string,
-    items: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        type: PropTypes.string,
-        className: PropTypes.string,
-        title: PropTypes.string,
-        icon: PropTypes.oneOfType([
-            PropTypes.node,
-            PropTypes.elementType,
-        ]),
-    })),
-    header: PropTypes.shape({
-        inputString: PropTypes.string,
-        inputPlaceholder: PropTypes.string,
-        useSingleSelectionAsPlaceholder: PropTypes.bool,
-        onInput: PropTypes.func,
-    }),
-    components: PropTypes.shape({
-        Header: componentPropType,
-        Input: componentPropType,
-        MenuList: componentPropType,
-        ListItem: componentPropType,
-        Check: componentPropType,
-        Checkbox: componentPropType,
-        ListPlaceholder: componentPropType,
-        GroupItem: componentPropType,
-    }),
-};

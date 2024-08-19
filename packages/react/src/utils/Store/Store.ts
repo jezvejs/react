@@ -1,8 +1,55 @@
 import { isFunction } from '@jezvejs/types';
 
+export type StoreActionPayload = object | string | number | boolean | bigint | symbol | null;
+
+export interface StoreActionObject {
+    type: string,
+    payload?: StoreActionPayload,
+}
+
+export type StoreActionPayloadFunction = (payload?: StoreActionPayload) => StoreActionObject;
+export type StoreActionFunction = (api: StoreActionAPI | null) => void;
+
+export type StoreAction = StoreActionObject | StoreActionFunction;
+
+export type StoreState = object;
+
+export type StoreReducer = (state: StoreState, action: StoreActionObject) => StoreState;
+export type StoreReducersList = StoreReducer | StoreReducer[];
+
+export type StoreActionReducer = (state: StoreState, payload?: StoreActionPayload) => StoreState;
+
+export interface StoreOptions {
+    initialState?: StoreState,
+    sendInitialState?: true,
+}
+
+export type StoreListener = (state: StoreState, prevState: StoreState) => void;
+
+export type StoreDispatchFunction = (action: StoreAction) => void;
+export type StoreGetStateFunction = () => StoreState;
+
+export interface StoreActionAPI {
+    dispatch: StoreDispatchFunction,
+    getState: StoreGetStateFunction,
+}
+
+export type StoreUpdaterFunction = (prev: StoreState) => StoreState;
+export type StoreUpdater = StoreState | StoreUpdaterFunction;
+
 /** State store class */
 export class Store {
-    constructor(reducer, options = {}) {
+    reducer: StoreReducer | null = null;
+
+    state: StoreState = {};
+
+    listeners: StoreListener[] = [];
+
+    sendInitialState: boolean = true;
+
+    storeAPI: StoreActionAPI | null = null;
+
+    constructor(reducer: StoreReducer, options: StoreOptions = {}) {
         if (!isFunction(reducer)) {
             throw new Error('Expected reducer to be a function');
         }
@@ -27,20 +74,26 @@ export class Store {
         return this.state;
     }
 
-    dispatch(action) {
-        if (isFunction(action)) {
+    dispatch(action: StoreAction | StoreActionFunction) {
+        if (typeof action === 'function') {
             action(this.storeAPI);
+            return;
+        }
+
+        if (!this.reducer) {
             return;
         }
 
         const newState = this.reducer(this.state, action);
         const prevState = this.state;
         this.state = newState;
-        this.listeners.forEach((listener) => listener(newState, prevState));
+        this.listeners.forEach((listener: StoreListener) => listener(newState, prevState));
     }
 
-    setState(state) {
-        const newState = isFunction(state) ? state(this.state) : state;
+    setState(state: StoreUpdater) {
+        const newState = (typeof state === 'function')
+            ? state(this.state)
+            : state;
         if (this.state === newState) {
             return;
         }
@@ -50,7 +103,7 @@ export class Store {
         this.listeners.forEach((listener) => listener(newState, prevState));
     }
 
-    subscribe(listener) {
+    subscribe(listener: StoreListener) {
         if (!isFunction(listener)) {
             throw new Error('Expected listener to be a function');
         }
@@ -69,4 +122,9 @@ export class Store {
     }
 }
 
-export const createStore = (...args) => (new Store(...args));
+export const createStore = (
+    reducer: StoreReducer,
+    options: StoreOptions = {},
+) => (
+    new Store(reducer, options)
+);

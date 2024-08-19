@@ -1,14 +1,16 @@
-import { isFunction } from '@jezvejs/types';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
 
-import { Menu, MenuHelpers, MenuProps } from '../Menu/Menu.tsx';
+import {
+    Menu,
+    MenuHelpers,
+    MenuDefProps,
+} from '../Menu/Menu.tsx';
 
 import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.ts';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
-import { PopupPosition } from '../../hooks/usePopupPosition/PopupPosition.ts';
 
+import { PopupMenuProps, PopupMenuState } from './types.ts';
 import './PopupMenu.scss';
 
 const defaultProps = {
@@ -24,40 +26,38 @@ const defaultProps = {
     },
 };
 
-const menuProps = MenuProps.getDefaultProps();
+const menuProps = MenuDefProps.getDefaultProps();
 
-export const PopupMenu = (p) => {
+export const PopupMenu = (p: PopupMenuProps) => {
     const props = {
         ...menuProps,
         ...defaultProps,
         ...p,
         position: {
-            ...menuProps.position,
             ...defaultProps.position,
             ...(p?.position ?? {}),
             updateProps: {
-                ...(menuProps.position?.updateProps ?? {}),
                 ...(defaultProps.position?.updateProps ?? {}),
                 ...(p?.position?.updateProps ?? {}),
             },
         },
     };
 
-    const [state, setState] = useState({
+    const [state, setState] = useState<PopupMenuState>({
         ...props,
         open: false,
         listenScroll: false,
     });
 
     const onToggle = () => {
-        setState((prev) => ({
+        setState((prev: PopupMenuState) => ({
             ...prev,
             open: !prev.open,
         }));
     };
 
     const closeMenu = () => {
-        setState((prev) => ({ ...prev, open: false }));
+        setState((prev: PopupMenuState) => ({ ...prev, open: false }));
     };
 
     const {
@@ -69,32 +69,33 @@ export const PopupMenu = (p) => {
         ...state.position,
         open: state.open,
         onScrollDone: () => {
-            setState((prev) => ({
+            setState((prev: PopupMenuState) => ({
                 ...prev,
                 listenScroll: true,
             }));
         },
     });
 
-    function onScroll(e) {
+    const onScroll = (e: Event) => {
         if (!state.hideOnScroll) {
             return;
         }
 
-        if (!e.target.contains(elem.current)) {
+        const target = e.target as HTMLElement;
+        if (!target.contains(elem.current as HTMLElement)) {
             return;
         }
 
         // Ignore scroll of menu itself
-        const listElem = isFunction(e.target.closest)
-            ? e.target.closest('.popup-menu-list')
+        const listElem = (typeof target.closest === 'function')
+            ? target.closest('.popup-menu-list')
             : null;
         if (listElem === elem.current) {
             return;
         }
 
         closeMenu();
-    }
+    };
 
     const addScrollListener = () => {
         if (state.open && state.listenScroll) {
@@ -112,7 +113,7 @@ export const PopupMenu = (p) => {
             listenScroll: false,
         }));
 
-        window.removeEventListener('scroll', onScroll, { passive: true, capture: true });
+        window.removeEventListener('scroll', onScroll, { capture: true });
     };
 
     const onItemClick = (item) => {
@@ -131,7 +132,7 @@ export const PopupMenu = (p) => {
             addScrollListener();
 
             if (state.listenScroll) {
-                elem.current.focus();
+                elem.current?.focus();
             }
         } else {
             removeScrollListener();
@@ -178,19 +179,4 @@ export const PopupMenu = (p) => {
             )}
         </>
     );
-};
-
-PopupMenu.propTypes = {
-    ...Menu.propTypes,
-    toggleOnClick: PropTypes.bool,
-    hideOnScroll: PropTypes.bool,
-    hideOnSelect: PropTypes.bool,
-    position: PropTypes.shape({
-        ...PopupPosition.propTypes,
-    }),
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    container: PropTypes.object,
 };

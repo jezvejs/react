@@ -32,21 +32,41 @@ export const formatDateString = (state) => (
     )).join('')
 );
 
-export const getDateFormat = (props) => {
+export interface DateFormatPartType {
+    type: string;
+    start: number;
+    end: number;
+    length: number;
+    value?: string;
+    order?: number;
+}
+
+export interface DateFormatType {
+    separator: string | null;
+    formatParts: DateFormatPartType[];
+    dayRange?: DateFormatPartType;
+    monthRange?: DateFormatPartType;
+    yearRange?: DateFormatPartType;
+    formatMask: string | null;
+}
+
+export const getDateFormat = (props: { locales: string | string[]; }): DateFormatType => {
     const formatter = Intl.DateTimeFormat(props.locales, { dateStyle: 'short' });
     const parts = formatter.formatToParts();
 
-    const res = {
+    const res: DateFormatType = {
         separator: null,
         formatParts: [],
+        formatMask: null,
     };
 
     let currentPos = 0;
     let order = 0;
     parts.forEach(({ type, value }) => {
-        const part = {
+        const part: DateFormatPartType = {
             type,
             start: currentPos,
+            end: currentPos,
             length: (type === 'day' || type === 'month') ? 2 : value.length,
         };
         part.end = part.start + part.length;
@@ -82,7 +102,7 @@ export const getDateFormat = (props) => {
         ...res,
         day: 'dd',
         month: 'mm',
-        year: ''.padStart(res.yearRange.length, 'y'),
+        year: ''.padStart(res.yearRange?.length ?? 0, 'y'),
     });
 
     return res;
@@ -333,9 +353,9 @@ export const handleExpectedContent = (content, state, updateCursor = false) => {
 export const getInitialState = (props) => {
     const dateFormat = getDateFormat(props);
     const emptyState = {
-        day: ''.padStart(dateFormat.dayRange.length, props.guideChar),
-        month: ''.padStart(dateFormat.monthRange.length, props.guideChar),
-        year: ''.padStart(dateFormat.yearRange.length, props.guideChar),
+        day: ''.padStart(dateFormat.dayRange?.length ?? 0, props.guideChar),
+        month: ''.padStart(dateFormat.monthRange?.length ?? 0, props.guideChar),
+        year: ''.padStart(dateFormat.yearRange?.length ?? 0, props.guideChar),
     };
 
     const res = {

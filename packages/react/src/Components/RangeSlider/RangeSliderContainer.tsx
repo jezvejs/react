@@ -1,6 +1,4 @@
-import PropTypes from 'prop-types';
 import { useRef, forwardRef, useImperativeHandle } from 'react';
-import { isFunction } from '@jezvejs/types';
 
 // Utils
 import { minmax } from '../../utils/common.ts';
@@ -13,23 +11,45 @@ import { RangeSliderBeforeArea } from './components/RangeSliderBeforeArea.tsx';
 import { RangeSliderAfterArea } from './components/RangeSliderAfterArea.tsx';
 
 import { positionToValue, valueToPosition, stepValue } from './helpers.ts';
+import { StoreUpdater } from '../../utils/Store/Store.ts';
+import {
+    RangeSliderBeforeChangeType,
+    RangeSliderProps,
+    RangeSliderRange,
+    RangeSliderState,
+    RangeSliderValue,
+} from './types.ts';
+
+type RangeSliderContainerProps = RangeSliderProps;
+type RangeSliderContainerRef = HTMLDivElement | null;
 
 // eslint-disable-next-line react/display-name
-export const RangeSliderContainer = forwardRef((props, ref) => {
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+export const RangeSliderContainer = forwardRef<
+    RangeSliderContainerRef,
+    RangeSliderContainerProps
+>((props, ref) => {
+    const innerRef = useRef<HTMLDivElement>(null);
+    useImperativeHandle<RangeSliderContainerRef, RangeSliderContainerRef>(ref, () => (
+        innerRef?.current
+    ));
 
-    const { getState, setState } = useDragnDrop();
+    const dragDrop = useDragnDrop();
+    const getState = () => dragDrop?.getState() as RangeSliderState ?? null;
+    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
 
-    const sliderRef = useRef(null);
-    const endSliderRef = useRef(null);
-    const sliderAreaRef = useRef(null);
-    const beforeAreaRef = useRef(null);
-    const afterAreaRef = useRef(null);
-    const selectedAreaRef = useRef(null);
+    const sliderRef = useRef<HTMLDivElement>(null);
+    const endSliderRef = useRef<HTMLDivElement>(null);
+    const sliderAreaRef = useRef<HTMLDivElement>(null);
+    const beforeAreaRef = useRef<HTMLDivElement>(null);
+    const afterAreaRef = useRef<HTMLDivElement>(null);
+    const selectedAreaRef = useRef<HTMLDivElement>(null);
 
-    const getValue = () => {
+    const getValue = (): RangeSliderValue => {
         const state = getState();
+        if (!state) {
+            return 0;
+        }
+
         return (props.range)
             ? { start: state.start, end: state.end }
             : state.value;
@@ -61,13 +81,16 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         props.onScroll?.(getValue());
     };
 
-    const beforeChange = (value, changeType = 'value') => (
-        isFunction(props.onBeforeChange)
+    const beforeChange = (
+        value: RangeSliderValue,
+        changeType: RangeSliderBeforeChangeType = 'value',
+    ): RangeSliderValue => (
+        (typeof props.onBeforeChange === 'function')
             ? props.onBeforeChange(value, changeType)
             : value
     );
 
-    const changeRange = (range, scroll = false) => {
+    const changeRange = (range: RangeSliderRange, scroll = false) => {
         const { start, end } = range;
 
         setState((prev) => ({ ...prev, start, end }));
@@ -78,7 +101,7 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         notifyChanged();
     };
 
-    const onScroll = (pos) => {
+    const onScroll = (pos: number) => {
         if (!props.range) {
             return;
         }
@@ -92,7 +115,7 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         changeRange({ start, end }, true);
     };
 
-    const onStartPosChange = (pos) => {
+    const onStartPosChange = (pos: number) => {
         if (!props.range) {
             return;
         }
@@ -105,10 +128,10 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         };
 
         const range = beforeChange(newRange, 'start');
-        changeRange(range);
+        changeRange(range as RangeSliderRange);
     };
 
-    const onEndPosChange = (pos) => {
+    const onEndPosChange = (pos: number) => {
         if (!props.range) {
             return;
         }
@@ -121,10 +144,10 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         };
 
         const range = beforeChange(newRange, 'end');
-        changeRange(range);
+        changeRange(range as RangeSliderRange);
     };
 
-    const onPosChange = (pos, type) => {
+    const onPosChange = (pos: number, type: string | null = null) => {
         if (props.range) {
             if (type === 'endSlider') {
                 onEndPosChange(pos);
@@ -152,26 +175,32 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         props?.onChange?.(value);
     };
 
-    const onClick = (e) => {
+    const onClick = (e: React.MouseEvent) => {
         const availTargets = [
             sliderAreaRef.current,
             beforeAreaRef.current,
             afterAreaRef.current,
         ];
 
-        if (e.target && !availTargets.includes(e.target)) {
+        if (e.target && !availTargets.includes(e.target as HTMLDivElement)) {
             return;
         }
 
-        let pos = null;
+        let pos: number | null = null;
         const { axis } = props;
 
         const rect = sliderRef.current?.getBoundingClientRect();
         const offset = innerRef.current?.getBoundingClientRect();
         if (axis === 'x') {
-            pos = (e.clientX - offset.left) - (rect.width / 2);
+            const { clientX } = e.nativeEvent;
+            const left = offset?.left ?? 0;
+            const width = rect?.width ?? 0;
+            pos = (clientX - left) - (width / 2);
         } else if (axis === 'y') {
-            pos = (e.clientY - offset.top) - (rect.height / 2);
+            const { clientY } = e.nativeEvent;
+            const top = offset?.top ?? 0;
+            const height = rect?.height ?? 0;
+            pos = (clientY - top) - (height / 2);
         }
 
         if (pos !== null) {
@@ -207,15 +236,15 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         props?.onClick?.(e);
     };
 
-    const onFocus = (e) => {
+    const onFocus = (e: React.FocusEvent) => {
         props?.onFocus?.(e);
     };
 
-    const onBlur = (e) => {
+    const onBlur = (e: React.FocusEvent) => {
         props?.onBlur?.(e);
     };
 
-    const onKey = (e) => {
+    const onKey = (e: React.KeyboardEvent) => {
         const { axis } = props;
         const state = getState();
         const {
@@ -303,7 +332,7 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
     const slider = (
         <RangeSliderDragZone
             {...commonProps}
-            onPosChange={(pos) => onPosChange(pos, props.range && 'startSlider')}
+            onPosChange={(pos) => onPosChange(pos, (props.range) ? 'startSlider' : null)}
             ref={sliderRef}
         />
     );
@@ -335,28 +364,3 @@ export const RangeSliderContainer = forwardRef((props, ref) => {
         </RangeSliderDropTarget>
     );
 });
-
-RangeSliderContainer.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    tabIndex: PropTypes.number,
-    value: PropTypes.number,
-    start: PropTypes.number,
-    end: PropTypes.number,
-    axis: PropTypes.oneOf(['x', 'y']),
-    min: PropTypes.number,
-    max: PropTypes.number,
-    step: PropTypes.number,
-    disabled: PropTypes.bool,
-    range: PropTypes.bool,
-    beforeArea: PropTypes.bool,
-    afterArea: PropTypes.bool,
-    scrollOnClickOutsideRange: PropTypes.bool,
-    onClick: PropTypes.func,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onKey: PropTypes.func,
-    onBeforeChange: PropTypes.func,
-    onChange: PropTypes.func,
-    onScroll: PropTypes.func,
-};

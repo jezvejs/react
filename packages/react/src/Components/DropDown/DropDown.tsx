@@ -29,9 +29,10 @@ import { DropDownGroupItem } from './components/Menu/GroupItem/GroupItem.tsx';
 import { DropDownGroupHeader } from './components/Menu/GroupHeader/GroupHeader.tsx';
 import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListPlaceholder.tsx';
 
-import * as DropDownProps from './defaultProps.ts';
+import * as DropDownDefProps from './defaultProps.ts';
 import * as DropDownHelpers from './helpers.ts';
 import { reducer } from './reducer.ts';
+import { DropDownProps } from './types.ts';
 import './DropDown.scss';
 
 export {
@@ -57,14 +58,18 @@ export {
     DropDownListPlaceholder,
     // utils
     DropDownHelpers,
-    DropDownProps,
+    DropDownDefProps,
 };
+
+export * from './types.ts';
+
+type DropDownRef = HTMLDivElement | null;
 
 /**
  * DropDown component
  */
 // eslint-disable-next-line react/display-name
-export const DropDown = forwardRef((props, ref) => {
+export const DropDown = forwardRef<DropDownRef, DropDownProps>((props, ref) => {
     const reducers = useMemo(() => {
         const extraReducers = asArray(props.reducers);
         return (extraReducers.length > 0)
@@ -73,7 +78,7 @@ export const DropDown = forwardRef((props, ref) => {
     }, [props.reducers]);
 
     const initialState = (
-        DropDownHelpers.getInitialState(props, DropDownProps.defaultProps)
+        DropDownHelpers.getInitialState(props, DropDownDefProps.defaultProps)
     );
 
     return (
@@ -85,7 +90,3 @@ export const DropDown = forwardRef((props, ref) => {
         </StoreProvider>
     );
 });
-
-DropDown.propTypes = {
-    ...DropDownContainer.propTypes,
-};

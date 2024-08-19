@@ -1,5 +1,16 @@
 import { asArray, isFunction, isObject } from '@jezvejs/types';
 import { minmax } from '../../utils/common.ts';
+import {
+    BaseChartBaseItem,
+    BaseChartDataCategory,
+    BaseChartDataGroup,
+    BaseChartDataProp,
+    BaseChartDataSerie,
+    BaseChartDataSet,
+    BaseChartItemSearchResult,
+    BaseChartProps,
+    BaseChartState,
+} from './types.ts';
 
 const SVG_VALUE_PRECISION = 3;
 
@@ -21,11 +32,14 @@ export const findItem = (items, query) => {
 /**
  * Returns true if objects target to the same data items
  *
- * @param {object} a
- * @param {object} b
+ * @param {BaseChartBaseItem} a
+ * @param {BaseChartBaseItem} b
  * @returns {boolean}
  */
-export const isSameTarget = (a, b) => (
+export const isSameTarget = (
+    a: BaseChartBaseItem | null,
+    b: BaseChartBaseItem | null,
+): boolean => (
     (a === b) || (
         !!a
         && !!b
@@ -36,23 +50,54 @@ export const isSameTarget = (a, b) => (
 );
 
 /** Returns array of data sets */
-export const getDataSets = (state) => {
-    const { values } = state.data;
+export const getDataValues = (data: BaseChartDataProp): BaseChartDataSet[] => {
+    if (Array.isArray(data)) {
+        const dataSet: BaseChartDataSet = {
+            data,
+        };
+        return [dataSet];
+    }
+
+    const values = data?.values ?? [];
     if (values.length === 0) {
         return [];
     }
 
     const [firstItem] = values;
     if (!isObject(firstItem)) {
-        const data = values;
-        return [{ data }];
+        const dataSet: BaseChartDataSet = {
+            data: values as number[],
+        };
+        return [dataSet];
     }
 
-    return values;
+    return values as BaseChartDataSet[];
 };
 
+/** Returns array of series data */
+export const getDataSeries = (data: BaseChartDataProp): BaseChartDataSerie[] => {
+    if (Array.isArray(data) || data === null) {
+        return [];
+    }
+
+    return data.series ?? [];
+};
+
+/** Returns true if chart data is stacked */
+export const isStackedData = (data: BaseChartDataProp): boolean => (
+    !Array.isArray(data)
+    && data !== null
+    && ('stacked' in data)
+    && !!data.stacked
+);
+
+/** Returns array of data sets */
+export const getDataSets = (state: BaseChartState): BaseChartDataSet[] => (
+    getDataValues(state.data)
+);
+
 /** Returns longest data set */
-export const getLongestDataSet = (state) => {
+export const getLongestDataSet = (state: BaseChartState): number[] => {
     const resIndex = state.dataSets.reduce((res, item, index) => (
         (state.dataSets[res].data.length < item.data.length) ? index : res
     ), 0);
@@ -60,25 +105,30 @@ export const getLongestDataSet = (state) => {
     return state.dataSets[resIndex]?.data ?? [];
 };
 
+/** Returns true if current chart data is stacked */
+export const isStacked = (state: BaseChartState): boolean => (
+    isStackedData(state.data)
+);
+
 /** Returns array of groups for stacked chart data */
-export const getStackedGroups = (state) => {
-    if (!state.data.stacked) {
+export const getStackedGroups = (state: BaseChartState): BaseChartDataGroup[] => {
+    if (!isStacked(state)) {
         return [];
     }
 
-    return state.dataSets.reduce((res, item) => {
+    return state.dataSets.reduce((res: BaseChartDataGroup[], item: BaseChartDataSet) => {
         const group = item.group ?? null;
         return res.includes(group) ? res : [...res, group];
     }, []);
 };
 
 /** Returns categories for stacked chart data */
-export const getStackedCategories = (state) => {
-    if (!state.data.stacked) {
+export const getStackedCategories = (state: BaseChartState): BaseChartDataCategory[] => {
+    if (!isStacked(state)) {
         return [];
     }
 
-    return state.dataSets.reduce((res, item) => {
+    return state.dataSets.reduce((res: BaseChartDataCategory[], item: BaseChartDataSet) => {
         let category = item.category ?? null;
         if (res.includes(category)) {
             return res;
@@ -94,9 +144,9 @@ export const getStackedCategories = (state) => {
 };
 
 /** Returns index of first visible item for specified state */
-export const getFirstVisibleGroupIndex = (state) => {
+export const getFirstVisibleGroupIndex = (state: BaseChartState): number => {
     const groupWidth = state.getGroupOuterWidth(state);
-    const offs = state.visibilityOffset;
+    const offs = state.visibilityOffset ?? 0;
 
     const left = state.scrollLeft - offs;
     const firstItem = Math.floor(left / groupWidth);
@@ -104,10 +154,10 @@ export const getFirstVisibleGroupIndex = (state) => {
 };
 
 /** Returns count of visible items from specified index */
-export const getVisibleGroupsCount = (firstItemIndex, state) => {
+export const getVisibleGroupsCount = (firstItemIndex: number, state: BaseChartState): number => {
     const groupWidth = state.getGroupOuterWidth(state);
     const longestSet = getLongestDataSet(state);
-    const offs = state.visibilityOffset;
+    const offs = state.visibilityOffset ?? 0;
     const first = Math.max(0, firstItemIndex);
 
     const width = state.containerWidth + 2 * offs;
@@ -116,14 +166,17 @@ export const getVisibleGroupsCount = (firstItemIndex, state) => {
 };
 
 /** Returns group index for specified position on x-axis */
-export const getGroupIndexByX = (x, state) => {
+export const getGroupIndexByX = (x: number, state: BaseChartState): number => {
     const groupOuterWidth = state.getGroupOuterWidth(state);
     return Math.floor(x / groupOuterWidth);
 };
 
 /** Returns series value for specified items group */
-export const getSeriesByIndex = (index, state) => {
-    if (index === -1) {
+export const getSeriesByIndex = (
+    index: number,
+    state: BaseChartState,
+): BaseChartDataSerie | null => {
+    if (index === -1 || !('series' in state.data)) {
         return null;
     }
 
@@ -190,41 +243,57 @@ export const updateColumnWidth = (state) => {
 };
 
 /** Calculates new state for specified chart data */
-export const getDataState = (data, state) => {
-    const newState = {
+export const getDataState = (data: BaseChartDataProp, state: BaseChartState): BaseChartState => {
+    const newState: BaseChartState = {
         ...state,
         data: {
-            values: [],
-            series: [],
-            stacked: false,
-            ...data,
+            values: getDataValues(data),
+            series: getDataSeries(data),
+            stacked: isStackedData(data),
         },
         lastHLabelOffset: 0,
     };
+    const { values } = newState.data;
 
     newState.dataSets = state.getDataSets(newState);
     newState.groupsCount = state.getGroupsCount(newState);
     newState.columnsInGroup = state.getColumnsInGroupCount(newState);
-    newState.grid = state.calculateGrid(data.values, newState);
+    newState.grid = state.calculateGrid(values, newState);
 
     return newState;
 };
 
 /** Returns initial state object for specified props */
-export const getInitialState = (props, defaultProps) => {
-    const state = {
+export const getInitialState = (
+    props: Partial<BaseChartProps>,
+    defaultProps: BaseChartProps,
+): BaseChartState => {
+    const state: BaseChartState = {
         ...(defaultProps ?? {}),
         scrollLeft: 0,
         scrollerWidth: 0,
         containerWidth: 0,
         containerHeight: 0,
         chartWidth: 0,
+        chartHeight: 0,
         scrollWidth: 0,
         chartContentWidth: 0,
         lastHLabelOffset: 0,
+        scrollRequested: false,
         ...props,
-        data: { ...defaultProps.data },
+        data: {
+            values: [],
+            series: [],
+            stacked: false,
+        },
         dataSets: [],
+        dataSeries: {
+            firstGroupIndex: -1,
+            lastGroupIndex: -1,
+            visibleGroups: -1,
+            items: [],
+        },
+        grid: null,
         groupsCount: 0,
         columnsInGroup: 0,
         currentTarget: null,
@@ -237,6 +306,12 @@ export const getInitialState = (props, defaultProps) => {
         showPopup: false,
         popupTarget: null,
         pinnedTarget: null,
+        xAxisLabels: {
+            firstGroupIndex: -1,
+            lastGroupIndex: -1,
+            visibleGroups: null,
+            items: [],
+        },
         components: {
             ...defaultProps.components,
             ...(props?.components ?? {}),
@@ -244,29 +319,39 @@ export const getInitialState = (props, defaultProps) => {
     };
 
     const { height, marginTop } = state;
-    state.chartHeight = height - marginTop;
+    state.chartHeight = (height ?? 0) - (marginTop ?? 0);
 
-    return getDataState(props.data, state);
+    return getDataState(props.data ?? [], state);
 };
 
-export const isHorizontalScaleNeeded = (state, prevState = {}) => (
+export const isHorizontalScaleNeeded = (
+    state: BaseChartState,
+    prevState?: BaseChartState,
+): boolean => (
     state.columnWidth !== prevState?.columnWidth
     || state.groupsGap !== prevState?.groupsGap
     || state.fitToWidth !== prevState?.fitToWidth
     || state.alignColumns !== prevState?.alignColumns
 );
 
-export const isVerticalScaleNeeded = (state, prevState = {}) => (
-    state.autoScale
+export const isVerticalScaleNeeded = (
+    state: BaseChartState,
+    prevState?: BaseChartState,
+): boolean => (
+    !!state.autoScale
     && state.data === prevState?.data
     && state.grid !== prevState?.grid
 );
 
 /** Find item by event object */
-export const findItemByEvent = (e, state, elem) => {
+export const findItemByEvent = (
+    e: React.MouseEvent,
+    state: BaseChartState,
+    elem: Node,
+): BaseChartItemSearchResult => {
     if (
         !state?.contentOffset
-        || !elem?.contains(e?.target)
+        || !elem?.contains(e?.target as Node)
     ) {
         return { item: null, index: -1 };
     }

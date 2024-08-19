@@ -1,26 +1,76 @@
 import { removeEvents, setEvents } from '@jezvejs/dom';
 import { useEffect, useMemo } from 'react';
-import PropTypes from 'prop-types';
+
+import { Point } from '../../utils/types.ts';
 
 import { useSlidableDragZone } from './useSlidableDragZone.tsx';
 import { useSlidableDropTarget } from './useSlidableDropTarget.tsx';
 
-export function useSlidable(props) {
+export interface UseSlidableProps {
+    id: string;
+
+    vertical: boolean;
+    allowMouse: boolean;
+    allowTouch: boolean;
+    allowWheel: boolean;
+
+    isReady: boolean | (() => boolean);
+
+    updatePosition: (position: number) => void;
+
+    onDragCancel: () => void;
+
+    // onDragEnd: () => void;
+
+    onWheel: (e: WheelEvent) => void;
+
+    onSlideEnd?: (position: number, totalDistance: number, velocity: number) => void,
+}
+
+export interface SlidableState {
+    id: string;
+
+    vertical: boolean;
+    allowMouse: boolean;
+    allowTouch: boolean;
+    allowWheel: boolean;
+
+    moved: boolean;
+
+    startPoint?: Point;
+
+    lastTime: number;
+    position: number;
+    origPosition: number;
+
+    distance: number;
+    totalDistance: number;
+
+    velocity: number;
+
+    shiftX: number;
+    shiftY: number;
+}
+
+export function useSlidable(props: UseSlidableProps) {
     const {
+        id,
         vertical,
         allowMouse,
         allowTouch,
         allowWheel,
         isReady = true,
         updatePosition,
-        onDragEnd = null,
-        onDragCancel = null,
+        onWheel,
+        onSlideEnd,
+        onDragCancel,
     } = props;
 
     const {
         dragZoneRef,
         avatarRef,
     } = useSlidableDragZone({
+        id,
         vertical,
         allowMouse,
         allowTouch,
@@ -32,15 +82,18 @@ export function useSlidable(props) {
     const {
         dropTargetRef,
     } = useSlidableDropTarget({
-        onDragEnd,
+        id,
+        onWheel,
+        onSlideEnd,
     });
 
     // Mouse wheel handler
     const wheelHandler = useMemo(() => ({
         wheel: {
-            listener: (e) => {
+            listener: (e: WheelEvent) => {
                 const elem = dragZoneRef?.current;
-                if (!elem?.contains(e.target)) {
+                const target = e.target as HTMLElement;
+                if (!elem?.contains(target)) {
                     return;
                 }
 
@@ -55,7 +108,7 @@ export function useSlidable(props) {
             },
             options: { passive: false, capture: true },
         },
-    }));
+    }), []);
 
     const setWheelHandler = () => {
         setEvents(document.documentElement, wheelHandler);
@@ -81,19 +134,3 @@ export function useSlidable(props) {
         dropTargetRef,
     };
 }
-
-useSlidable.propTypes = {
-    id: PropTypes.string,
-    isReady: PropTypes.oneOfType([
-        PropTypes.bool,
-        PropTypes.func,
-    ]),
-    updatePosition: PropTypes.func,
-    onDragCancel: PropTypes.func,
-    onDragEnd: PropTypes.func,
-    onWheel: PropTypes.func,
-    vertical: PropTypes.bool,
-    allowMouse: PropTypes.bool,
-    allowTouch: PropTypes.bool,
-    allowWheel: PropTypes.bool,
-};

@@ -1,7 +1,13 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 
-import { componentPropType, getSelectedItems } from '../../../helpers.ts';
+import { useStore } from '../../../../../utils/Store/StoreProvider.tsx';
+
+import { getSelectedItems } from '../../../helpers.ts';
+import {
+    DropDownMenuHeaderComponent,
+    DropDownMenuHeaderProps,
+    DropDownState,
+} from '../../../types.ts';
 
 import './MenuHeader.scss';
 
@@ -11,7 +17,6 @@ const defaultProps = {
     inputPlaceholder: null,
     useSingleSelectionAsPlaceholder: true,
     multiple: false,
-    onInput: null,
     components: {
         Input: null,
     },
@@ -20,7 +25,7 @@ const defaultProps = {
 /**
  * Custom Menu header with Input component
  */
-export const DropDownMenuHeader = (p) => {
+export const DropDownMenuHeader: DropDownMenuHeaderComponent = (p: DropDownMenuHeaderProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -35,17 +40,25 @@ export const DropDownMenuHeader = (p) => {
         disabled,
         multiple,
     } = props;
-    const { Input } = props.components;
+    const { Input } = props.components ?? {};
 
-    let placeholder = props.inputPlaceholder;
-    const [item] = getSelectedItems(props);
+    const store = useStore()!;
+    if (!Input) {
+        return null;
+    }
+
+    const { getState } = store;
+
+    const inputPlaceholder = props.inputPlaceholder ?? '';
+    let placeholder = inputPlaceholder;
+    const [item] = getSelectedItems(getState() as DropDownState);
     const str = item?.title ?? '';
     if (!multiple) {
         const usePlaceholder = (
             !props.useSingleSelectionAsPlaceholder
-            && placeholder?.length > 0
+            && ((placeholder?.length ?? 0) > 0)
         );
-        placeholder = (usePlaceholder) ? props.inputPlaceholder : str;
+        placeholder = (usePlaceholder) ? inputPlaceholder : str;
     }
 
     const inputProps = {
@@ -59,18 +72,4 @@ export const DropDownMenuHeader = (p) => {
     return (
         <Input {...inputProps} ref={props.inputRef} />
     );
-};
-
-DropDownMenuHeader.propTypes = {
-    inputRef: PropTypes.object,
-    inputString: PropTypes.string,
-    inputPlaceholder: PropTypes.string,
-    useSingleSelectionAsPlaceholder: PropTypes.bool,
-    disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
-    onInput: PropTypes.func,
-    className: PropTypes.string,
-    components: PropTypes.shape({
-        Input: componentPropType,
-    }),
 };

@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { circularArc, hexColor, svgValue } from '../../helpers.ts';
+import { PieChartSectorProps } from '../../types.ts';
 
-export const PieChartSector = (props) => {
+export const PieChartSector = (props: PieChartSectorProps) => {
     const {
         x,
         y,
@@ -14,29 +14,26 @@ export const PieChartSector = (props) => {
         offset = 0,
         category,
         color = null,
-        onItemClick = null,
-        onItemOver = null,
-        onItemOut = null,
     } = props;
 
-    const cx = parseFloat(x);
-    const cy = parseFloat(y);
+    const cx = x;
+    const cy = y;
     if (Number.isNaN(cx) || Number.isNaN(cy)) {
         throw new Error(`Invalid coordinates: (${x}; ${y})`);
     }
 
-    const radius = parseFloat(r);
+    const radius = r;
     if (Number.isNaN(radius) || radius === 0.0) {
         throw new Error(`Invalid radius: ${r}`);
     }
 
-    const innerRadius = parseFloat(ir);
+    const innerRadius = ir;
     if (Number.isNaN(innerRadius) || innerRadius < 0 || innerRadius > radius) {
         throw new Error(`Invalid inner radius: ${ir}`);
     }
 
     const getFullSectorPath = () => {
-        const offs = parseFloat(offset);
+        const offs = offset;
         if (Number.isNaN(offs)) {
             throw new Error(`Invalid offset: ${offset}`);
         }
@@ -93,16 +90,22 @@ export const PieChartSector = (props) => {
         return `${outer} ${inner} l${slx} ${sly}z`;
     };
 
-    const pathProps = {
+    const onClick = (event: React.MouseEvent) => props.onItemClick?.({ event });
+
+    const onMouseOver = (event: React.MouseEvent) => props.onItemOver?.({ event });
+
+    const onMouseOut = (event: React.MouseEvent) => props.onItemOut?.({ event });
+
+    const pathProps: React.SVGAttributes<SVGPathElement> = {
         className: classNames(
             'pie__sector',
             `pie__sector-${category}`,
             props.className,
         ),
         d: getSectorPath(),
-        onClick: onItemClick,
-        onMouseOver: onItemOver,
-        onMouseOut: onItemOut,
+        onClick,
+        onMouseOver,
+        onMouseOut,
     };
 
     if (color) {
@@ -112,21 +115,4 @@ export const PieChartSector = (props) => {
     return (
         <path {...pathProps} />
     );
-};
-
-PieChartSector.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    category: PropTypes.string,
-    color: PropTypes.number,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    r: PropTypes.number,
-    ir: PropTypes.number,
-    start: PropTypes.number,
-    arc: PropTypes.number,
-    offset: PropTypes.number,
-    onItemClick: PropTypes.func,
-    onItemOver: PropTypes.func,
-    onItemOut: PropTypes.func,
 };

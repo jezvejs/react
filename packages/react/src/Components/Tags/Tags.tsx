@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import { ComponentType } from 'react';
 import classNames from 'classnames';
 
-import { Tag } from '../Tag/Tag.tsx';
+import { Tag, TagProps } from '../Tag/Tag.tsx';
 
 import { removeItemsById } from './helpers.ts';
 import './Tags.scss';
@@ -10,20 +10,43 @@ export const TagsHelpers = {
     removeItemsById,
 };
 
+export type ClickEventType = React.TouchEvent<Element> | React.MouseEvent<Element, MouseEvent>;
+
+export interface TagsProps<T extends TagProps = TagProps> {
+    className?: string;
+
+    itemSelector?: string | null;
+    sortModeClass?: string;
+    buttonClass?: string;
+
+    activeItemId?: string | null;
+    closeable?: boolean;
+    disabled?: boolean;
+    listMode?: string;
+
+    items: T[];
+    ItemComponent: ComponentType<T>;
+
+    onItemClick?: (itemId: string, e: ClickEventType) => void;
+
+    onCloseItem?: (itemId: string, e: ClickEventType) => void;
+}
+
 const defaultProps = {
     ItemComponent: Tag,
     activeItemId: null,
     closeable: false,
     disabled: false,
+    listMode: 'list',
+    itemSelector: Tag.selector,
     sortModeClass: 'tags_sort',
-    onItemClick: null,
-    onCloseItem: null,
+    buttonClass: Tag.buttonClass,
 };
 
 /**
  * Tags list components
  */
-export const Tags = (p) => {
+export function Tags<T extends TagProps = TagProps>(p: TagsProps<T>) {
     const props = {
         ...defaultProps,
         ...p,
@@ -34,11 +57,13 @@ export const Tags = (p) => {
         ItemComponent,
     } = props;
 
-    const getClosestItemElement = (elem) => (
-        elem?.closest?.(props?.itemSelector ?? ItemComponent?.selector) ?? null
+    const selector = props?.itemSelector; // ?? ItemComponent?.selector
+
+    const getClosestItemElement = (elem: HTMLElement): HTMLElement | null => (
+        ((selector) ? (elem?.closest?.(selector) as HTMLElement) : null) ?? null
     );
 
-    const getItemProps = (item, state) => ({
+    const getItemProps = (item: T, state: TagsProps<T>) => ({
         ...item,
         disabled: item.disabled || state.disabled,
         listMode: state.listMode,
@@ -53,18 +78,19 @@ export const Tags = (p) => {
      * Item click event handler
      * @param {Event} e - click event object
      */
-    const onItemClick = (e) => {
+    const onItemClick = (e: React.TouchEvent | React.MouseEvent) => {
         e?.stopPropagation();
 
-        const elem = e?.target;
-        const closestElem = getClosestItemElement(elem);
+        const target = e?.target as HTMLElement;
+        const closestElem = getClosestItemElement(target) as HTMLElement;
         const itemId = closestElem?.dataset?.id ?? null;
         if (itemId === null) {
             return;
         }
 
-        if (props.closeable && ItemComponent.buttonClass) {
-            if (e.target.closest(`.${ItemComponent.buttonClass}`)) {
+        const { buttonClass } = props; // ItemComponent.buttonClass
+        if (props.closeable && buttonClass) {
+            if (target?.closest?.(`.${buttonClass}`)) {
                 e.stopPropagation();
 
                 props.onCloseItem?.(itemId, e);
@@ -76,15 +102,17 @@ export const Tags = (p) => {
         props.onItemClick?.(itemId, e);
     };
 
+    const containerProps = {
+        className: classNames(
+            'tags',
+            { tags_disabled: !!disabled },
+            props.className,
+        ),
+        onClick: onItemClick,
+    };
+
     return (
-        <div
-            className={classNames(
-                'tags',
-                props.className,
-            )}
-            onClick={onItemClick}
-            disabled={disabled}
-        >
+        <div {...containerProps}>
             {props.items.map((item) => (
                 <ItemComponent
                     {...getItemProps(item, props)}
@@ -93,17 +121,4 @@ export const Tags = (p) => {
             ))}
         </div>
     );
-};
-
-Tags.propTypes = {
-    ItemComponent: PropTypes.func,
-    activeItemId: PropTypes.string,
-    closeable: PropTypes.bool,
-    disabled: PropTypes.bool,
-    itemSelector: PropTypes.string,
-    sortModeClass: PropTypes.string,
-    onItemClick: PropTypes.func,
-    onCloseItem: PropTypes.func,
-    items: PropTypes.array,
-    className: PropTypes.string,
-};
+}

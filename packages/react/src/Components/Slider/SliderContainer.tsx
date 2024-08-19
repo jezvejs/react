@@ -1,10 +1,10 @@
 import { afterTransition } from '@jezvejs/dom';
 import {
+    HTMLAttributes,
     useEffect,
     useImperativeHandle,
     useRef,
 } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { minmax, px } from '../../utils/common.ts';
@@ -12,26 +12,36 @@ import { useSlidable } from '../../hooks/useSlidable/useSlidable.tsx';
 
 import { Slide } from './components/Slide/Slide.tsx';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
+import { StoreUpdater } from '../../utils/Store/Store.ts';
+import { SliderContainerProps, SliderState } from './types.ts';
 
 const TRANSITION_END_TIMEOUT = 500;
 const SWIPE_THRESHOLD = 0.1;
 
-export const SliderContainer = (props) => {
+interface Callable {
+    (): void,
+}
+
+export const SliderContainer = (props: SliderContainerProps) => {
     const {
+        id,
         vertical = false,
         allowMouse = false,
         allowTouch = true,
         allowWheel = true,
+        updatePosition,
         onChanged = null,
     } = props;
 
-    const { getState, setState } = useDragnDrop();
+    const dragDrop = useDragnDrop();
+    const getState = () => dragDrop?.getState() as SliderState ?? null;
+    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
 
     const elemRef = useRef(null);
     const contentRef = useRef(null);
 
-    const animationFrameRef = useRef(null);
-    const removeTransitionHandlerRef = useRef(null);
+    const animationFrameRef = useRef(0);
+    const clearTransitionRef = useRef<Callable | null>(null);
 
     const clientSize = () => {
         const state = getState();
@@ -42,7 +52,7 @@ export const SliderContainer = (props) => {
         onChanged?.(getState().slideIndex);
     };
 
-    const calculatePosition = (num) => {
+    const calculatePosition = (num: number): number | false => {
         const state = getState();
 
         if (num < 0 || num > state.items.length - 1) {
@@ -52,12 +62,12 @@ export const SliderContainer = (props) => {
         return clientSize() * num * -1;
     };
 
-    const slideIndexFromPosition = (position) => (
+    const slideIndexFromPosition = (position: number): number => (
         Math.round(-position / clientSize())
     );
 
     const onAnimationDone = () => {
-        removeTransitionHandlerRef.current = null;
+        clearTransitionRef.current = null;
 
         setState((prev) => ({
             ...prev,
@@ -74,13 +84,13 @@ export const SliderContainer = (props) => {
             animationFrameRef.current = 0;
         }
 
-        if (removeTransitionHandlerRef.current) {
-            removeTransitionHandlerRef.current();
-            removeTransitionHandlerRef.current = null;
+        if (clearTransitionRef.current) {
+            clearTransitionRef.current?.();
+            clearTransitionRef.current = null;
         }
     };
 
-    const slideTo = (num) => {
+    const slideTo = (num: number) => {
         const position = calculatePosition(num);
         if (position === false) {
             return;
@@ -101,7 +111,7 @@ export const SliderContainer = (props) => {
                 slideIndex,
             }));
 
-            removeTransitionHandlerRef.current = afterTransition(
+            clearTransitionRef.current = afterTransition(
                 contentRef.current,
                 {
                     duration: TRANSITION_END_TIMEOUT,
@@ -130,7 +140,7 @@ export const SliderContainer = (props) => {
             slideIndex,
         }));
 
-        notifyChanged(slideIndex);
+        notifyChanged();
     };
 
     const slideToPrev = () => {
@@ -142,26 +152,30 @@ export const SliderContainer = (props) => {
     };
 
     const { dragZoneRef, dropTargetRef } = useSlidable({
+        id,
         vertical,
         allowMouse,
         allowTouch,
         allowWheel,
 
+        updatePosition,
+
         isReady: () => !getState().waitingForAnimation,
 
-        onWheel(e) {
+        onWheel(e: WheelEvent) {
             if (!allowWheel || getState().waitingForAnimation) {
                 return;
             }
 
-            if (e.wheelDelta > 0) {
+            const delta = (e.deltaY === 0) ? e.deltaX : e.deltaY;
+            if (delta > 0) {
                 slideToPrev();
             } else {
                 slideToNext();
             }
         },
 
-        onDragEnd(position, distance, velocity) {
+        onSlideEnd(position, distance, velocity) {
             const passThreshold = Math.abs(velocity) > SWIPE_THRESHOLD;
             let slideNum = -position / clientSize();
             if (passThreshold) {
@@ -180,8 +194,11 @@ export const SliderContainer = (props) => {
         },
     });
 
-    useImperativeHandle(dragZoneRef, () => contentRef.current);
-    useImperativeHandle(dropTargetRef, () => elemRef.current);
+    type DragZoneRef = Element | null;
+    useImperativeHandle<DragZoneRef, DragZoneRef>(dragZoneRef, () => contentRef.current);
+
+    type DropTargetRef = Element | null;
+    useImperativeHandle<DropTargetRef, DropTargetRef>(dropTargetRef, () => elemRef.current);
 
     useEffect(() => {
         const state = getState();
@@ -218,7 +235,7 @@ export const SliderContainer = (props) => {
     };
 
     // Sliding content props
-    const contentProps = {
+    const contentProps: HTMLAttributes<HTMLDivElement> = {
         className: classNames(
             'slider__content',
             {
@@ -229,9 +246,9 @@ export const SliderContainer = (props) => {
     };
 
     if (state.vertical) {
-        contentProps.style.top = px(state.position);
+        contentProps.style!.top = px(state.position);
     } else {
-        contentProps.style.left = px(state.position);
+        contentProps.style!.left = px(state.position);
     }
 
     // Slide props
@@ -253,18 +270,4 @@ export const SliderContainer = (props) => {
             </div>
         </div>
     );
-};
-
-SliderContainer.propTypes = {
-    id: PropTypes.string,
-    slideIndex: PropTypes.number,
-    onChanged: PropTypes.func,
-    animate: PropTypes.bool,
-    vertical: PropTypes.bool,
-    allowMouse: PropTypes.bool,
-    allowTouch: PropTypes.bool,
-    allowWheel: PropTypes.bool,
-    width: PropTypes.number,
-    height: PropTypes.number,
-    items: PropTypes.array,
 };

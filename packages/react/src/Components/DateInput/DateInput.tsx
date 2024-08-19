@@ -1,9 +1,8 @@
 import { getCursorPos } from '@jezvejs/dom';
 import { useState } from 'react';
 import { flushSync } from 'react-dom';
-import PropTypes from 'prop-types';
 
-import { ControlledInput, ControlledInputHelpers } from '../ControlledInput/ControlledInput.tsx';
+import { ControlledInput, ControlledInputHelpers, ControlledInputProps } from '../ControlledInput/ControlledInput.tsx';
 
 import {
     dispatchInputEvent,
@@ -20,10 +19,24 @@ import {
 
 const { getInputContent } = ControlledInputHelpers;
 
-export const DateInput = (p) => {
+interface DateInputReplaceSelectionOptions {
+    e?: UIEvent | null;
+    replaceAll?: boolean;
+}
+
+interface DateInputProps extends ControlledInputProps {
+    guideChar?: string,
+    locales?: string | string[],
+}
+
+const defaultProps: DateInputProps = {
+    guideChar: '_',
+    locales: [],
+};
+
+export const DateInput = (p: DateInputProps) => {
     const props = {
-        guideChar: '_',
-        locales: [],
+        ...defaultProps,
         ...p,
     };
     const [state, setState] = useState(getInitialState(props));
@@ -143,7 +156,7 @@ export const DateInput = (p) => {
      * Replace current selection by specified string or insert it to cursor position
      * @param {string} text - string to insert
      */
-    const replaceSelection = (text, options = {}) => {
+    const replaceSelection = (text: string, options: DateInputReplaceSelectionOptions) => {
         const {
             e = null,
             replaceAll = false,
@@ -160,7 +173,7 @@ export const DateInput = (p) => {
 
         const range = (replaceAll)
             ? { start: 0, end: origValue.length }
-            : getCursorPos(e.target);
+            : getCursorPos(e?.target);
 
         range.start = fixCursorPos(range.start, state);
         range.end = fixCursorPos(range.end, state);
@@ -358,13 +371,4 @@ export const DateInput = (p) => {
             {...inputProps}
         />
     );
-};
-
-DateInput.propTypes = {
-    ...ControlledInput.propTypes,
-    guideChar: PropTypes.string,
-    locales: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
 };

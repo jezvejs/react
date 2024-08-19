@@ -6,12 +6,11 @@ import {
     useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { usePopupPosition } from '../../../../hooks/usePopupPosition/usePopupPosition.ts';
-import { PopupPosition } from '../../../../hooks/usePopupPosition/PopupPosition.ts';
 
+import { StoreAction, StoreActionObject } from '../../../../utils/Store/Store.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
 // Local components
@@ -32,36 +31,54 @@ import {
     getScreenWidth,
 } from '../../helpers.ts';
 import { actions } from '../../reducer.ts';
+import {
+    DatePickerHeaderProps,
+    DatePickerProps,
+    DatePickerState,
+    DatePickerViewState,
+} from '../../types.ts';
 import './DatePickerContainer.scss';
 
+type DatePickerContainerProps = DatePickerProps;
+type DatePickerContainerRef = HTMLDivElement | null;
+
 // eslint-disable-next-line react/display-name
-export const DatePickerContainer = forwardRef((props, ref) => {
-    const { getState, dispatch } = useStore();
-    const state = getState();
+export const DatePickerContainer = forwardRef<
+    DatePickerContainerRef,
+    DatePickerContainerProps
+>((props, ref) => {
+    const store = useStore();
+
+    const getState = () => store?.getState() as DatePickerState ?? null;
+    const dispatch = (action: StoreAction) => store?.dispatch(action);
+
+    const state = getState() ?? (props as DatePickerState);
 
     const {
-        keyboardNavigation,
-        vertical,
+        keyboardNavigation = true,
+        vertical = false,
     } = props;
 
     const doubleView = useMemo(() => (
-        props.doubleView
+        !!props.doubleView
         && (
-            props.vertical
-            || getScreenWidth() >= MIN_DOUBLE_VIEW_SCREEN_WIDTH
+            !!props.vertical
+            || (getScreenWidth() >= MIN_DOUBLE_VIEW_SCREEN_WIDTH)
         )
     ), [props.doubleView, props.vertical]);
 
-    const currViewRef = useRef(null);
-    const secondViewRef = useRef(null);
+    const currViewRef = useRef<HTMLDivElement | null>(null);
+    const secondViewRef = useRef<HTMLDivElement | null>(null);
 
     const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+    useImperativeHandle<DatePickerContainerRef, DatePickerContainerRef>(ref, () => (
+        innerRef?.current
+    ));
 
     // Popup position
     const { referenceRef, elementRef } = usePopupPosition({
-        ...state.position,
-        open: state.visible,
+        ...(state?.position ?? {}),
+        open: (state?.visible ?? false),
     });
 
     const onStateReady = () => {
@@ -93,7 +110,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
      * Show/hide date picker
      * @param {boolean} visible - if true then show view, hide otherwise
      */
-    const show = (visible = true) => {
+    const show = (visible: boolean = true) => {
         const changed = state.visible !== visible;
 
         dispatch(actions.show(visible));
@@ -105,7 +122,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
 
     const hide = () => show(false);
 
-    const navigateTo = (action) => {
+    const navigateTo = (action: StoreActionObject) => {
         if (state.waitingForAnimation) {
             return;
         }
@@ -193,7 +210,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     };
 
     /** Range select inner callback */
-    const onRangeSelect = (date) => {
+    const onRangeSelect = (date: Date) => {
         if (state.waitingForAnimation) {
             return;
         }
@@ -204,21 +221,21 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         } else {
             setSelection(start, date, false);
 
-            const newState = getState();
+            const newState = getState() as DatePickerState;
             const { curRange } = newState;
             props.onRangeSelect?.(curRange, newState);
         }
     };
 
     /** Day cell click inner callback */
-    const onDayClick = (date) => {
+    const onDayClick = (date: Date) => {
         if (state.waitingForAnimation) {
             return;
         }
 
         dispatch(actions.selectDay(date));
 
-        const newState = getState();
+        const newState = getState() as DatePickerState;
         const { actDate } = newState;
         props.onDateSelect?.(actDate, newState);
 
@@ -301,7 +318,11 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         onClickNext: () => navigateToNext(),
     };
 
-    const renderDateView = (date, viewState, dateViewRef) => {
+    const renderDateView = (
+        date: Date,
+        viewState: DatePickerViewState,
+        dateViewRef: React.MutableRefObject<HTMLDivElement | null>,
+    ) => {
         const {
             viewType,
             locales,
@@ -400,7 +421,7 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         locales: state.locales,
     });
 
-    const headerProps = {
+    const headerProps: DatePickerHeaderProps = {
         ...headerEvents,
         doubleView: doubleView && !vertical,
         focusable: keyboardNavigation,
@@ -415,13 +436,13 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         });
     }
 
-    const header = (
+    const header = Header && (
         <Header {...headerProps} />
     );
 
     // Weekdays header
     const { WeekDaysHeader } = state.components;
-    let weekdays = null;
+    let weekdays: JSX.Element | null = null;
     if (props.vertical && WeekDaysHeader && state.viewType === MONTH_VIEW) {
         weekdays = (
             <WeekDaysHeader
@@ -432,10 +453,14 @@ export const DatePickerContainer = forwardRef((props, ref) => {
     }
 
     // Content
-    const currentView = renderDateView(currentDate, state, currViewRef);
+    const viewState: DatePickerViewState = {
+        ...state,
+        focusable: keyboardNavigation,
+    };
+    const currentView = renderDateView(currentDate, viewState, currViewRef);
 
     const secondView = state.doubleView && (
-        renderDateView(nextDate, state, secondViewRef)
+        renderDateView(nextDate, viewState, secondViewRef)
     );
 
     const cellsContainer = (
@@ -505,93 +530,3 @@ export const DatePickerContainer = forwardRef((props, ref) => {
         </>
     );
 });
-
-DatePickerContainer.propTypes = {
-    /* Additional reducers */
-    reducers: PropTypes.oneOfType([
-        PropTypes.func,
-        PropTypes.arrayOf(PropTypes.func),
-    ]),
-    /** Additional CSS classes */
-    className: PropTypes.string,
-    /** Date select mode. Possible values: 'date', 'month', 'year' */
-    mode: PropTypes.oneOf(['date', 'month', 'year']),
-    /** Initial date to render */
-    date: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    /** Show datepicker popup */
-    visible: PropTypes.bool,
-    /** If enabled component will be rendered on place instead of wrapping it with popup */
-    inline: PropTypes.bool,
-    /** If enabled popup will be hidden after select date */
-    hideOnSelect: PropTypes.bool,
-    /** Enables multiple items select mode */
-    multiple: PropTypes.bool,
-    /** Enables range select mode */
-    range: PropTypes.bool,
-    /** Range selection start date */
-    startDate: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    /** Range selection end date */
-    endDate: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    /** Columns gap in pixels */
-    columnGap: PropTypes.number,
-    /** Rows gap in pixels */
-    rowGap: PropTypes.number,
-    /** If enabled two views of the same type will be rendered */
-    doubleView: PropTypes.bool,
-    /** If enabled slide axis is changed from horizontal to vertical */
-    vertical: PropTypes.bool,
-    /** Set current target for range select mode. Possible values: 'start', 'end', null */
-    rangePart: PropTypes.oneOf(['start', 'end', null]),
-    /** List of locales */
-    locales: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
-    /** First day of week */
-    firstDay: PropTypes.number,
-    /** Enables keyboard navigation by child components */
-    keyboardNavigation: PropTypes.bool,
-    /** If enabled child components will render days from other month */
-    showOtherMonthDays: PropTypes.bool,
-    /** If enabled month view will always render 6 weeks */
-    fixedHeight: PropTypes.bool,
-    /** Enables animation */
-    animated: PropTypes.bool,
-    /** Callback to set disabled state of items */
-    disabledDateFilter: PropTypes.func,
-    /** Range selected event handler */
-    onRangeSelect: PropTypes.func,
-    /** Date selected event handler */
-    onDateSelect: PropTypes.func,
-    /** Component shown event handler */
-    onShow: PropTypes.func,
-    /** Component hidden event handler */
-    onHide: PropTypes.func,
-    /** Props for footer component */
-    footer: PropTypes.object,
-    /** If enabled popup will use fixed position */
-    fixed: PropTypes.bool,
-    /** Popup position props */
-    position: PropTypes.shape({
-        ...PopupPosition.propTypes,
-    }),
-    container: PropTypes.object,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    components: PropTypes.shape({
-        Footer: PropTypes.func,
-        Header: PropTypes.func,
-        WeekDaysHeader: PropTypes.func,
-    }),
-};

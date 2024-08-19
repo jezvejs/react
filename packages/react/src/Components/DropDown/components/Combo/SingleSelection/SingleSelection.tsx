@@ -1,8 +1,10 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
+import { DropDownSingleSelectionComponent, DropDownSingleSelectionProps } from '../../../types.ts';
 import './SingleSelection.scss';
 
-export const DropDownSingleSelection = (props) => {
+export const DropDownSingleSelection: DropDownSingleSelectionComponent = (
+    props: DropDownSingleSelectionProps,
+) => {
     const itemTitle = props.item?.title ?? '';
 
     return (
@@ -13,11 +15,4 @@ export const DropDownSingleSelection = (props) => {
             {itemTitle}
         </span>
     );
-};
-
-DropDownSingleSelection.propTypes = {
-    className: PropTypes.string,
-    item: PropTypes.shape({
-        title: PropTypes.string,
-    }),
 };

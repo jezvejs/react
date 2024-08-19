@@ -1,14 +1,12 @@
 import { ge, removeEvents, setEvents } from '@jezvejs/dom';
-import { asArray, isFunction, isObject } from '@jezvejs/types';
-
-interface DragZone {
-};
-
-interface DropTarget {
-};
-
-interface DragAvatar {
-};
+import { asArray } from '@jezvejs/types';
+import { ListenerFunctionsGroup, ListenersGroup, Point } from '../types.ts';
+import {
+    DragAvatar,
+    DragHandle,
+    DragZone,
+    DropTarget,
+} from './types.ts';
 
 /** Main drag and drop class */
 export class DragMaster {
@@ -22,7 +20,11 @@ export class DragMaster {
         return this.instance;
     }
 
-    static getElementUnderClientXY(elem: HTMLElement | null, clientX: number, clientY: number): Element | null {
+    static getElementUnderClientXY(
+        elem: HTMLElement | null,
+        clientX: number,
+        clientY: number,
+    ): Element | null {
         if (!elem) {
             return null;
         }
@@ -42,8 +44,8 @@ export class DragMaster {
         return target;
     }
 
-    static getEventCoordinatesObject(e: TouchEvent | MouseEvent | Event) {
-        if (e.touches) {
+    static getEventCoordinatesObject(e: TouchEvent | MouseEvent) {
+        if ('touches' in e) {
             if (e.type === 'touchend' || e.type === 'touchcancel') {
                 return e.changedTouches[0];
             }
@@ -54,7 +56,7 @@ export class DragMaster {
         return e;
     }
 
-    static getEventPageCoordinates(e) {
+    static getEventPageCoordinates(e: TouchEvent | MouseEvent): Point {
         const coords = this.getEventCoordinatesObject(e);
 
         return {
@@ -63,7 +65,7 @@ export class DragMaster {
         };
     }
 
-    static getEventClientCoordinates(e) {
+    static getEventClientCoordinates(e: TouchEvent | MouseEvent): Point {
         const coords = this.getEventCoordinatesObject(e);
 
         return {
@@ -72,7 +74,7 @@ export class DragMaster {
         };
     }
 
-    static makeDraggable(dragZone) {
+    static makeDraggable(dragZone: DragZone) {
         const inst = this.getInstance();
         inst.makeDraggable(dragZone);
     }
@@ -82,15 +84,58 @@ export class DragMaster {
         inst.destroyDraggable();
     }
 
-    static registerDropTarget(dropTarget) {
+    static registerDropTarget(dropTarget: DropTarget) {
         const inst = this.getInstance();
         inst.registerDropTarget(dropTarget);
     }
 
-    static unregisterDropTarget(dropTarget) {
+    static unregisterDropTarget(dropTarget: DropTarget) {
         const inst = this.getInstance();
         inst.unregisterDropTarget(dropTarget);
     }
+
+    dragZoneRegistry: DragZone[] = [];
+
+    dropTargetRegistry: DropTarget[] = [];
+
+    dragZone: DragZone | null = null;
+
+    avatar: DragAvatar | null = null;
+
+    dropTarget: DropTarget | null = null;
+
+    isTouch: boolean = false;
+
+    touchTimeout: number = 0;
+
+    touchMoveReady: boolean = false;
+
+    touchHandlerSet: boolean = false;
+
+    listenScroll: boolean = false;
+
+    handlers: ListenerFunctionsGroup;
+
+    startHandlers: ListenerFunctionsGroup;
+
+    touchMoveHandler: ListenerFunctionsGroup;
+
+    touchScrollHandler: ListenerFunctionsGroup;
+
+    downX: number = 0;
+
+    downY: number = 0;
+
+    touchEvents = {
+        move: 'touchmove',
+        end: 'touchend',
+        cancel: 'touchcancel',
+    };
+
+    mouseEvents = {
+        move: 'mousemove',
+        end: 'mouseup',
+    };
 
     constructor() {
         this.dragZoneRegistry = [];
@@ -105,12 +150,12 @@ export class DragMaster {
         this.touchHandlerSet = false;
 
         this.handlers = {
-            keydown: (e) => this.onKey(e),
-            start: (e) => this.mouseDown(e),
-            move: (e) => this.mouseMove(e),
-            end: (e) => this.mouseUp(e),
-            cancel: (e) => this.mouseUp(e),
-            preventDefault: (e) => e.preventDefault(),
+            keydown: (e: Event) => this.onKey(e as KeyboardEvent),
+            start: (e: Event) => this.mouseDown(e as MouseEvent),
+            move: (e: Event) => this.mouseMove(e as MouseEvent),
+            end: (e: Event) => this.mouseUp(e as MouseEvent),
+            cancel: (e: Event) => this.mouseUp(e as MouseEvent),
+            preventDefault: (e: Event) => e.preventDefault(),
         };
 
         this.startHandlers = {
@@ -119,26 +164,15 @@ export class DragMaster {
         };
 
         this.touchMoveHandler = {
-            touchmove: (e: TouchEvent) => this.mouseMove(e),
+            touchmove: (e: Event) => this.mouseMove(e as TouchEvent),
         };
 
         this.touchScrollHandler = {
             scroll: (e: Event) => this.onScroll(e),
         };
-
-        this.touchEvents = {
-            move: 'touchmove',
-            end: 'touchend',
-            cancel: 'touchcancel',
-        };
-
-        this.mouseEvents = {
-            move: 'mousemove',
-            end: 'mouseup',
-        };
     }
 
-    makeDraggable(dragZone) {
+    makeDraggable(dragZone: DragZone) {
         this.registerDragZone(dragZone);
 
         const { elem } = dragZone;
@@ -163,9 +197,9 @@ export class DragMaster {
     }
 
     /** Returns true if event is valid to start drag */
-    isValidStartEvent(e) {
+    isValidStartEvent(e: TouchEvent | MouseEvent) {
         return (
-            (e.type === 'touchstart' && e.touches?.length === 1)
+            (e.type === 'touchstart' && ('touches' in e) && e.touches?.length === 1)
             || (e.type === 'mousedown' && e.which === 1)
         );
     }
@@ -182,21 +216,24 @@ export class DragMaster {
 
     /** Returns event handlers object except 'move' and 'selectstart' */
     getEventHandlers() {
-        const { move, end, cancel } = (this.isTouch) ? this.touchEvents : this.mouseEvents;
-        const events = {
+        const { move, end } = (this.isTouch) ? this.touchEvents : this.mouseEvents;
+        const events: ListenersGroup = {
             keydown: this.handlers.keydown,
             [end]: this.handlers.end,
             dragstart: this.handlers.preventDefault,
         };
 
         if (!this.isTouch) {
-            events[move] = {
+            const moveListener = {
                 listener: this.handlers.move,
                 options: { passive: false },
             };
+
+            events[move] = moveListener;
         }
 
-        if (cancel) {
+        const { cancel } = this.touchEvents;
+        if (this.isTouch && cancel) {
             events[cancel] = this.handlers.cancel;
         }
 
@@ -251,7 +288,11 @@ export class DragMaster {
     }
 
     /** Sets touch move timeout */
-    initTouchMove(e) {
+    initTouchMove(e: TouchEvent) {
+        if (!this.dragZone) {
+            return;
+        }
+
         this.resetMoveTimeout();
         this.setupScrollHandler();
 
@@ -263,7 +304,7 @@ export class DragMaster {
             return;
         }
 
-        this.touchTimeout = setTimeout(() => {
+        this.touchTimeout = window.setTimeout(() => {
             this.touchMoveReady = true;
 
             this.handleMove(e);
@@ -280,24 +321,24 @@ export class DragMaster {
     }
 
     /** Searches for drag zone by specified element */
-    findDragZoneByElement(elem) {
+    findDragZoneByElement(elem?: Element | null) {
         if (!elem) {
-            throw new Error('Invalid element');
+            return null;
         }
 
-        return this.dragZoneRegistry.find((item) => item?.elem === elem);
+        return this.dragZoneRegistry.find((item: DragZone) => item?.elem === elem);
     }
 
     /** Searches for all drag zones containing specified element */
-    findAllDragZonesByElement(elem) {
+    findAllDragZonesByElement(elem?: Element | null) {
         if (!elem) {
-            throw new Error('Invalid element');
+            return null;
         }
 
-        return this.dragZoneRegistry.filter((item) => item?.elem?.contains?.(elem));
+        return this.dragZoneRegistry.filter((item: DragZone) => item?.elem?.contains?.(elem));
     }
 
-    registerDragZone(dragZone) {
+    registerDragZone(dragZone: DragZone) {
         if (!dragZone) {
             throw new Error('Invalid dragZone');
         }
@@ -309,7 +350,7 @@ export class DragMaster {
         this.dragZoneRegistry.push(dragZone);
     }
 
-    unregisterDragZone(dragZone) {
+    unregisterDragZone(dragZone: DragZone) {
         if (!dragZone) {
             throw new Error('Invalid dragZone');
         }
@@ -319,26 +360,26 @@ export class DragMaster {
     }
 
     /** Search for drag zone object */
-    findDragZone(target) {
+    findDragZone(target?: Element | null) {
         if (!target) {
             return null;
         }
 
-        let elem = target;
-        while (elem && elem !== document) {
+        let elem: Element | null = target;
+        while (elem && elem !== document.documentElement) {
             const dragZone = this.findDragZoneByElement(elem);
             if (dragZone) {
                 return dragZone;
             }
 
-            elem = elem.parentNode;
+            elem = elem.parentNode as Element;
         }
 
         return null;
     }
 
     /** Search for drag zone object */
-    findDragZoneById(id) {
+    findDragZoneById(id: string) {
         const strId = id?.toString() ?? null;
         if (strId === null) {
             return null;
@@ -348,15 +389,15 @@ export class DragMaster {
     }
 
     /** Searches for drag zone by specified element */
-    findDropTargetByElement(elem) {
+    findDropTargetByElement(elem?: Element | null) {
         if (!elem) {
-            throw new Error('Invalid element');
+            return null;
         }
 
         return this.dropTargetRegistry.find((item) => item?.elem === elem);
     }
 
-    registerDropTarget(dropTarget) {
+    registerDropTarget(dropTarget: DropTarget) {
         if (!dropTarget) {
             throw new Error('Invalid dropTarget');
         }
@@ -368,7 +409,7 @@ export class DragMaster {
         this.dropTargetRegistry.push(dropTarget);
     }
 
-    unregisterDropTarget(dropTarget) {
+    unregisterDropTarget(dropTarget: DropTarget) {
         if (!dropTarget) {
             throw new Error('Invalid dropTarget');
         }
@@ -380,29 +421,29 @@ export class DragMaster {
     /** Try to find drop target under mouse cursor */
     findDropTarget() {
         let elem = this.avatar?.getTargetElem?.() ?? null;
-        while (elem && elem !== document) {
+        while (elem && elem !== document.documentElement) {
             const dropTarget = this.findDropTargetByElement(elem);
             if (dropTarget) {
                 return dropTarget;
             }
 
-            elem = elem.parentNode;
+            elem = elem.parentNode as Element;
         }
 
         return null;
     }
 
-    initAvatar(e) {
+    initAvatar(e: TouchEvent | MouseEvent) {
         if (this.avatar || !this.dragZone) {
             return;
         }
 
         if (!this.isTouch) {
             const coords = DragMaster.getEventPageCoordinates(e);
-            const { mouseMoveThreshold } = this.dragZone;
+            const threshold = this.dragZone.mouseMoveThreshold ?? 0;
             if (
-                Math.abs(this.downX - coords.x) < mouseMoveThreshold
-                && Math.abs(this.downY - coords.y) < mouseMoveThreshold
+                Math.abs(this.downX - coords.x) < threshold
+                && Math.abs(this.downY - coords.y) < threshold
             ) {
                 return;
             }
@@ -420,7 +461,7 @@ export class DragMaster {
         }
     }
 
-    handleMove(e) {
+    handleMove(e: TouchEvent | MouseEvent) {
         if (!this.dragZone) {
             return;
         }
@@ -434,7 +475,7 @@ export class DragMaster {
 
         this.avatar.onDragMove(e);
 
-        const newDropTarget = this.findDropTarget(e);
+        const newDropTarget = this.findDropTarget();
         if (this.dropTarget !== newDropTarget) {
             if (this.dropTarget) {
                 this.dropTarget.onDragLeave?.(newDropTarget, this.avatar, e);
@@ -451,7 +492,7 @@ export class DragMaster {
     }
 
     /** Document mouse move event handler */
-    mouseMove(e: TouchEvent | MouseEvent | Event) {
+    mouseMove(e: TouchEvent | MouseEvent) {
         if (!this.dragZone) {
             return;
         }
@@ -471,7 +512,7 @@ export class DragMaster {
     }
 
     /** Document mouse up event handler */
-    mouseUp(e: TouchEvent | MouseEvent | Event) {
+    mouseUp(e: TouchEvent | MouseEvent) {
         if (!this.isTouch && e.which !== 1) {
             return;
         }
@@ -499,31 +540,32 @@ export class DragMaster {
     }
 
     /** Keydown event handler */
-    onKey(e) {
+    onKey(e: KeyboardEvent) {
         if (e.code === 'Escape') {
             this.cancelDrag(e);
         }
     }
 
-    defaultDragHandleValildation(target) {
+    defaultDragHandleValildation(target: Element) {
         if (!target) {
             return false;
         }
 
         // allow to drag using whole drag zone in case no handles is set
-        if (!this.dragZone.handles) {
+        if (!this.dragZone?.handles) {
             return true;
         }
 
         const handles = asArray(this.dragZone.handles);
 
-        return handles.some((hnd) => {
-            let elem;
-            if (isObject(hnd) && (hnd.elem || hnd.query)) {
-                if (hnd.query) {
-                    const qres = this.dragZone.elem.querySelectorAll(hnd.query);
+        return handles.some((hnd: DragHandle) => {
+            let elem: Element | Element[] = [];
+
+            if (typeof hnd === 'object' && ('query' in hnd || 'elem' in hnd)) {
+                if ('query' in hnd) {
+                    const qres = this.dragZone?.elem?.querySelectorAll(hnd.query) ?? [];
                     elem = Array.from(qres);
-                } else if (typeof hnd === 'string') {
+                } else if (typeof hnd.elem === 'string') {
                     elem = ge(hnd.elem);
                 } else {
                     elem = hnd.elem;
@@ -534,14 +576,13 @@ export class DragMaster {
                 elem = hnd;
             }
 
-            elem = asArray(elem);
-
-            return elem.some((el) => (
+            return asArray(elem).some((el: Element) => (
                 el
                 && (
                     el === target
                     || (
-                        isObject(hnd)
+                        (typeof hnd === 'object')
+                        && ('includeChilds' in hnd)
                         && hnd.includeChilds
                         && el.contains(target)
                     )
@@ -551,21 +592,22 @@ export class DragMaster {
     }
 
     /** Mouse down on drag object element event handler */
-    mouseDown(e) {
+    mouseDown(e: TouchEvent | MouseEvent) {
         if (!this.isValidStartEvent(e)) {
             return;
         }
 
         this.isTouch = e.type === 'touchstart';
+        const target = e.target as Element;
 
-        this.dragZone = this.findDragZone(e.target);
+        this.dragZone = this.findDragZone(target);
         if (!this.dragZone) {
             return;
         }
 
-        const isValidDragHandle = isFunction(this.dragZone.isValidDragHandle)
-            ? this.dragZone.isValidDragHandle(e.target)
-            : this.defaultDragHandleValildation(e.target);
+        const isValidDragHandle = (typeof this.dragZone.isValidDragHandle === 'function')
+            ? this.dragZone.isValidDragHandle(target)
+            : this.defaultDragHandleValildation(target);
         if (!isValidDragHandle) {
             this.dragZone = null;
             return;
@@ -578,11 +620,11 @@ export class DragMaster {
         this.setupHandlers();
 
         if (this.isTouch) {
-            this.initTouchMove(e);
+            this.initTouchMove(e as TouchEvent);
         }
     }
 
-    onScroll(e) {
+    onScroll(e: Event) {
         if (!this.isTouch || this.avatar?.scrollRequested) {
             return;
         }

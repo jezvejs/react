@@ -8,28 +8,36 @@ import {
     YEARRANGE_VIEW,
     YEAR_RANGE_LENGTH,
 } from './constants.ts';
+import {
+    DatePickerHeaderTitleParam,
+    DatePickerProps,
+    DatePickerRange,
+    DatePickerState,
+    DatePickerViewType,
+} from './types.ts';
 
-export const toCSSValue = (val) => (+val.toFixed(4));
+export const toCSSValue = (val: number): number => (+val.toFixed(4));
 
 /** Returns initial state object for specified props */
-export const getInitialState = (props, defaultProps) => {
+export const getInitialState = (props: DatePickerProps, defaultProps: DatePickerProps) => {
     const mode = props.mode ?? defaultProps?.mode;
     if (!(mode in viewTypesMap)) {
         throw new Error('Invalid mode');
     }
 
-    const res = {
+    const res: DatePickerState = {
         ...(defaultProps ?? {}),
         ...props,
         visible: !!props.inline || props.visible,
         fixed: false,
-        viewType: viewTypesMap[mode],
+        viewType: viewTypesMap[mode] as DatePickerViewType,
         date: isDate(props.date) ? props.date : new Date(),
         curRange: { start: null, end: null },
         selRange: { start: null, end: null },
         actDate: null,
         transition: null,
         secondViewTransition: false,
+        waitingForAnimation: false,
         position: {
             ...(defaultProps?.position ?? {}),
             ...(props.position ?? {}),
@@ -59,15 +67,15 @@ export const compareViewTypes = (a, b) => {
 };
 
 /** Returns previous date for specified view type */
-export const getPrevViewDate = (date, viewType) => {
+export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
     if (!isDate(date)) {
         throw new Error('Invalid date');
     }
 
     const typeMap = {
-        [MONTH_VIEW]: (d) => (new Date(d.getFullYear(), d.getMonth() - 1, 1)),
-        [YEAR_VIEW]: (d) => (new Date(d.getFullYear() - 1, 1, 1)),
-        [YEARRANGE_VIEW]: (d) => (new Date(d.getFullYear() - YEAR_RANGE_LENGTH, 1, 1)),
+        [MONTH_VIEW]: (d: Date) => (new Date(d.getFullYear(), d.getMonth() - 1, 1)),
+        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() - 1, 1, 1)),
+        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() - YEAR_RANGE_LENGTH, 1, 1)),
     };
 
     if (!isFunction(typeMap[viewType])) {
@@ -78,15 +86,15 @@ export const getPrevViewDate = (date, viewType) => {
 };
 
 /** Returns next date for specified view type */
-export const getNextViewDate = (date, viewType) => {
+export const getNextViewDate = (date: Date, viewType) => {
     if (!isDate(date)) {
         throw new Error('Invalid date');
     }
 
     const typeMap = {
-        [MONTH_VIEW]: (d) => (new Date(d.getFullYear(), d.getMonth() + 1, 1)),
-        [YEAR_VIEW]: (d) => (new Date(d.getFullYear() + 1, 1, 1)),
-        [YEARRANGE_VIEW]: (d) => (new Date(d.getFullYear() + YEAR_RANGE_LENGTH, 1, 1)),
+        [MONTH_VIEW]: (d: Date) => (new Date(d.getFullYear(), d.getMonth() + 1, 1)),
+        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() + 1, 1, 1)),
+        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() + YEAR_RANGE_LENGTH, 1, 1)),
     };
 
     if (!isFunction(typeMap[viewType])) {
@@ -97,12 +105,12 @@ export const getNextViewDate = (date, viewType) => {
 };
 
 /** Returns true if array includes Date object for same date as specified */
-export const includesDate = (arr, date) => (
-    asArray(arr).some((item) => isSameDate(item, date))
+export const includesDate = (arr: Date | Date[], date: Date) => (
+    asArray(arr).some((item: Date) => isSameDate(item, date))
 );
 
 /** Returns width of screen considering orientation */
-export const getScreenWidth = () => {
+export const getScreenWidth = (): number => {
     const { angle } = window.screen.orientation;
     const { width, height } = window.screen;
     return (angle === 270 || angle === 90)
@@ -111,7 +119,7 @@ export const getScreenWidth = () => {
 };
 
 /** Returns header title string for specified view state */
-export const getHeaderTitle = (state) => {
+export const getHeaderTitle = (state: DatePickerHeaderTitleParam): string => {
     const { viewType, date, locales } = state;
     const rYear = date.getFullYear();
 
@@ -142,10 +150,18 @@ export const getComponentHeight = (component) => (
  * @param {Date} date - date to check
  * @param {object} range - date range object
  */
-export const inRange = (date, range) => {
-    if (!isDate(date) || !isDate(range?.start) || !isDate(range?.end)) {
+export const inRange = (date: Date, range: DatePickerRange): boolean => {
+    if (
+        !isDate(date)
+        || !isDate(range?.start)
+        || !isDate(range?.end)
+    ) {
         return false;
     }
 
-    return (date - range.start >= 0 && date - range.end <= 0);
+    const time = date?.getTime() ?? 0;
+    const rangeStart = range.start?.getTime() ?? 0;
+    const rangeEnd = range.end?.getTime() ?? 0;
+
+    return (time - rangeStart >= 0 && time - rangeEnd <= 0);
 };

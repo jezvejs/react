@@ -1,30 +1,34 @@
 import {
-    Context,
     createContext,
     ReactNode,
     useContext,
     useMemo,
     useState,
 } from 'react';
-import { createStore } from '../Store/Store.ts';
+import {
+    createStore,
+    StoreAction,
+    StoreReducer,
+    StoreUpdater,
+} from '../Store/Store.ts';
 
 export interface DragnDropContextStore {
     store: object,
     state: object,
     getState: () => object,
-    setState: (...args: any[]) => void,
-    dispatch: (...args: any[]) => void,
-};
+    setState: (update: StoreUpdater) => void,
+    dispatch: (action: StoreAction) => void,
+}
 
 export interface DragnDropProviderProps {
-    reducer: (state: object, action: object) => object,
+    reducer: StoreReducer,
     initialState: object,
     children: ReactNode,
-};
+}
 
-const DragnDropContext = createContext(null);
+const DragnDropContext = createContext<DragnDropContextStore | null>(null);
 
-export const useDragnDrop = () => useContext(DragnDropContext);
+export const useDragnDrop = (): DragnDropContextStore | null => useContext(DragnDropContext);
 
 export function DragnDropProvider(props: DragnDropProviderProps) {
     const {
@@ -47,8 +51,8 @@ export function DragnDropProvider(props: DragnDropProviderProps) {
         store,
         state,
         getState: () => store.getState(),
-        setState: (...args: any[]) => store.setState(...args),
-        dispatch: (...args: any[]) => store.dispatch(...args),
+        setState: (update: StoreUpdater) => store.setState(update),
+        dispatch: (action: StoreAction) => store.dispatch(action),
     }), [state]);
 
     return (

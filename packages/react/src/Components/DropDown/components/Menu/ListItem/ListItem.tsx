@@ -1,12 +1,12 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 import { MenuItem } from '../../../../Menu/Menu.tsx';
+import { DropDownMenuItemProps } from '../../../types.ts';
 
 const defaultProps = {
     hidden: false,
 };
 
-export const DropDownListItem = (p) => {
+export const DropDownListItem = (p: DropDownMenuItemProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -21,8 +21,3 @@ export const DropDownListItem = (p) => {
 };
 
 DropDownListItem.selector = MenuItem.selector;
-
-DropDownListItem.propTypes = {
-    ...MenuItem.propTypes,
-    hidden: PropTypes.bool,
-};

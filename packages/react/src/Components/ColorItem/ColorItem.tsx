@@ -1,11 +1,16 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './ColorItem.scss';
+
+export interface ColorItemProps {
+    className: string,
+    value: string,
+    colorProp: string,
+}
 
 /**
  * ColorItem component
  */
-export const ColorItem = (props) => {
+export const ColorItem = (props: ColorItemProps) => {
     const {
         value = '',
         colorProp = '--color-item-value',
@@ -21,10 +26,4 @@ export const ColorItem = (props) => {
     return (
         <div {...colorItemProps} />
     );
-};
-
-ColorItem.propTypes = {
-    className: PropTypes.string,
-    value: PropTypes.string,
-    colorProp: PropTypes.string,
 };

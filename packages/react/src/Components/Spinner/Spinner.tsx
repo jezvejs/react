@@ -1,12 +1,16 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './Spinner.scss';
 
+export interface SpinnerProps {
+    id: string,
+    className: string,
+}
+
 /**
  * Spinner component
  */
-export const Spinner = (props) => {
+export const Spinner = (props: SpinnerProps) => {
     const {
         className,
         ...rest
@@ -18,9 +22,4 @@ export const Spinner = (props) => {
             {...rest}
         />
     );
-};
-
-Spinner.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
 };

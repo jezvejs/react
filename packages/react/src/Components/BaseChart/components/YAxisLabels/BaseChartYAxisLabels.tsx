@@ -1,19 +1,23 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
 import { px } from '../../../../utils/common.ts';
-
+import { BaseChartState } from '../../types.ts';
 import './BaseChartYAxisLabels.scss';
+
+export interface BaseChartLabelProps {
+    id: string,
+    value: string,
+    className?: string,
+}
 
 /**
  * BaseChartYAxisLabels component
  */
-export const BaseChartYAxisLabels = (props) => {
-    const defaultLabelRenderer = (value) => value?.toString();
+export const BaseChartYAxisLabels = (props: BaseChartState) => {
+    const defaultLabelRenderer = (value: number) => (value?.toString() ?? '');
     const formatFunction = props.renderYAxisLabel ?? defaultLabelRenderer;
 
-    const { grid } = props;
-    if (!grid) {
+    const { grid, yAxisGrid } = props;
+    if (!grid?.steps || !yAxisGrid) {
         return null;
     }
 
@@ -29,7 +33,7 @@ export const BaseChartYAxisLabels = (props) => {
     let val = grid.valueFirst;
     let step = 0;
 
-    const items = [];
+    const items: BaseChartLabelProps[] = [];
 
     while (step <= grid.steps) {
         lastY = curY;
@@ -37,8 +41,8 @@ export const BaseChartYAxisLabels = (props) => {
         const isZero = Math.abs(grid.toPrec(val)) === 0;
         const tVal = (isZero) ? 0 : grid.toPrecString(val);
 
-        const label = {
-            id: step,
+        const label: BaseChartLabelProps = {
+            id: step.toString(),
             value: formatFunction(tVal),
             className: 'chart__text chart-y-axis-labels__label',
         };
@@ -83,11 +87,4 @@ export const BaseChartYAxisLabels = (props) => {
             </div>
         </div>
     );
-};
-
-BaseChartYAxisLabels.propTypes = {
-    grid: PropTypes.object,
-    yAxis: PropTypes.oneOf(['left', 'right', 'none']),
-    yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
-    renderYAxisLabel: PropTypes.func,
 };

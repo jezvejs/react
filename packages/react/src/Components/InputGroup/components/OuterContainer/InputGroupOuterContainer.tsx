@@ -1,15 +1,12 @@
-import PropTypes from 'prop-types';
+import { ReactNode } from 'react';
 import './InputGroupOuterContainer.scss';
 
-export const InputGroupOuterContainer = ({ children }) => (
+export interface InputGroupOuterContainerProps {
+    children: ReactNode,
+}
+
+export const InputGroupOuterContainer = ({ children }: InputGroupOuterContainerProps) => (
     <div className="input-group__input-outer">
         {children}
     </div>
 );
-
-InputGroupOuterContainer.propTypes = {
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-};

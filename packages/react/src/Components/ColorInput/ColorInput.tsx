@@ -1,10 +1,24 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { ColorItem } from '../ColorItem/ColorItem.tsx';
 import { Input } from '../Input/Input.tsx';
 
 import './ColorInput.scss';
+
+export interface ColorInputProps {
+    className: string,
+    inputId: string,
+    value: string,
+    colorProp: string,
+    form: string,
+    name: string,
+    tabIndex: number,
+    disabled: boolean,
+    onInput: () => void,
+    onChange: () => void,
+    onFocus: () => void,
+    onBlur: () => void,
+}
 
 /**
  * ColorInput component
@@ -57,19 +71,4 @@ export const ColorInput = (props) => {
             <ColorItem {...valueProps} />
         </div>
     );
-};
-
-ColorInput.propTypes = {
-    className: PropTypes.string,
-    inputId: PropTypes.string,
-    value: PropTypes.string,
-    colorProp: PropTypes.string,
-    form: PropTypes.string,
-    name: PropTypes.string,
-    tabIndex: PropTypes.number,
-    disabled: PropTypes.bool,
-    onInput: PropTypes.func,
-    onChange: PropTypes.func,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
 };

@@ -1,6 +1,12 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 import './ListPlaceholder.scss';
+
+export interface DropDownListPlaceholderProps {
+    content: string,
+    active: boolean,
+    selectable: boolean,
+    className: string,
+}
 
 const defaultProps = {
     content: null,
@@ -30,11 +36,4 @@ export const DropDownListPlaceholder = (p) => {
             </div>
         </li>
     );
-};
-
-DropDownListPlaceholder.propTypes = {
-    content: PropTypes.string,
-    active: PropTypes.bool,
-    selectable: PropTypes.bool,
-    className: PropTypes.string,
 };

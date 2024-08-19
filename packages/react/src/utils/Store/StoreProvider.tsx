@@ -1,17 +1,38 @@
 import {
     createContext,
+    ReactNode,
     useContext,
     useMemo,
     useState,
 } from 'react';
-import PropTypes from 'prop-types';
-import { createStore } from './Store.ts';
+import {
+    createStore,
+    Store,
+    StoreAction,
+    StoreReducer,
+    StoreState,
+    StoreUpdater,
+} from './Store.ts';
 
-const StoreContext = createContext(null);
+export interface StoreProviderProps {
+    reducer: StoreReducer,
+    initialState: StoreState,
+    children: ReactNode,
+}
+
+export interface StoreProviderContext {
+    store: Store,
+    state: StoreState,
+    getState: () => StoreState,
+    setState: (state: StoreUpdater) => void,
+    dispatch: (action: StoreAction) => void,
+}
+
+const StoreContext = createContext<StoreProviderContext | null>(null);
 
 export const useStore = () => useContext(StoreContext);
 
-export function StoreProvider(props) {
+export function StoreProvider(props: StoreProviderProps) {
     const {
         reducer,
         children,
@@ -20,7 +41,7 @@ export function StoreProvider(props) {
 
     const [state, setState] = useState(options.initialState ?? {});
 
-    const listener = (newState) => setState(newState);
+    const listener = (newState: StoreUpdater) => setState(newState);
 
     const store = useMemo(() => {
         const res = createStore(reducer, options);
@@ -32,8 +53,8 @@ export function StoreProvider(props) {
         store,
         state,
         getState: () => store.getState(),
-        setState: (...args) => store.setState(...args),
-        dispatch: (...args) => store.dispatch(...args),
+        setState: (update: StoreUpdater) => store.setState(update),
+        dispatch: (action: StoreAction) => store.dispatch(action),
     }), [state]);
 
     return (
@@ -42,12 +63,3 @@ export function StoreProvider(props) {
         </StoreContext.Provider>
     );
 }
-
-StoreProvider.propTypes = {
-    reducer: PropTypes.func,
-    initialState: PropTypes.object,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-};

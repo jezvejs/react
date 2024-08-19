@@ -1,33 +1,41 @@
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { isSameTarget } from '../../../BaseChart/helpers.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
 import { getLinePath } from '../../helpers.ts';
+import { BaseChartDataSet } from '../../../BaseChart/types.ts';
+import {
+    LineChartItemProps,
+    LineChartState,
+    LineChartDataGroup,
+    LineChartDataItemType,
+    LineChartDataPath,
+} from '../../types.ts';
+import { BaseChartHelpers } from '../../../BaseChart/BaseChart.tsx';
 
 /**
  * LineChartDataSeries component
  */
-export const LineChartDataSeries = (props) => {
-    const { getState, setState } = useStore();
-    const { dataSets, activeTarget, grid } = getState();
+export const LineChartDataSeries = (props: LineChartState) => {
+    const store = useStore();
 
-    const storeState = getState();
+    const storeState = store?.getState() as LineChartState;
+    const { dataSets, activeTarget, grid } = storeState;
 
     useEffect(() => {
         const firstGroupIndex = props.getFirstVisibleGroupIndex(storeState);
         const visibleGroups = props.getVisibleGroupsCount(firstGroupIndex, storeState);
         const activeCategory = storeState.activeCategory?.toString() ?? null;
 
-        const items = [];
+        const items: LineChartDataGroup[] = [];
         for (let i = 0; i < visibleGroups; i += 1) {
             const groupIndex = firstGroupIndex + i;
-            const group = [];
+            const group: LineChartDataGroup = [];
             let posValueOffset = 0;
             let negValueOffset = 0;
 
-            dataSets.forEach((dataSet, categoryIndex) => {
+            dataSets.forEach((dataSet: BaseChartDataSet, categoryIndex: number) => {
                 const value = dataSet.data[groupIndex] ?? 0;
                 const category = dataSet.category ?? null;
                 const valueOffset = (value >= 0) ? posValueOffset : negValueOffset;
@@ -42,13 +50,14 @@ export const LineChartDataSeries = (props) => {
                     )
                 );
 
-                const itemProps = {
+                const itemProps: LineChartItemProps = {
                     value,
                     groupIndex,
                     category,
                     categoryIndex,
                     active,
                     valueOffset,
+                    columnIndex: 0,
                 };
 
                 const item = props.createItem(itemProps, storeState);
@@ -70,8 +79,8 @@ export const LineChartDataSeries = (props) => {
 
         // Paths
         const categoriesCount = props.getCategoriesCount(storeState);
-        const paths = [];
-        const flatItems = items.flat();
+        const paths: LineChartDataPath[] = [];
+        const flatItems = items.flat() as LineChartDataItemType[];
         for (let i = 0; i < categoriesCount; i += 1) {
             const categoryItems = flatItems.filter((item) => (
                 item?.categoryIndex === i
@@ -98,7 +107,7 @@ export const LineChartDataSeries = (props) => {
             paths.push(path);
         }
 
-        setState((prev) => ({
+        store?.setState((prev: LineChartState) => ({
             ...prev,
             dataSeries: {
                 ...prev.dataSeries,
@@ -127,13 +136,17 @@ export const LineChartDataSeries = (props) => {
         storeState.pinnedTarget,
     ]);
 
-    if (dataSets.length === 0 || !grid) {
+    if (!store || dataSets.length === 0 || !grid) {
         return null;
     }
 
-    const { DataItem, DataPath } = props.components;
+    const state = store.getState() as LineChartState;
 
-    const state = getState();
+    const { DataItem, DataPath } = state.components;
+    if (!DataItem || !DataPath) {
+        return null;
+    }
+
     const items = state.dataSeries?.items ?? [];
     const paths = state.dataSeries?.paths ?? [];
 
@@ -141,6 +154,7 @@ export const LineChartDataSeries = (props) => {
         autoScale: state.autoScale,
         animate: state.animate,
         animateNow: state.animateNow,
+        stacked: BaseChartHelpers.isStacked(state),
     };
 
     return (
@@ -155,7 +169,11 @@ export const LineChartDataSeries = (props) => {
                 ))}
             </g>
             <g>
-                {items.flat().map((item, ind) => {
+                {items.flat().map((item: LineChartDataItemType | null, ind: number) => {
+                    if (!item) {
+                        return null;
+                    }
+
                     if (isSameTarget(item, state.popupTarget)) {
                         return (
                             <DataItem
@@ -189,40 +207,4 @@ export const LineChartDataSeries = (props) => {
             </g>
         </>
     );
-};
-
-LineChartDataSeries.propTypes = {
-    grid: PropTypes.object,
-    dataSets: PropTypes.array,
-    items: PropTypes.array,
-    data: PropTypes.object,
-    autoScale: PropTypes.bool,
-    animate: PropTypes.bool,
-    animateNow: PropTypes.bool,
-    scrollLeft: PropTypes.number,
-    groupsGap: PropTypes.number,
-    groupsCount: PropTypes.number,
-    columnWidth: PropTypes.number,
-    columnsInGroup: PropTypes.number,
-    chartContentWidth: PropTypes.number,
-    height: PropTypes.number,
-    chartWidth: PropTypes.number,
-    scrollerWidth: PropTypes.number,
-    activeTarget: PropTypes.object,
-    popupTarget: PropTypes.object,
-    pinnedTarget: PropTypes.object,
-    popupTargetRef: PropTypes.func,
-    pinnedPopupTargetRef: PropTypes.func,
-    activeCategory: PropTypes.string,
-    getStackedGroups: PropTypes.func,
-    getStackedCategories: PropTypes.func,
-    getCategoriesCount: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
-    isVisibleValue: PropTypes.func,
-    createItem: PropTypes.func,
-    components: PropTypes.shape({
-        DataItem: PropTypes.object,
-        DataPath: PropTypes.object,
-    }),
 };

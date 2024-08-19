@@ -1,25 +1,106 @@
 import { getOffset } from '@jezvejs/dom';
-import { isFunction } from '@jezvejs/types';
-import { useRef } from 'react';
-import PropTypes from 'prop-types';
+import { ComponentType, useRef } from 'react';
 
-import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
+import { px } from '../../utils/common.ts';
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
-import { px } from '../../utils/common.ts';
+import {
+    DragAvatar,
+    DropTarget,
+    OnDragCancelParams,
+    OnDragStartParams,
+} from '../../utils/DragnDrop/types.ts';
+import { useDragZone, UseDragZoneProps } from '../../utils/DragnDrop/useDragZone.tsx';
+import { StoreUpdater } from '../../utils/Store/Store.ts';
 
-export function useSortableDragZone(props) {
-    const { setState } = useDragnDrop();
-    const dragItemRef = useRef(null);
+import {
+    GetGroupFunction,
+    OnSortStartParam,
+    SortableAvatarState,
+    SortableDragAvatar,
+    SortableState,
+} from './types.ts';
 
-    const dragZone = useDragZone({
+export interface UseSortableDragZoneProps extends UseDragZoneProps {
+    group?: string | GetGroupFunction;
+
+    selector?: string;
+    placeholderClass?: string;
+    animatedClass?: string;
+    dragClass?: string | boolean;
+    containerSelector?: string;
+
+    allowSingleItemSort?: boolean;
+    onlyRootHandle?: boolean;
+    dragOriginal?: boolean;
+    absolutePos?: boolean;
+    copyWidth?: boolean;
+
+    table?: boolean;
+    tree?: boolean;
+
+    sourceNode?: HTMLElement | null;
+    sourceNodeRestored?: boolean;
+    nodeObserver?: MutationObserver | null;
+
+    onDragStart: (params: OnDragStartParams) => DragAvatar | null;
+
+    onSortStart?: (params: OnSortStartParam) => void;
+
+    getClosestItemElement?: (elem: Element | null) => Element | null;
+    itemIdFromElem?: (elem: Element | null) => string | null;
+    getDragItemElement?: () => Element | null;
+    findDragZoneItem?: (target: Element | null) => Element | null;
+    findAllDragZoneItems?: () => Element[];
+    isValidDragHandle?: (target: Element) => boolean;
+
+    getPlaceholder?: () => string | null;
+    getAnimatedClass?: () => string | null;
+    getItemSelector?: () => string | null;
+    getContainerSelector?: () => string | null;
+    getDragClass?: () => string | null;
+
+    restoreSourceNode?: () => void;
+    observeNode?: (node: Element | null) => void;
+    disconnectNodeObserver?: () => void;
+    removeSourceNode?: () => void;
+    finishDrag?: () => void;
+
+    makeSortableTableAvatar?: () => SortableDragAvatar | null;
+    makeSortableAvatar?: () => SortableDragAvatar | null;
+    makeAvatar?: () => SortableDragAvatar | null;
+
+    getGroup?: GetGroupFunction;
+
+    components?: {
+        Avatar?: ComponentType;
+    };
+}
+
+export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
+    const dragDrop = useDragnDrop();
+    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+
+    const dragItemRef = useRef<Element | null>(null);
+
+    const dragZoneProps: UseSortableDragZoneProps = {
+        id: props.id ?? '',
+
         ...props,
+
+        sourceNode: null,
+        sourceNodeRestored: false,
+        nodeObserver: null,
 
         /**
          * Returns closest item element if available for the specified element
          * @param {Element} elem - target list item element
          */
-        getClosestItemElement(elem) {
+        getClosestItemElement(elem: Element | null): Element | null {
+            if (!props.selector) {
+                return null;
+            }
+
             return elem?.closest(props.selector) ?? null;
         },
 
@@ -27,47 +108,55 @@ export function useSortableDragZone(props) {
          * Returns item id from specified item element
          * @param {Element} elem - target list item element
          */
-        itemIdFromElem(elem) {
-            const listItemElem = this.getClosestItemElement(elem);
+        itemIdFromElem(elem: Element | null): string | null {
+            const listItemElem = this.getClosestItemElement?.(elem) as HTMLElement;
             return listItemElem?.dataset?.id ?? null;
         },
 
         /**
          * Return current drag item element
          */
-        getDragItemElement() {
+        getDragItemElement(): Element | null {
             return dragItemRef.current;
         },
 
         // Find specific drag zone element
-        findDragZoneItem(target) {
+        findDragZoneItem(target: Element | null): Element | null {
             if (!props.selector) {
                 return null;
             }
 
-            const el = this.getClosestItemElement(target);
-            const isPlaceholder = el?.classList?.contains(props.placeholderClass);
+            const el = this.getClosestItemElement?.(target) ?? null;
+            const isPlaceholder = (
+                !!props.placeholderClass
+                && el?.classList?.contains(props.placeholderClass)
+            );
+
             return (isPlaceholder) ? null : el;
         },
 
         // Returns all drag items inside of container
-        findAllDragZoneItems() {
-            return Array.from(this.elem?.querySelectorAll(props.selector));
+        findAllDragZoneItems(): Element[] {
+            if (!props.selector) {
+                return [];
+            }
+
+            return Array.from(this.elem?.querySelectorAll?.(props.selector) ?? []);
         },
 
-        isValidDragHandle(target) {
+        isValidDragHandle(target: Element): boolean {
             if (!target) {
                 return false;
             }
 
             if (!props.allowSingleItemSort) {
-                const allItems = this.findAllDragZoneItems();
+                const allItems = this.findAllDragZoneItems?.() ?? [];
                 if (allItems.length < 2) {
                     return false;
                 }
             }
 
-            const item = this.findDragZoneItem(target);
+            const item = this.findDragZoneItem?.(target);
             if (!item) {
                 return false;
             }
@@ -81,45 +170,42 @@ export function useSortableDragZone(props) {
         },
 
         /** Returns sortable group */
-        getGroup(elem) {
+        getGroup(elem: Element | null): string | null {
             const group = props?.group ?? null;
-            return isFunction(group) ? group(elem ?? this.elem) : group;
+            return (
+                (typeof group === 'function')
+                    ? group(elem ?? this.elem ?? null)
+                    : group
+            );
         },
 
         /** Returns CSS class for placeholder element */
-        getPlaceholder() {
+        getPlaceholder(): string | null {
             return props?.placeholderClass ?? null;
         },
 
         /** Returns CSS class for animated element */
-        getAnimatedClass() {
+        getAnimatedClass(): string | null {
             return props?.animatedClass ?? null;
         },
 
         /** Returns selector for sortable item element */
-        getItemSelector() {
+        getItemSelector(): string | null {
             return props?.selector ?? null;
         },
 
         /** Returns selector for container element */
-        getContainerSelector() {
+        getContainerSelector(): string | null {
             return props?.containerSelector ?? null;
         },
 
         /** Returns class for drag avatar element */
-        getDragClass() {
+        getDragClass(): string | null {
             if (props?.dragClass) {
                 return (props.dragClass === true) ? 'drag' : props.dragClass;
             }
 
             return null;
-        },
-
-        /** Sort done event handler */
-        onSortEnd(info) {
-            if (isFunction(props.onSort)) {
-                props.onSort(info);
-            }
         },
 
         restoreSourceNode() {
@@ -130,17 +216,21 @@ export function useSortableDragZone(props) {
             }
         },
 
-        observeNode(node) {
-            this.disconnectNodeObserver();
-            this.removeSourceNode();
+        observeNode(node: Element | null) {
+            this.disconnectNodeObserver?.();
+            this.removeSourceNode?.();
 
-            this.sourceNode = node;
+            this.sourceNode = node as HTMLElement;
             this.nodeObserver = new MutationObserver(() => {
                 if (node && !node.parentElement) {
-                    this.restoreSourceNode();
-                    this.disconnectNodeObserver();
+                    this.restoreSourceNode?.();
+                    this.disconnectNodeObserver?.();
                 }
             });
+
+            if (!node?.parentElement) {
+                return;
+            }
 
             this.nodeObserver.observe(node.parentElement, {
                 childList: true,
@@ -164,14 +254,14 @@ export function useSortableDragZone(props) {
         },
 
         finishDrag() {
-            this.disconnectNodeObserver();
-            this.removeSourceNode();
+            this.disconnectNodeObserver?.();
+            this.removeSourceNode?.();
         },
 
-        makeSortableTableAvatar() {
-            const avatar = this.makeAvatar();
+        makeSortableTableAvatar(): SortableDragAvatar | null {
+            const avatar = this.makeAvatar?.();
             if (!avatar) {
-                return false;
+                return null;
             }
 
             return {
@@ -182,8 +272,8 @@ export function useSortableDragZone(props) {
                     if (!avatar.dragZone) {
                         return false;
                     }
-
-                    const dragZoneElem = avatar.dragZone.findDragZoneItem(e.target);
+                    const target = e.target as HTMLElement;
+                    const dragZoneElem = avatar.dragZone.findDragZoneItem?.(target) as HTMLElement;
                     if (!dragZoneElem) {
                         return false;
                     }
@@ -193,7 +283,7 @@ export function useSortableDragZone(props) {
                         return false;
                     }
 
-                    const avatarState = {
+                    const avatarState: SortableAvatarState = {
                         className: tbl.className,
                         style: {
                             width: px(dragZoneElem.offsetWidth),
@@ -201,13 +291,19 @@ export function useSortableDragZone(props) {
                         columns: [],
                     };
 
-                    const tableStyles = Array.from(tbl.style);
-                    tableStyles.forEach((propName) => {
+                    const tableStyles = Array.from(tbl.style) as string[];
+                    tableStyles.forEach((propName: string) => {
+                        if (!avatarState.style) {
+                            avatarState.style = {};
+                        }
+
                         avatarState.style[propName] = tbl.style[propName];
                     });
 
                     if (avatar.dragZone.copyWidth) {
-                        let srcCell = dragZoneElem.querySelector('td');
+                        let srcCell: Element | null;
+
+                        srcCell = dragZoneElem.querySelector('td');
                         while (srcCell) {
                             const box = srcCell.getBoundingClientRect();
                             avatarState.columns.push({
@@ -221,7 +317,7 @@ export function useSortableDragZone(props) {
                     }
 
                     const offset = getOffset(avatar.dragZone.elem);
-                    setState((prev) => ({
+                    setState((prev: SortableState) => ({
                         ...prev,
                         avatarState,
                         origLeft: prev.left,
@@ -233,39 +329,39 @@ export function useSortableDragZone(props) {
                     return true;
                 },
 
-                onDragCancel(params = {}) {
-                    avatar.onDragCancel();
+                onDragCancel(params: OnDragCancelParams) {
+                    avatar.onDragCancel?.(params);
 
                     if (this.dropTarget) {
-                        this.dropTarget.onDragCancel({ ...params, avatar: this });
+                        this.dropTarget.onDragCancel?.({ ...params, avatar: this });
                     }
                 },
 
-                saveSortTarget(target) {
+                saveSortTarget(target: DropTarget | null) {
                     this.dropTarget = target;
                 },
             };
         },
 
-        makeSortableAvatar() {
+        makeSortableAvatar(): SortableDragAvatar | null {
             if (props.table) {
-                return this.makeSortableTableAvatar();
+                return this.makeSortableTableAvatar?.() ?? null;
             }
 
-            const avatar = this.makeAvatar();
+            const avatar = this.makeAvatar?.();
             if (!avatar) {
-                return false;
+                return null;
             }
 
             return {
                 ...avatar,
                 dropTarget: null,
 
-                onDragCancel(params = {}) {
-                    avatar.onDragCancel();
+                onDragCancel(params: OnDragCancelParams) {
+                    avatar.onDragCancel?.(params);
 
                     if (this.dropTarget) {
-                        this.dropTarget.onDragCancel({ ...params, avatar: this });
+                        this.dropTarget.onDragCancel?.({ ...params, avatar: this });
                     }
                 },
 
@@ -276,31 +372,38 @@ export function useSortableDragZone(props) {
         },
 
         /** Drag start event handler */
-        onDragStart(params) {
+        onDragStart(params: OnDragStartParams): DragAvatar | null {
             const { e } = params;
-            const itemEl = this.findDragZoneItem(e.target);
-            const itemId = this.itemIdFromElem(itemEl);
-            if (itemId === null) {
-                return false;
+            const target = e?.target as HTMLElement;
+            const itemEl = this.findDragZoneItem?.(target) as HTMLElement;
+            if (!itemEl) {
+                return null;
             }
 
-            const avatar = this.makeSortableAvatar();
-            avatar?.initFromEvent?.(params);
-            if (!avatar) {
-                return false;
+            const itemId = this.itemIdFromElem?.(itemEl) ?? null;
+            if (itemId === null) {
+                return null;
             }
+
+            const avatar = this.makeSortableAvatar?.();
+            if (!avatar) {
+                return null;
+            }
+
+            avatar?.initFromEvent?.(params);
 
             dragItemRef.current = itemEl;
 
-            this.observeNode(itemEl);
+            this.observeNode?.(itemEl);
 
-            const parentEl = this.findDragZoneItem(itemEl.parentNode);
-            const parentId = this.itemIdFromElem(parentEl) ?? this.id;
+            const parentNode = itemEl.parentNode as Element;
+            const parentEl = this.findDragZoneItem?.(parentNode) ?? null;
+            const parentId = this.itemIdFromElem?.(parentEl) ?? this.id;
 
             const { downX, downY } = params;
             const offset = getOffset(itemEl);
             const width = (props.copyWidth) ? itemEl.offsetWidth : null;
-            setState((prev) => ({
+            setState((prev: SortableState) => ({
                 ...prev,
                 origLeft: prev.left,
                 origTop: prev.top,
@@ -309,9 +412,8 @@ export function useSortableDragZone(props) {
                 width,
             }));
 
-            props.onDragStart?.({
+            props.onSortStart?.({
                 ...params,
-                avatar,
                 parentId,
                 zoneId: this.id,
                 itemId,
@@ -319,21 +421,9 @@ export function useSortableDragZone(props) {
 
             return avatar;
         },
-    });
+    };
+
+    const dragZone = useDragZone(dragZoneProps);
 
     return dragZone;
 }
-
-useSortableDragZone.propTypes = {
-    id: PropTypes.string,
-    selector: PropTypes.string,
-    placeholderClass: PropTypes.string,
-    allowSingleItemSort: PropTypes.bool,
-    onlyRootHandle: PropTypes.bool,
-    dragOriginal: PropTypes.bool,
-    absolutePos: PropTypes.bool,
-    onDragStart: PropTypes.func,
-    components: PropTypes.shape({
-        Avatar: PropTypes.object,
-    }),
-};

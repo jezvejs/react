@@ -1,16 +1,23 @@
-import { isFunction } from '@jezvejs/types';
 import { forwardRef } from 'react';
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
-
+import { BaseChartState, BaseChartTarget } from './types.ts';
 import { getComponent } from './helpers.ts';
+
+type BaseChartPopupContainerRef = HTMLDivElement | null;
+
+export interface BaseChartPopupContainerProps extends BaseChartState {
+    target?: BaseChartTarget,
+}
 
 /**
  * BaseChartPopupContainer component
  */
 // eslint-disable-next-line react/display-name
-export const BaseChartPopupContainer = forwardRef((props, ref) => {
-    const defaultPopupContent = (target, state) => {
+export const BaseChartPopupContainer = forwardRef<
+    BaseChartPopupContainerRef,
+    BaseChartPopupContainerProps
+>((props, ref) => {
+    const defaultPopupContent = (target: object, state: object) => {
         if (!target) {
             return null;
         }
@@ -25,22 +32,27 @@ export const BaseChartPopupContainer = forwardRef((props, ref) => {
         );
     };
 
-    const renderPopupContent = (target, state) => {
-        if (isFunction(state.renderPopup)) {
+    const renderPopupContent = (target: BaseChartTarget, state: BaseChartState) => {
+        if (typeof state.renderPopup === 'function') {
             return state.renderPopup(target, state);
         }
 
         return defaultPopupContent(target, state);
     };
 
-    const isPinnedTarget = !!props.pinnedTarget && props.target === props.pinnedTarget;
+    const currentTarget = props.target ?? null;
+    if (!currentTarget) {
+        return null;
+    }
 
-    const item = props.findItemByTarget(props.target, props);
+    const isPinnedTarget = !!props.pinnedTarget && currentTarget === props.pinnedTarget;
+
+    const item = props.findItemByTarget(currentTarget, props);
     if (!item) {
         return null;
     }
 
-    const content = renderPopupContent(props.target, props);
+    const content = renderPopupContent(currentTarget, props);
     if (!item) {
         return null;
     }
@@ -60,10 +72,3 @@ export const BaseChartPopupContainer = forwardRef((props, ref) => {
         </div>
     );
 });
-
-BaseChartPopupContainer.propTypes = {
-    target: PropTypes.object,
-    pinnedTarget: PropTypes.object,
-    animatePopup: PropTypes.bool,
-    findItemByTarget: PropTypes.func,
-};

@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { minmax } from '../../utils/common.ts';
 
-import { BaseChart } from '../BaseChart/BaseChart.tsx';
+import { BaseChartProps, BaseChartState } from '../BaseChart/types.ts';
 import { Histogram } from '../Histogram/Histogram.tsx';
 import { LineChart } from '../LineChart/LineChart.tsx';
 import { RangeSlider } from '../RangeSlider/RangeSlider.tsx';
+import { RangeSliderProps } from '../RangeSlider/types.ts';
 
 import {
     getSliderChangeType,
@@ -15,6 +15,18 @@ import {
     getSliderStart,
 } from './helpers.ts';
 import './RangeScrollChart.scss';
+import { Store } from '../../utils/Store/Store.ts';
+
+export type RangeScrollChartData = BaseChartProps;
+
+export interface RangeScrollChartProps {
+    className: string,
+    type: 'histogram' | 'linechart',
+    hideScrollBar: boolean,
+    mainChart: RangeScrollChartData,
+    navigationChart: RangeScrollChartData,
+    navigationSlider: RangeSliderProps,
+}
 
 const chartTypesMap = {
     histogram: Histogram,
@@ -33,8 +45,8 @@ export const RangeScrollChart = (props) => {
         navigationSlider,
     } = props;
 
-    const mainStoreRef = useRef(null);
-    const navStoreRef = useRef(null);
+    const mainStoreRef = useRef<Store | null>(null);
+    const navStoreRef = useRef<Store | null>(null);
 
     const [state, setState] = useState({
         ...props,
@@ -47,8 +59,8 @@ export const RangeScrollChart = (props) => {
         chartScrollRequested: false,
     });
 
-    const getMainState = () => (
-        mainStoreRef.current?.getState() ?? null
+    const getMainState = (): BaseChartState => (
+        (mainStoreRef.current?.getState() as BaseChartState) ?? null
     );
 
     const onBeforeSliderChange = (value, changeType) => {
@@ -324,21 +336,4 @@ export const RangeScrollChart = (props) => {
             </div>
         </div>
     );
-};
-
-RangeScrollChart.propTypes = {
-    className: PropTypes.string,
-    type: PropTypes.oneOf(chartTypes),
-    hideScrollBar: PropTypes.bool,
-    mainChart: PropTypes.shape({
-        ...BaseChart.propTypes,
-        data: PropTypes.object,
-    }),
-    navigationChart: PropTypes.shape({
-        ...BaseChart.propTypes,
-        data: PropTypes.object,
-    }),
-    navigationSlider: PropTypes.shape({
-        ...RangeSlider.propTypes,
-    }),
 };

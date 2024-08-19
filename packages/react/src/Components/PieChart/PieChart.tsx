@@ -1,13 +1,13 @@
 import { asArray, isObject } from '@jezvejs/types';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { PieChartSector } from './components/PieChartSector/PieChartSector.tsx';
 
 import { arraySum } from './helpers.ts';
+import { PieChartProps, PieChartSectorProps } from './types.ts';
 import './PieChart.scss';
 
-export const PieChart = (props) => {
+export const PieChart = (props: PieChartProps) => {
     const {
         radius = 150,
         innerRadius = 0,
@@ -29,17 +29,17 @@ export const PieChart = (props) => {
     };
 
     /** Sector item 'click' event handler */
-    const onItemClick = (event, sector) => {
+    const onItemClick = (event: React.MouseEvent, sector: PieChartSectorProps) => {
         props.onItemClick?.({ sector, event });
     };
 
     /** Sector item 'mouseover' event handler */
-    const onItemOver = (event, sector) => {
+    const onItemOver = (event: React.MouseEvent, sector: PieChartSectorProps) => {
         props.onItemOver?.({ sector, event });
     };
 
     /** Sector item 'mouseout' from bar event handler */
-    const onItemOut = (event, sector) => {
+    const onItemOut = (event: React.MouseEvent, sector: PieChartSectorProps) => {
         props.onItemOut?.({ sector, event });
     };
 
@@ -81,13 +81,13 @@ export const PieChart = (props) => {
     }
 
     let start = 0;
-    let prevColor;
+    let prevColor = 0;
 
-    const r = parseFloat(radius);
+    const r = radius;
     if (Number.isNaN(r) || r === 0.0) {
         throw new Error('Invalid radius');
     }
-    const ir = parseFloat(innerRadius);
+    const ir = innerRadius;
     if (Number.isNaN(ir) || ir < 0 || ir > r) {
         throw new Error('Invalid radius');
     }
@@ -143,17 +143,4 @@ export const PieChart = (props) => {
             </g>
         </svg>
     );
-};
-
-PieChart.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    radius: PropTypes.number,
-    innerRadius: PropTypes.number,
-    offset: PropTypes.number,
-    data: PropTypes.array,
-    colors: PropTypes.array,
-    onItemClick: PropTypes.func,
-    onItemOver: PropTypes.func,
-    onItemOut: PropTypes.func,
 };

@@ -1,7 +1,6 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
-
 import { PaginatorArrow } from '../Arrow/PaginatorArrow.tsx';
+import { PaginatorItemAttr, PaginatorItemProps } from '../../types.ts';
 
 const defaultProps = {
     ellipsis: false,
@@ -9,7 +8,7 @@ const defaultProps = {
     allowActiveLink: false,
 };
 
-export const PaginatorItem = (p) => {
+export const PaginatorItem = (p: PaginatorItemProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -25,7 +24,7 @@ export const PaginatorItem = (p) => {
         );
     }
 
-    const commonProps = {
+    const commonProps: PaginatorItemAttr = {
         className: classNames(
             'paginator-item',
             { 'paginator-item__active': !!props.active },
@@ -33,15 +32,17 @@ export const PaginatorItem = (p) => {
     };
 
     if (props.page) {
-        commonProps['data-page'] = props.page;
+        commonProps['data-page'] = props.page.toString();
     } else {
         commonProps.disabled = true;
     }
 
     if (props.url) {
         const url = new URL(props.url);
-        url.searchParams.set(props.pageParam, props.page);
-        commonProps.href = url;
+        if (props.pageParam) {
+            url.searchParams.set(props.pageParam, props.page?.toString() ?? '');
+        }
+        commonProps.href = url.toString();
     }
 
     if (props.navigation) {
@@ -51,14 +52,4 @@ export const PaginatorItem = (p) => {
     return (
         <a {...commonProps}>{props.page}</a>
     );
-};
-
-PaginatorItem.propTypes = {
-    ellipsis: PropTypes.bool,
-    active: PropTypes.bool,
-    allowActiveLink: PropTypes.bool,
-    page: PropTypes.number,
-    url: PropTypes.string,
-    pageParam: PropTypes.string,
-    navigation: PropTypes.string,
 };

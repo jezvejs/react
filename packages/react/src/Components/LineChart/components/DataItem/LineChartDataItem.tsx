@@ -1,33 +1,51 @@
-import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
+import { CSSProperties, forwardRef } from 'react';
 import classNames from 'classnames';
 
 import { formatCoord } from '../../../BaseChart/helpers.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
+import {
+    LineChartDataItemComponent,
+    LineChartDataItemProps,
+    LineChartDataItemRef,
+    LineChartState,
+} from '../../types.ts';
 import './LineChartDataItem.scss';
 
 const animateAttributes = ['cy'];
+
+export interface LineChartDataItemAttrs {
+    cx: number,
+    cy: number,
+    r: number,
+    style?: CSSProperties,
+}
 
 /**
  * LineChartDataItem component
  */
 // eslint-disable-next-line react/display-name
-export const LineChartDataItem = forwardRef((props, ref) => {
+export const LineChartDataItem: LineChartDataItemComponent = forwardRef<
+    LineChartDataItemRef,
+    LineChartDataItemProps
+>((props, ref) => {
     const {
         cx = 0,
         cy = 0,
         r = 4,
     } = props;
 
-    const attrs = {
+    const attrs: LineChartDataItemAttrs = {
         cx,
         cy,
         r,
     };
 
-    const { getState } = useStore();
-    const state = getState();
+    const store = useStore();
+    if (!store) {
+        return null;
+    }
+    const state = store.getState() as LineChartState;
 
     const isValid = Object.values(attrs).every((value) => value >= 0);
     if (!isValid) {
@@ -76,19 +94,3 @@ export const LineChartDataItem = forwardRef((props, ref) => {
         <circle {...itemProps} ref={ref} />
     );
 });
-
-LineChartDataItem.propTypes = {
-    cx: PropTypes.number,
-    cy: PropTypes.number,
-    r: PropTypes.number,
-    categoryIndex: PropTypes.number,
-    category: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-    ]),
-    stacked: PropTypes.bool,
-    active: PropTypes.bool,
-    autoScale: PropTypes.bool,
-    animate: PropTypes.bool,
-    animateNow: PropTypes.bool,
-};

@@ -1,17 +1,24 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { PopupPosition } from './PopupPosition.ts';
+import { PopupPositionProps } from './types.ts';
 
-export function usePopupPosition(options = {}) {
+export interface UsePopupPositionProps extends PopupPositionProps {
+    open?: boolean,
+}
+
+export function usePopupPosition<E = HTMLElement, R = HTMLElement>(
+    options: UsePopupPositionProps,
+) {
     const {
         open = false,
         ...props
     } = options;
 
-    const reference = useRef(null);
-    const elem = useRef(null);
-    const position = useRef(null);
+    const reference = useRef<R | null>(null);
+    const elem = useRef<E | null>(null);
+    const position = useRef<PopupPosition | null>(null);
 
-    const referenceRef = useCallback((node) => {
+    const referenceRef = useCallback((node: R | null) => {
         if (!node) {
             return;
         }
@@ -19,7 +26,7 @@ export function usePopupPosition(options = {}) {
         reference.current = node;
     }, [open]);
 
-    const elementRef = useCallback((node) => {
+    const elementRef = useCallback((node: E | null) => {
         if (!node) {
             return;
         }

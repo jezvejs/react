@@ -1,45 +1,47 @@
 import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
+import {
+    DropDownNativeSelectComponent,
+    DropDownNativeSelectProps,
+    DropDownNativeSelectRef,
+    OptGroupProps,
+    OptionProps,
+} from '../../types.ts';
 
-const Option = (props) => (
+/**
+ * Select option component
+ */
+const Option = (props: OptionProps) => (
     <option value={props.id}>{props.title}</option>
 );
 
-Option.propTypes = {
-    id: PropTypes.string,
-    title: PropTypes.string,
-};
-
-const OptGroup = (props) => (
+/**
+ * Select options group component
+ */
+const OptGroup = (props: OptGroupProps) => (
     <optgroup label={props.title} disabled={props.disabled}>
-        {props.items.map((item) => (
+        {props.items.map((item: OptionProps) => (
             <Option key={`opt_${Date.now()}${item.id}`} {...props} />
         ))}
     </optgroup>
 );
 
-OptGroup.propTypes = {
-    id: PropTypes.string,
-    title: PropTypes.string,
-    disabled: PropTypes.bool,
-    items: PropTypes.array,
-};
-
-const renderListItem = ({ type, ...props }) => (
-    (type === 'group')
-        ? <OptGroup key={`opt_${Date.now()}${props.id}`} {...props} />
-        : <Option key={`opt_${Date.now()}${props.id}`} {...props} />
+const NativeSelectListItem = (props: OptionProps | OptGroupProps) => (
+    ('type' in props && props.type === 'group')
+        ? <OptGroup {...props} />
+        : <Option {...props} />
 );
 
 const defaultProps = {
     tabIndex: 0,
     disabled: false,
     multiple: false,
-    onChange: null,
 };
 
 // eslint-disable-next-line react/display-name
-export const DropDownNativeSelect = forwardRef((p, ref) => {
+export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
+    DropDownNativeSelectRef,
+    DropDownNativeSelectProps
+>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -52,29 +54,28 @@ export const DropDownNativeSelect = forwardRef((p, ref) => {
         onChange,
     } = props;
 
-    const selectProps = {
+    const selectProps: React.SelectHTMLAttributes<HTMLSelectElement> = {
         id,
         multiple,
         disabled,
-        tabIndex: (disabled) ? '' : props.tabIndex,
         onChange,
     };
+
+    if (!disabled && ('tabIndex' in props)) {
+        selectProps.tabIndex = props.tabIndex;
+    }
 
     return (
         <select
             {...selectProps}
             ref={ref}
         >
-            {props.items.map(renderListItem)}
+            {props.items.map((item: OptionProps | OptGroupProps) => (
+                <NativeSelectListItem
+                    {...item}
+                    key={`opt_${Date.now()}${props.id}`}
+                />
+            ))}
         </select>
     );
 });
-
-DropDownNativeSelect.propTypes = {
-    id: PropTypes.string,
-    tabIndex: PropTypes.number,
-    disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
-    onChange: PropTypes.func,
-    items: PropTypes.array,
-};

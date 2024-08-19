@@ -23,8 +23,10 @@ import { DropDownGroupItem } from './components/Menu/GroupItem/GroupItem.tsx';
 import { DropDownGroupHeader } from './components/Menu/GroupHeader/GroupHeader.tsx';
 import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListPlaceholder.tsx';
 
-export const defaultProps = {
-    className: null,
+import { DropDownProps } from './types.ts';
+
+export const defaultProps: DropDownProps = {
+    id: '',
     multiple: false,
     listAttach: false,
     static: false,
@@ -36,11 +38,10 @@ export const defaultProps = {
     noResultsMessage: 'No items',
     allowCreate: false,
     allowActiveGroupHeader: false,
-    addItemMessage: (title) => `Add item: '${title}'`,
+    addItemMessage: (title: string) => `Add item: '${title}'`,
     disabled: false,
     useNativeSelect: false,
     fullScreen: false,
-    placeholder: null,
     reducers: null,
     blurInputOnSingleSelect: true,
     useSingleSelectionAsPlaceholder: true,
@@ -51,7 +52,7 @@ export const defaultProps = {
     onGroupHeaderClick: null,
     onItemSelect: null,
     onChange: null,
-    onInput: null,
+
     components: {
         Input: DropDownInput,
         NativeSelect: DropDownNativeSelect,

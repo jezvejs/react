@@ -1,5 +1,5 @@
-import { asArray, isDate } from '@jezvejs/types';
 import { isSameDate } from '@jezvejs/datetime';
+import { asArray, isDate } from '@jezvejs/types';
 
 import { createSlice } from '../../utils/createSlice.ts';
 
@@ -9,39 +9,51 @@ import {
     YEARRANGE_VIEW,
 } from './constants.ts';
 import {
+    getNextViewDate,
     getPrevViewDate,
     includesDate,
-    getNextViewDate,
 } from './helpers.ts';
+import {
+    DatePickerDisabledDateFilter,
+    DatePickerRangePart,
+    DatePickerSetSelectionParams,
+    DatePickerState,
+} from './types.ts';
 
 // Reducers
 const slice = createSlice({
-    show: (state, visible) => (
+    show: (state: DatePickerState, visible: boolean): DatePickerState => (
         (state.visible === visible)
             ? state
             : { ...state, visible }
     ),
 
-    setRangePart: (state, rangePart) => (
+    setRangePart: (state: DatePickerState, rangePart: DatePickerRangePart): DatePickerState => (
         (state.rangePart === rangePart)
             ? state
             : { ...state, rangePart }
     ),
 
-    setReadyState: (state, update) => ({
+    setReadyState: (
+        state: DatePickerState,
+        update: Partial<DatePickerState>,
+    ): DatePickerState => ({
         ...state,
         ...update,
         transition: null,
         secondViewTransition: false,
     }),
 
-    resize: (state, update) => ({
+    resize: (
+        state: DatePickerState,
+        update: Partial<DatePickerState>,
+    ): DatePickerState => ({
         ...state,
         ...update,
         secondViewTransition: false,
     }),
 
-    zoomIn: (state, { date, secondViewTransition }) => (
+    zoomIn: (state: DatePickerState, { date, secondViewTransition }): DatePickerState => (
         ([YEAR_VIEW, YEARRANGE_VIEW].includes(state.viewType))
             ? {
                 ...state,
@@ -53,7 +65,7 @@ const slice = createSlice({
             : state
     ),
 
-    zoomOut: (state, { secondViewTransition }) => (
+    zoomOut: (state: DatePickerState, { secondViewTransition }): DatePickerState => (
         ([MONTH_VIEW, YEAR_VIEW].includes(state.viewType))
             ? {
                 ...state,
@@ -64,37 +76,37 @@ const slice = createSlice({
             : state
     ),
 
-    navigateToPrev: (state) => ({
+    navigateToPrev: (state: DatePickerState): DatePickerState => ({
         ...state,
         date: getPrevViewDate(state.date, state.viewType),
         transition: 'slideToPrevious',
     }),
 
-    navigateToNext: (state) => ({
+    navigateToNext: (state: DatePickerState): DatePickerState => ({
         ...state,
         date: getNextViewDate(state.date, state.viewType),
         transition: 'slideToNext',
     }),
 
-    showMonth: (state, date) => ({
+    showMonth: (state: DatePickerState, date: Date): DatePickerState => ({
         ...state,
         viewType: MONTH_VIEW,
         date,
     }),
 
-    showYear: (state, date) => ({
+    showYear: (state: DatePickerState, date: Date): DatePickerState => ({
         ...state,
         viewType: YEAR_VIEW,
         date,
     }),
 
-    showYearRange: (state, date) => ({
+    showYearRange: (state: DatePickerState, date: Date): DatePickerState => ({
         ...state,
         viewType: YEARRANGE_VIEW,
         date,
     }),
 
-    selectDay: (state, date) => {
+    selectDay: (state: DatePickerState, date: Date): DatePickerState => {
         if (!state.multiple) {
             return {
                 ...state,
@@ -104,13 +116,13 @@ const slice = createSlice({
 
         return {
             ...state,
-            actDate: (includesDate(state.actDate, date))
-                ? asArray(state.actDate).filter((item) => !isSameDate(item, date))
+            actDate: (!!state.actDate && includesDate(state.actDate, date))
+                ? asArray(state.actDate).filter((item: Date) => !isSameDate(item, date))
                 : [...asArray(state.actDate), date],
         };
     },
 
-    startRangeSelect: (state, date) => ({
+    startRangeSelect: (state: DatePickerState, date: Date): DatePickerState => ({
         ...state,
         curRange: { start: null, end: null },
         selRange: {
@@ -119,7 +131,10 @@ const slice = createSlice({
         },
     }),
 
-    setSelection: (state, options) => {
+    setSelection: (
+        state: DatePickerState,
+        options: DatePickerSetSelectionParams,
+    ): DatePickerState => {
         const {
             startDate,
             endDate,
@@ -153,14 +168,17 @@ const slice = createSlice({
         return newState;
     },
 
-    clearSelection: (state) => ({
+    clearSelection: (state: DatePickerState): DatePickerState => ({
         ...state,
         curRange: { start: null, end: null },
         selRange: { start: null, end: null },
         actDate: null,
     }),
 
-    setDisabledDateFilter: (state, disabledDateFilter) => (
+    setDisabledDateFilter: (
+        state: DatePickerState,
+        disabledDateFilter: DatePickerDisabledDateFilter | null,
+    ): DatePickerState => (
         (state.disabledDateFilter === disabledDateFilter)
             ? state
             : { ...state, disabledDateFilter }

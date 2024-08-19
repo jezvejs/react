@@ -1,11 +1,15 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
+import { DatePickerHeaderProps } from '../../types.ts';
 import NavArrowIcon from './assets/nav-arrow.svg';
-
 import './Header.scss';
 
-const DatePickerHeaderTitle = (props) => {
+interface DatePickerHeaderTitleProps {
+    title?: string | null;
+    focusable?: boolean;
+    secondary?: boolean;
+}
+
+const DatePickerHeaderTitle = (props: DatePickerHeaderTitleProps) => {
     const titleProps = {
         className: classNames(
             'dp__header_item dp__header_title',
@@ -28,13 +32,7 @@ const DatePickerHeaderTitle = (props) => {
     );
 };
 
-DatePickerHeaderTitle.propTypes = {
-    title: PropTypes.string,
-    focusable: PropTypes.bool,
-    secondary: PropTypes.bool,
-};
-
-export const DatePickerHeader = (props) => {
+export const DatePickerHeader: React.FC<DatePickerHeaderProps> = (props: DatePickerHeaderProps) => {
     const {
         doubleView = false,
         focusable = false,
@@ -42,22 +40,24 @@ export const DatePickerHeader = (props) => {
         secondTitle = null,
     } = props;
 
-    const onClick = (e) => {
+    const onClick = (e: React.MouseEvent) => {
         e.stopPropagation();
 
-        const isTitle = e.target.closest('.dp__header_title');
-        const isSecondTitle = doubleView && e.target.closest('.dp__header_sec-title');
+        const target = e.target as HTMLElement;
+
+        const isTitle = target?.closest?.('.dp__header_title');
+        const isSecondTitle = doubleView && target?.closest('.dp__header_sec-title');
         if (isTitle || isSecondTitle) {
             props.onClickTitle?.({ e, secondViewTransition: !!isSecondTitle });
             return;
         }
 
-        if (e.target.closest('.dp__header_nav-prev')) {
+        if (target?.closest('.dp__header_nav-prev')) {
             props.onClickPrev?.({ e });
             return;
         }
 
-        if (e.target.closest('.dp__header_nav-next')) {
+        if (target?.closest('.dp__header_nav-next')) {
             props.onClickNext?.({ e });
         }
     };
@@ -97,14 +97,4 @@ export const DatePickerHeader = (props) => {
             </div>
         </div>
     );
-};
-
-DatePickerHeader.propTypes = {
-    title: PropTypes.string,
-    secondTitle: PropTypes.string,
-    doubleView: PropTypes.bool,
-    focusable: PropTypes.bool,
-    onClickTitle: PropTypes.func,
-    onClickPrev: PropTypes.func,
-    onClickNext: PropTypes.func,
 };

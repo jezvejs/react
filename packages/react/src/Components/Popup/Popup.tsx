@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
+import { ReactNode } from 'react';
 import classNames from 'classnames';
 
 // Common hooks
@@ -10,8 +10,21 @@ import { CloseButton } from '../CloseButton/CloseButton.tsx';
 
 import './Popup.scss';
 
-const defaultProps = {
-    className: null,
+export interface PopupProps {
+    id: string,
+    className: string,
+    show: boolean,
+    nodim: boolean,
+    scrollMessage: boolean,
+    closeButton: boolean,
+    onClose: ((e: React.MouseEvent) => void) | null,
+    title: ReactNode,
+    footer: ReactNode,
+    children: ReactNode,
+    container: Element | DocumentFragment,
+}
+
+const defaultProps: Partial<PopupProps> = {
     title: null,
     footer: null,
     closeButton: false,
@@ -24,7 +37,7 @@ const defaultProps = {
 /**
  * Popup component
  */
-export const Popup = (p) => {
+export const Popup = (p: PopupProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -36,7 +49,7 @@ export const Popup = (p) => {
 
     useScrollLock(props.nodim !== true && props.show);
 
-    const onClose = (e) => {
+    const onClose = (e: React.MouseEvent) => {
         props.onClose?.(e);
     };
 
@@ -73,27 +86,4 @@ export const Popup = (p) => {
         </div>,
         container,
     );
-};
-
-Popup.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    show: PropTypes.bool,
-    nodim: PropTypes.bool,
-    scrollMessage: PropTypes.bool,
-    closeButton: PropTypes.bool,
-    onClose: PropTypes.func,
-    title: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    footer: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    container: PropTypes.object,
 };

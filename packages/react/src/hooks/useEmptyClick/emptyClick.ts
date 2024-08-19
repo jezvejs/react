@@ -1,7 +1,15 @@
 import { isFunction, asArray } from '@jezvejs/types';
 import { ge } from '@jezvejs/dom';
 
-const clickHandlersMap = [];
+export type EmptyClickCallback = () => void;
+export type EmptyClickHandler = (e: MouseEvent) => void;
+
+export interface EmptyClickEntry {
+    callback: EmptyClickCallback;
+    handler: EmptyClickHandler;
+}
+
+const clickHandlersMap: EmptyClickEntry[] = [];
 
 /**
  * Handler for click on empty space event
@@ -9,7 +17,7 @@ const clickHandlersMap = [];
  * @param {Function} callback - event handler
  * @param {Element[]} elem - elements to skip handler if click occurs on it
  */
-const onEmptyClick = (e, callback, elem) => {
+const onEmptyClick = (e: Event, callback: EmptyClickCallback, elem: Element | Element[]) => {
     let notExcluded = true;
     const elems = asArray(elem);
 
@@ -18,7 +26,7 @@ const onEmptyClick = (e, callback, elem) => {
     }
 
     if (e) {
-        notExcluded = elems.every((el) => {
+        notExcluded = elems.every((el: string) => {
             const currentElem = ((typeof el === 'string') ? ge(el) : el) || null;
 
             return ((
@@ -35,12 +43,12 @@ const onEmptyClick = (e, callback, elem) => {
 };
 
 /** Returns index of 'empty click' handler with specified callback */
-const getEmptyClickHandlerIndex = (callback) => (
-    clickHandlersMap.findIndex((item) => item.callback === callback)
+const getEmptyClickHandlerIndex = (callback: EmptyClickCallback) => (
+    clickHandlersMap.findIndex((item: EmptyClickEntry) => item.callback === callback)
 );
 
 /** Set event handler for click by empty place */
-export const setEmptyClick = (callback, elem) => {
+export const setEmptyClick = (callback: EmptyClickCallback, elem: Element | Element[]) => {
     if (!document.documentElement || !isFunction(callback)) {
         return;
     }
@@ -51,7 +59,7 @@ export const setEmptyClick = (callback, elem) => {
             return;
         }
 
-        const handler = (e) => onEmptyClick(e, callback, elem);
+        const handler = (e: MouseEvent) => onEmptyClick(e, callback, elem);
         clickHandlersMap.push({ callback, handler });
 
         document.documentElement.addEventListener(
@@ -62,7 +70,7 @@ export const setEmptyClick = (callback, elem) => {
 };
 
 /** Remove previously set event handler for click by empty place */
-export const removeEmptyClick = (callback) => {
+export const removeEmptyClick = (callback: EmptyClickCallback) => {
     const ind = getEmptyClickHandlerIndex(callback);
     if (ind === -1) {
         return;

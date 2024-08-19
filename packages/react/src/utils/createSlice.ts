@@ -1,4 +1,22 @@
 import { isObject } from '@jezvejs/types';
+import {
+    StoreActionObject,
+    StoreActionPayload,
+    StoreActionPayloadFunction,
+    StoreActionReducer,
+    StoreReducer,
+    StoreState,
+} from './Store/Store.ts';
+
+export interface ReducerSlice {
+    actions: {
+        [type: string]: StoreActionPayloadFunction,
+    },
+    reducers: {
+        [type: string]: StoreActionReducer,
+    },
+    reducer: StoreReducer,
+}
 
 /**
  * Returns map of actions and reducer function for specified reducers object
@@ -6,15 +24,15 @@ import { isObject } from '@jezvejs/types';
  * @param {object} reducers
  * @returns {object}
  */
-export const createSlice = (reducers) => {
+export const createSlice = (reducers: object): ReducerSlice => {
     if (!isObject(reducers)) {
         throw new Error('Invalid actions object');
     }
 
-    const slice = {
+    const slice: ReducerSlice = {
         actions: {},
         reducers: {},
-        reducer(state, action) {
+        reducer(state: StoreState, action: StoreActionObject): StoreState {
             if (!(action.type in slice.reducers)) {
                 return state;
             }
@@ -25,7 +43,7 @@ export const createSlice = (reducers) => {
     };
 
     Object.entries(reducers).forEach(([action, reducer]) => {
-        slice.actions[action] = (payload) => ({ type: action, payload });
+        slice.actions[action] = (payload?: StoreActionPayload) => ({ type: action, payload });
         slice.reducers[action] = reducer;
     });
 

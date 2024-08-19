@@ -1,12 +1,27 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './Radio.scss';
 
+export interface RadioProps {
+    id: string,
+    name: string,
+    className: string,
+    form: string,
+    tabIndex: number,
+    checked: boolean,
+    disabled: boolean,
+    value: string,
+    label: string,
+    tooltip: string,
+    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void,
+    onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
+}
+
 /**
  * Radio component
  */
-export const Radio = (props) => {
+export const Radio = (props: RadioProps) => {
     const {
         checked = false,
         tooltip = null,
@@ -16,14 +31,22 @@ export const Radio = (props) => {
         name,
         tabIndex,
         disabled = false,
-        onFocus = null,
-        onBlur = null,
-        onChange = null,
     } = props;
+
+    const title = (tooltip === null && typeof label === 'string')
+        ? label
+        : (tooltip ?? '');
+
+    const onFocus = (e: React.FocusEvent<HTMLInputElement>) => props.onFocus?.(e);
+
+    const onBlur = (e: React.FocusEvent<HTMLInputElement, Element>) => props.onBlur?.(e);
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange?.(e);
 
     const inputProps = {
         form,
         name,
+        title,
         value,
         tabIndex,
         disabled,
@@ -31,10 +54,6 @@ export const Radio = (props) => {
         onBlur,
         onChange,
     };
-
-    inputProps.title = (tooltip === null && typeof label === 'string')
-        ? label
-        : (tooltip ?? '');
 
     return (
         <label className={classNames('radio', props.className)}>
@@ -47,20 +66,4 @@ export const Radio = (props) => {
             {props.label && (<span className='radio__label'>{props.label}</span>)}
         </label>
     );
-};
-
-Radio.propTypes = {
-    id: PropTypes.string,
-    name: PropTypes.string,
-    className: PropTypes.string,
-    form: PropTypes.string,
-    tabIndex: PropTypes.number,
-    checked: PropTypes.bool,
-    disabled: PropTypes.bool,
-    value: PropTypes.string,
-    label: PropTypes.string,
-    tooltip: PropTypes.string,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
 };

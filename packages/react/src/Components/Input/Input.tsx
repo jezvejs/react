@@ -1,25 +1,52 @@
-import { isFunction } from '@jezvejs/types';
 import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './Input.scss';
 
-const defaultProps = {
+export type InputModes = (
+    'text'
+    | 'search'
+    | 'email'
+    | 'tel'
+    | 'url'
+    | 'none'
+    | 'numeric'
+    | 'decimal'
+);
+
+export interface InputProps {
+    id?: string,
+    name?: string,
+    className?: string,
+    form?: string,
+    tabIndex?: number,
+    inputMode?: InputModes,
+    placeholder?: string,
+    type?: string,
+    disabled?: boolean,
+    value?: string,
+
+    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void,
+    onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
+
+    renderValue?: (value: InputProps) => string,
+}
+
+const defaultProps: InputProps = {
     type: 'text',
     disabled: false,
     value: '',
-    onInput: null,
-    onFocus: null,
-    onBlur: null,
-    onChange: null,
 };
+
+export type InputRef = HTMLInputElement;
 
 /**
  * Input component
  */
 // eslint-disable-next-line react/display-name
-export const Input = forwardRef((p, ref) => {
+export const Input = forwardRef<InputRef, InputProps>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -30,10 +57,16 @@ export const Input = forwardRef((p, ref) => {
         ...rest
     } = props;
 
-    const onChange = (e) => props.onChange?.(e);
+    const onFocus = (e: React.FocusEvent<HTMLInputElement>) => props.onFocus?.(e);
 
-    const getValue = (inputState) => (
-        isFunction(renderValue)
+    const onBlur = (e: React.FocusEvent<HTMLInputElement, Element>) => props.onBlur?.(e);
+
+    const onInput = (e: React.ChangeEvent<HTMLInputElement>) => props.onInput?.(e);
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange?.(e);
+
+    const getValue = (inputState: InputProps) => (
+        (typeof renderValue === 'function')
             ? renderValue(inputState)
             : (inputState?.value)
     );
@@ -41,6 +74,9 @@ export const Input = forwardRef((p, ref) => {
     const inputProps = {
         ...rest,
         className: classNames('input', props.className),
+        onFocus,
+        onBlur,
+        onInput,
         onChange,
         value: getValue(props),
     };
@@ -49,21 +85,3 @@ export const Input = forwardRef((p, ref) => {
         <input {...inputProps} ref={ref} />
     );
 });
-
-Input.propTypes = {
-    id: PropTypes.string,
-    name: PropTypes.string,
-    className: PropTypes.string,
-    form: PropTypes.string,
-    tabIndex: PropTypes.number,
-    inputMode: PropTypes.string,
-    placeholder: PropTypes.string,
-    type: PropTypes.string,
-    disabled: PropTypes.bool,
-    value: PropTypes.string,
-    onInput: PropTypes.func,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
-    renderValue: PropTypes.func,
-};

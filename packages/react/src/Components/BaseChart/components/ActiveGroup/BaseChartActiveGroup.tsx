@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { formatCoord } from '../../helpers.ts';
+import { BaseChartState } from '../../types.ts';
 import './BaseChartActiveGroup.scss';
 
 /**
  * BaseChartActiveGroup component
  */
-export const BaseChartActiveGroup = (props) => {
+export const BaseChartActiveGroup = (props: BaseChartState) => {
     if (!props.activeTarget) {
         return null;
     }
@@ -29,11 +29,4 @@ export const BaseChartActiveGroup = (props) => {
             <rect {...rectProps} />
         </g>
     );
-};
-
-BaseChartActiveGroup.propTypes = {
-    className: PropTypes.string,
-    height: PropTypes.number,
-    activeTarget: PropTypes.object,
-    getGroupOuterWidth: PropTypes.func,
 };

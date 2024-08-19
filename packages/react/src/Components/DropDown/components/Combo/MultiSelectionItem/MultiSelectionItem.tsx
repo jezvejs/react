@@ -1,15 +1,17 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 
 import { Tag } from '../../../../Tag/Tag.tsx';
 
+import { DropDownMultiSelectionItemComponent, DropDownMultiSelectionItemProps } from '../../../types.ts';
 import './MultiSelectionItem.scss';
 
 const defaultProps = {
     active: false,
 };
 
-export const DropDownMultiSelectionItem = (p) => {
+export const DropDownMultiSelectionItem: DropDownMultiSelectionItemComponent = (
+    p: DropDownMultiSelectionItemProps,
+) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -26,8 +28,3 @@ export const DropDownMultiSelectionItem = (p) => {
 DropDownMultiSelectionItem.selector = Tag.selector;
 DropDownMultiSelectionItem.buttonClass = Tag.buttonClass;
 DropDownMultiSelectionItem.placeholderClass = Tag.placeholderClass;
-
-DropDownMultiSelectionItem.propTypes = {
-    active: PropTypes.bool,
-    className: PropTypes.string,
-};

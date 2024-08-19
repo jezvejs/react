@@ -6,9 +6,10 @@ import {
     updateColumnWidth,
     getDataState,
 } from './helpers.ts';
+import { BaseChartState, BaseChartTarget } from './types.ts';
 
 /** Updates state of component based on layout changes(scroll or resize) */
-const refreshView = (state, layout) => {
+const refreshView = (state: BaseChartState, layout: Partial<BaseChartState>) => {
     let newState = {
         ...state,
         ...layout,
@@ -33,16 +34,19 @@ const refreshView = (state, layout) => {
 
 // Reducers
 const slice = createSlice({
-    update: (state, stateUpdate) => ({ ...state, ...stateUpdate }),
+    update: (state: BaseChartState, stateUpdate: Partial<BaseChartState>) => ({
+        ...state,
+        ...stateUpdate,
+    }),
 
-    setScroll: (state, scrollLeft) => (
+    setScroll: (state: BaseChartState, scrollLeft: number) => (
         (state.scrollLeft === scrollLeft)
             ? state
             : { ...state, scrollLeft }
     ),
 
-    setColumnWidth: (state, value) => {
-        const width = parseFloat(value, 10);
+    setColumnWidth: (state: BaseChartState, value: number) => {
+        const width = value;
         if (Number.isNaN(width) || width < 1 || state.columnWidth === width) {
             return state;
         }
@@ -54,8 +58,8 @@ const slice = createSlice({
         });
     },
 
-    setGroupsGap: (state, value) => {
-        const groupsGap = parseFloat(value, 10);
+    setGroupsGap: (state: BaseChartState, value: number) => {
+        const groupsGap = value;
         if (Number.isNaN(groupsGap) || state.groupsGap === groupsGap) {
             return state;
         }
@@ -67,13 +71,13 @@ const slice = createSlice({
         });
     },
 
-    setActiveCategory: (state, activeCategory) => (
+    setActiveCategory: (state: BaseChartState, activeCategory) => (
         (state.activeCategory === activeCategory)
             ? state
             : { ...state, activeCategory }
     ),
 
-    activateTarget: (state, target) => {
+    activateTarget: (state: BaseChartState, target: BaseChartTarget) => {
         if (
             !target?.item
             || isSameTarget(state.activeTarget, target)
@@ -87,25 +91,25 @@ const slice = createSlice({
         };
     },
 
-    deactivateTarget: (state) => (
+    deactivateTarget: (state: BaseChartState) => (
         (state.activeTarget)
             ? { ...state, activeTarget: null }
             : state
     ),
 
-    requestScroll: (state) => (
+    requestScroll: (state: BaseChartState) => (
         (!state.scrollRequested)
             ? { ...state, scrollRequested: true }
             : state
     ),
 
-    finishScroll: (state) => (
+    finishScroll: (state: BaseChartState) => (
         (state.scrollRequested)
             ? { ...state, scrollRequested: false }
             : state
     ),
 
-    scrollToRight: (state) => {
+    scrollToRight: (state: BaseChartState) => {
         if (!state.scrollRequested) {
             return state;
         }
@@ -124,13 +128,13 @@ const slice = createSlice({
         };
     },
 
-    ignoreTouch: (state) => (
+    ignoreTouch: (state: BaseChartState) => (
         (state.ignoreTouch)
             ? state
             : { ...state, ignoreTouch: true }
     ),
 
-    itemClicked: (state) => ({
+    itemClicked: (state: BaseChartState) => ({
         ...state,
         popupTarget: (
             (state.showPopupOnClick && !state.pinPopupOnClick)
@@ -140,25 +144,25 @@ const slice = createSlice({
         pinnedTarget: (state.pinPopupOnClick) ? state.activeTarget : null,
     }),
 
-    itemOver: (state) => (
+    itemOver: (state: BaseChartState) => (
         (state.showPopupOnHover)
             ? { ...state, popupTarget: state.activeTarget }
             : state
     ),
 
-    hidePopup: (state) => (
+    hidePopup: (state: BaseChartState) => (
         (state.popupTarget)
             ? { ...state, popupTarget: null }
             : state
     ),
 
-    startAnimation: (state) => (
+    startAnimation: (state: BaseChartState) => (
         (!state.animateNow)
             ? { ...state, animateNow: true }
             : state
     ),
 
-    animationDone: (state) => (
+    animationDone: (state: BaseChartState) => (
         (state.animateNow)
             ? { ...state, animateNow: false }
             : state
@@ -168,7 +172,7 @@ const slice = createSlice({
 
     resize: refreshView,
 
-    setData: (state, { data, layout }) => {
+    setData: (state: BaseChartState, { data, layout }) => {
         if (state.data === data) {
             return state;
         }
@@ -187,7 +191,7 @@ const slice = createSlice({
         return updateChartWidth(newState);
     },
 
-    scaleVisible: (state, values) => (
+    scaleVisible: (state: BaseChartState, values) => (
         (state.autoScale && values?.length > 0)
             ? {
                 ...state,

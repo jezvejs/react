@@ -36,8 +36,8 @@
 }
 
 /* Disabled component */
-.dd__container[disabled],
-.dd__container_attached[disabled] {
+.dd__container.dd__container_disabled,
+.dd__container_attached.dd__container_disabled {
   .dd__input {
     background-color: var(--dd-disabled-input-bg);
     color: var(--dd-disabled-input-text);

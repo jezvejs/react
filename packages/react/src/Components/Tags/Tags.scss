@@ -17,7 +17,7 @@
   background: var(--tags-background);
 }
 
-/* Disabled drop down */
-.tags[disabled] {
+/* Disabled state */
+.tags.tags_disabled {
   background-color: var(--tags-disabled-background);
 }

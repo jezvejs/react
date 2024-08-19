@@ -1,29 +1,35 @@
-import PropTypes from 'prop-types';
-import { forwardRef } from 'react';
+import { CSSProperties, forwardRef } from 'react';
 
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
 import { px } from '../../../utils/common.ts';
+
 import { valueToPosition } from '../helpers.ts';
+import { RangeSliderAfterAreaProps, RangeSliderState } from '../types.ts';
+
+type RangeSliderAfterAreaRef = HTMLDivElement | null;
 
 // eslint-disable-next-line react/display-name
-export const RangeSliderAfterArea = forwardRef((props, ref) => {
-    const getEndValue = (state) => (
+export const RangeSliderAfterArea = forwardRef<
+    RangeSliderAfterAreaRef,
+    RangeSliderAfterAreaProps
+>((props, ref) => {
+    const getEndValue = (state: RangeSliderState) => (
         (props.range) ? state.end : state.value
     );
 
-    const { getState } = useDragnDrop();
-
-    if (!props.afterArea) {
+    const dragnDrop = useDragnDrop();
+    if (!dragnDrop || !props.afterArea) {
         return null;
     }
 
-    const state = getState();
-    const value = getEndValue(state);
+    const { getState } = dragnDrop;
+    const state = getState() as RangeSliderState;
 
+    const value = getEndValue(state);
     const endPos = valueToPosition(value, state.min, state.max, state.maxPos);
     const size = Math.abs(state.maxPos - endPos);
 
-    const style = {
+    const style: CSSProperties = {
     };
 
     if (props.axis === 'x') {
@@ -36,9 +42,3 @@ export const RangeSliderAfterArea = forwardRef((props, ref) => {
         <div className="range-slider__after-area" style={style} ref={ref} />
     );
 });
-
-RangeSliderAfterArea.propTypes = {
-    axis: PropTypes.oneOf(['x', 'y']),
-    range: PropTypes.bool,
-    afterArea: PropTypes.bool,
-};

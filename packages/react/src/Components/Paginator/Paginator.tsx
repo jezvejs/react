@@ -1,11 +1,11 @@
 import { isFunction } from '@jezvejs/types';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { PaginatorItem } from './components/Item/PaginatorItem.tsx';
 
 import { getItems } from './helpers.ts';
+import { PaginatorProps, PaginatorState } from './types.ts';
 import './Paginator.scss';
 
 const defaultProps = {
@@ -22,16 +22,16 @@ const defaultProps = {
     onChange: null,
 };
 
-export const Paginator = (p) => {
+export const Paginator = (p: PaginatorProps) => {
     const props = {
         ...defaultProps,
         ...p,
     };
 
-    const [state, setState] = useState(props);
+    const [state, setState] = useState<PaginatorState>(props);
     const items = getItems(state);
 
-    const setPage = (pageNum) => {
+    const setPage = (pageNum: number) => {
         if (
             (state.pageNum === pageNum)
             || (pageNum < 1)
@@ -75,19 +75,4 @@ export const Paginator = (p) => {
             ))}
         </div>
     );
-};
-
-Paginator.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    breakLimit: PropTypes.number,
-    groupLimit: PropTypes.number,
-    pageNum: PropTypes.number,
-    pagesCount: PropTypes.number,
-    allowActiveLink: PropTypes.bool,
-    showSingleItem: PropTypes.bool,
-    arrows: PropTypes.bool,
-    pageParam: PropTypes.string,
-    url: PropTypes.string,
-    onChange: PropTypes.func,
 };

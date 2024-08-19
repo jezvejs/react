@@ -6,9 +6,16 @@ import {
     isNumberString,
     trimDecimalPlaces,
 } from '@jezvejs/number';
-import PropTypes from 'prop-types';
 
-import { ControlledInput } from '../ControlledInput/ControlledInput.tsx';
+import { ControlledInput, ControlledInputProps } from '../ControlledInput/ControlledInput.tsx';
+
+export interface DecimalInputProps extends ControlledInputProps {
+    min: number,
+    max: number,
+    digits: number,
+    allowNegative: boolean,
+    allowMultipleLeadingZeros: boolean,
+}
 
 const defaultProps = {
     value: '',
@@ -19,13 +26,13 @@ const defaultProps = {
     allowMultipleLeadingZeros: false,
 };
 
-export const DecimalInput = (p) => {
+export const DecimalInput = (p: DecimalInputProps) => {
     const props = {
         ...defaultProps,
         ...p,
     };
 
-    const isValidValue = (value) => {
+    const isValidValue = (value: string) => {
         if (value === '') {
             return true;
         }
@@ -64,8 +71,8 @@ export const DecimalInput = (p) => {
         return true;
     };
 
-    const renderValue = (state) => (
-        (typeof digits === 'number')
+    const renderValue = (state: DecimalInputProps) => (
+        (typeof state.digits === 'number')
             ? trimDecimalPlaces(state.value, state.digits)
             : state.value
     );
@@ -87,13 +94,4 @@ export const DecimalInput = (p) => {
             {...inputProps}
         />
     );
-};
-
-DecimalInput.propTypes = {
-    ...ControlledInput.propTypes,
-    min: PropTypes.number,
-    max: PropTypes.number,
-    digits: PropTypes.number,
-    allowNegative: PropTypes.bool,
-    allowMultipleLeadingZeros: PropTypes.bool,
 };

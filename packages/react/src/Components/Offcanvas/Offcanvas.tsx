@@ -1,11 +1,29 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.ts';
 
 import './Offcanvas.scss';
+
+export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
+
+export interface OffcanvasProps {
+    id?: string,
+    className?: string,
+    placement: OffcanvasPlacement,
+    closed?: boolean,
+    useScrollLock?: boolean,
+    onOpened?: (() => void) | null,
+    onClosed?: (() => void) | null,
+    onToggle?: (() => void) | null,
+    children?: ReactNode,
+    container?: Element | DocumentFragment,
+}
+
+interface OffcanvasState extends OffcanvasProps {
+    transitionInProgress?: boolean,
+}
 
 const defaultProps = {
     placement: 'left',
@@ -16,13 +34,13 @@ const defaultProps = {
     onToggle: null,
 };
 
-export const Offcanvas = (p) => {
+export const Offcanvas = (p: OffcanvasProps) => {
     const props = {
         ...defaultProps,
         ...p,
     };
 
-    const [state, setState] = useState(props);
+    const [state, setState] = useState<OffcanvasState>(props);
     const showBackground = state.transitionInProgress || state.closed === false;
 
     useEffect(() => {
@@ -89,20 +107,4 @@ export const Offcanvas = (p) => {
         </>,
         container,
     );
-};
-
-Offcanvas.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    placement: PropTypes.oneOf(['left', 'right', 'top', 'bottom']),
-    closed: PropTypes.bool,
-    useScrollLock: PropTypes.bool,
-    onOpened: PropTypes.func,
-    onClosed: PropTypes.func,
-    onToggle: PropTypes.func,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    container: PropTypes.object,
 };

@@ -1,7 +1,13 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './Progress.scss';
+
+export interface ProgressProps {
+    id: string,
+    className: string,
+    disabled: boolean,
+    value: number,
+}
 
 const defaultProps = {
     disabled: false,
@@ -11,7 +17,7 @@ const defaultProps = {
 /**
  * Progress component
  */
-export const Progress = (p) => {
+export const Progress = (p: ProgressProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -36,11 +42,4 @@ export const Progress = (p) => {
             />
         </div>
     );
-};
-
-Progress.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    disabled: PropTypes.bool,
-    value: PropTypes.number,
 };

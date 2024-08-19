@@ -4,7 +4,7 @@
 export class ScrollLock {
     static locked = false;
 
-    static scrollTop = null;
+    static scrollTop = 0;
 
     static lock() {
         if (this.locked) {
@@ -17,7 +17,7 @@ export class ScrollLock {
         this.scrollTop = scrollElem.scrollTop;
 
         const { style } = document.body;
-        style.top = `-${this.scrollTop}px`;
+        style.top = `${-this.scrollTop}px`;
         style.overflow = 'hidden';
         style.width = '100%';
         style.height = 'auto';
@@ -48,7 +48,7 @@ export class ScrollLock {
             window.scrollTo(0, this.scrollTop);
         }
 
-        this.scrollTop = null;
+        this.scrollTop = 0;
     }
 
     static toggle() {

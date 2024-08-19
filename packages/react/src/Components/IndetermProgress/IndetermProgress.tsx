@@ -1,7 +1,13 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './IndetermProgress.scss';
+
+export interface IndetermProgressProps {
+    id: string,
+    className: string,
+    run: boolean,
+    circlesCount: number,
+}
 
 const defaultProps = {
     run: true,
@@ -11,7 +17,7 @@ const defaultProps = {
 /**
  * IndetermProgress component
  */
-export const IndetermProgress = (p) => {
+export const IndetermProgress = (p: IndetermProgressProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -42,11 +48,4 @@ export const IndetermProgress = (p) => {
             ))}
         </div>
     );
-};
-
-IndetermProgress.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    run: PropTypes.bool,
-    circlesCount: PropTypes.number,
 };

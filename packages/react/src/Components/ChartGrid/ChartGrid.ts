@@ -20,7 +20,7 @@ export interface ChartGridProps {
     defaultValueRange?: number,
     height?: number,
     margin?: number,
-};
+}
 
 /**
  * Chart grid class constructor
@@ -33,22 +33,39 @@ export interface ChartGridProps {
  */
 export class ChartGrid {
     props: ChartGridProps;
+
     precision: number = 0;
+
     valueStep: number = 1;
+
     valueFirst: number = 0;
+
     valueLast: number = 0;
+
     steps: number = 0;
+
     yFirst: number = 0;
+
     yLast: number = 0;
+
     yStep: number = 0;
+
     minValue: number = 0;
+
     maxValue: number = 0;
+
     dValue: number = 0;
+
     firstStep: number = 0;
+
     lastStep: number = 0;
+
     dStep: number = 0;
+
     viewMin: number = 0;
+
     viewMax: number = 0;
+
     viewDelta: number = 0;
 
     constructor(props: ChartGridProps = {}) {
@@ -314,7 +331,7 @@ export class ChartGrid {
     }
 
     /** Calculate grid parameters for specified values */
-    calculate(values) {
+    calculate(values: number[] | object[]) {
         const allValues = this.getAllValues(values);
         if (!allValues.length) {
             return;

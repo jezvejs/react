@@ -1,31 +1,55 @@
-import {
+import React, {
     useEffect,
     useRef,
     forwardRef,
     useImperativeHandle,
+    ReactNode,
 } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
 
+export interface RangeSliderDropTargetProps {
+    id: string;
+    className: string;
+    axis: 'x' | 'y';
+    disabled: boolean;
+
+    children: ReactNode;
+
+    onClickCapture: (e: React.MouseEvent) => void;
+    onFocusCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
+    onBlurCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
+    onKeyDownCapture: (e: React.KeyboardEvent) => void;
+    // onDragEnd: () => void;
+}
+
+type RangeSliderDropTargetRef = HTMLDivElement | null;
+
 // eslint-disable-next-line react/display-name
-export const RangeSliderDropTarget = forwardRef((props, ref) => {
+export const RangeSliderDropTarget = forwardRef<
+    RangeSliderDropTargetRef,
+    RangeSliderDropTargetProps
+>((props, ref) => {
     const {
-        onClickCapture = null,
-        onFocusCapture = null,
-        onBlurCapture = null,
-        onKeyDownCapture = null,
+        onClickCapture,
+        onFocusCapture,
+        onBlurCapture,
+        onKeyDownCapture,
         disabled = false,
     } = props;
 
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+    const innerRef = useRef<RangeSliderDropTargetRef>(null);
+    useImperativeHandle<
+        RangeSliderDropTargetRef,
+        RangeSliderDropTargetRef
+    >(ref, () => innerRef.current);
 
     useEffect(() => {
         const dropTarget = {
             id: props.id,
             elem: innerRef?.current,
+
             onDragEnd({ avatar }) {
                 avatar.onDragEnd?.();
             },
@@ -58,19 +82,3 @@ export const RangeSliderDropTarget = forwardRef((props, ref) => {
         </div>
     );
 });
-
-RangeSliderDropTarget.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    axis: PropTypes.oneOf(['x', 'y']),
-    disabled: PropTypes.bool,
-    onClickCapture: PropTypes.func,
-    onFocusCapture: PropTypes.func,
-    onBlurCapture: PropTypes.func,
-    onKeyDownCapture: PropTypes.func,
-    onDragEnd: PropTypes.func,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-};

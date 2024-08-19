@@ -18,6 +18,7 @@ import { DatePickerWeekDaysHeader } from './components/WeekDaysHeader/WeekDaysHe
 import { defaultProps } from './defaultProps.ts';
 import { reducer } from './reducer.ts';
 import * as DatePickerHelpers from './helpers.ts';
+import { DatePickerProps } from './types.ts';
 import './DatePicker.scss';
 
 export {
@@ -31,8 +32,13 @@ export {
     DatePickerHelpers,
 };
 
+type DatePickerRef = HTMLDivElement | null;
+
 // eslint-disable-next-line react/display-name
-export const DatePicker = forwardRef((props, ref) => {
+export const DatePicker = forwardRef<
+    DatePickerRef,
+    DatePickerProps
+>((props, ref) => {
     const reducers = useMemo(() => {
         const extraReducers = asArray(props.reducers);
         return (extraReducers.length > 0)
@@ -53,7 +59,3 @@ export const DatePicker = forwardRef((props, ref) => {
         </StoreProvider>
     );
 });
-
-DatePicker.propTypes = {
-    ...DatePickerContainer.propTypes,
-};

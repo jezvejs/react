@@ -5,47 +5,77 @@ import {
     useImperativeHandle,
     useRef,
 } from 'react';
-import PropTypes from 'prop-types';
 
 // Utils
 import { minmax } from '../../../utils/common.ts';
 import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
+import { StoreUpdater } from '../../../utils/Store/Store.ts';
 
 // Local components
-import { RangeSliderValueSlider } from './RangeSliderValueSlider.tsx';
 import { RangeSliderSelectedArea } from './RangeSliderSelectedArea.tsx';
+import { RangeSliderValueSlider } from './RangeSliderValueSlider.tsx';
 
 import { getMaxPos } from '../helpers.ts';
+import {
+    RangeSliderSelectedAreaProps,
+    RangeSliderState,
+    RangeSliderValueSliderProps,
+    RangeSliderValueSliderType,
+} from '../types.ts';
+import { DragZone, OnDragStartParams } from '../../../utils/DragnDrop/types.ts';
+
+export interface RangeSliderDragZoneProps {
+    id: string;
+    axis: 'x' | 'y';
+    type?: 'startSlider' | 'endSlider' | 'selectedArea';
+    range: boolean;
+    onPosChange: (position: number) => void;
+}
+
+type RangeSliderDragZoneRef = HTMLDivElement | null;
 
 // eslint-disable-next-line react/display-name
-export const RangeSliderDragZone = forwardRef((props, ref) => {
+export const RangeSliderDragZone = forwardRef<
+    RangeSliderDragZoneRef,
+    RangeSliderDragZoneProps
+>((props, ref) => {
     const {
         type = 'startSlider',
     } = props;
     const sliderId = type;
 
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+    const innerRef = useRef<RangeSliderDragZoneRef>(null);
+    useImperativeHandle<
+        RangeSliderDragZoneRef,
+        RangeSliderDragZoneRef
+    >(ref, () => (
+        innerRef?.current
+    ));
 
-    const avatarRef = useRef(null);
-    const currentTargetElemRef = useRef(null);
+    const avatarRef = useRef<HTMLElement | null>(null);
+    const currentTargetElemRef = useRef<HTMLElement | null>(null);
 
-    const { getState, setState } = useDragnDrop();
+    const dragDrop = useDragnDrop();
+    const getState = () => dragDrop?.getState() as RangeSliderState ?? null;
+    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
 
     useEffect(() => {
         if (!innerRef?.current) {
             return;
         }
 
-        const dragZone = {
+        const dragZoneProps = {
+            id: props.id,
             elem: innerRef.current,
             mouseMoveThreshold: 0,
             touchMoveTimeout: 0,
-            onDragStart(params) {
+
+            onDragStart(params: OnDragStartParams) {
                 const avatar = {
                     id: props.id,
                     elem: avatarRef.current,
+
                     getDragInfo() {
                         const sliderState = getState()[sliderId];
                         return {
@@ -56,9 +86,11 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
                             },
                         };
                     },
+
                     getTargetElem() {
                         return currentTargetElemRef.current;
                     },
+
                     initFromEvent({ downX, downY }) {
                         if (!innerRef?.current) {
                             return false;
@@ -67,13 +99,13 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
                         const offset = getOffset(innerRef.current);
 
                         const rect = innerRef.current.getBoundingClientRect();
-                        const offsetRect = innerRef.current.offsetParent.getBoundingClientRect();
+                        const offsetRect = innerRef.current?.offsetParent?.getBoundingClientRect();
 
                         setState((prev) => ({
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
-                                origLeft: innerRef.current.offsetLeft,
+                                origLeft: innerRef.current?.offsetLeft,
                                 shiftX: downX - offset.left,
                                 shiftY: downY - offset.top,
                                 rect,
@@ -83,12 +115,15 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
 
                         return true;
                     },
-                    onDragMove(e) {
+
+                    onDragMove(e: TouchEvent | MouseEvent) {
                         const client = DragMaster.getEventClientCoordinates(e);
 
                         const state = getState();
                         const currentState = state[sliderId];
-                        const sliderState = (type !== 'endSlider') ? state.startSlider : currentState;
+                        const sliderState = (type !== 'endSlider')
+                            ? state.startSlider
+                            : currentState;
 
                         const pos = (props.axis === 'x')
                             ? (client.x - currentState.offset.left - currentState.shiftX)
@@ -102,15 +137,15 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
 
                         const newPos = minmax(0, maxPos, pos);
 
-                        const rect = innerRef.current.getBoundingClientRect();
-                        const offsetRect = innerRef.current.offsetParent.getBoundingClientRect();
+                        const rect = innerRef.current?.getBoundingClientRect();
+                        const offsetRect = innerRef.current?.offsetParent?.getBoundingClientRect();
 
-                        setState((prev) => ({
+                        setState((prev: RangeSliderState) => ({
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
-                                left: (props.axis === 'x') ? newPos : prev.left,
-                                top: (props.axis === 'y') ? newPos : prev.top,
+                                left: (props.axis === 'x') ? newPos : prev[sliderId].left,
+                                top: (props.axis === 'y') ? newPos : prev[sliderId].top,
                                 rect,
                                 offset: offsetRect,
                             },
@@ -122,17 +157,21 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
                         if (!innerRef?.current) {
                             return;
                         }
-                        currentTargetElemRef.current = innerRef.current.parentElement;
+
+                        if (currentTargetElemRef) {
+                            currentTargetElemRef.current = innerRef.current.parentElement;
+                        }
 
                         props.onPosChange?.(newPos);
                     },
+
                     onDragCancel() {
                         setState((prev) => ({
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
-                                left: prev.origLeft,
-                                top: prev.origTop,
+                                left: prev[sliderId].origLeft,
+                                top: prev[sliderId].origTop,
                             },
                             dragging: false,
                         }));
@@ -145,7 +184,7 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
             },
         };
 
-        DragMaster.makeDraggable(dragZone);
+        DragMaster.makeDraggable(dragZoneProps as DragZone);
     }, [innerRef]);
 
     const onResize = () => {
@@ -160,6 +199,10 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
     };
 
     useEffect(() => {
+        if (!innerRef?.current?.offsetParent) {
+            return undefined;
+        }
+
         const observer = new ResizeObserver(onResize);
         observer.observe(innerRef.current.offsetParent);
 
@@ -168,16 +211,22 @@ export const RangeSliderDragZone = forwardRef((props, ref) => {
         };
     }, [innerRef]);
 
+    if (type === 'selectedArea') {
+        const selectedAreaProps: RangeSliderSelectedAreaProps = {
+            ...props,
+        };
+
+        return (
+            <RangeSliderSelectedArea {...selectedAreaProps} ref={innerRef} />
+        );
+    }
+
+    const valueSliderProps: RangeSliderValueSliderProps = {
+        ...props,
+        type: props.type as RangeSliderValueSliderType,
+    };
+
     return (
-        (type === 'selectedArea')
-            ? <RangeSliderSelectedArea {...props} ref={innerRef} />
-            : <RangeSliderValueSlider {...props} ref={innerRef} />
+        <RangeSliderValueSlider {...valueSliderProps} ref={innerRef} />
     );
 });
-
-RangeSliderDragZone.propTypes = {
-    id: PropTypes.string,
-    axis: PropTypes.oneOf(['x', 'y']),
-    type: PropTypes.oneOf(['startSlider', 'endSlider', 'selectedArea']),
-    onPosChange: PropTypes.func,
-};

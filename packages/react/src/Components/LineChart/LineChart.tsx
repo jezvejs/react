@@ -1,25 +1,37 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+// Global components
 import { BaseChart, BaseChartHelpers } from '../BaseChart/BaseChart.tsx';
+import { BaseChartItemSearchResult, BaseChartState } from '../BaseChart/types.ts';
 
+// Local components
 import { LineChartDataItem } from './components/DataItem/LineChartDataItem.tsx';
 import { LineChartDataPath } from './components/DataPath/LineChartDataPath.tsx';
 import { LineChartDataSeries } from './components/DataSeries/LineChartDataSeries.tsx';
 
+import {
+    LineChartAlignedXOptions,
+    LineChartDataItemType,
+    LineChartItemProps,
+    LineChartProps,
+    LineChartState,
+} from './types.ts';
 import './LineChart.scss';
 
 /**
  * LineChart component
  */
-export const LineChart = (props) => {
-    const chartProps = {
+export const LineChart = (props: LineChartProps) => {
+    const defaultProps = {
         yAxisGrid: true,
         xAxisGrid: false,
         drawNodeCircles: false,
         nodeCircleRadius: 4,
         scaleAroundAxis: false,
+    };
 
+    const chartProps: LineChartProps = {
+        ...defaultProps,
         ...props,
 
         columnGap: 0,
@@ -29,38 +41,42 @@ export const LineChart = (props) => {
             props.className,
         ),
 
-        getColumnOuterWidth: (state) => (
+        getColumnOuterWidth: (state: LineChartState): number => (
             state.columnWidth + state.columnGap
         ),
 
         /** Returns current count of columns in group */
-        getColumnsInGroupCount: (state) => {
-            const stackedGroups = state.getStackedGroups(state);
-            return (state.data.stacked)
+        getColumnsInGroupCount: (state: BaseChartState): number => {
+            const chartState = state as LineChartState;
+            const stackedGroups = chartState.getStackedGroups(chartState);
+            return (chartState.data.stacked)
                 ? Math.max(stackedGroups.length, 1)
-                : state.dataSets.length;
+                : chartState.dataSets.length;
         },
 
-        getGroupWidth: (state) => (
+        getGroupWidth: (state: LineChartState): number => (
             state.getColumnOuterWidth(state) * state.columnsInGroup - state.columnGap
         ),
 
-        getGroupOuterWidth: (state) => (
-            state.getGroupWidth(state) + state.groupsGap
-        ),
+        getGroupOuterWidth: (state: BaseChartState): number => {
+            const chartState = state as LineChartState;
+            return chartState.getGroupWidth(chartState) + chartState.groupsGap;
+        },
 
-        getX: (item, groupWidth) => (
+        getX: (item: LineChartAlignedXOptions, groupWidth: number): number => (
             item.groupIndex * groupWidth
         ),
 
-        getAlignedX: (options, state) => {
+        getAlignedX: (
+            options: LineChartAlignedXOptions,
+            state: LineChartState,
+        ) => {
             const {
-                groupIndex = 0,
                 groupWidth = 0,
                 alignColumns = 'left',
             } = options;
 
-            let x = state.getX({ groupIndex }, groupWidth);
+            let x = state.getX(options, groupWidth);
             if (alignColumns === 'right') {
                 x += groupWidth;
             } else if (alignColumns === 'center') {
@@ -70,11 +86,12 @@ export const LineChart = (props) => {
             return x;
         },
 
-        getGroupIndexByX: (value, state) => {
-            const { alignColumns } = state;
-            const groupWidth = state.getGroupOuterWidth(state);
+        getGroupIndexByX: (value: number, state: BaseChartState) => {
+            const chartState = state as LineChartState;
+            const { alignColumns } = chartState;
+            const groupWidth = chartState.getGroupOuterWidth(chartState);
 
-            let x = parseFloat(value);
+            let x = value;
             if (alignColumns === 'left') {
                 x += groupWidth / 2;
             } else if (alignColumns === 'right') {
@@ -84,15 +101,24 @@ export const LineChart = (props) => {
             return Math.floor(x / groupWidth);
         },
 
-        isVisibleValue: (value) => (value < 0 || value > 0),
+        isVisibleValue: (value: number) => (value < 0 || value > 0),
 
-        isHorizontalScaleNeeded: (state, prevState = {}) => (
-            BaseChartHelpers.isHorizontalScaleNeeded(state, prevState)
-            || state.columnGap !== prevState?.columnGap
-        ),
+        isHorizontalScaleNeeded: (state: BaseChartState, prevState?: BaseChartState): boolean => {
+            const chartState = state as LineChartState;
+            const prevChartState = prevState as LineChartState;
+
+            return (
+                BaseChartHelpers.isHorizontalScaleNeeded(chartState, prevChartState)
+                || chartState.columnGap !== prevChartState?.columnGap
+            );
+        },
 
         /** Find item by event object */
-        findItemByEvent: (e, state, elem) => {
+        findItemByEvent: (
+            e: React.MouseEvent,
+            state: BaseChartState,
+            elem: Element,
+        ): BaseChartItemSearchResult | null => {
             const result = BaseChartHelpers.findItemByEvent(e, state, elem);
             if (!Array.isArray(result.item)) {
                 return result;
@@ -102,7 +128,7 @@ export const LineChart = (props) => {
             const diffs = result.item.map((item, ind) => ({ ind, diff: Math.abs(y - item.cy) }));
             diffs.sort((a, b) => a.diff - b.diff);
 
-            let item = null;
+            let item: LineChartDataItemType | null = null;
             let index = diffs[0].ind;
             if (index >= 0 && index < result.item.length) {
                 item = result.item[index];
@@ -118,7 +144,7 @@ export const LineChart = (props) => {
                 groupIndex: item?.groupIndex,
                 category: item?.category,
                 categoryIndex: item?.categoryIndex,
-                columnIndex: item?.columnIndex,
+                columnIndex: 0,
                 value: item?.value,
                 valueOffset: item?.valueOffset,
             };
@@ -126,7 +152,10 @@ export const LineChart = (props) => {
             return res;
         },
 
-        createItem: (data, state) => {
+        createItem: (
+            data: LineChartItemProps,
+            state: LineChartState,
+        ): LineChartDataItemType | null => {
             const { grid, alignColumns } = state;
             if (!grid) {
                 return null;
@@ -136,18 +165,20 @@ export const LineChart = (props) => {
             const valueOffset = data?.valueOffset ?? 0;
             const groupWidth = state.getGroupOuterWidth(state);
 
-            const itemProps = {
+            const itemProps: LineChartDataItemType = {
                 ...data,
                 value,
                 valueOffset,
-                cx: state.getAlignedX({
-                    groupIndex: data.groupIndex,
-                    groupWidth,
-                    alignColumns,
-                }, state),
+                cx: 0,
                 cy: grid.getY(value + valueOffset),
                 r: state.nodeCircleRadius,
             };
+
+            itemProps.cx = state.getAlignedX({
+                groupIndex: itemProps.groupIndex,
+                groupWidth,
+                alignColumns,
+            }, state);
 
             return itemProps;
         },
@@ -163,13 +194,4 @@ export const LineChart = (props) => {
     return (
         <BaseChart {...chartProps} />
     );
-};
-
-LineChart.propTypes = {
-    ...BaseChart.propTypes,
-    drawNodeCircles: PropTypes.bool,
-    components: PropTypes.shape({
-        ...BaseChart.childComponents,
-        DataPath: PropTypes.func,
-    }),
 };

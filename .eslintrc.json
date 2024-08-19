@@ -53,7 +53,9 @@
             {
                 "allowConstantExport": true
             }
-        ]
+        ],
+        "no-use-before-define": "off",
+        "react/prop-types": "off"
     },
     "plugins": [
         "react-refresh"

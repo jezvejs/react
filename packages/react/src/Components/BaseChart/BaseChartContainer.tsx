@@ -1,64 +1,93 @@
 import { isFunction } from '@jezvejs/types';
 import { getOffset } from '@jezvejs/dom';
-import {
+import React, {
     forwardRef,
     useRef,
     useImperativeHandle,
     useEffect,
 } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { debounce } from '../../utils/common.ts';
+import { debounce, DebounceCancelFunction } from '../../utils/common.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
 
 import { actions } from './reducer.ts';
 import { getComponent, mapValues } from './helpers.ts';
 import { BaseChartPopupContainer } from './BaseChartPopupContainer.tsx';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
+import { BaseChartState } from './types.ts';
+import { StoreAction, StoreUpdater } from '../../utils/Store/Store.ts';
+
+export interface BaseChartMeasuredLayout {
+    contentOffset?: {
+        top: number,
+        left: number,
+    },
+    scrollerWidth?: number,
+    scrollLeft?: number,
+    scrollWidth?: number,
+    containerWidth?: number,
+    containerHeight?: number,
+    xAxisLabelsHeight?: number,
+    height?: number,
+    chartHeight?: number,
+}
+
+export type BaseChartContainerRef = HTMLDivElement | null;
+
+export type BaseChartScaleFunction = () => void;
+export type BaseChartScrollFunction = () => void;
 
 /**
  * BaseChartContainer component
  */
 // eslint-disable-next-line react/display-name
-export const BaseChartContainer = forwardRef((props, ref) => {
+export const BaseChartContainer = forwardRef<
+    BaseChartContainerRef,
+    BaseChartState
+>((props, ref) => {
     const store = useStore();
-    const {
-        getState,
-        setState,
-        dispatch,
-    } = store;
+
+    const getState = () => store?.getState() as BaseChartState ?? null;
+    const setState = (update: StoreUpdater) => store?.setState(update);
+    const dispatch = (action: StoreAction) => store?.dispatch(action);
 
     useEffect(() => {
-        props?.onStoreReady?.(store);
+        if (store) {
+            props?.onStoreReady?.(store);
+        }
     }, [store]);
 
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+    const innerRef = useRef<HTMLDivElement | null>(null);
+    useImperativeHandle<
+        BaseChartContainerRef,
+        BaseChartContainerRef
+    >(ref, () => innerRef?.current);
 
-    const scrollerRef = useRef(null);
-    const chartContentRef = useRef(null);
-    const xAxisLabelsRef = useRef(null);
-    const popupRef = useRef(null);
-    const pinnedPopupRef = useRef(null);
+    const scrollerRef = useRef<HTMLDivElement | null>(null);
+    const chartContentRef = useRef<SVGSVGElement | null>(null);
+    const xAxisLabelsRef = useRef<HTMLElement | null>(null);
+    const popupRef = useRef<HTMLElement | null>(null);
+    const pinnedPopupRef = useRef<HTMLElement | null>(null);
 
-    const scaleFunc = useRef(null);
-    const cancelScaleFunc = useRef(null);
-    const scrollFunc = useRef(null);
-    const cancelScrollFunc = useRef(null);
+    const scaleFunc = useRef<BaseChartScaleFunction | null>(null);
+    const cancelScaleFunc = useRef<DebounceCancelFunction | null>(null);
 
-    const animationFrameRef = useRef(null);
+    const scrollFunc = useRef<BaseChartScrollFunction | null>(null);
+    const cancelScrollFunc = useRef<DebounceCancelFunction | null>(null);
+
+    const animationFrameRef = useRef<number>(0);
     const removeTransitionHandlerRef = useRef(null);
 
     /** Returns object with main dimensions of component */
-    const measureLayout = () => {
+    const measureLayout = (): BaseChartMeasuredLayout | null => {
         if (!scrollerRef.current || !innerRef.current) {
-            return {};
+            return null;
         }
 
         const { clientHeight, scrollWidth, scrollLeft } = scrollerRef.current;
 
-        const res = {
+        const res: BaseChartMeasuredLayout = {
             contentOffset: getOffset(scrollerRef.current),
             scrollerWidth: scrollerRef.current?.offsetWidth,
             scrollLeft,
@@ -71,7 +100,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         if (!props.height) {
             res.xAxisLabelsHeight = xAxisLabelsRef.current?.offsetHeight ?? 0;
             res.height = clientHeight - res.xAxisLabelsHeight;
-            res.chartHeight = res.height - props.marginTop;
+            res.chartHeight = res.height - (props.marginTop ?? 0);
         }
 
         return res;
@@ -150,11 +179,15 @@ export const BaseChartContainer = forwardRef((props, ref) => {
      * 'click' event handler
      * @param {MouseEvent} e
      */
-    const onClick = (e) => {
+    const onClick = (e: React.MouseEvent) => {
+        if (!innerRef.current) {
+            return;
+        }
+
         const state = getState();
 
         const target = state.findItemByEvent(e, getState(), innerRef.current);
-        if (!target.item) {
+        if (!target?.item) {
             deactivateTarget();
             return;
         }
@@ -165,14 +198,14 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
         dispatch(actions.itemClicked());
 
-        props.onItemClick?.({ ...target, event: e });
+        props.onItemClick?.({ e });
     };
 
     /**
      * 'touchstart' event handler
      * @param {TouchEvent} e
      */
-    const onTouchStart = (e) => {
+    const onTouchStart = (e: React.TouchEvent) => {
         if (e.touches) {
             dispatch(actions.ignoreTouch());
         }
@@ -182,7 +215,11 @@ export const BaseChartContainer = forwardRef((props, ref) => {
      * 'mousemove' event handler
      * @param {MouseEvent} e
      */
-    const onMouseMove = (e) => {
+    const onMouseMove = (e: React.MouseEvent /* | React.TouchEvent */) => {
+        if (!innerRef.current) {
+            return;
+        }
+
         const state = getState();
         if (state.ignoreTouch) {
             return;
@@ -194,7 +231,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         }
 
         if (state.currentTarget?.item) {
-            props.onItemOut?.({ ...state.currentTarget, event: e });
+            props.onItemOut?.({ ...state.currentTarget, e });
         }
 
         setState((prev) => ({
@@ -202,7 +239,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
             currentTarget: target,
         }));
 
-        if (!innerRef.current.contains(e.target)) {
+        if (!innerRef.current?.contains?.(e.target as Node)) {
             if (state.activateOnHover) {
                 deactivateTarget();
             }
@@ -215,21 +252,22 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
         dispatch(actions.itemOver());
 
-        props.onItemOver?.({ ...target, event: e });
+        props.onItemOver?.({ ...target, e });
     };
 
     /**
      * 'mouseleave' event handler
      * @param {MouseEvent} e
      */
-    const onMouseLeave = (e) => {
+    const onMouseLeave = (e: React.MouseEvent) => {
         const state = getState();
 
+        const relatedNode = e.relatedTarget as Node;
         if (
-            e.relatedTarget
+            relatedNode
             && (
-                popupRef.current?.contains(e.relatedTarget)
-                || pinnedPopupRef.current?.contains(e.relatedTarget)
+                popupRef.current?.contains(relatedNode)
+                || pinnedPopupRef.current?.contains(relatedNode)
             )
         ) {
             return;
@@ -240,7 +278,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         }
 
         if (state.currentTarget?.item) {
-            props.onItemOut?.({ ...state.currentTarget, event: e });
+            props.onItemOut?.({ ...state.currentTarget, e });
         }
 
         setState((prev) => ({
@@ -304,13 +342,29 @@ export const BaseChartContainer = forwardRef((props, ref) => {
 
     // Resize observer
     useEffect(() => {
+        if (!scrollerRef.current) {
+            return undefined;
+        }
+
         const state = getState();
-        const handler = debounce(() => onResize(), state.resizeTimeout);
+
+        const debouncedHandler = debounce(
+            () => onResize(),
+            state.resizeTimeout,
+            { cancellable: true },
+        );
+        const handler = (typeof debouncedHandler === 'function')
+            ? debouncedHandler
+            : debouncedHandler.run;
+
         const observer = new ResizeObserver(handler);
         observer.observe(scrollerRef.current);
 
         return () => {
             observer.disconnect();
+            if (typeof debouncedHandler === 'object') {
+                debouncedHandler.cancel();
+            }
         };
     }, [scrollerRef.current]);
 
@@ -330,8 +384,10 @@ export const BaseChartContainer = forwardRef((props, ref) => {
                 { cancellable: true },
             );
 
-            scaleFunc.current = scaleHandler.run;
-            cancelScaleFunc.current = scaleHandler.cancel;
+            if (typeof scaleHandler === 'object') {
+                scaleFunc.current = scaleHandler.run;
+                cancelScaleFunc.current = scaleHandler.cancel;
+            }
         }
 
         if (props.scrollToEnd) {
@@ -341,8 +397,10 @@ export const BaseChartContainer = forwardRef((props, ref) => {
                 { cancellable: true },
             );
 
-            scrollFunc.current = scrollHandler.run;
-            cancelScrollFunc.current = scrollHandler.cancel;
+            if (typeof scrollHandler === 'object') {
+                scrollFunc.current = scrollHandler.run;
+                cancelScrollFunc.current = scrollHandler.cancel;
+            }
         } else {
             scrollFunc.current = null;
         }
@@ -373,7 +431,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
     // Scroll
     useEffect(() => {
         const scrollLeft = props.scrollLeft
-            ? Math.round(parseFloat(props.scrollLeft))
+            ? Math.round(props.scrollLeft)
             : null;
 
         if (
@@ -432,7 +490,7 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         ),
     };
 
-    const chartContentProps = {
+    const chartContentProps: React.SVGProps<SVGSVGElement> = {
         className: 'chart__content',
         onClick,
         onTransitionEndCapture: handleTransitionEnd,
@@ -572,80 +630,3 @@ export const BaseChartContainer = forwardRef((props, ref) => {
         </div>
     );
 });
-
-const isComponent = PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.func,
-]);
-
-BaseChartContainer.childComponents = {
-    ActiveGroup: isComponent,
-    ChartPopup: isComponent,
-    DataItem: isComponent,
-    DataSeries: isComponent,
-    Grid: isComponent,
-    Legend: isComponent,
-    XAxisLabels: isComponent,
-    YAxisLabels: isComponent,
-};
-
-BaseChartContainer.propTypes = {
-    id: PropTypes.string,
-    data: PropTypes.object,
-    className: PropTypes.string,
-
-    // Layout
-    columnWidth: PropTypes.number,
-    groupsGap: PropTypes.number,
-    height: PropTypes.number,
-    marginTop: PropTypes.number,
-    autoScale: PropTypes.bool,
-    autoScaleTimeout: PropTypes.number,
-    scrollToEnd: PropTypes.bool,
-
-    scrollLeft: PropTypes.number,
-
-    beforeScroller: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    afterScroller: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-
-    // Grid
-    xAxisGrid: PropTypes.bool,
-    yAxisGrid: PropTypes.bool,
-
-    // Labels
-    xAxis: PropTypes.oneOf(['bottom', 'top', 'none']),
-    yAxis: PropTypes.oneOf(['left', 'right', 'none']),
-    yAxisLabelsAlign: PropTypes.oneOf(['left', 'center', 'right']),
-
-    alignColumns: PropTypes.oneOf(['left', 'center', 'right']),
-    activateOnHover: PropTypes.bool,
-    showLegend: PropTypes.bool,
-    animationEndTimeout: PropTypes.number,
-
-    // Popup
-    showPopupOnHover: PropTypes.bool,
-
-    // Callbacks
-    onStoreReady: PropTypes.func,
-    onItemClick: PropTypes.func,
-    onItemOver: PropTypes.func,
-    onItemOut: PropTypes.func,
-    onScroll: PropTypes.func,
-    scrollDone: PropTypes.func,
-
-    // Chart data functions
-    getGroupOuterWidth: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
-
-    // Child components
-    components: PropTypes.shape({
-        ...BaseChartContainer.childComponents,
-    }),
-};

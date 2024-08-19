@@ -1,14 +1,12 @@
 import classNames from 'classnames';
-import { Input } from '../../../Input/Input.tsx';
+import { Input, InputProps } from '../../../Input/Input.tsx';
 import './InputGroupInput.scss';
 
-export const InputGroupInput = (props) => (
+export type InputGroupInputProps = InputProps;
+
+export const InputGroupInput = (props: InputGroupInputProps) => (
     <Input
         {...props}
         className={classNames('input-group__input', props.className)}
     />
 );
-
-InputGroupInput.propTypes = {
-    ...Input.propTypes,
-};

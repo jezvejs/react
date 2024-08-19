@@ -1,9 +1,18 @@
-import PropTypes from 'prop-types';
-
 import { BaseChartXAxisGrid } from './BaseChartXAxisGrid.tsx';
 import { BaseChartYAxisGrid } from './BaseChartYAxisGrid.tsx';
 
 import './BaseChartGrid.scss';
+
+export interface BaseChartGridProps {
+    grid: object,
+    yAxisGrid: boolean,
+    xAxisGrid: boolean,
+    chartWidth: number,
+    height: number,
+    getGroupOuterWidth: () => void,
+    getFirstVisibleGroupIndex: () => void,
+    getVisibleGroupsCount: () => void,
+}
 
 /**
  * BaseChartGrid component
@@ -28,15 +37,4 @@ export const BaseChartGrid = (props) => {
             <YAxisGrid {...gridProps} />
         </g>
     );
-};
-
-BaseChartGrid.propTypes = {
-    grid: PropTypes.object,
-    yAxisGrid: PropTypes.bool,
-    xAxisGrid: PropTypes.bool,
-    chartWidth: PropTypes.number,
-    height: PropTypes.number,
-    getGroupOuterWidth: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
 };

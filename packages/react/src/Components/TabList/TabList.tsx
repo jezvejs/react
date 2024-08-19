@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { MenuProps, MenuList, MenuHelpers } from '../Menu/Menu.tsx';
+import { MenuDefProps, MenuList, MenuHelpers } from '../Menu/Menu.tsx';
 
-import { selectItem } from './helpers.ts';
+import { TabListItemProps, TabListProps } from './types.ts';
+import { generateId, selectItem } from './helpers.ts';
 import './TabList.scss';
+import { MenuListProps } from '../Menu/types.ts';
 
 const defaultProps = {
     items: [],
@@ -15,7 +16,7 @@ const defaultProps = {
 /**
  * Tabs list component
  */
-export const TabList = (p) => {
+export const TabList = (p: TabListProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -34,16 +35,19 @@ export const TabList = (p) => {
     }, selectedId);
     const [state, setState] = useState(initialState);
 
-    const onChange = (selected) => {
+    const onChange = (selected: string | null) => {
         setState((prev) => selectItem(prev, selected));
     };
 
-    const tabContentItem = state.items.find((item) => item.id === state.selectedId);
+    const tabContentItem = state.items?.find?.((item: TabListItemProps) => (
+        item.id === state.selectedId
+    ));
 
-    const menuDefaultProps = MenuProps.getDefaultProps();
+    const menuDefaultProps = MenuDefProps.getDefaultProps();
 
-    const listProps = {
+    const listProps: MenuListProps = {
         ...props,
+        id: props.id ?? `tabs${generateId()}`,
         className: 'tab-list_header',
         items: MenuHelpers.createItems(state.items, state),
         getItemProps: MenuHelpers.getItemProps,
@@ -61,24 +65,4 @@ export const TabList = (p) => {
             <div className='tab-list__content'>{tabContentItem?.content}</div>
         </div>
     );
-};
-
-TabList.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    selectedId: PropTypes.string,
-    items: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        type: PropTypes.string,
-        className: PropTypes.string,
-        title: PropTypes.string,
-        icon: PropTypes.oneOfType([
-            PropTypes.node,
-            PropTypes.elementType,
-        ]),
-        content: PropTypes.oneOfType([
-            PropTypes.node,
-            PropTypes.elementType,
-        ]),
-    })),
 };

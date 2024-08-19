@@ -1,27 +1,54 @@
-import PropTypes from 'prop-types';
-import { forwardRef } from 'react';
+import {
+    CSSProperties,
+    forwardRef,
+    useImperativeHandle,
+    useRef,
+} from 'react';
 
 import { px } from '../../../utils/common.ts';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
 
 import { getMaxPos, valueToPosition } from '../helpers.ts';
+import { RangeSliderState, RangeSliderValueSliderProps } from '../types.ts';
+
+interface SliderProps {
+    id: string,
+    tabIndex?: number,
+    style: CSSProperties,
+}
+
+type RangeSliderValueSliderRef = HTMLDivElement | null;
 
 // eslint-disable-next-line react/display-name
-export const RangeSliderValueSlider = forwardRef((props, ref) => {
+export const RangeSliderValueSlider = forwardRef<
+    RangeSliderValueSliderRef,
+    RangeSliderValueSliderProps
+>((props, ref) => {
     const {
         type = 'startSlider',
         axis = 'x',
     } = props;
 
-    const { getState } = useDragnDrop();
-    const state = getState();
+    const innerRef = useRef<HTMLDivElement>(null);
+    useImperativeHandle<
+        RangeSliderValueSliderRef,
+        RangeSliderValueSliderRef
+    >(ref, () => innerRef?.current);
 
-    const maxPos = getMaxPos(ref?.current, props);
+    const dragDrop = useDragnDrop();
+    if (!dragDrop) {
+        return null;
+    }
+
+    const { getState } = dragDrop;
+    const state = getState() as RangeSliderState;
+
+    const maxPos = getMaxPos(innerRef?.current, props);
     const rangeValue = (type === 'endSlider') ? state.end : state.start;
     const sliderValue = state.range ? rangeValue : state.value;
     const pos = valueToPosition(sliderValue, state.min, state.max, maxPos);
 
-    const sliderProps = {
+    const sliderProps: SliderProps = {
         id: props.id,
         style: {
         },
@@ -41,15 +68,7 @@ export const RangeSliderValueSlider = forwardRef((props, ref) => {
         <div
             {...sliderProps}
             className="range-slider__slider"
-            ref={ref}
+            ref={innerRef}
         />
     );
 });
-
-RangeSliderValueSlider.propTypes = {
-    id: PropTypes.string,
-    axis: PropTypes.oneOf(['x', 'y']),
-    type: PropTypes.oneOf(['startSlider', 'endSlider']),
-    tabIndex: PropTypes.number,
-    disabled: PropTypes.bool,
-};

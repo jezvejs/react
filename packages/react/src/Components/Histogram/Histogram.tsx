@@ -1,50 +1,63 @@
 import classNames from 'classnames';
 
 import { BaseChart, BaseChartHelpers } from '../BaseChart/BaseChart.tsx';
+import { BaseChartItemSearchResult, BaseChartState } from '../BaseChart/types.ts';
 
 import { HistogramDataItem } from './components/DataItem/HistogramDataItem.tsx';
 import { HistogramDataSeries } from './components/DataSeries/HistogramDataSeries.tsx';
 
+import {
+    HistogramAlignedXOptions,
+    HistogramDataItemType,
+    HistogramItemProps,
+    HistogramProps,
+    HistogramState,
+} from './types.ts';
 import './Histogram.scss';
 
 /**
  * Histogram component
  */
-export const Histogram = (props) => {
-    const chartProps = {
+export const Histogram = (props: HistogramProps) => {
+    const defaultProps = {
         yAxisGrid: true,
         xAxisGrid: false,
+    };
 
+    const chartProps = {
+        ...defaultProps,
         ...props,
 
         columnGap: 0,
         className: classNames('histogram', props.className),
 
-        getColumnOuterWidth: (state) => (
+        getColumnOuterWidth: (state: HistogramState): number => (
             state.columnWidth + state.columnGap
         ),
 
         /** Returns current count of columns in group */
-        getColumnsInGroupCount: (state) => {
-            const stackedGroups = state.getStackedGroups(state);
-            return (state.data.stacked)
+        getColumnsInGroupCount: (state: BaseChartState): number => {
+            const chartState = state as HistogramState;
+            const stackedGroups = chartState.getStackedGroups(chartState);
+            return (chartState.data.stacked)
                 ? Math.max(stackedGroups.length, 1)
-                : state.dataSets.length;
+                : chartState.dataSets.length;
         },
 
-        getGroupWidth: (state) => (
+        getGroupWidth: (state: HistogramState): number => (
             state.getColumnOuterWidth(state) * state.columnsInGroup - state.columnGap
         ),
 
-        getGroupOuterWidth: (state) => (
-            state.getGroupWidth(state) + state.groupsGap
-        ),
+        getGroupOuterWidth: (state: BaseChartState): number => {
+            const chartState = state as HistogramState;
+            return chartState.getGroupWidth(chartState) + chartState.groupsGap;
+        },
 
-        getX: (item, groupWidth, columnWidth) => (
+        getX: (item: HistogramDataItemType, groupWidth: number, columnWidth: number): number => (
             item.groupIndex * groupWidth + item.columnIndex * columnWidth
         ),
 
-        getAlignedX: (options, state) => {
+        getAlignedX: (options: HistogramAlignedXOptions, state: HistogramState): number => {
             const {
                 item = null,
                 groupWidth = 0,
@@ -52,6 +65,10 @@ export const Histogram = (props) => {
                 alignColumns = 'left',
                 groupsGap = 0,
             } = (options ?? {});
+
+            if (!item) {
+                return NaN;
+            }
 
             let x = state.getX(item, groupWidth, columnWidth);
             if (alignColumns === 'right') {
@@ -63,29 +80,39 @@ export const Histogram = (props) => {
             return x;
         },
 
-        isVisibleValue: (value) => (value < 0 || value > 0),
+        isVisibleValue: (value: number) => (value < 0 || value > 0),
 
-        isHorizontalScaleNeeded: (state, prevState = {}) => (
-            BaseChartHelpers.isHorizontalScaleNeeded(state, prevState)
-            || state.columnGap !== prevState?.columnGap
-        ),
+        isHorizontalScaleNeeded: (state: BaseChartState, prevState?: BaseChartState): boolean => {
+            const chartState = state as HistogramState;
+            const prevChartState = prevState as HistogramState;
+
+            return (
+                BaseChartHelpers.isHorizontalScaleNeeded(chartState, prevChartState)
+                || chartState.columnGap !== prevChartState?.columnGap
+            );
+        },
 
         /** Find item by event object */
-        findItemByEvent: (e, state, elem) => {
+        findItemByEvent: (
+            e: React.MouseEvent,
+            state: BaseChartState,
+            elem: Element,
+        ): BaseChartItemSearchResult | null => {
             const result = BaseChartHelpers.findItemByEvent(e, state, elem);
             if (!Array.isArray(result.item)) {
                 return result;
             }
 
-            let item = null;
+            let item: HistogramDataItemType | null = null;
             let index = -1;
 
-            const groupWidth = state.getGroupWidth(state);
-            const groupOuterWidth = state.getGroupOuterWidth(state);
+            const chartState = state as HistogramState;
+            const groupWidth = chartState.getGroupWidth(chartState);
+            const groupOuterWidth = chartState.getGroupOuterWidth(chartState);
             const groupX = groupOuterWidth * result.index;
-            let { x } = result;
+            let x = result?.x ?? 0;
 
-            if (state.data.stacked) {
+            if (chartState.data.stacked) {
                 // Fix x coordinate if curson is between groups
                 if (x >= groupX + groupWidth && x < groupX + groupOuterWidth) {
                     x = groupX + groupWidth - 1;
@@ -143,7 +170,10 @@ export const Histogram = (props) => {
             return res;
         },
 
-        createItem: (data, state) => {
+        createItem: (
+            data: HistogramItemProps,
+            state: HistogramState,
+        ): HistogramDataItemType | null => {
             const value = data?.value ?? 0;
             if (!state.isVisibleValue(value)) {
                 return null;
@@ -161,10 +191,11 @@ export const Histogram = (props) => {
             const groupWidth = state.getGroupOuterWidth(state);
             const columnWidth = state.getColumnOuterWidth(state);
 
-            const itemProps = {
+            const itemProps: HistogramDataItemType = {
                 ...data,
                 value,
                 valueOffset,
+                x: 0,
                 y: Math.min(y0, y1),
                 width: state.columnWidth,
                 height,
@@ -195,8 +226,4 @@ export const Histogram = (props) => {
     return (
         <BaseChart {...chartProps} />
     );
-};
-
-Histogram.propTypes = {
-    ...BaseChart.propTypes,
 };

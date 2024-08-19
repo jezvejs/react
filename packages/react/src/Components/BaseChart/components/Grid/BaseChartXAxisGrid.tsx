@@ -1,16 +1,22 @@
-import PropTypes from 'prop-types';
 import { formatCoord } from '../../helpers.ts';
+import { BaseChartState } from '../../types.ts';
+
+export interface BaseChartXAxisGridItemProps {
+    id: string,
+    className: string,
+    d: string,
+}
 
 /**
  * BaseChartXAxisGrid component
  */
-export const BaseChartXAxisGrid = (props) => {
+export const BaseChartXAxisGrid = (props: BaseChartState) => {
     const { grid, data } = props;
     if (!grid?.steps || !props.xAxisGrid) {
         return null;
     }
 
-    const items = [];
+    const items: BaseChartXAxisGridItemProps[] = [];
     const groupOuterWidth = props.getGroupOuterWidth(props);
     const firstGroupIndex = props.getFirstVisibleGroupIndex(props);
     const visibleGroups = props.getVisibleGroupsCount(firstGroupIndex, props);
@@ -30,7 +36,7 @@ export const BaseChartXAxisGrid = (props) => {
         const curX = groupIndex * groupOuterWidth;
         let rX = Math.round(curX);
         rX += (rX > curX) ? -0.5 : 0.5;
-        rX = formatCoord(rX);
+        const fmtX = formatCoord(rX);
 
         const y0 = formatCoord(grid.yFirst);
         const y1 = formatCoord(grid.yLast);
@@ -38,7 +44,7 @@ export const BaseChartXAxisGrid = (props) => {
         const gridLine = {
             id: `xgrid_${groupIndex}`,
             className: 'chart__grid-line',
-            d: `M${rX},${y0}L${rX},${y1}`,
+            d: `M${fmtX},${y0}L${fmtX},${y1}`,
         };
 
         items.push(gridLine);
@@ -51,13 +57,4 @@ export const BaseChartXAxisGrid = (props) => {
             ))}
         </g>
     );
-};
-
-BaseChartXAxisGrid.propTypes = {
-    grid: PropTypes.object,
-    xAxisGrid: PropTypes.bool,
-    data: PropTypes.object,
-    getGroupOuterWidth: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
 };

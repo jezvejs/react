@@ -1,35 +1,38 @@
 import { getOffset } from '@jezvejs/dom';
 import { useEffect, useRef } from 'react';
 import { DragMaster } from './DragMaster.ts';
+import { DragAvatar, DropTarget, OnDragEndParams } from './types.ts';
 
-interface useDropTargetProps {
-    getTargetElem: () => void,
-    hideHoverIndication: () => void,
-    showHoverIndication: () => void,
-    onDragMove: (params: object) => void,
-    onDragEnd: (params: object) => void,
-    onDragEnter: () => void,
-    onDragLeave: () => void,
-};
+export interface UseDropTargetProps extends DropTarget {
+    getTargetElem?: (avatar: DragAvatar, e?: Event) => HTMLElement | null,
 
-export function useDropTarget(props: useDropTargetProps) {
-    const dropTargetRef = useRef(null);
+    hideHoverIndication?: (avatar?: DragAvatar) => void,
+
+    showHoverIndication?: (avatar: DragAvatar) => void,
+
+    applyNewTarget?: (avatar: DragAvatar, elem: HTMLElement) => void,
+}
+
+export function useDropTarget(props: UseDropTargetProps) {
+    const dropTargetRef = useRef<Element | null>(null);
 
     useEffect(() => {
-        const dropTarget = {
+        const dropTarget: DropTarget = {
             ...props,
+
             elem: dropTargetRef?.current,
-            onDragEnd(params) {
+
+            onDragEnd(params: OnDragEndParams) {
                 const { avatar, e } = params;
 
                 const elem = dropTargetRef?.current;
                 const offset = getOffset(elem);
                 const border = {
-                    top: elem.clientTop,
-                    left: elem.clientLeft,
+                    top: elem?.clientTop ?? 0,
+                    left: elem?.clientLeft ?? 0,
                 };
 
-                const avatarInfo = avatar.getDragInfo(e);
+                const avatarInfo = avatar.getDragInfo?.(e);
                 avatar.onDragEnd?.();
 
                 props.onDragEnd?.({

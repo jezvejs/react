@@ -9,34 +9,36 @@ export const minmax = (min: number, max: number, value: number): number => (
 );
 
 /** Return string for value in pixels */
-export const px = (val: string) => `${parseInt(val, 10)}px`;
+export const px = (val: string | number) => (
+    `${(typeof val === 'string') ? parseInt(val, 10) : val}px`
+);
 
 /** Check bit flag is set */
 export const hasFlag = (x: number, flag: number) => ((x & flag) === flag);
 
-interface DebounceOptions {
+export interface DebounceOptions {
     immediate?: boolean,
     cancellable?: boolean,
 }
 
-interface DebounceCallback {
+export interface DebounceCallback {
     (n?: number): void;
-};
+}
 
-interface DebounceRunFunction {
-    (args: any[]): void;
-};
-
-interface DebounceCancelFunction {
+export interface DebounceRunFunction {
     (): void;
-};
+}
 
-interface DebounceCancellableReturnResult {
+export interface DebounceCancelFunction {
+    (): void;
+}
+
+export interface DebounceCancellableReturnResult {
     run: DebounceRunFunction,
     cancel: DebounceCancelFunction,
-};
+}
 
-type DebounceReturnResult = DebounceRunFunction | DebounceCancellableReturnResult;
+export type DebounceReturnResult = DebounceRunFunction | DebounceCancellableReturnResult;
 
 /**
  * Runs only last call of function after timeout
@@ -59,7 +61,7 @@ export function debounce(
 
     let timeout: number = 0;
 
-    const run = function (...args: any[]) {
+    const run = function (...args) {
         const callFunc = () => func(...args);
 
         const later = () => {

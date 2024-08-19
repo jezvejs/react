@@ -1,15 +1,15 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 import { MenuGroupItem } from '../../../../Menu/Menu.tsx';
+import { DropDownGroupItemComponent, DropDownGroupItemProps } from '../../../types.ts';
 import './GroupItem.scss';
 
-export const DropDownGroupItem = (props) => (
+export const DropDownGroupItem: DropDownGroupItemComponent = (
+    props: DropDownGroupItemProps,
+) => (
     <MenuGroupItem
         {...props}
         className={classNames('dd__list-group', props.className)}
     />
 );
 
-DropDownGroupItem.propTypes = {
-    className: PropTypes.string,
-};
+DropDownGroupItem.selector = '.dd__list-group';

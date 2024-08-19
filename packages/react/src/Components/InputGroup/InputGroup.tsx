@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { ReactNode } from 'react';
 import './InputGroup.scss';
 
 export { InputGroupInput } from './components/Input/InputGroupInput.tsx';
@@ -8,10 +8,15 @@ export { InputGroupButton } from './components/Button/InputGroupButton.tsx';
 export { InputGroupInnerButton } from './components/InnerButton/InputGroupInnerButton.tsx';
 export { InputGroupOuterContainer } from './components/OuterContainer/InputGroupOuterContainer.tsx';
 
+export interface InputGroupProps {
+    className: string,
+    children: ReactNode,
+}
+
 /**
  * InputGroup component
  */
-export const InputGroup = (props) => (
+export const InputGroup = (props: InputGroupProps) => (
     <div
         className={classNames(
             'input-group',
@@ -21,11 +26,3 @@ export const InputGroup = (props) => (
         {props.children}
     </div>
 );
-
-InputGroup.propTypes = {
-    className: PropTypes.string,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-};

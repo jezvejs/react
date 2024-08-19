@@ -1,10 +1,16 @@
-import PropTypes from 'prop-types';
+import { BaseChartState } from '../../types.ts';
 import './BaseChartLegend.scss';
+
+export interface BaseChartLegendProps {
+    onlyVisibleCategoriesLegend: boolean,
+    getAllCategories: () => void,
+    getVisibleCategories: () => void,
+}
 
 /**
  * BaseChartLegend component
  */
-export const BaseChartLegend = (props) => {
+export const BaseChartLegend = (props: BaseChartState) => {
     const categories = (props.onlyVisibleCategoriesLegend)
         ? props.getVisibleCategories(props)
         : props.getAllCategories(props);
@@ -13,15 +19,9 @@ export const BaseChartLegend = (props) => {
         <ul className="chart__legend-list">
             {categories.map((category, ind) => (
                 <li className="chart__legend-list-item" key={`chlegenditem_${ind}`}>
-                    {category.toString()}
+                    {category?.toString()}
                 </li>
             ))}
         </ul>
     );
-};
-
-BaseChartLegend.propTypes = {
-    onlyVisibleCategoriesLegend: PropTypes.bool,
-    getAllCategories: PropTypes.func,
-    getVisibleCategories: PropTypes.func,
 };

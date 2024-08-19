@@ -1,7 +1,14 @@
-import { Button } from '../../../Button/Button.tsx';
+import { Button, ButtonProps } from '../../../Button/Button.tsx';
 import './InputGroupButton.scss';
 
-export const InputGroupButton = ({ children, ...props }) => {
+export type InputGroupButtonProps = ButtonProps;
+
+export const InputGroupButton = (props: InputGroupButtonProps) => {
+    const {
+        children,
+        ...buttonProps
+    } = props;
+
     const content = children && (
         <div className="input-group__btn-title">
             {children}
@@ -9,12 +16,8 @@ export const InputGroupButton = ({ children, ...props }) => {
     );
 
     return (
-        <Button {...props} className="input-group__btn">
+        <Button {...buttonProps} className="input-group__btn">
             {content}
         </Button>
     );
-};
-
-InputGroupButton.propTypes = {
-    ...Button.propTypes,
 };

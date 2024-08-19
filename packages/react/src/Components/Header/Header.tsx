@@ -1,12 +1,17 @@
-import PropTypes from 'prop-types';
+import { ReactNode } from 'react';
 import classNames from 'classnames';
-
 import './Header.scss';
+
+export interface HeaderProps {
+    id: string,
+    className: string,
+    children: ReactNode,
+}
 
 /**
  * Header component
  */
-export const Header = (props) => (
+export const Header = (props: HeaderProps) => (
     <header
         {...props}
         className={classNames('header', props.className)}
@@ -14,12 +19,3 @@ export const Header = (props) => (
         {props.children}
     </header>
 );
-
-Header.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-};

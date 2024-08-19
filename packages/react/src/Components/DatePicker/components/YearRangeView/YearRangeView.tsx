@@ -1,13 +1,13 @@
 import { shiftDate } from '@jezvejs/datetime';
 import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { YEARRANGE_VIEW, YEAR_RANGE_LENGTH } from '../../constants.ts';
 import { getHeaderTitle } from '../../helpers.ts';
+import { DatePickerHeaderProps, DatePickerYearRangeItemProps, DatePickerYearRangeViewProps } from '../../types.ts';
 import './YearRangeView.scss';
 
-const DatePickerYearRangeItem = (props) => {
+const DatePickerYearRangeItem = (props: DatePickerYearRangeItemProps) => {
     const {
         date,
         focusable,
@@ -41,16 +41,6 @@ const DatePickerYearRangeItem = (props) => {
     );
 };
 
-DatePickerYearRangeItem.propTypes = {
-    date: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    isOther: PropTypes.bool,
-    disabled: PropTypes.bool,
-    focusable: PropTypes.bool,
-};
-
 const defaultProps = {
     renderHeader: false,
     header: null,
@@ -60,8 +50,13 @@ const defaultProps = {
     },
 };
 
+type DatePickerYearRangeViewRef = HTMLDivElement | null;
+
 // eslint-disable-next-line react/display-name
-export const DatePickerYearRangeView = forwardRef((p, ref) => {
+export const DatePickerYearRangeView = forwardRef<
+    DatePickerYearRangeViewRef,
+    DatePickerYearRangeViewProps
+>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -76,7 +71,7 @@ export const DatePickerYearRangeView = forwardRef((p, ref) => {
         locales,
         focusable,
     } = props;
-    const { Header } = props.components;
+    const { Header } = (props.components ?? {});
 
     const title = getHeaderTitle({
         viewType: YEARRANGE_VIEW,
@@ -85,18 +80,27 @@ export const DatePickerYearRangeView = forwardRef((p, ref) => {
     });
 
     // year range header
-    const header = props.renderHeader && (
-        <Header
-            {...(props.header ?? {})}
-            locales={locales}
-            title={title}
-            focusable={focusable}
-        />
+    const headerProps: DatePickerHeaderProps = {
+        ...(props.header ?? {}),
+        title,
+        focusable,
+    };
+
+    const header = props.renderHeader && Header && (
+        <Header {...headerProps} />
     );
+
+    /*
+    <Header
+        {...(props.header ?? {})}
+        title={title}
+        focusable={focusable}
+    />
+    */
 
     const rYear = date.getFullYear();
     const startYear = rYear - (rYear % 10) - 1;
-    const items = [];
+    const items: DatePickerYearRangeItemProps[] = [];
 
     // years of current range
     for (let i = 0; i < YEAR_RANGE_LENGTH + 2; i += 1) {
@@ -121,20 +125,3 @@ export const DatePickerYearRangeView = forwardRef((p, ref) => {
         </div>
     );
 });
-
-DatePickerYearRangeView.propTypes = {
-    date: PropTypes.oneOfType([
-        PropTypes.instanceOf(Date),
-        PropTypes.number,
-    ]),
-    locales: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
-    renderHeader: PropTypes.bool,
-    header: PropTypes.object,
-    focusable: PropTypes.bool,
-    components: PropTypes.shape({
-        Header: PropTypes.func,
-    }),
-};

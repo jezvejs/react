@@ -1,6 +1,13 @@
-import PropTypes from 'prop-types';
-import { componentPropType, getSelectedItems } from '../../../helpers.ts';
+import { useStore } from '../../../../../utils/Store/StoreProvider.tsx';
+
 import { comboControlsDefaultProps } from '../../../comboControlsDefaultProps.ts';
+import { getSelectedItems } from '../../../helpers.ts';
+import {
+    DropDownComboBoxControlsComponent,
+    DropDownComboBoxControlsProps,
+    DropDownState,
+} from '../../../types.ts';
+
 import './ComboBoxControls.scss';
 
 const defaultProps = comboControlsDefaultProps;
@@ -8,7 +15,9 @@ const defaultProps = comboControlsDefaultProps;
 /**
  * Combo box controls container
  */
-export const DropDownComboBoxControls = (p) => {
+export const DropDownComboBoxControls: DropDownComboBoxControlsComponent = (
+    p: DropDownComboBoxControlsProps,
+) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -25,7 +34,8 @@ export const DropDownComboBoxControls = (p) => {
     } = props;
     const { ClearButton, ToggleButton } = props.components;
 
-    const selectedItems = getSelectedItems(props);
+    const { state } = useStore()!;
+    const selectedItems = getSelectedItems(state as DropDownState);
 
     const showClear = (
         props.multiple
@@ -48,18 +58,4 @@ export const DropDownComboBoxControls = (p) => {
             )}
         </div>
     );
-};
-
-DropDownComboBoxControls.propTypes = {
-    multiple: PropTypes.bool,
-    disabled: PropTypes.bool,
-    showClearButton: PropTypes.bool,
-    showToggleButton: PropTypes.bool,
-    actSelItemIndex: PropTypes.number,
-    onClearSelection: PropTypes.func,
-    onToggle: PropTypes.func,
-    components: PropTypes.shape({
-        ToggleButton: componentPropType,
-        ClearButton: componentPropType,
-    }),
 };

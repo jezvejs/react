@@ -1,12 +1,15 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 
 import { Button } from '../../../../Button/Button.tsx';
+
+import { DropDownToggleButtonComponent, DropDownToggleButtonProps } from '../../../types.ts';
 
 import ToggleIcon from './assets/toggle.svg';
 import './ToggleButton.scss';
 
-export const DropDownToggleButton = (props) => (
+export const DropDownToggleButton: DropDownToggleButtonComponent = (
+    props: DropDownToggleButtonProps,
+) => (
     <Button
         {...props}
         icon={ToggleIcon}
@@ -14,7 +17,3 @@ export const DropDownToggleButton = (props) => (
         type="static"
     />
 );
-
-DropDownToggleButton.propTypes = {
-    className: PropTypes.string,
-};

@@ -1,8 +1,14 @@
 import { DatePickerHeader } from './components/Header/Header.tsx';
 import { DatePickerWeekDaysHeader } from './components/WeekDaysHeader/WeekDaysHeader.tsx';
+import { DatePickerSelectMode } from './types.ts';
 
 export const defaultProps = {
-    mode: 'date', // possible values: 'date', 'month', 'year'
+    reducers: [],
+    className: '',
+    startDate: null,
+    endDate: null,
+    fixed: false,
+    mode: 'date' as DatePickerSelectMode, // possible values: 'date', 'month', 'year'
     date: new Date(),
     visible: false,
     inline: false,
@@ -26,6 +32,10 @@ export const defaultProps = {
     onShow: null,
     onHide: null,
     footer: {},
+
+    container: null,
+    children: null,
+
     position: {
         margin: 5,
         screenPadding: 5,

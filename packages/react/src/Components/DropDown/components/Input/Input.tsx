@@ -1,6 +1,10 @@
 import { forwardRef } from 'react';
-import PropTypes from 'prop-types';
-
+import {
+    DropDownInputComponent,
+    DropDownInputProps,
+    DropDownInputRef,
+    DropDownValidInputTypes,
+} from '../../types.ts';
 import './Input.scss';
 
 const autoFeatures = {
@@ -9,16 +13,6 @@ const autoFeatures = {
     spellCheck: false,
     autoCorrect: 'off',
 };
-
-const validInputTypes = [
-    'email',
-    'number',
-    'password',
-    'search',
-    'tel',
-    'text',
-    'url',
-];
 
 const defaultProps = {
     value: '',
@@ -30,7 +24,10 @@ const defaultProps = {
 };
 
 // eslint-disable-next-line react/display-name
-export const DropDownInput = forwardRef((p, ref) => {
+export const DropDownInput: DropDownInputComponent = forwardRef<
+    DropDownInputRef,
+    DropDownInputProps
+>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -44,36 +41,29 @@ export const DropDownInput = forwardRef((p, ref) => {
         disabled,
     } = props;
 
-    const onInput = (e) => {
+    const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         props?.onInput?.(e);
     };
 
-    const inputProps = {
+    const inputProps: DropDownInputProps = {
         ...autoFeatures,
         id,
+        className: 'dd__input',
         value,
-        type,
+        type: type as DropDownValidInputTypes,
         placeholder,
         disabled,
-        tabIndex: (disabled) ? '' : props.tabIndex,
+        onInput,
     };
+
+    if (!disabled) {
+        inputProps.tabIndex = props.tabIndex;
+    }
 
     return (
         <input
             ref={ref}
-            className="dd__input"
             {...inputProps}
-            onInput={onInput}
         />
     );
 });
-
-DropDownInput.propTypes = {
-    id: PropTypes.string,
-    value: PropTypes.string,
-    type: PropTypes.oneOf(validInputTypes),
-    placeholder: PropTypes.string,
-    tabIndex: PropTypes.number,
-    disabled: PropTypes.bool,
-    onInput: PropTypes.func,
-};

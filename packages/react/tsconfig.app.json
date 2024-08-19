@@ -22,7 +22,6 @@
         "jsx": "react-jsx",
         /* TODO: remove me */
         "noImplicitAny": false,
-        "noEmitOnError": false,
         /* Linting */
         "strict": true,
         "noUnusedLocals": true,

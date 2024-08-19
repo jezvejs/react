@@ -1,11 +1,17 @@
-const getCommonProps = (state) => ({
+import {
+    PaginatorCommonItemProps,
+    PaginatorItemProps,
+    PaginatorState,
+} from './types.ts';
+
+const getCommonProps = (state: PaginatorState): PaginatorCommonItemProps => ({
     allowActiveLink: state.allowActiveLink,
     pageParam: state.pageParam,
     url: state.url,
 });
 
-export const getPageItems = (state) => {
-    const res = [];
+export const getPageItems = (state: PaginatorState): PaginatorItemProps[] => {
+    const res: PaginatorItemProps[] = [];
     const commonProps = getCommonProps(state);
 
     // 1 2 3 4 5
@@ -55,8 +61,8 @@ export const getPageItems = (state) => {
     return res;
 };
 
-export const getItems = (state) => {
-    const res = [];
+export const getItems = (state: PaginatorState): PaginatorItemProps[] => {
+    const res: PaginatorItemProps[] = [];
     const commonProps = getCommonProps(state);
 
     if (!state.showSingleItem && state.pagesCount < 2) {
@@ -65,7 +71,10 @@ export const getItems = (state) => {
 
     // Previous page arrow
     if (state.arrows) {
-        const navItem = { navigation: 'prev', ...commonProps };
+        const navItem: PaginatorItemProps = {
+            ...commonProps,
+            navigation: 'prev',
+        };
         if (state.pageNum > 1) {
             navItem.page = state.pageNum - 1;
         }
@@ -77,7 +86,10 @@ export const getItems = (state) => {
 
     // Next page arrow
     if (state.arrows) {
-        const navItem = { navigation: 'next', ...commonProps };
+        const navItem: PaginatorItemProps = {
+            ...commonProps,
+            navigation: 'next',
+        };
         if (state.pageNum < state.pagesCount) {
             navItem.page = state.pageNum + 1;
         }

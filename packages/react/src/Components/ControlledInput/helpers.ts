@@ -3,7 +3,7 @@ import { getCursorPos } from '@jezvejs/dom';
 /** Obtain from event input data to be inserted */
 export const getInputContent = (e) => {
     if (e.type === 'paste') {
-        return (e.clipboardData || window.clipboardData).getData('text');
+        return e.clipboardData.getData('text');
     }
     if (e.type === 'beforeinput') {
         return e.data;

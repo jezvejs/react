@@ -1,5 +1,8 @@
-import PropTypes from 'prop-types';
 import './BaseChartPopup.scss';
+
+export interface BaseChartPopupProps {
+    target: object,
+}
 
 /**
  * BaseChartPopup component
@@ -24,8 +27,4 @@ export const BaseChartPopup = (props) => {
             {content}
         </div>
     );
-};
-
-BaseChartPopup.propTypes = {
-    target: PropTypes.object,
 };

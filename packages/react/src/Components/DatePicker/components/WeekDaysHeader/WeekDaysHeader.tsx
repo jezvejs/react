@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
 import { getWeekDays, getWeekdayShort } from '@jezvejs/datetime';
+import { DatePickerWeekDaysHeaderItemProps, DatePickerWeekDaysHeaderProps } from '../../types.ts';
 import './WeekDaysHeader.scss';
 
-const DatePickerWeekDaysHeaderItem = (props) => {
+const DatePickerWeekDaysHeaderItem = (props: DatePickerWeekDaysHeaderItemProps) => {
     const {
         weekday,
         locales = [],
@@ -20,21 +20,20 @@ const DatePickerWeekDaysHeaderItem = (props) => {
     );
 };
 
-DatePickerWeekDaysHeaderItem.propTypes = {
-    weekday: PropTypes.instanceOf(Date),
-    locales: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
-};
+export interface DatePickerWeekDaysParams {
+    locales?: string | string[],
+    options?: {
+        firstDay?: number | null,
+    },
+}
 
-export const DatePickerWeekDaysHeader = (props) => {
+export const DatePickerWeekDaysHeader = (props: DatePickerWeekDaysHeaderProps) => {
     const {
         locales = [],
         firstDay = null,
     } = props;
 
-    const params = {
+    const params: DatePickerWeekDaysParams = {
         locales,
     };
     if (typeof firstDay === 'number') {
@@ -47,7 +46,7 @@ export const DatePickerWeekDaysHeader = (props) => {
 
     return (
         <div className="dp__weekdays-header">
-            {week.map((weekday) => (
+            {week.map((weekday: Date) => (
                 <DatePickerWeekDaysHeaderItem
                     key={`dp_whrd_${weekday.getTime()}`}
                     weekday={weekday}
@@ -56,12 +55,4 @@ export const DatePickerWeekDaysHeader = (props) => {
             ))}
         </div>
     );
-};
-
-DatePickerWeekDaysHeader.propTypes = {
-    locales: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
-    firstDay: PropTypes.number,
 };

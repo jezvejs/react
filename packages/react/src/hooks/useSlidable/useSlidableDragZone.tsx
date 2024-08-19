@@ -1,24 +1,49 @@
-import PropTypes from 'prop-types';
-import { isFunction } from '@jezvejs/types';
 import { useRef } from 'react';
 
+// Utils
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
+import { OnDragStartParams } from '../../utils/DragnDrop/types.ts';
 import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
+import { StoreUpdater } from '../../utils/Store/Store.ts';
+import { Point } from '../../utils/types.ts';
 
-export function useSlidableDragZone(props) {
+import { SlidableState } from './useSlidable.tsx';
+
+export interface PositionShift {
+    shiftX: number;
+    shiftY: number;
+}
+
+export interface UseSlidableDragZoneProps {
+    id: string,
+
+    vertical: boolean;
+    allowMouse: boolean;
+    allowTouch: boolean;
+
+    isReady: boolean | (() => boolean);
+
+    updatePosition: (position: number) => void;
+
+    onDragCancel: () => void;
+}
+
+export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
     const avatarRef = useRef(null);
-    const currentTargetElemRef = useRef(null);
+    const currentTargetElemRef = useRef<HTMLElement | null>(null);
 
-    const { getState, setState } = useDragnDrop();
+    const dragDrop = useDragnDrop();
+    const getState = () => dragDrop?.getState() as SlidableState ?? null;
+    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
 
-    const getPositionForCoordinates = (coords, state) => (
+    const getPositionForCoordinates = (coords: Point, state?: PositionShift): number => (
         (props.vertical)
             ? (coords.y - (state?.shiftY ?? 0))
             : (coords.x - (state?.shiftX ?? 0))
     );
 
-    const isValidDragStartAngle = (pointA, pointB) => {
+    const isValidDragStartAngle = (pointA: Point, pointB: Point) => {
         const dx = pointA.x - pointB.x;
         const dy = pointA.y - pointB.y;
         if (dx === 0 && dy === 0) {
@@ -31,7 +56,7 @@ export function useSlidableDragZone(props) {
             : ((angle >= 0 && angle < 45) || (angle > 135 && angle <= 180));
     };
 
-    const dragZone = useDragZone({
+    const dragZoneProps = {
         ...props,
 
         mouseMoveThreshold: 0,
@@ -42,6 +67,7 @@ export function useSlidableDragZone(props) {
             return {
                 id: props.id,
                 elem: avatarRef.current,
+
                 getDragInfo() {
                     const state = getState();
                     return {
@@ -52,11 +78,13 @@ export function useSlidableDragZone(props) {
                         },
                     };
                 },
+
                 getTargetElem() {
                     return currentTargetElemRef.current;
                 },
+
                 initFromEvent({ downX, downY, e }) {
-                    const dragZoneEl = dragZone.dragZoneRef?.current;
+                    const dragZoneEl = dragZone.dragZoneRef?.current as HTMLElement;
                     if (!dragZoneEl) {
                         return false;
                     }
@@ -96,8 +124,12 @@ export function useSlidableDragZone(props) {
 
                     return true;
                 },
-                onDragMove(e) {
+
+                onDragMove(e: TouchEvent | MouseEvent) {
                     const state = getState();
+                    if (!state.startPoint) {
+                        return;
+                    }
 
                     const coord = DragMaster.getEventPageCoordinates(e);
                     const dx = state.startPoint.x - coord.x;
@@ -117,7 +149,7 @@ export function useSlidableDragZone(props) {
                     }
 
                     const dragZoneEl = dragZone.dragZoneRef?.current;
-                    currentTargetElemRef.current = dragZoneEl;
+                    currentTargetElemRef.current = dragZoneEl as HTMLElement;
 
                     const position = getPositionForCoordinates(coord, state);
                     const distance = state.position - position;
@@ -144,6 +176,7 @@ export function useSlidableDragZone(props) {
                         props?.updatePosition?.(position);
                     }
                 },
+
                 onDragEnd() {
                     setState((prev) => ({
                         ...prev,
@@ -151,6 +184,7 @@ export function useSlidableDragZone(props) {
                         shiftY: 0,
                     }));
                 },
+
                 onDragCancel() {
                     const state = getState();
 
@@ -163,7 +197,7 @@ export function useSlidableDragZone(props) {
             };
         },
 
-        onDragStart(params) {
+        onDragStart(params: OnDragStartParams) {
             if (!this.isReady()) {
                 return null;
             }
@@ -177,29 +211,19 @@ export function useSlidableDragZone(props) {
         },
 
         isReady() {
-            return isFunction(props.isReady) ? props.isReady() : true;
+            return (typeof props.isReady === 'function')
+                ? props.isReady()
+                : true;
         },
 
-        updatePosition(position) {
-            if (isFunction(props.updatePosition)) {
+        updatePosition(position: number) {
+            if (typeof props.updatePosition === 'function') {
                 props.updatePosition(position);
             }
         },
-    });
+    };
+
+    const dragZone = useDragZone(dragZoneProps);
 
     return dragZone;
 }
-
-useSlidableDragZone.propTypes = {
-    id: PropTypes.string,
-    onDragCancel: PropTypes.func,
-    isReady: PropTypes.func,
-    updatePosition: PropTypes.func,
-    vertical: PropTypes.bool,
-    allowMouse: PropTypes.bool,
-    allowTouch: PropTypes.bool,
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-};

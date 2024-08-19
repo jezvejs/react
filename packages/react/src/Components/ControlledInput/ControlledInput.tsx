@@ -1,8 +1,7 @@
 import { isFunction } from '@jezvejs/types';
 import { useCallback } from 'react';
-import PropTypes from 'prop-types';
 
-import { Input } from '../Input/Input.tsx';
+import { Input, InputProps } from '../Input/Input.tsx';
 
 import { getInputContent, replaceSelection } from './helpers.ts';
 
@@ -17,6 +16,16 @@ export const ControlledInputHelpers = {
     getInputContent,
     replaceSelection,
 };
+
+export interface ControlledInputProps extends InputProps {
+    selectionStart?: number,
+    selectionEnd?: number,
+    handleValueProperty?: boolean,
+    disableAutoFeatures?: boolean,
+    isValidValue?: () => void,
+    onValidateInput?: () => void,
+    onValue?: () => void,
+}
 
 export const ControlledInput = (props) => {
     const {
@@ -69,20 +78,23 @@ export const ControlledInput = (props) => {
         : defaultValuehandler;
 
     /** Define setter for 'value' property of input to prevent invalid values */
-    const observeInputValue = (input) => {
+    const observeInputValue = (input: HTMLInputElement) => {
         const elementPrototype = Object.getPrototypeOf(input);
-        const descriptor = Object.getOwnPropertyDescriptor(elementPrototype, 'value');
+        const descriptor = Object.getOwnPropertyDescriptor(elementPrototype, 'value') ?? null;
+        if (!descriptor) {
+            return;
+        }
 
         Object.defineProperty(input, 'value', {
             get() {
-                return descriptor.get.call(this);
+                return descriptor.get?.call(this);
             },
             set(value) {
                 if (value === this.value) {
                     return;
                 }
 
-                descriptor.set.call(this, handleValue(value, this.value));
+                descriptor.set?.call(this, handleValue(value, this.value));
             },
         });
     };
@@ -117,15 +129,4 @@ export const ControlledInput = (props) => {
     return (
         <Input {...inputProps} />
     );
-};
-
-ControlledInput.propTypes = {
-    ...Input.propTypes,
-    selectionStart: PropTypes.number,
-    selectionEnd: PropTypes.number,
-    handleValueProperty: PropTypes.bool,
-    disableAutoFeatures: PropTypes.bool,
-    isValidValue: PropTypes.func,
-    onValidateInput: PropTypes.func,
-    onValue: PropTypes.func,
 };

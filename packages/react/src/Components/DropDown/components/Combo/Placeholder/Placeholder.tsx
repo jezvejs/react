@@ -1,12 +1,14 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
+import { DropDownPlaceholderComponent, DropDownPlaceholderProps } from '../../../types.ts';
 import './Placeholder.scss';
 
 const defaultProps = {
     placeholder: '',
 };
 
-export const DropDownPlaceholder = (p) => {
+export const DropDownPlaceholder: DropDownPlaceholderComponent = (
+    p: DropDownPlaceholderProps,
+) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -23,9 +25,4 @@ export const DropDownPlaceholder = (p) => {
             {placeholder}
         </span>
     );
-};
-
-DropDownPlaceholder.propTypes = {
-    className: PropTypes.string,
-    placeholder: PropTypes.string,
 };

@@ -6,9 +6,10 @@ import { MenuList } from './components/List/MenuList.tsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.tsx';
 
 import { getItemProps, isAvailableItem } from './helpers.ts';
+import { MenuItemType, MenuProps } from './types.ts';
 
 export const itemDefaultProps = {
-    type: 'button',
+    type: 'button' as MenuItemType,
     selectable: true,
     selected: false,
     disabled: false,
@@ -20,10 +21,13 @@ export const itemDefaultProps = {
 
 export const getItemDefaultProps = () => itemDefaultProps;
 
-export const defaultProps = {
+export const defaultProps: MenuProps = {
+    id: '',
+    itemSelector: null,
     defaultItemType: 'button',
     iconAlign: 'left',
     checkboxSide: 'left',
+    multiple: false,
     disabled: false,
     tabThrough: true,
     tabIndex: 0,
@@ -36,6 +40,7 @@ export const defaultProps = {
     isAvailableItem,
     getItemProps,
     getItemDefaultProps,
+    onItemActivate: null,
     onGroupHeaderClick: null,
     renderNotSelected: false,
     allowActiveGroupHeader: false,

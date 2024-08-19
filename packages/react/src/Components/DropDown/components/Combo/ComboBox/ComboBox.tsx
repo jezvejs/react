@@ -1,6 +1,7 @@
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { forwardRef } from 'react';
+
+import { useStore } from '../../../../../utils/Store/StoreProvider.tsx';
 
 // Local components
 import { DropDownMultiSelectionItem } from '../MultiSelectionItem/MultiSelectionItem.tsx';
@@ -12,7 +13,15 @@ import { DropDownMultipleSelection } from '../MultipleSelection/MultipleSelectio
 import { DropDownSingleSelection } from '../SingleSelection/SingleSelection.tsx';
 import { DropDownPlaceholder } from '../Placeholder/Placeholder.tsx';
 
-import { getSelectedItems, componentPropType } from '../../../helpers.ts';
+import { getSelectedItems } from '../../../helpers.ts';
+import {
+    DropDownComboBoxComponent,
+    DropDownComboBoxProps,
+    DropDownComboBoxRef,
+    DropDownInputProps,
+    DropDownPlaceholderProps,
+    DropDownState,
+} from '../../../types.ts';
 import './ComboBox.scss';
 
 const defaultProps = {
@@ -28,7 +37,6 @@ const defaultProps = {
     showToggleButton: true,
     items: [],
     actSelItemIndex: -1,
-    onInput: null,
     onDeleteSelectedItem: null,
     onClearSelection: null,
     onToggle: null,
@@ -45,7 +53,10 @@ const defaultProps = {
 };
 
 // eslint-disable-next-line react/display-name
-export const DropDownComboBox = forwardRef((p, ref) => {
+export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
+    DropDownComboBoxRef,
+    DropDownComboBoxProps
+>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -68,23 +79,24 @@ export const DropDownComboBox = forwardRef((p, ref) => {
         MultipleSelection,
         MultiSelectionItem,
         ComboBoxControls,
-    } = props.components;
+    } = props.components ?? {};
 
     const onDeleteSelectedItem = (itemId, e) => {
         props?.onDeleteSelectedItem?.({ itemId, e });
     };
 
-    const selectedItems = getSelectedItems(props);
+    const { state } = useStore()!;
+    const selectedItems = getSelectedItems(state as DropDownState);
     const [selectedItem] = selectedItems;
     const str = selectedItem?.title ?? '';
 
     const usePlaceholder = (
         multiple || (
             !props.useSingleSelectionAsPlaceholder
-            && props.placeholder?.length > 0
+            && (props.placeholder?.length ?? 0) > 0
         )
     );
-    const placeholder = (usePlaceholder) ? props.placeholder : str;
+    const placeholder = (usePlaceholder) ? (props.placeholder ?? '') : str;
     const showPlaceholder = (!editable && usePlaceholder);
 
     const activeItem = (props.showMultipleSelection && props.actSelItemIndex !== -1)
@@ -109,9 +121,15 @@ export const DropDownComboBox = forwardRef((p, ref) => {
 
     const showSingleSelection = !multiple && !editable && !showPlaceholder;
 
-    const inputProps = {
+    // Placeholder
+    const placeholderProps: DropDownPlaceholderProps = {
         placeholder,
-        onInput,
+    };
+
+    // Input
+    const inputProps: DropDownInputProps = {
+        placeholder,
+        onInput: (onInput ?? undefined),
         disabled,
     };
     if (editable) {
@@ -125,41 +143,11 @@ export const DropDownComboBox = forwardRef((p, ref) => {
         >
             <div className="dd__combo-value">
                 {multipleSelection}
-                {showPlaceholder && <Placeholder placeholder={placeholder} />}
+                {showPlaceholder && <Placeholder {...placeholderProps} />}
                 {showSingleSelection && <SingleSelection item={selectedItem} />}
-                {editable && <Input {...inputProps} ref={props.inputRef} />}
+                {editable && Input && <Input {...inputProps} ref={props.inputRef} />}
             </div>
             <ComboBoxControls {...props} />
         </div>
     );
 });
-
-DropDownComboBox.propTypes = {
-    className: PropTypes.string,
-    inputRef: PropTypes.object,
-    inputString: PropTypes.string,
-    multiple: PropTypes.bool,
-    editable: PropTypes.bool,
-    enableFilter: PropTypes.bool,
-    disabled: PropTypes.bool,
-    placeholder: PropTypes.string,
-    useSingleSelectionAsPlaceholder: PropTypes.bool,
-    showMultipleSelection: PropTypes.bool,
-    showClearButton: PropTypes.bool,
-    showToggleButton: PropTypes.bool,
-    actSelItemIndex: PropTypes.number,
-    onInput: PropTypes.func,
-    onDeleteSelectedItem: PropTypes.func,
-    onClearSelection: PropTypes.func,
-    onToggle: PropTypes.func,
-    components: PropTypes.shape({
-        Input: componentPropType,
-        Placeholder: componentPropType,
-        SingleSelection: componentPropType,
-        MultipleSelection: componentPropType,
-        MultiSelectionItem: componentPropType,
-        ComboBoxControls: componentPropType,
-        ToggleButton: componentPropType,
-        ClearButton: componentPropType,
-    }),
-};

@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import { afterTransition } from '@jezvejs/dom';
 import classNames from 'classnames';
 import {
     forwardRef,
@@ -8,14 +8,33 @@ import {
     useRef,
     useState,
 } from 'react';
-import { afterTransition } from '@jezvejs/dom';
 
-import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.tsx';
-import { AnimationStages, isPlaceholder } from '../../helpers.ts';
 import { px } from '../../../../utils/common.ts';
+import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.tsx';
+import { isPlaceholder } from '../../helpers.ts';
+
+import {
+    SortableItemWrapperProps,
+    SortableItemWrapperRef,
+    SortableState,
+} from '../../types.ts';
+
+enum AnimationStages {
+    exited = 0,
+    entering,
+    entered,
+    exiting,
+}
+
+interface Callable {
+    (): void,
+}
 
 // eslint-disable-next-line react/display-name
-export const SortableItemWrapper = forwardRef((props, ref) => {
+export const SortableItemWrapper = forwardRef<
+    SortableItemWrapperRef,
+    SortableItemWrapperProps
+>((props, ref) => {
     const {
         placeholderClass,
         animatedClass,
@@ -27,13 +46,16 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         offsetTransform: props.offsetTransform,
     });
 
-    const { getState } = useDragnDrop();
+    const dragDrop = useDragnDrop();
+    const getState = () => dragDrop?.getState() as SortableState ?? null;
 
-    const innerRef = useRef(0);
-    useImperativeHandle(ref, () => innerRef.current);
+    const innerRef = useRef<HTMLElement>(null);
+    useImperativeHandle<SortableItemWrapperRef, SortableItemWrapperRef>(ref, () => (
+        innerRef?.current
+    ));
 
     const animationFrameRef = useRef(0);
-    const clearTransitionRef = useRef(0);
+    const clearTransitionRef = useRef<Callable | null>(null);
 
     const setAnimationStage = (stage) => {
         setAnimation((prev) => ({ ...prev, stage }));
@@ -51,8 +73,8 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
     };
 
     const clearTransition = () => {
-        if (clearTransitionRef.current) {
-            clearTransitionRef.current();
+        if (typeof clearTransitionRef.current === 'function') {
+            clearTransitionRef.current?.();
             clearTransitionRef.current = null;
         }
     };
@@ -162,10 +184,12 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
             ...item,
             className: classNames(
                 item.className,
-                {
-                    [placeholderClass]: isPlaceholder(item, state),
-                    [animatedClass]: (item.animated && isEntered),
-                },
+                (placeholderClass)
+                    ? { [placeholderClass]: isPlaceholder(item, state) }
+                    : {},
+                (animatedClass)
+                    ? { [animatedClass]: (item.animated && isEntered) }
+                    : {},
             ),
             items: (
                 Array.isArray(item.items)
@@ -196,7 +220,7 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         }
 
         if (props.targetRect) {
-            res.style.width = px(props.targetRect.width);
+            res.style.width = px(props.targetRect.width ?? 0);
         }
 
         const targetChild = props.targetRect?.childContainer;
@@ -228,7 +252,7 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         animation.stage,
     ]);
 
-    const { ListItem } = props.components;
+    const { ListItem } = props.components ?? {};
     if (!ListItem) {
         return null;
     }
@@ -237,31 +261,3 @@ export const SortableItemWrapper = forwardRef((props, ref) => {
         <ListItem {...listItemProps} ref={innerRef} />
     );
 });
-
-const isComponent = PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.func,
-]);
-
-SortableItemWrapper.propTypes = {
-    id: PropTypes.string,
-    zoneId: PropTypes.string,
-    group: PropTypes.string,
-    items: PropTypes.array,
-    className: PropTypes.string,
-    placeholderClass: PropTypes.string,
-    animatedClass: PropTypes.string,
-    title: PropTypes.string,
-    placeholder: PropTypes.bool,
-    animated: PropTypes.bool,
-    transitionTimeout: PropTypes.number,
-    initialTransform: PropTypes.string,
-    offsetTransform: PropTypes.string,
-    style: PropTypes.object,
-    rect: PropTypes.object,
-    targetRect: PropTypes.object,
-    childContainer: PropTypes.object,
-    components: PropTypes.shape({
-        ListItem: isComponent,
-    }),
-};

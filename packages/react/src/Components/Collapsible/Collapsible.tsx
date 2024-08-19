@@ -1,13 +1,28 @@
-import { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import {
+    ReactNode,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react';
 import classNames from 'classnames';
 
 import './Collapsible.scss';
 
+export interface CollapsibleProps {
+    id: string,
+    className: string,
+    expanded: boolean,
+    animated: boolean,
+    toggleOnClick: boolean,
+    header: ReactNode,
+    children: ReactNode,
+    onStateChange: (expanded: boolean) => void,
+}
+
 /**
  * Collapsible component
  */
-export const Collapsible = (props) => {
+export const Collapsible = (props: CollapsibleProps) => {
     const {
         expanded = false,
         animated = false,
@@ -84,7 +99,9 @@ export const Collapsible = (props) => {
         }));
     };
 
-    const animationStyle = {};
+    const animationStyle: {
+        height?: number,
+    } = {};
     if (state.animated && state.animationReady) {
         animationStyle.height = (state.expanded) ? state.expandedHeight : 0;
     }
@@ -119,21 +136,4 @@ export const Collapsible = (props) => {
             </div>
         </div>
     );
-};
-
-Collapsible.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    expanded: PropTypes.bool,
-    animated: PropTypes.bool,
-    toggleOnClick: PropTypes.bool,
-    header: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    onStateChange: PropTypes.func,
 };

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import {
     forwardRef,
     useEffect,
@@ -8,16 +7,23 @@ import {
 } from 'react';
 
 import { px } from '../../../../utils/common.ts';
+import { StoreUpdater } from '../../../../utils/Store/Store.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
+import { BaseChartState, BaseChartXAxisLabelProps } from '../../types.ts';
 import './BaseChartXAxisLabels.scss';
+
+type BaseChartXAxisLabelsRef = HTMLDivElement | null;
 
 /**
  * BaseChartXAxisLabels component
  */
 // eslint-disable-next-line react/display-name
-export const BaseChartXAxisLabels = forwardRef((props, ref) => {
-    const defaultLabelRenderer = (value) => value?.toString();
+export const BaseChartXAxisLabels = forwardRef<
+    BaseChartXAxisLabelsRef,
+    BaseChartState
+>((props, ref) => {
+    const defaultLabelRenderer = (value: number | string) => (value?.toString() ?? '');
 
     const {
         xAxis = 'bottom',
@@ -25,15 +31,21 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
     } = props;
     const disabled = xAxis === 'none';
 
-    const { getState, setState } = useStore();
+    const store = useStore();
+
+    const getState = (): BaseChartState | null => (store?.getState() as BaseChartState) ?? null;
+    const setState = (update: StoreUpdater) => store?.setState(update);
 
     const [prevState, setPrevState] = useState({
         scrollLeft: 0,
     });
 
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
-    const animationFrameRef = useRef(0);
+    const innerRef = useRef<HTMLDivElement>(null);
+    useImperativeHandle<BaseChartXAxisLabelsRef, BaseChartXAxisLabelsRef>(ref, () => (
+        innerRef?.current
+    ));
+
+    const animationFrameRef = useRef<number>(0);
 
     const initLabels = () => {
         const groupOuterWidth = props.getGroupOuterWidth(props);
@@ -41,10 +53,11 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
         const visibleGroups = props.getVisibleGroupsCount(firstGroupIndex, props);
         const formatFunction = props.renderXAxisLabel ?? defaultLabelRenderer;
 
-        const isAlreadyHidden = (label) => {
-            const { xAxisLabels } = getState();
-            const groupIndex = label.id;
+        const isAlreadyHidden = (label: BaseChartXAxisLabelProps) => {
+            const state = getState();
+            const groupIndex = parseInt(label.id, 10);
 
+            const xAxisLabels = state?.xAxisLabels ?? null;
             if (
                 !xAxisLabels
                 || !(groupIndex >= xAxisLabels.firstGroupIndex)
@@ -53,11 +66,11 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
                 return false;
             }
 
-            const prevItem = xAxisLabels.items.find((item) => item.id === groupIndex);
+            const prevItem = xAxisLabels.items.find((item) => item.id === groupIndex.toString());
             return !!prevItem?.hidden;
         };
 
-        const items = [];
+        const items: BaseChartXAxisLabelProps[] = [];
         for (let i = 0; i < visibleGroups; i += 1) {
             const groupIndex = firstGroupIndex + i;
             const value = props.data.series[groupIndex];
@@ -70,14 +83,15 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
                 continue;
             }
 
-            const item = {
-                id: groupIndex,
+            const item: BaseChartXAxisLabelProps = {
+                id: groupIndex.toString(),
                 value: formatFunction(value),
                 className: 'chart__text chart-x-axis__label',
                 style: {
                     left: px(groupIndex * groupOuterWidth),
                 },
-                'data-id': groupIndex,
+                'data-id': groupIndex.toString(),
+                hidden: false,
             };
 
             item.hidden = isAlreadyHidden(item);
@@ -85,7 +99,7 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
             items.push(item);
         }
 
-        setState((prev) => ({
+        setState((prev: BaseChartState) => ({
             ...prev,
             xAxisLabels: {
                 firstGroupIndex,
@@ -96,15 +110,20 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
         }));
     };
 
+    const getItems = (): BaseChartXAxisLabelProps[] => {
+        const state = getState();
+        return (state?.xAxisLabels?.items ?? []) as BaseChartXAxisLabelProps[];
+    };
+
     const getFilteredItems = () => {
-        const { items } = getState().xAxisLabels;
-        return items?.filter((item) => !item.hidden);
+        const items = getItems();
+        return items?.filter((item: BaseChartXAxisLabelProps) => !item.hidden);
     };
 
     const updateLabels = () => {
-        let lastOffset = null;
+        let lastOffset: number | null = null;
         const lblMarginLeft = 10;
-        const labelsToRemove = [];
+        const labelsToRemove: string[] = [];
         let resizeRequested = false;
         let resizeOffset = 0;
         const toLeft = (
@@ -112,31 +131,34 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
             && props.scrollLeft < prevState.scrollLeft
         );
 
-        const labels = innerRef.current.children;
+        const labels = innerRef.current?.children;
+        if (!labels) {
+            return;
+        }
         const filteredItems = getFilteredItems();
-
         if (labels.length < filteredItems.length) {
             animationFrameRef.current = requestAnimationFrame(() => updateLabels());
             return;
         }
 
-        const { items } = getState().xAxisLabels;
+        const items = getItems();
 
         for (let ind = 0; ind < labels.length; ind += 1) {
             const index = (toLeft) ? (labels.length - ind - 1) : ind;
-            const label = labels[index];
+            const label = labels[index] as HTMLElement;
             const labelLeft = label.offsetLeft;
             const labelRight = labelLeft + label.offsetWidth;
 
-            const groupIndex = parseInt(label.dataset?.id ?? -1, 10);
-            const item = items.find(({ id }) => id === groupIndex);
+            const labelId = label.dataset?.id ?? null;
+            const groupIndex = (labelId) ? parseInt(labelId, 10) : -1;
+            const item = items.find(({ id }) => id === groupIndex.toString());
             if (!item) {
                 continue;
             }
 
             const overflow = (toLeft)
-                ? (labelRight + lblMarginLeft > lastOffset)
-                : (labelLeft < lastOffset + lblMarginLeft);
+                ? (lastOffset !== null && labelRight + lblMarginLeft > lastOffset)
+                : (lastOffset !== null && labelLeft < lastOffset + lblMarginLeft);
 
             // Check current label not intersects previous one
             if (lastOffset !== null && overflow) {
@@ -167,7 +189,7 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
 
         animationFrameRef.current = 0;
 
-        setState((prev) => ({
+        setState((prev: BaseChartState) => ({
             ...prev,
             xAxisLabels: {
                 ...prev.xAxisLabels,
@@ -214,8 +236,7 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
         return null;
     }
 
-    const state = getState();
-    const labels = state.xAxisLabels?.items ?? [];
+    const labels = getItems();
     const filteredItems = labels.filter((item) => !item.hidden);
 
     return (
@@ -226,20 +247,3 @@ export const BaseChartXAxisLabels = forwardRef((props, ref) => {
         </div>
     );
 });
-
-BaseChartXAxisLabels.propTypes = {
-    data: PropTypes.object,
-    xAxis: PropTypes.oneOf(['bottom', 'top', 'none']),
-    scrollerWidth: PropTypes.number,
-    chartContentWidth: PropTypes.number,
-    scrollLeft: PropTypes.number,
-    hLabelsHeight: PropTypes.number,
-    fitToWidth: PropTypes.bool,
-    allowLastXAxisLabelOverflow: PropTypes.bool,
-    renderXAxisLabel: PropTypes.func,
-    isHorizontalScaleNeeded: PropTypes.func,
-    getGroupOuterWidth: PropTypes.func,
-    getFirstVisibleGroupIndex: PropTypes.func,
-    getVisibleGroupsCount: PropTypes.func,
-    onResize: PropTypes.func,
-};

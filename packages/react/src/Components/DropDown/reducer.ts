@@ -1,7 +1,16 @@
-import { isFunction, asArray } from '@jezvejs/types';
+import { isFunction } from '@jezvejs/types';
 
 import { createSlice } from '../../utils/createSlice.ts';
 import { MenuHelpers } from '../Menu/Menu.tsx';
+
+import {
+    createGroup,
+    createItems,
+    createMenuItem,
+    getAvailableItems,
+} from './helpers.ts';
+import { DropDownMenuItemProps, DropDownState } from './types.ts';
+import { MenuItemType } from '../Menu/types.ts';
 
 const {
     filterItems,
@@ -10,101 +19,11 @@ const {
     generateItemId,
     mapItems,
     pushItem,
-    toFlatList,
 } = MenuHelpers;
-
-const CREATE_ITEM_CLASS = 'dd__create-item';
-
-export const generateGroupId = (state) => (
-    generateItemId(state.items, 'group')
-);
-
-/** Returns new item object */
-export const createItem = (props, state) => {
-    const defaultItemProps = {
-        selectable: true,
-        selected: false,
-        hidden: false,
-        disabled: false,
-        group: null,
-    };
-
-    const res = {
-        ...defaultItemProps,
-        ...props,
-        id: props.id.toString(),
-        active: false,
-    };
-
-    return isFunction(state?.createItem)
-        ? state.createItem(res, state)
-        : res;
-};
-
-/**
- * Create new group
- * @param {string} label
- */
-export const createGroup = (options, state) => {
-    const {
-        title,
-        disabled = false,
-        items = [],
-        ...rest
-    } = options;
-
-    const group = {
-        id: options.id?.toString() ?? generateGroupId(state),
-        type: 'group',
-        title,
-        disabled,
-        items,
-        ...rest,
-    };
-
-    return group;
-};
-
-/**
- * Create items from specified array
- * @param {Object|Object[]} items
- * @param {Object} state
- */
-export const createItems = (items, state) => (
-    mapItems(
-        asArray(items),
-        (item) => createItem(item, state),
-        { includeGroupItems: state.allowActiveGroupHeader },
-    )
-);
 
 const deactivateAllItems = (items) => (
     mapItems(items, (item) => ({ ...item, active: false }))
 );
-
-export const isAvailableItem = (item, state) => (
-    !!item
-    && !item.hidden
-    && !item.disabled
-    && ((state.filtered) ? item.matchFilter : true)
-    && (
-        item.type !== 'group'
-        || state.allowActiveGroupHeader
-    )
-);
-
-/** Return array of visible and enabled list items */
-export const getAvailableItems = (state) => {
-    const options = {
-        includeGroupItems: state.allowActiveGroupHeader,
-    };
-
-    const filterCallback = isFunction(state.isAvailableItem)
-        ? (item) => state.isAvailableItem(item, state)
-        : (item) => isAvailableItem(item, state);
-
-    return toFlatList(state.items, options).filter(filterCallback);
-};
 
 /**
  * Search for last selected item to leave selection only on it
@@ -112,12 +31,15 @@ export const getAvailableItems = (state) => {
  * @param {Object} state
  * @returns
  */
-export const processSingleSelection = (state) => {
+export const processSingleSelection = (state: DropDownState) => {
     if (state.multiple) {
         return state;
     }
 
-    let selectedItem = findLastMenuItem(state.items, (item) => item.selected);
+    let selectedItem = findLastMenuItem(
+        state.items ?? [],
+        (item: DropDownMenuItemProps) => !!item.selected,
+    );
     if (!selectedItem) {
         const availItems = getAvailableItems(state);
         [selectedItem] = availItems;
@@ -126,15 +48,18 @@ export const processSingleSelection = (state) => {
     const selId = selectedItem?.id?.toString() ?? null;
     return {
         ...state,
-        items: mapItems(state.items, (item) => ({
-            ...item,
-            selected: item.id === selId,
-        })),
+        items: mapItems<DropDownMenuItemProps>(
+            state.items ?? [],
+            (item: DropDownMenuItemProps) => ({
+                ...item,
+                selected: item.id === selId,
+            }),
+        ),
     };
 };
 
-const renderAddMessage = (state) => {
-    const title = state?.inputString;
+const renderAddMessage = (state: DropDownState) => {
+    const title = state?.inputString ?? '';
     const message = isFunction(state.addItemMessage)
         ? state.addItemMessage(title)
         : state.addItemMessage;
@@ -146,56 +71,56 @@ const renderAddMessage = (state) => {
     return {
         title: message,
         selectable: true,
-        type: 'button',
-        className: CREATE_ITEM_CLASS,
+        type: 'button' as MenuItemType,
+        className: 'dd__create-item',
     };
 };
 
 // Reducers
 const slice = createSlice({
-    startScrollWaiting: (state) => (
+    startScrollWaiting: (state: DropDownState) => (
         (!state.waitForScroll) ? { ...state, waitForScroll: true } : state
     ),
 
-    stopScrollWaiting: (state) => (
+    stopScrollWaiting: (state: DropDownState) => (
         (state.waitForScroll) ? { ...state, waitForScroll: false } : state
     ),
 
-    startWindowListening: (state) => (
+    startWindowListening: (state: DropDownState) => (
         (!state.listeningWindow) ? { ...state, listeningWindow: true } : state
     ),
 
-    stopWindowListening: (state) => (
+    stopWindowListening: (state: DropDownState) => (
         (state.listeningWindow) ? { ...state, listeningWindow: false } : state
     ),
 
-    confirmTouch: (state) => ({ ...state, isTouch: true }),
+    confirmTouch: (state: DropDownState) => ({ ...state, isTouch: true }),
 
-    setRenderTime: (state) => ({ ...state, renderTime: Date.now() }),
+    setRenderTime: (state: DropDownState) => ({ ...state, renderTime: Date.now() }),
 
-    deselectAll: (state) => ({
+    deselectAll: (state: DropDownState) => ({
         ...state,
-        items: mapItems(state.items, (item) => ({
+        items: mapItems(state.items ?? [], (item) => ({
             ...item,
             selected: false,
         })),
         changed: true,
     }),
 
-    removeCreatableMenuItem: (state) => (
+    removeCreatableMenuItem: (state: DropDownState) => (
         (state.createFromInputItemId)
             ? {
                 ...state,
                 createFromInputItemId: null,
                 items: filterItems(
-                    state.items,
+                    state.items ?? [],
                     (item) => item.id !== state.createFromInputItemId,
                 ),
             }
             : state
     ),
 
-    toggleShowMenu: (state) => ({
+    toggleShowMenu: (state: DropDownState) => ({
         ...state,
         visible: !state.visible,
         inputString: (!state.visible) ? state.inputString : null,
@@ -207,7 +132,7 @@ const slice = createSlice({
         ),
     }),
 
-    showMenu: (state, visible) => (
+    showMenu: (state: DropDownState, visible: boolean) => (
         (state.visible === visible)
             ? state
             : {
@@ -223,13 +148,13 @@ const slice = createSlice({
             }
     ),
 
-    toggleEnable: (state) => ({
+    toggleEnable: (state: DropDownState) => ({
         ...state,
         disabled: !state.disabled,
         active: false,
     }),
 
-    toggleActivate: (state) => ({
+    toggleActivate: (state: DropDownState) => ({
         ...state,
         active: !state.active,
         actSelItemIndex: -1,
@@ -238,7 +163,7 @@ const slice = createSlice({
         items: deactivateAllItems(state.items),
     }),
 
-    activateInput: (state) => ({
+    activateInput: (state: DropDownState) => ({
         ...state,
         actSelItemIndex: -1,
         inputString: (
@@ -249,17 +174,17 @@ const slice = createSlice({
         ),
     }),
 
-    setChanged: (state) => (
+    setChanged: (state: DropDownState) => (
         (!state.changed) ? { ...state, changed: true } : state
     ),
 
-    changeEventSent: (state) => (
+    changeEventSent: (state: DropDownState) => (
         (state.changed) ? { ...state, changed: false } : state
     ),
 
-    selectItem: (state, id) => ({
+    selectItem: (state: DropDownState, id: string) => ({
         ...state,
-        items: mapItems(state.items, (item) => ({
+        items: mapItems(state.items ?? [], (item) => ({
             ...item,
             selected: (state.multiple)
                 ? (item.selected || item.id === id)
@@ -267,23 +192,23 @@ const slice = createSlice({
         })),
     }),
 
-    deselectItem: (state, id) => ({
+    deselectItem: (state: DropDownState, id: string) => ({
         ...state,
-        items: mapItems(state.items, (item) => ({
+        items: mapItems(state.items ?? [], (item) => ({
             ...item,
             selected: item.selected && item.id !== id,
         })),
     }),
 
-    setSelection: (state, ids) => ({
+    setSelection: (state: DropDownState, ids: string[]) => ({
         ...state,
-        items: mapItems(state.items, (item) => ({
+        items: mapItems(state.items ?? [], (item) => ({
             ...item,
             selected: ids.includes(item.id),
         })),
     }),
 
-    activateSelectionItem: (state, index) => ({
+    activateSelectionItem: (state: DropDownState, index: number) => ({
         ...state,
         actSelItemIndex: index,
         items: (
@@ -293,30 +218,30 @@ const slice = createSlice({
         ),
     }),
 
-    showAllItems: (state, resetInput = true) => ({
+    showAllItems: (state: DropDownState, resetInput: boolean = true) => ({
         ...state,
         filtered: false,
         inputString: (resetInput) ? null : '',
         createFromInputItemId: null,
         items: deactivateAllItems(
             filterItems(
-                state.items,
+                state.items ?? [],
                 (item) => item.id !== state.createFromInputItemId,
             ),
         ),
     }),
 
-    filter: (state, inputString) => {
+    filter: (state: DropDownState, inputString: string) => {
         const lfstr = inputString.toLowerCase();
         let exactMatch = false;
-        let items = [];
+        let items: DropDownMenuItemProps[] = [];
         const { createFromInputItemId } = state;
         const options = {
             includeGroupItems: true,
         };
-        let createFromInputItem = null;
+        let createFromInputItem: DropDownMenuItemProps | null = null;
 
-        forItems(state.items, (item) => {
+        forItems<DropDownMenuItemProps>(state.items ?? [], (item: DropDownMenuItemProps) => {
             if (createFromInputItemId && item.id === createFromInputItemId) {
                 createFromInputItem = { ...item };
                 return;
@@ -353,7 +278,7 @@ const slice = createSlice({
         } else if (!exactMatch && !newState.createFromInputItemId) {
             newState.createFromInputItemId = generateItemId(state?.items ?? [], 'item');
 
-            const newItem = createItem({
+            const newItem = createMenuItem({
                 id: newState.createFromInputItemId,
                 ...renderAddMessage(newState),
                 matchFilter: true,
@@ -361,8 +286,9 @@ const slice = createSlice({
 
             newState.items.push(newItem);
         } else if (!exactMatch && newState.createFromInputItemId) {
-            const newItem = {
-                ...createFromInputItem,
+            const newItem: DropDownMenuItemProps = {
+                id: createFromInputItem!.id,
+                ...(createFromInputItem ?? {}),
                 ...renderAddMessage(newState),
             };
 
@@ -372,11 +298,11 @@ const slice = createSlice({
         return newState;
     },
 
-    setActive: (state, id) => ({
+    setActive: (state: DropDownState, id: string) => ({
         ...state,
         actSelItemIndex: -1,
         items: mapItems(
-            state.items,
+            state.items ?? [],
             (item) => (
                 (item.active !== (item.id === id))
                     ? { ...item, active: !item.active }
@@ -387,17 +313,17 @@ const slice = createSlice({
         activeItem: id,
     }),
 
-    addItem: (state, item) => processSingleSelection({
+    addItem: (state: DropDownState, item: DropDownMenuItemProps) => processSingleSelection({
         ...state,
         items: (
             pushItem(
-                createItem(item, state),
+                createMenuItem(item, state),
                 structuredClone(state.items),
             )
         ),
     }),
 
-    addGroup: (state, group) => ({
+    addGroup: (state: DropDownState, group) => ({
         ...state,
         items: pushItem(
             createGroup(group, state),
@@ -405,7 +331,7 @@ const slice = createSlice({
         ),
     }),
 
-    append: (state, items) => processSingleSelection({
+    append: (state: DropDownState, items: DropDownMenuItemProps[]) => processSingleSelection({
         ...state,
         items: (
             createItems(items, state).reduce(
@@ -415,9 +341,9 @@ const slice = createSlice({
         ),
     }),
 
-    toggleEnableItem: (state, id) => ({
+    toggleEnableItem: (state: DropDownState, id: string) => ({
         ...state,
-        items: mapItems(state.items, (item) => ({
+        items: mapItems(state.items ?? [], (item) => ({
             ...item,
             disabled: (
                 (item.id === id)
@@ -432,14 +358,14 @@ const slice = createSlice({
         })),
     }),
 
-    removeItem: (state, id) => ({
+    removeItem: (state: DropDownState, id: string) => ({
         ...state,
-        items: filterItems(state.items, (item) => item.id !== id),
+        items: filterItems(state.items ?? [], (item) => item.id !== id),
     }),
 
-    removeAllItems: (state) => ({ ...state, items: [] }),
+    removeAllItems: (state: DropDownState) => ({ ...state, items: [] }),
 
-    setFullScreenHeight: (state, fullScreenHeight) => ({
+    setFullScreenHeight: (state: DropDownState, fullScreenHeight: number) => ({
         ...state,
         fullScreenHeight,
     }),

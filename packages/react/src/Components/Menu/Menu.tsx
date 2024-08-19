@@ -6,7 +6,6 @@ import {
     useEffect,
     useMemo,
 } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { MenuCheckbox } from './components/Checkbox/MenuCheckbox.tsx';
@@ -16,8 +15,15 @@ import { MenuGroupHeader } from './components/GroupHeader/MenuGroupHeader.tsx';
 import { MenuGroupItem } from './components/GroupItem/MenuGroupItem.tsx';
 import { MenuItem } from './components/ListItem/MenuItem.tsx';
 
-import * as MenuProps from './defaultProps.ts';
+import * as MenuDefProps from './defaultProps.ts';
 import * as MenuHelpers from './helpers.ts';
+import {
+    MenuAttrs,
+    MenuItemProps,
+    MenuProps,
+    MenuState,
+    OnGroupHeaderClickParam,
+} from './types.ts';
 import './Menu.scss';
 
 export {
@@ -29,14 +35,17 @@ export {
     MenuGroupItem,
     // utils
     MenuHelpers,
-    MenuProps,
+    MenuDefProps,
 };
+
+type MenuRef = HTMLDivElement | null;
 
 const {
     findLastMenuItem,
     findMenuItem,
     toFlatList,
     getActiveItem,
+    getItemSelector,
     getClosestItemElement,
     getItemById,
     getNextItem,
@@ -47,13 +56,13 @@ const {
     getInitialState,
 } = MenuHelpers;
 
-const defaultProps = MenuProps.getDefaultProps();
+const defaultProps = MenuDefProps.getDefaultProps();
 
 /**
  * Menu component
  */
 // eslint-disable-next-line react/display-name
-export const Menu = forwardRef((p, ref) => {
+export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -64,77 +73,82 @@ export const Menu = forwardRef((p, ref) => {
     };
 
     const initial = getInitialState(props, defaultProps);
-    const [state, setState] = useState(initial);
+    const [state, setState] = useState<MenuState>(initial);
 
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+    const innerRef = useRef<HTMLDivElement | null>(null);
+    useImperativeHandle<MenuRef, MenuRef>(ref, () => innerRef?.current);
 
     const disableTouch = () => (
-        setState((prev) => ({ ...prev, ignoreTouch: true }))
+        setState((prev: MenuState) => ({ ...prev, ignoreTouch: true }))
     );
 
     const enableTouch = () => (
-        setState((prev) => ({ ...prev, ignoreTouch: false }))
+        setState((prev: MenuState) => ({ ...prev, ignoreTouch: false }))
     );
 
-    const handleFocus = (e) => {
-        if (innerRef?.current === e?.target) {
+    const handleFocus = (e: React.FocusEvent) => {
+        const target = e?.target as HTMLElement;
+        if (innerRef?.current === target) {
             return;
         }
 
-        const closestElem = getClosestItemElement(e?.target, state);
+        const selector = getItemSelector(state);
+        const closestElem = getClosestItemElement(target, selector);
         const itemId = closestElem?.dataset?.id ?? null;
 
         if (state.activeItem === itemId) {
             return;
         }
 
-        setState((prev) => ({
+        setState((prev: MenuState) => ({
             ...prev,
             activeItem: itemId,
         }));
     };
 
-    const handleBlur = (e) => {
+    const handleBlur = (e: React.FocusEvent) => {
         if (!innerRef?.current) {
             return;
         }
-        if (e?.relatedTarget && innerRef.current.contains(e.relatedTarget)) {
+        if (e?.relatedTarget && innerRef.current.contains(e.relatedTarget as HTMLElement)) {
             return;
         }
 
-        setState((prev) => ({
+        setState((prev: MenuState) => ({
             ...prev,
             activeItem: null,
         }));
     };
 
-    const handleTouchStart = (e) => {
+    const handleTouchStart = (e: React.TouchEvent) => {
         if (e.touches) {
             disableTouch();
         }
     };
 
-    const activateItem = (itemId) => {
+    const activateItem = (itemId: string | null) => {
         if (!innerRef?.current) {
             return;
         }
 
-        const item = getItemById(itemId, state.items);
+        const item = getItemById(itemId, state.items ?? []);
         if (!item) {
             return;
         }
 
         const focusOptions = { preventScroll: true };
 
-        const itemEl = innerRef.current.querySelector(`.menu-item[data-id="${itemId}"]`);
+        const itemEl = innerRef.current.querySelector(`.menu-item[data-id="${itemId}"]`) as HTMLElement;
         if (!itemEl) {
             return;
         }
 
         if (item.type === 'group' && state.allowActiveGroupHeader) {
-            const { GroupHeader } = state.components;
-            const groupHeader = itemEl?.querySelector(GroupHeader?.selector);
+            const { GroupHeader } = state.components ?? {};
+            const selector = GroupHeader?.selector ?? null;
+            const groupHeader = (selector)
+                ? (itemEl?.querySelector(selector) as HTMLElement ?? null)
+                : null;
             groupHeader?.focus(focusOptions);
         } else {
             itemEl.focus(focusOptions);
@@ -150,14 +164,14 @@ export const Menu = forwardRef((p, ref) => {
 
         const focused = document.activeElement;
         if (innerRef.current.contains(focused)) {
-            focused.scrollIntoView({
+            focused?.scrollIntoView?.({
                 behavior: 'instant',
                 block: 'nearest',
             });
         }
     };
 
-    const handleMouseEnter = (itemId, e) => {
+    const handleMouseEnter = (itemId: string | null, e: React.MouseEvent) => {
         if (
             state.ignoreTouch
             || !state.focusItemOnHover
@@ -169,19 +183,21 @@ export const Menu = forwardRef((p, ref) => {
             return;
         }
 
-        const item = getItemById(itemId, state.items);
-        if (item.type === 'group') {
+        const item = getItemById(itemId, state.items ?? []);
+        if (item?.type === 'group') {
             if (!state.allowActiveGroupHeader) {
                 return;
             }
 
-            const { GroupHeader } = state.components;
-            if (!e?.target.closest(GroupHeader?.selector)) {
+            const target = e?.target as HTMLElement;
+
+            const { GroupHeader } = state.components ?? {};
+            if (GroupHeader && !target.closest(GroupHeader?.selector)) {
                 return;
             }
         }
 
-        setState((prev) => ({
+        setState((prev: MenuState) => ({
             ...prev,
             activeItem: itemId,
         }));
@@ -189,7 +205,7 @@ export const Menu = forwardRef((p, ref) => {
         activateItem(itemId);
     };
 
-    const handleMouseLeave = (relItemId) => {
+    const handleMouseLeave = (relItemId?: string | null) => {
         if (
             state.activeItem === null
             || (state.activeItem === relItemId)
@@ -197,7 +213,7 @@ export const Menu = forwardRef((p, ref) => {
             return;
         }
 
-        setState((prev) => ({
+        setState((prev: MenuState) => ({
             ...prev,
             activeItem: null,
         }));
@@ -224,22 +240,29 @@ export const Menu = forwardRef((p, ref) => {
         }
     };
 
-    const toggleItem = (itemId) => {
+    const toggleItem = (itemId: string | null) => {
         setState(toggleSelectItem(itemId));
     };
 
-    const handleItemClick = (itemId, e) => {
+    const handleItemClick = (
+        itemId: string | null,
+        e: React.MouseEvent | React.KeyboardEvent<Element>,
+    ) => {
         e?.stopPropagation();
 
-        const clickedItem = getItemById(itemId, state.items);
-        const type = clickedItem?.type ?? null;
+        const clickedItem = getItemById(itemId, state.items ?? []);
+        if (!clickedItem) {
+            return;
+        }
+
+        const type = clickedItem.type ?? null;
 
         if (
             state.activeItem
             && state.activeItem !== itemId
             && !state.ignoreTouch
         ) {
-            setState((prev) => ({
+            setState((prev: MenuState) => ({
                 ...prev,
                 activeItem: itemId,
             }));
@@ -255,19 +278,23 @@ export const Menu = forwardRef((p, ref) => {
 
         // Handle clicks by group header
         if (type === 'group') {
-            const { GroupHeader } = state.components;
-            if (!e?.target.closest(GroupHeader?.selector)) {
+            const { GroupHeader } = state.components ?? {};
+            const selector = GroupHeader?.selector ?? null;
+            const target = e?.target as HTMLElement;
+            if (selector !== null && !target.closest(selector)) {
                 return;
             }
 
-            finishClick(() => (
-                props.onGroupHeaderClick?.({
+            finishClick(() => {
+                const clickParams: OnGroupHeaderClickParam = {
                     item: clickedItem,
                     e,
                     state,
                     setState,
-                })
-            ));
+                };
+
+                return props.onGroupHeaderClick?.(clickParams);
+            });
             return;
         }
 
@@ -276,20 +303,30 @@ export const Menu = forwardRef((p, ref) => {
         finishClick(() => props.onItemClick?.(clickedItem, e));
     };
 
-    const handleKey = (e) => {
-        const availCallback = (item) => props.isAvailableItem(item, state);
+    const handleKey = (e: React.KeyboardEvent) => {
+        /*
+        const availCallback = (item: MenuItemProps): boolean => (
+            props.isAvailableItem?.(item, state) ?? true
+        );
+        */
+        const availCallback = (item: MenuItemProps): boolean => (
+            props.isAvailableItem?.(item, state) ?? true
+        );
+
         const options = {
             includeGroupItems: state.allowActiveGroupHeader,
         };
 
+        const menuItems = state.items ?? [];
+
         if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
             const activeItem = getActiveItem(state);
             let nextItem = (activeItem)
-                ? getNextItem(activeItem.id, state.items, availCallback, options)
-                : findMenuItem(state.items, availCallback);
+                ? getNextItem(activeItem.id, menuItems, availCallback, options)
+                : findMenuItem(menuItems, availCallback);
 
             if (state.loopNavigation && activeItem && !nextItem) {
-                nextItem = findMenuItem(state.items, availCallback);
+                nextItem = findMenuItem(menuItems, availCallback);
             }
 
             if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
@@ -305,11 +342,11 @@ export const Menu = forwardRef((p, ref) => {
         if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
             const activeItem = getActiveItem(state);
             let nextItem = (activeItem)
-                ? getPreviousItem(activeItem.id, state.items, availCallback, options)
-                : findLastMenuItem(state.items, availCallback);
+                ? getPreviousItem(activeItem.id, menuItems, availCallback, options)
+                : findLastMenuItem(menuItems, availCallback);
 
             if (state.loopNavigation && activeItem && !nextItem) {
-                nextItem = findLastMenuItem(state.items, availCallback);
+                nextItem = findLastMenuItem(menuItems, availCallback);
             }
 
             if (nextItem && (!activeItem || nextItem.id !== activeItem.id)) {
@@ -335,7 +372,7 @@ export const Menu = forwardRef((p, ref) => {
     };
 
     useEffect(() => {
-        setState((prev) => ({
+        setState((prev: MenuState) => ({
             ...prev,
             items: createItems(props.items, prev),
             activeItem: props.activeItem,
@@ -349,7 +386,7 @@ export const Menu = forwardRef((p, ref) => {
             afterContent: false,
         };
 
-        const flatItems = toFlatList(state.items, {
+        const flatItems = toFlatList(state.items ?? [], {
             includeGroupItems: state.allowActiveGroupHeader,
         });
 
@@ -385,90 +422,65 @@ export const Menu = forwardRef((p, ref) => {
         return res;
     }, [props.items]);
 
-    const { Header, Footer, List } = state.components;
-    const menuHeader = Header && <Header {...(props.header ?? {})} components={state.components} />;
+    const { Header, Footer, List } = state.components ?? {};
+
+    const menuHeader = Header && (
+        <Header {...(props.header ?? {})} />
+    );
 
     const { className, ...rest } = state;
     const listProps = {
         ...rest,
         ...columns,
+        id: state.id!,
+        items: state.items ?? [],
         getItemProps: MenuHelpers.getItemProps,
         onItemClick: handleItemClick,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
     };
 
-    listProps.itemSelector = listProps.components.ListItem.selector;
+    listProps.itemSelector = listProps.components?.ListItem?.selector ?? null;
 
-    const menuList = List && <List {...listProps} components={state.components} />;
-    const menuFooter = Footer && <Footer {...(props.footer ?? {})} components={state.components} />;
+    const menuList = List && (
+        <List {...listProps} />
+    );
+
+    const menuFooter = Footer && (
+        <Footer {...(props.footer ?? {})} />
+    );
 
     const { disabled } = props;
-    let tabIndex = (props.tabThrough) ? -1 : (props.tabIndex ?? null);
+    let tabIndex: number | null = (props.tabThrough) ? -1 : (props.tabIndex ?? null);
     if (disabled) {
         tabIndex = null;
     }
 
+    const menuProps: MenuAttrs = {
+        id: props.id,
+        className: classNames('menu', className),
+        disabled,
+
+        onFocusCapture: handleFocus,
+        onBlurCapture: handleBlur,
+        onTouchStartCapture: handleTouchStart,
+        onKeyDownCapture: handleKey,
+        onScrollCapture: handleScroll,
+    };
+
+    if (tabIndex !== null) {
+        menuProps.tabIndex = tabIndex;
+    }
+
+    if (props.parentId) {
+        menuProps['data-parent'] = props.parentId;
+    }
+
     return (
-        <div
-            id={props.id}
-            className={classNames('menu', className)}
-            disabled={disabled}
-            tabIndex={tabIndex}
-            onFocusCapture={handleFocus}
-            onBlurCapture={handleBlur}
-            onTouchStartCapture={handleTouchStart}
-            onKeyDownCapture={handleKey}
-            onScrollCapture={handleScroll}
-            ref={innerRef}
-        >
+        <div {...menuProps} ref={innerRef} >
             {menuHeader}
             {menuList}
             {menuFooter}
         </div>
     );
 });
-
-Menu.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    defaultItemType: PropTypes.string,
-    iconAlign: PropTypes.oneOf(['left', 'right']),
-    checkboxSide: PropTypes.oneOf(['left', 'right']),
-    disabled: PropTypes.bool,
-    tabThrough: PropTypes.bool,
-    tabIndex: PropTypes.number,
-    loopNavigation: PropTypes.bool,
-    preventNavigation: PropTypes.bool,
-    focusItemOnHover: PropTypes.bool,
-    header: PropTypes.object,
-    footer: PropTypes.object,
-    onItemClick: PropTypes.func,
-    isAvailableItem: PropTypes.func,
-    getItemProps: PropTypes.func,
-    onGroupHeaderClick: PropTypes.func,
-    onItemActivate: PropTypes.func,
-    allowActiveGroupHeader: PropTypes.bool,
-    activeItem: PropTypes.string,
-    items: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        type: PropTypes.string,
-        className: PropTypes.string,
-        title: PropTypes.string,
-        icon: PropTypes.oneOfType([
-            PropTypes.node,
-            PropTypes.elementType,
-        ]),
-    })),
-    components: PropTypes.shape({
-        Header: PropTypes.func,
-        List: PropTypes.func,
-        ListItem: PropTypes.func,
-        ListPlaceholder: PropTypes.func,
-        Check: PropTypes.func,
-        Separator: PropTypes.func,
-        GroupHeader: PropTypes.func,
-        GroupItem: PropTypes.func,
-        Footer: PropTypes.func,
-    }),
-};

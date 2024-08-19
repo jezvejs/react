@@ -1,13 +1,12 @@
-import PropTypes from 'prop-types';
-
 import { createSlice } from '../../utils/createSlice.ts';
 import { DragnDropProvider } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 
 import { SliderContainer } from './SliderContainer.tsx';
 
+import { SliderProps } from './types.ts';
 import './Slider.scss';
 
-export const Slider = (props) => {
+export const Slider = (props: SliderProps) => {
     const {
         vertical = false,
         allowMouse = false,
@@ -39,19 +38,4 @@ export const Slider = (props) => {
             <SliderContainer {...props} />
         </DragnDropProvider>
     );
-};
-
-Slider.propTypes = {
-    id: PropTypes.string,
-    className: PropTypes.string,
-    slideIndex: PropTypes.number,
-    onChanged: PropTypes.func,
-    width: PropTypes.number,
-    height: PropTypes.number,
-    animate: PropTypes.bool,
-    vertical: PropTypes.bool,
-    items: PropTypes.array,
-    allowMouse: PropTypes.bool,
-    allowTouch: PropTypes.bool,
-    allowWheel: PropTypes.bool,
 };

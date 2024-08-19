@@ -1,17 +1,16 @@
 import { removeEvents, setEvents, getCursorPos } from '@jezvejs/dom';
-import { isFunction } from '@jezvejs/types';
 import {
     useRef,
     useEffect,
     forwardRef,
     useImperativeHandle,
     useCallback,
+    CSSProperties,
 } from 'react';
 import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { px } from '../../utils/common.ts';
+import { DebounceRunFunction, px } from '../../utils/common.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
 
 // Common components
@@ -26,7 +25,6 @@ import { DropDownMenuHeader } from './components/Menu/MenuHeader/MenuHeader.tsx'
 
 import {
     isEditable,
-    componentPropType,
     getAvailableItems,
     getPrevAvailableItem,
     getNextAvailableItem,
@@ -36,26 +34,45 @@ import {
 } from './helpers.ts';
 import { actions } from './reducer.ts';
 import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.ts';
+import {
+    DropDownMenuItemProps,
+    DropDownMenuProps,
+    DropDownNativeSelectProps,
+    DropDownProps,
+    DropDownSelectedItem,
+    DropDownState,
+} from './types.ts';
+import { MenuItemProps, OnGroupHeaderClickParam } from '../Menu/types.ts';
+import { ListenerFunctionsGroup, ListenersGroup } from '../../utils/types.ts';
+
+type DropDownRef = HTMLDivElement | null;
 
 /**
  * DropDown component
  */
 // eslint-disable-next-line react/display-name
-export const DropDownContainer = forwardRef((props, ref) => {
-    const { state, getState, dispatch } = useStore();
+export const DropDownContainer = forwardRef<
+    DropDownRef,
+    DropDownProps
+>((props, ref) => {
+    const store = useStore()!;
+    const { getState, dispatch, setState } = store;
+    const state = store.state as DropDownState;
 
-    const innerRef = useRef(null);
-    useImperativeHandle(ref, () => innerRef.current);
+    const innerRef = useRef<HTMLDivElement>(null);
+    useImperativeHandle<DropDownRef, DropDownRef>(ref, () => (
+        innerRef?.current
+    ));
 
-    const inputElem = useRef(null);
-    const focusedElem = useRef(null);
+    const inputElem = useRef<HTMLInputElement | null>(null);
+    const focusedElem = useRef<HTMLElement | null>(null);
     const selectElem = useRef(null);
 
     const allowScrollAndResize = !state?.isTouch || !isEditable(state);
 
-    let viewportEvents = null;
-    let windowEvents = null;
-    let showListHandler = null;
+    let viewportEvents: ListenerFunctionsGroup | null = null;
+    let windowEvents: ListenersGroup | null = null;
+    let showListHandler: DebounceRunFunction | null = null;
 
     /** Returns true if fullscreen mode is enabled and active */
     const isFullScreen = () => (
@@ -65,7 +82,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     );
 
     const setFullScreenContainerHeight = () => {
-        const screenHeight = window.visualViewport.height;
+        const screenHeight = window.visualViewport?.height ?? 0;
         dispatch(actions.setFullScreenHeight(screenHeight));
     };
 
@@ -113,19 +130,20 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
         open: state.visible && !state.fullScreen,
         onScrollDone: () => dispatch(actions.startWindowListening()),
-        onWindowScroll: (e) => onUpdatePosition(e),
-        onViewportResize: (e) => onUpdatePosition(e),
+        onWindowScroll: () => onUpdatePosition(),
+        onViewportResize: () => onUpdatePosition(),
     });
 
     /** Return index of selected item contains specified element */
-    const getSelectedItemIndex = (el) => {
+    const getSelectedItemIndex = (el: HTMLElement) => {
         const SelectionItemComponent = state.components.MultiSelectionItem;
-        const selItemElem = el?.closest(SelectionItemComponent.selector);
+        const selector = SelectionItemComponent.selector ?? null;
+        const selItemElem = (selector) ? (el?.closest(selector) as HTMLElement) : null;
         if (!selItemElem) {
             return -1;
         }
 
-        const selectedItems = getSelectedItems(getState());
+        const selectedItems = getSelectedItems(getState() as DropDownState);
         if (!Array.isArray(selectedItems)) {
             return -1;
         }
@@ -137,72 +155,78 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const getContainer = () => innerRef?.current;
 
     /** Returns menu element if exists */
-    const getMenu = () => elem?.current;
+    const getMenu = (): HTMLElement | null => elem?.current ?? null;
 
     /** Returns current input element if exists */
-    const getInput = () => inputElem?.current;
+    const getInput = (): HTMLElement | null => inputElem?.current;
 
     /** Returns current select element if exists */
-    const getSelect = () => selectElem?.current;
+    const getSelect = (): HTMLElement | null => selectElem?.current;
 
     /** Returns true if element is child of component */
-    const isChildTarget = (target) => (
-        target && (getContainer())?.contains(target)
+    const isChildTarget = (target: HTMLElement): boolean => (
+        !!target && !!((getContainer())?.contains(target))
     );
 
     /** Returns true if element is list or its child */
-    const isMenuTarget = (target) => {
+    const isMenuTarget = (target: HTMLElement): boolean => {
         const menuEl = getMenu();
-        return target && (target === menuEl || menuEl?.contains(target));
+        return (
+            !!target
+            && (
+                target === menuEl
+                || (menuEl?.contains(target) ?? false)
+            )
+        );
     };
 
     /** Returns true if element is clear button or its child */
-    const isClearButtonTarget = (target) => {
-        const refEl = reference?.current;
+    const isClearButtonTarget = (target: HTMLElement) => {
+        const refEl = reference?.current ?? null;
 
         const btn = refEl?.closest?.('.dd__clear-btn');
         return target && (target === btn || btn?.contains(target));
     };
 
     /** Returns true if element is delete selection item button or its child */
-    const isSelectionItemDeleteButtonTarget = (target) => {
+    const isSelectionItemDeleteButtonTarget = (target: HTMLElement) => {
         const { MultiSelectionItem } = state.components;
         return target?.closest(`.${MultiSelectionItem.buttonClass}`);
     };
 
     /** Returns true if element is allowed to toggle menu list */
-    const isValidToggleTarget = (target) => (
-        !isFunction(props.isValidToggleTarget)
+    const isValidToggleTarget = (target: HTMLElement) => (
+        (typeof props.isValidToggleTarget !== 'function')
         || props.isValidToggleTarget(target)
     );
 
     /**
      * Returns true if component is containing specified element
      *
-     * @param {Element} elem
-     * @returns {Boolean}
+     * @param {Element} target
+     * @returns {boolean}
      */
-    const isChildElement = (target) => (
+    const isChildElement = (target: Element): boolean => (
         !!target
         && (
-            isChildTarget(target)
-            || isMenuTarget(target)
+            isChildTarget(target as HTMLElement)
+            || isMenuTarget(target as HTMLElement)
         )
     );
 
     /**
      * Returns true if focus moved outside of component
      *
-     * @param {Event} e event object
-     * @returns {Boolean}
+     * @param {FocusEvent} e event object
+     * @returns {boolean}
      */
-    const isLostFocus = (e) => (
-        !isChildElement(e.relatedTarget)
+    const isLostFocus = (e: React.FocusEvent): boolean => (
+        !isChildElement(e.relatedTarget as HTMLElement)
     );
 
     /** Return selected items data for 'itemselect' and 'change' events */
-    const getSelectionData = () => {
-        const selectedItems = getSelectedItems(getState())
+    const getSelectionData = (): DropDownSelectedItem[] | DropDownSelectedItem | null => {
+        const selectedItems = getSelectedItems(getState() as DropDownState)
             .map((item) => ({ id: item.id, value: item.title }));
 
         if (state.multiple) {
@@ -214,9 +238,9 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Send current selection data to 'itemselect' event handler */
     const sendItemSelectEvent = () => {
-        if (isFunction(props.onItemSelect)) {
+        if (typeof props.onItemSelect === 'function') {
             const data = getSelectionData();
-            props.onItemSelect(data);
+            props.onItemSelect?.(data);
         }
     };
 
@@ -229,9 +253,9 @@ export const DropDownContainer = forwardRef((props, ref) => {
             return;
         }
 
-        if (isFunction(props.onChange)) {
+        if (typeof props.onChange === 'function') {
             const data = getSelectionData();
-            props.onChange(data);
+            props.onChange?.(data);
         }
 
         dispatch(actions.changeEventSent());
@@ -274,7 +298,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     );
 
     /** Toggle item selected status */
-    const toggleItem = (item) => {
+    const toggleItem = (item: MenuItemProps | null) => {
         if (!item) {
             return;
         }
@@ -288,23 +312,22 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
     };
 
-    const getItem = (itemId) => (
-        MenuHelpers.getItemById(itemId, state.items)
+    const getItem = (itemId: string | null) => (
+        MenuHelpers.getItemById(itemId, state.items ?? [])
     );
 
     /** Deselect specified item */
-    const deselectItem = (itemId) => {
-        if (!state.multiple) {
+    const deselectItem = (itemId: string | null) => {
+        if (itemId === null || !state.multiple) {
             return;
         }
 
-        const strId = itemId?.toString();
-        const itemToDeselect = getItem(strId);
+        const itemToDeselect = getItem(itemId);
         if (!itemToDeselect?.selected) {
             return;
         }
 
-        dispatch(actions.deselectItem(strId));
+        dispatch(actions.deselectItem(itemId));
     };
 
     /** Show all list items */
@@ -331,7 +354,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     };
 
     /** Set active state for specified list item */
-    const setActive = (itemId) => {
+    const setActive = (itemId: string | null) => {
         const itemToActivate = getItem(itemId);
         const activeItem = getActiveItem(state);
         if (
@@ -345,7 +368,10 @@ export const DropDownContainer = forwardRef((props, ref) => {
         dispatch(actions.setActive(strId));
     };
 
-    const focusInputIfNeeded = (keepActiveItem = false, activeItemId = null) => {
+    const focusInputIfNeeded = (
+        keepActiveItem: boolean = false,
+        activeItemId: string | null = null,
+    ) => {
         const inputEl = getInput();
         if (!inputEl) {
             return;
@@ -365,7 +391,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     };
 
     /** Activate or deactivate component */
-    const activate = (val) => {
+    const activate = (val: boolean) => {
         if (state.active === val) {
             return;
         }
@@ -381,8 +407,8 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const activateInput = () => dispatch(actions.activateInput());
 
     /** Activate specified selected item */
-    const activateSelectedItem = (index) => {
-        const current = getState();
+    const activateSelectedItem = (index: number) => {
+        const current = getState() as DropDownState;
         if (
             props.disabled
             || !state.multiple
@@ -414,7 +440,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Activate last(right) selected item */
     const activateLastSelectedItem = () => {
-        const selectedItems = getSelectedItems(getState());
+        const selectedItems = getSelectedItems(getState() as DropDownState);
         if (!selectedItems.length) {
             return;
         }
@@ -447,7 +473,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
         if (
             !allowCreate
-            || !(inputString?.length > 0)
+            || !((inputString?.length ?? 0) > 0)
         ) {
             return;
         }
@@ -470,12 +496,15 @@ export const DropDownContainer = forwardRef((props, ref) => {
     };
 
     /** Handles group item select event */
-    const handleGroupItemSelect = (item) => {
-        props.onGroupHeaderClick?.({
+    const handleGroupItemSelect = (item: MenuItemProps) => {
+        const params: OnGroupHeaderClickParam<DropDownState> = {
             item,
             state,
+            setState,
             dispatch,
-        });
+        };
+
+        props.onGroupHeaderClick?.(params);
     };
 
     /** Handles user item select event */
@@ -523,19 +552,20 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
     };
 
-    const onClick = (e) => {
+    const onClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (e.type === 'touchstart') {
             dispatch(actions.confirmTouch());
             return;
         }
 
-        const validTarget = isValidToggleTarget(e.target);
+        const target = e.target as HTMLElement;
+        const validTarget = isValidToggleTarget(target);
 
         if (
             state.waitForScroll
-            || isMenuTarget(e.target)
-            || isClearButtonTarget(e.target)
-            || isSelectionItemDeleteButtonTarget(e.target)
+            || isMenuTarget(target)
+            || isClearButtonTarget(target)
+            || isSelectionItemDeleteButtonTarget(target)
             || !validTarget
         ) {
             if (!validTarget) {
@@ -558,7 +588,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
 
         const focused = document.activeElement;
-        if (menuEl.contains(focused)) {
+        if (focused && menuEl.contains(focused)) {
             focused.scrollIntoView({
                 behavior: 'instant',
                 block: 'nearest',
@@ -567,7 +597,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     };
 
     /** 'focus' event handler */
-    const onFocus = (e) => {
+    const onFocus = (e: React.FocusEvent) => {
         e?.stopPropagation();
 
         if (props.disabled) {
@@ -577,22 +607,23 @@ export const DropDownContainer = forwardRef((props, ref) => {
         activate(true);
         const inputEl = getInput();
 
-        const index = getSelectedItemIndex(e.target);
+        const target = e.target as HTMLElement;
+        const index = getSelectedItemIndex(target);
         if (index !== -1) {
             activateSelectedItem(index);
-        } else if (e.target === inputEl) {
+        } else if (target === inputEl) {
             activateInput();
         }
 
         const focusedBefore = !!focusedElem?.current;
         if (focusedElem) {
-            focusedElem.current = e.target;
+            focusedElem.current = target;
         }
 
         if (
             !state.multiple
             && props.blurInputOnSingleSelect
-            && e.target === innerRef?.current
+            && target === innerRef?.current
         ) {
             return;
         }
@@ -604,27 +635,23 @@ export const DropDownContainer = forwardRef((props, ref) => {
             showListHandler?.();
         }
 
-        const closestElem = MenuHelpers.getClosestItemElement(e?.target, {
-            ...state,
-            itemSelector: '.menu-item',
-        });
+        const closestElem = MenuHelpers.getClosestItemElement(target, '.menu-item');
         const itemId = closestElem?.dataset?.id ?? null;
-
         if (itemId) {
             scrollToItem();
         }
 
         if (
             index === -1
-            && !isClearButtonTarget(e.target)
-            && e.target !== inputEl
+            && !isClearButtonTarget(target)
+            && target !== inputEl
         ) {
             focusInputIfNeeded(true, itemId);
         }
     };
 
     /** 'blur' event handler */
-    const onBlur = (e) => {
+    const onBlur = (e: React.FocusEvent) => {
         e?.stopPropagation();
 
         if (isLostFocus(e)) {
@@ -635,8 +662,9 @@ export const DropDownContainer = forwardRef((props, ref) => {
             activate(false);
         }
 
+        const target = e.target as HTMLElement;
         const selectEl = getSelect();
-        if (selectEl && e.target === selectEl) {
+        if (selectEl && target === selectEl) {
             sendChangeEvent();
         }
     };
@@ -645,13 +673,13 @@ export const DropDownContainer = forwardRef((props, ref) => {
         toggleMenu();
     };
 
-    const onItemClick = (target) => {
+    const onItemClick = (target: DropDownMenuItemProps) => {
         handleItemSelect(target);
     };
 
     /** Click by delete button of selected item event handler */
     const onDeleteSelectedItem = ({ e }) => {
-        const current = getState();
+        const current = getState() as DropDownState;
         if (!state.multiple || !e) {
             return;
         }
@@ -705,7 +733,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     /** Handler for left or right arrow keys */
     const onSelectionNavigate = (e) => {
-        const current = getState();
+        const current = getState() as DropDownState;
         if (!state.multiple) {
             return;
         }
@@ -727,12 +755,12 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
             activateSelectedItem(index - 1);
         } else {
-            const itemToActivate = (index === selectedItems.length - 1) ? -1 : index + 1;
+            const itemToActivate = (index === selectedItems.length - 1) ? -1 : (index + 1);
             activateSelectedItem(itemToActivate);
         }
     };
 
-    const activateItem = (itemId) => {
+    const activateItem = (itemId: string | null) => {
         const menuElem = getMenu();
         if (!menuElem) {
             return;
@@ -744,28 +772,29 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
 
         const focusOptions = { preventScroll: true };
-
-        const itemEl = menuElem.querySelector(`.menu-item[data-id="${itemId}"]`);
+        const itemSelector = `.menu-item[data-id="${itemId}"]`;
+        const itemEl = menuElem.querySelector(itemSelector) as HTMLElement;
         if (!itemEl) {
             return;
         }
 
         if (item.type === 'group' && state.allowActiveGroupHeader) {
             const { GroupHeader } = state.components;
-            const groupHeader = itemEl?.querySelector(GroupHeader?.selector);
+            const selector = GroupHeader?.selector ?? null;
+            const groupHeader = itemEl?.querySelector(selector) as HTMLElement;
             groupHeader?.focus(focusOptions);
         } else {
             itemEl.focus(focusOptions);
         }
     };
 
-    const onKey = (e) => {
+    const onKey = (e: React.KeyboardEvent) => {
         e.stopPropagation();
 
         const editable = isEditable(state);
         const { multiple, showMultipleSelection, listAttach } = props;
         const inputEl = getInput();
-        let newItem = null;
+        let newItem: MenuItemProps | null = null;
 
         let allowSelectionNavigate = multiple && showMultipleSelection && !listAttach;
         if (allowSelectionNavigate && editable && e.target === inputEl) {
@@ -869,17 +898,18 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
 
         if (focusInput) {
-            focusInputIfNeeded(true, newItem.id);
+            focusInputIfNeeded(true, newItem?.id ?? null);
         }
     };
 
     /** Handler for 'input' event of text field  */
-    const onInput = (e) => {
+    const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (props.enableFilter) {
-            filter(e.target.value);
+            const target = e?.target as HTMLInputElement;
+            filter(target?.value);
         }
 
-        props?.onInput?.(e, dispatch);
+        props?.onInput?.(e);
     };
 
     /** Handler for 'clear selection' button click */
@@ -898,7 +928,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
         }
     };
 
-    const onItemActivate = (itemId) => {
+    const onItemActivate = (itemId: string | null) => {
         setActive(itemId);
     };
 
@@ -914,10 +944,10 @@ export const DropDownContainer = forwardRef((props, ref) => {
         updateListPosition();
     };
 
-    viewportEvents = { resize: (e) => onViewportResize(e) };
+    viewportEvents = { resize: onViewportResize };
     windowEvents = {
         scroll: {
-            listener: (e) => onWindowScroll(e),
+            listener: onWindowScroll,
             options: { passive: true, capture: true },
         },
     };
@@ -925,7 +955,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
     showListHandler = useDebounce(
         stopScrollWaiting,
         SHOW_LIST_SCROLL_TIMEOUT,
-    );
+    ) as DebounceRunFunction;
 
     useEffect(() => {
         if (state.visible) {
@@ -965,7 +995,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
         inputRef: inputElem,
         disabled: props.disabled,
         editable,
-        items: MenuHelpers.toFlatList(state.items),
+        items: MenuHelpers.toFlatList<DropDownMenuItemProps>(state.items ?? []),
         onInput,
         onToggle,
         onDeleteSelectedItem,
@@ -981,14 +1011,18 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const showInput = props.listAttach && props.enableFilter;
 
     // Menu
-    const menuProps = {
+    const menuProps: DropDownMenuProps = {
         ...state,
+        items: state.items ?? [],
         inputRef: inputElem,
         disabled: props.disabled,
         className: classNames({
             dd__list_fixed: !!state.fixedMenu,
             dd__list_open: !!state.fixedMenu && !!state.visible,
         }),
+        itemSelector: '.menu-item',
+        tabThrough: false,
+        activeItem: null,
         editable,
         onItemClick,
         onInput,
@@ -1006,7 +1040,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
         menuProps.header = {
             inputRef: inputElem,
             disabled: props.disabled,
-            inputString: state.inputString,
+            inputString: state.inputString ?? '',
             inputPlaceholder: props.placeholder,
             useSingleSelectionAsPlaceholder: props.useSingleSelectionAsPlaceholder,
             multiple: props.multiple,
@@ -1030,8 +1064,8 @@ export const DropDownContainer = forwardRef((props, ref) => {
     const selected = getSelectedItems(state);
     const selectedIds = selected.map((item) => item.id).join();
 
-    let tabIndex = null;
-    let selectTabIndex = null;
+    let tabIndex: number | undefined;
+    let selectTabIndex: number | null = null;
     if (!props.disabled) {
         const nativeSelectVisible = false; // isVisible(selectElem, true);
 
@@ -1048,17 +1082,22 @@ export const DropDownContainer = forwardRef((props, ref) => {
 
     // Native select
     const { NativeSelect } = state.components;
-    const nativeSelect = props.useNativeSelect && (
-        <NativeSelect
-            id={props.id}
-            disabled={props.disabled}
-            multiple={props.multiple}
-            tabIndex={selectTabIndex}
-            items={state.items}
-        />
+
+    const nativeSelectProps: DropDownNativeSelectProps = {
+        id: props.id,
+        disabled: props.disabled,
+        multiple: props.multiple,
+        items: state.items ?? [],
+    };
+    if (selectTabIndex !== null) {
+        nativeSelectProps.tabIndex = selectTabIndex;
+    }
+
+    const nativeSelect = props.useNativeSelect && NativeSelect && (
+        <NativeSelect {...nativeSelectProps} />
     );
 
-    const style = {};
+    const style: CSSProperties = {};
     if (state.visible && state.fullScreenHeight) {
         style.height = px(state.fullScreenHeight);
     }
@@ -1078,6 +1117,7 @@ export const DropDownContainer = forwardRef((props, ref) => {
                     dd__list_active: isEditable(state),
                     dd__fullscreen: !!state.fullScreen,
                     dd__container_native: !!state.useNativeSelect,
+                    dd__container_disabled: !!props.disabled,
                 },
                 props.className,
             )}
@@ -1086,7 +1126,6 @@ export const DropDownContainer = forwardRef((props, ref) => {
             onFocusCapture={onFocus}
             onBlurCapture={onBlur}
             onKeyDownCapture={onKey}
-            disabled={props.disabled}
             data-value={selectedIds}
             ref={innerRef}
             style={style}
@@ -1102,108 +1141,3 @@ export const DropDownContainer = forwardRef((props, ref) => {
         </div>
     );
 });
-
-DropDownContainer.propTypes = {
-    /* DropDown container element 'id' property */
-    id: PropTypes.string,
-    /* Select element 'name' property */
-    name: PropTypes.string,
-    /* Select element 'form' property */
-    form: PropTypes.string,
-    /* Additional CSS classes */
-    className: PropTypes.string,
-    /* Content to attach DropDown component to */
-    children: PropTypes.oneOfType([
-        PropTypes.node,
-        PropTypes.elementType,
-    ]),
-    /* allow to select multiple items */
-    multiple: PropTypes.bool,
-    /* attach menu to element and don't create combo box */
-    listAttach: PropTypes.bool,
-    /* If enabled component container will use static position */
-    static: PropTypes.bool,
-    /* Callback to verity element to toggle menu list popup */
-    isValidToggleTarget: PropTypes.func,
-    /* If enabled menu will use fixed position or absolute otherwise */
-    fixedMenu: PropTypes.bool,
-    /* Enables filtering items by text input */
-    enableFilter: PropTypes.bool,
-    /* If enabled menu will be opened on component receive focus */
-    openOnFocus: PropTypes.bool,
-    /* If enabled then after last item will be activated first and vice versa */
-    loopNavigation: PropTypes.bool,
-    /* Title for empty menu list placeholder */
-    noResultsMessage: PropTypes.string,
-    /* Enables create new items from filter input value */
-    allowCreate: PropTypes.bool,
-    /* Enabled activation of group headers and includes its to item iterations */
-    allowActiveGroupHeader: PropTypes.bool,
-    /* Callback returning title for 'Create from filter' menu item */
-    addItemMessage: PropTypes.func,
-    /* Disabled any interactions with component */
-    disabled: PropTypes.bool,
-    /* If enabled component will use native select element on
-       small devices(less 768px width) to view list and edit selection */
-    useNativeSelect: PropTypes.bool,
-    /* if set true component will show fullscreen popup */
-    fullScreen: PropTypes.bool,
-    /* Placeholder text for component */
-    placeholder: PropTypes.string,
-    /* Additional reducers */
-    reducers: PropTypes.oneOfType([
-        PropTypes.func,
-        PropTypes.arrayOf(PropTypes.func),
-    ]),
-    /* If enabled single select component will move focus from input to container
-       after select item */
-    blurInputOnSingleSelect: PropTypes.bool,
-    /* If enabled single select component will use title of selected item as placeholder */
-    useSingleSelectionAsPlaceholder: PropTypes.bool,
-    /* If enabled multiple select component will clear filter input after select item */
-    clearFilterOnMultiSelect: PropTypes.bool,
-    /* Enables render multiple selection inside combo box */
-    showMultipleSelection: PropTypes.bool,
-    /* Enables render 'clear multiple selection' button inside combo box */
-    showClearButton: PropTypes.bool,
-    /* Enables render 'toggle' button inside combo box */
-    showToggleButton: PropTypes.bool,
-    /* group header click event handler */
-    onGroupHeaderClick: PropTypes.func,
-    /* item selected event handler */
-    onItemSelect: PropTypes.func,
-    /* selection changed event handler */
-    onChange: PropTypes.func,
-    /* filer input event handler */
-    onInput: PropTypes.func,
-    items: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        type: PropTypes.string,
-        className: PropTypes.string,
-        title: PropTypes.string,
-        icon: PropTypes.oneOfType([
-            PropTypes.node,
-            PropTypes.elementType,
-        ]),
-    })),
-    components: PropTypes.shape({
-        Input: componentPropType,
-        NativeSelect: componentPropType,
-        Placeholder: componentPropType,
-        SingleSelection: componentPropType,
-        ComboBox: componentPropType,
-        Menu: componentPropType,
-        MenuList: componentPropType,
-        ListItem: componentPropType,
-        Check: componentPropType,
-        GroupItem: componentPropType,
-        GroupHeader: componentPropType,
-        ListPlaceholder: componentPropType,
-        MultipleSelection: componentPropType,
-        MultiSelectionItem: componentPropType,
-        ComboBoxControls: componentPropType,
-        ToggleButton: componentPropType,
-        ClearButton: componentPropType,
-    }),
-    container: PropTypes.object,
-};

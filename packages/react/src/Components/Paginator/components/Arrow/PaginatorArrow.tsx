@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
+import { PaginatorArrowProps } from '../../types.ts';
 
 const defaultArrowIcon = () => (
     <svg className='paginator-arrow__icon' viewBox='0 0 2.1 3.4'>
@@ -10,10 +10,9 @@ const defaultArrowIcon = () => (
 );
 
 const defaultProps = {
-    isNext: false,
 };
 
-export const PaginatorArrow = (p) => {
+export const PaginatorArrow = (p: PaginatorArrowProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -38,9 +37,4 @@ export const PaginatorArrow = (p) => {
             <Icon />
         </a>
     );
-};
-
-PaginatorArrow.propTypes = {
-    navigation: PropTypes.string,
-    page: PropTypes.number,
 };

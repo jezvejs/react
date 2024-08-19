@@ -1,23 +1,29 @@
-import PropTypes from 'prop-types';
-import { forwardRef } from 'react';
+import { CSSProperties, forwardRef } from 'react';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
 import { px } from '../../../utils/common.ts';
 import { valueToPosition } from '../helpers.ts';
+import { RangeSliderSelectedAreaProps, RangeSliderState } from '../types.ts';
+
+type RangeSliderSelectedAreaRef = HTMLDivElement | null;
 
 // eslint-disable-next-line react/display-name
-export const RangeSliderSelectedArea = forwardRef((props, ref) => {
-    const { getState } = useDragnDrop();
-
-    if (!props.range) {
+export const RangeSliderSelectedArea = forwardRef<
+    RangeSliderSelectedAreaRef,
+    RangeSliderSelectedAreaProps
+>((props, ref) => {
+    const dragDrop = useDragnDrop();
+    if (!dragDrop || !props.range) {
         return null;
     }
 
-    const state = getState();
+    const { getState } = dragDrop;
+    const state = getState() as RangeSliderState;
+
     const startPos = valueToPosition(state.start, state.min, state.max, state.maxPos);
     const endPos = valueToPosition(state.end, state.min, state.max, state.maxPos);
     const size = Math.abs(endPos - startPos);
 
-    const style = {
+    const style: CSSProperties = {
     };
 
     if (props.axis === 'x') {
@@ -36,9 +42,3 @@ export const RangeSliderSelectedArea = forwardRef((props, ref) => {
         />
     );
 });
-
-RangeSliderSelectedArea.propTypes = {
-    id: PropTypes.string,
-    axis: PropTypes.oneOf(['x', 'y']),
-    range: PropTypes.bool,
-};
