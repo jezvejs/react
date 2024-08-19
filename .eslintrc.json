@@ -3,6 +3,7 @@
     "extends": [
         "airbnb-base",
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
@@ -47,16 +48,16 @@
             "error",
             "ignorePackages"
         ],
-        "react/jsx-no-target-blank": "off",
         "react-refresh/only-export-components": [
             "warn",
             {
                 "allowConstantExport": true
             }
-        ]
+        ],
+        "no-use-before-define": "off",
+        "react/prop-types": "off"
     },
     "plugins": [
-        "react",
         "react-refresh"
     ],
     "settings": {

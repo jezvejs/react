@@ -11,8 +11,8 @@
 }
 
 /* Disabled drop down */
-.dd__container[disabled],
-.dd__container_attached[disabled] {
+.dd__container.dd__container_disabled,
+.dd__container_attached.dd__container_disabled {
   .dd__clear-btn {
     display: none;
   }

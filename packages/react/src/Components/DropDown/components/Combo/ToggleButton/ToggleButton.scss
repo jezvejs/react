@@ -10,8 +10,8 @@
 }
 
 /* Disabled component */
-.dd__container[disabled],
-.dd__container_attached[disabled] {
+.dd__container.dd__container_disabled,
+.dd__container_attached.dd__container_disabled {
   .btn.dd__toggle-btn {
     --btn-icon-color: var(--dd-disabled-btn-fill);
   }

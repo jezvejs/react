@@ -7,7 +7,7 @@
     "module": "index.js",
     "main": "index.js",
     "scripts": {
-        "lint-src": "npx eslint --ext js,jsx --quiet ./packages/ ./storybook/",
+        "lint-src": "npx eslint --ext js,jsx,ts,tsx --quiet ./packages/ ./storybook/",
         "lint-style": "npx stylelint packages/**/*.scss storybook/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
         "prestart": "npm install",
@@ -37,8 +37,13 @@
     ],
     "devDependencies": {
         "@jezvejs/release-tools": "^0.5.1",
-        "@playwright/test": "^1.46.0",
-        "@types/node": "^20.14.14",
+        "@playwright/test": "^1.46.1",
+        "@tsconfig/vite-react": "^3.0.2",
+        "@types/node": "^20.16.0",
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@typescript-eslint/eslint-plugin": "^8.1.0",
+        "@typescript-eslint/parser": "^8.1.0",
         "browserslist": "^4.23.3",
         "commonjs-variables-for-esmodules": "^1.1.0",
         "dotenv": "^16.4.5",
@@ -53,9 +58,10 @@
         "sass": "^1.77.8",
         "shelljs": "^0.8.5",
         "ssh2-sftp-client": "^10.0.3",
-        "stylelint": "^16.8.1",
+        "stylelint": "^16.8.2",
         "stylelint-config-prettier-scss": "^1.0.0",
-        "stylelint-config-standard-scss": "^13.1.0"
+        "stylelint-config-standard-scss": "^13.1.0",
+        "typescript": "^5.5.4"
     },
     "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
 }
