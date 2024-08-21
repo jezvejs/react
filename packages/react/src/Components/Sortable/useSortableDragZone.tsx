@@ -7,11 +7,13 @@ import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 import {
     DragAvatar,
     DropTarget,
+    DragAvatarInitParam,
     OnDragCancelParams,
     OnDragStartParams,
 } from '../../utils/DragnDrop/types.ts';
 import { useDragZone, UseDragZoneProps } from '../../utils/DragnDrop/useDragZone.tsx';
 import { StoreUpdater } from '../../utils/Store/Store.ts';
+import { StyleDeclaration } from '../../utils/types.ts';
 
 import {
     GetGroupFunction,
@@ -268,11 +270,12 @@ export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
                 ...avatar,
                 dropTarget: null,
 
-                initFromEvent({ downX, downY, e }) {
+                initFromEvent(params: DragAvatarInitParam) {
                     if (!avatar.dragZone) {
                         return false;
                     }
-                    const target = e.target as HTMLElement;
+
+                    const target = params.e.target as HTMLElement;
                     const dragZoneElem = avatar.dragZone.findDragZoneItem?.(target) as HTMLElement;
                     if (!dragZoneElem) {
                         return false;
@@ -292,12 +295,13 @@ export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
                     };
 
                     const tableStyles = Array.from(tbl.style) as string[];
+                    const tblStyle = tbl.style as StyleDeclaration;
                     tableStyles.forEach((propName: string) => {
                         if (!avatarState.style) {
                             avatarState.style = {};
                         }
 
-                        avatarState.style[propName] = tbl.style[propName];
+                        (avatarState.style as StyleDeclaration)[propName] = tblStyle[propName];
                     });
 
                     if (avatar.dragZone.copyWidth) {
@@ -322,8 +326,8 @@ export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
                         avatarState,
                         origLeft: prev.left,
                         origTop: prev.top,
-                        shiftX: downX - offset.left,
-                        shiftY: downY - offset.top,
+                        shiftX: params.downX - offset.left,
+                        shiftY: params.downY - offset.top,
                     }));
 
                     return true;

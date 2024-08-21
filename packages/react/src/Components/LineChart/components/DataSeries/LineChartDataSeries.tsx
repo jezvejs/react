@@ -11,13 +11,18 @@ import {
     LineChartDataGroup,
     LineChartDataItemType,
     LineChartDataPath,
+    LineChartDataSeriesComponent,
+    LineChartDataSeriesProps,
 } from '../../types.ts';
 import { BaseChartHelpers } from '../../../BaseChart/BaseChart.tsx';
 
 /**
  * LineChartDataSeries component
  */
-export const LineChartDataSeries = (props: LineChartState) => {
+export const LineChartDataSeries: LineChartDataSeriesComponent = (
+    p: LineChartDataSeriesProps,
+) => {
+    const props = p as LineChartState;
     const store = useStore();
 
     const storeState = store?.getState() as LineChartState;
@@ -60,7 +65,10 @@ export const LineChartDataSeries = (props: LineChartState) => {
                     columnIndex: 0,
                 };
 
-                const item = props.createItem(itemProps, storeState);
+                const item = props.createItem?.(itemProps, storeState);
+                if (!item) {
+                    return;
+                }
 
                 group.push(item);
 

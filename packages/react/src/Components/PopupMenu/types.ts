@@ -15,4 +15,5 @@ export interface PopupMenuProps extends MenuProps {
 export interface PopupMenuState extends PopupMenuProps {
     open: boolean;
     listenScroll: boolean;
+    ignoreTouch: boolean;
 }

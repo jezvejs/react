@@ -1,3 +1,5 @@
+import { asArray } from '@jezvejs/types';
+import classNames from 'classnames';
 import {
     forwardRef,
     useEffect,
@@ -6,7 +8,6 @@ import {
     useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
-import classNames from 'classnames';
 
 import { usePopupPosition } from '../../../../hooks/usePopupPosition/usePopupPosition.ts';
 
@@ -32,10 +33,17 @@ import {
 } from '../../helpers.ts';
 import { actions } from '../../reducer.ts';
 import {
+    DatePickerDisabledDateFilter,
     DatePickerHeaderProps,
+    DatePickerItem,
     DatePickerProps,
+    DatePickerRangePart,
+    DatePickerSearchResults,
     DatePickerState,
+    DatePickerTitleClickParams,
     DatePickerViewState,
+    DatePickerZoomInParams,
+    DatePickerZoomOutParams,
 } from '../../types.ts';
 import './DatePickerContainer.scss';
 
@@ -134,7 +142,8 @@ export const DatePickerContainer = forwardRef<
         }
     };
 
-    const zoomIn = ({ date, secondViewTransition = false }) => {
+    const zoomIn = (params: DatePickerZoomInParams) => {
+        const { date, secondViewTransition = false } = params;
         const { viewType } = state;
         if (viewType !== YEAR_VIEW && viewType !== YEARRANGE_VIEW) {
             return;
@@ -148,11 +157,13 @@ export const DatePickerContainer = forwardRef<
         }));
     };
 
-    const zoomOut = ({ secondViewTransition = false }) => {
+    const zoomOut = (params: DatePickerZoomOutParams) => {
         const { viewType } = state;
         if (viewType !== MONTH_VIEW && viewType !== YEAR_VIEW) {
             return;
         }
+
+        const { secondViewTransition = false } = params;
 
         navigateTo(actions.zoomOut({
             secondViewTransition,
@@ -169,10 +180,14 @@ export const DatePickerContainer = forwardRef<
 
     /**
      * Set up selected items range
-     * @param {Date} startDate - date to start selection from
-     * @param {Date} endDate  - date to finnish selection at
+     * @param {Date|null} startDate - date to start selection from
+     * @param {Date|null} endDate  - date to finnish selection at
      */
-    const setSelection = (startDate, endDate, navigateToFirst = true) => {
+    const setSelection = (
+        startDate: Date | null,
+        endDate: Date | null,
+        navigateToFirst: boolean = true,
+    ) => {
         if (state.waitingForAnimation) {
             return;
         }
@@ -193,7 +208,7 @@ export const DatePickerContainer = forwardRef<
         dispatch(actions.clearSelection());
     };
 
-    const setDisabledDateFilter = (disabledDateFilter) => {
+    const setDisabledDateFilter = (disabledDateFilter: DatePickerDisabledDateFilter | null) => {
         if (state.waitingForAnimation) {
             return;
         }
@@ -201,7 +216,7 @@ export const DatePickerContainer = forwardRef<
         dispatch(actions.setDisabledDateFilter(disabledDateFilter));
     };
 
-    const setRangePart = (rangePart) => {
+    const setRangePart = (rangePart: DatePickerRangePart | null) => {
         if (state.waitingForAnimation) {
             return;
         }
@@ -236,8 +251,11 @@ export const DatePickerContainer = forwardRef<
         dispatch(actions.selectDay(date));
 
         const newState = getState() as DatePickerState;
-        const { actDate } = newState;
-        props.onDateSelect?.(actDate, newState);
+        const activeDates = asArray(newState.actDate);
+        if (activeDates.length > 0) {
+            const [actDate] = activeDates;
+            props.onDateSelect?.(actDate, newState);
+        }
 
         if (props.range) {
             onRangeSelect(date);
@@ -248,7 +266,7 @@ export const DatePickerContainer = forwardRef<
         }
     };
 
-    const handleItemSelect = (item, { secondViewTransition = false }) => {
+    const handleItemSelect = (item: DatePickerItem, { secondViewTransition = false }) => {
         if (!item) {
             return;
         }
@@ -268,8 +286,8 @@ export const DatePickerContainer = forwardRef<
         }
     };
 
-    const findItemByElement = (elem) => {
-        const cell = elem?.closest('.dp__cell');
+    const findItemByElement = (elem: HTMLElement): DatePickerSearchResults => {
+        const cell = elem?.closest('.dp__cell') as HTMLElement;
         const time = cell?.dataset?.date ?? null;
         if (time === null) {
             return {
@@ -280,10 +298,12 @@ export const DatePickerContainer = forwardRef<
             };
         }
 
-        const item = {
+        const item: DatePickerItem = {
             date: new Date(parseInt(time, 10)),
         };
-        const siblings = Array.from(cell.parentNode?.querySelectorAll('.dp__cell'));
+
+        const elems = cell.parentNode?.querySelectorAll?.('.dp__cell') ?? [];
+        const siblings = Array.from(elems);
         const index = siblings.indexOf(cell);
 
         let secondViewTransition = false;
@@ -300,22 +320,24 @@ export const DatePickerContainer = forwardRef<
         };
     };
 
-    const onViewClick = (e) => {
+    const onViewClick = (e: React.MouseEvent) => {
         e.stopPropagation();
 
         if (!currViewRef?.current || state.waitingForAnimation) {
             return;
         }
 
-        const { item, secondViewTransition } = findItemByElement(e.target);
-
-        handleItemSelect(item, { secondViewTransition });
+        const target = e.target as HTMLElement;
+        const { item, secondViewTransition } = findItemByElement(target);
+        if (item) {
+            handleItemSelect(item, { secondViewTransition });
+        }
     };
 
     const headerEvents = {
-        onClickTitle: (options) => zoomOut(options),
-        onClickPrev: () => navigateToPrev(),
-        onClickNext: () => navigateToNext(),
+        onClickTitle: zoomOut,
+        onClickPrev: navigateToPrev,
+        onClickNext: navigateToNext,
     };
 
     const renderDateView = (
@@ -339,7 +361,7 @@ export const DatePickerContainer = forwardRef<
             header: {
                 ...headerEvents,
                 focusable,
-                onClickTitle: (options) => zoomOut({
+                onClickTitle: (options: DatePickerTitleClickParams) => zoomOut({
                     ...options,
                     secondViewTransition: true,
                 }),

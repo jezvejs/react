@@ -1,30 +1,14 @@
-import React, {
+import {
     useEffect,
     useRef,
     forwardRef,
     useImperativeHandle,
-    ReactNode,
 } from 'react';
 import classNames from 'classnames';
 
 import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
-
-export interface RangeSliderDropTargetProps {
-    id: string;
-    className: string;
-    axis: 'x' | 'y';
-    disabled: boolean;
-
-    children: ReactNode;
-
-    onClickCapture: (e: React.MouseEvent) => void;
-    onFocusCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
-    onBlurCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
-    onKeyDownCapture: (e: React.KeyboardEvent) => void;
-    // onDragEnd: () => void;
-}
-
-type RangeSliderDropTargetRef = HTMLDivElement | null;
+import { RangeSliderDropTargetProps, RangeSliderDropTargetRef } from '../types.ts';
+import { OnDragEndParams } from '../../../utils/DragnDrop/types.ts';
 
 // eslint-disable-next-line react/display-name
 export const RangeSliderDropTarget = forwardRef<
@@ -50,8 +34,9 @@ export const RangeSliderDropTarget = forwardRef<
             id: props.id,
             elem: innerRef?.current,
 
-            onDragEnd({ avatar }) {
-                avatar.onDragEnd?.();
+            onDragEnd(param: OnDragEndParams) {
+                const avatar = param?.avatar ?? null;
+                avatar?.onDragEnd?.();
             },
         };
 

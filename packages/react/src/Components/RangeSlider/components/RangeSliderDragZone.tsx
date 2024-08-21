@@ -18,22 +18,14 @@ import { RangeSliderValueSlider } from './RangeSliderValueSlider.tsx';
 
 import { getMaxPos } from '../helpers.ts';
 import {
+    RangeSliderDragZoneProps,
+    RangeSliderDragZoneRef,
     RangeSliderSelectedAreaProps,
     RangeSliderState,
     RangeSliderValueSliderProps,
     RangeSliderValueSliderType,
 } from '../types.ts';
-import { DragZone, OnDragStartParams } from '../../../utils/DragnDrop/types.ts';
-
-export interface RangeSliderDragZoneProps {
-    id: string;
-    axis: 'x' | 'y';
-    type?: 'startSlider' | 'endSlider' | 'selectedArea';
-    range: boolean;
-    onPosChange: (position: number) => void;
-}
-
-type RangeSliderDragZoneRef = HTMLDivElement | null;
+import { DragAvatarInitParam, DragZone, OnDragStartParams } from '../../../utils/DragnDrop/types.ts';
 
 // eslint-disable-next-line react/display-name
 export const RangeSliderDragZone = forwardRef<
@@ -91,7 +83,8 @@ export const RangeSliderDragZone = forwardRef<
                         return currentTargetElemRef.current;
                     },
 
-                    initFromEvent({ downX, downY }) {
+                    initFromEvent(initParams: DragAvatarInitParam) {
+                        const { downX, downY } = initParams;
                         if (!innerRef?.current) {
                             return false;
                         }
@@ -101,11 +94,12 @@ export const RangeSliderDragZone = forwardRef<
                         const rect = innerRef.current.getBoundingClientRect();
                         const offsetRect = innerRef.current?.offsetParent?.getBoundingClientRect();
 
-                        setState((prev) => ({
+                        setState((prev: RangeSliderState) => ({
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
-                                origLeft: innerRef.current?.offsetLeft,
+                                origLeft: innerRef.current?.offsetLeft ?? 0,
+                                origTop: innerRef.current?.offsetTop ?? 0,
                                 shiftX: downX - offset.left,
                                 shiftY: downY - offset.top,
                                 rect,
@@ -166,7 +160,7 @@ export const RangeSliderDragZone = forwardRef<
                     },
 
                     onDragCancel() {
-                        setState((prev) => ({
+                        setState((prev: RangeSliderState) => ({
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
@@ -194,7 +188,7 @@ export const RangeSliderDragZone = forwardRef<
 
         setState((prev) => ({
             ...prev,
-            maxPos: getMaxPos(innerRef.current, props),
+            maxPos: getMaxPos(innerRef.current, props.axis),
         }));
     };
 

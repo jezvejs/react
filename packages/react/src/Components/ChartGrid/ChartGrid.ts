@@ -1,4 +1,4 @@
-import { isObject } from '@jezvejs/types';
+import { BaseChartDataSet } from '../BaseChart/types.ts';
 
 const mandatoryProps = ['height', 'margin'];
 
@@ -120,17 +120,17 @@ export class ChartGrid {
     }
 
     /** Round value to current grid precision and return number */
-    toPrec(value) {
+    toPrec(value: number): number {
         return this.roundToPrecision(value, this.precision);
     }
 
     /** Round value to current grid precision and return string */
-    toPrecString(value) {
+    toPrecString(value: number): string {
         return value.toFixed(this.precision);
     }
 
     /** Rounds value to nearest less or equal value of current grid order */
-    floor(value) {
+    floor(value: number): number {
         const nValue = this.roundToPrecision((value / this.valueStep), 2);
         const res = Math.floor(nValue) * this.valueStep;
 
@@ -138,7 +138,7 @@ export class ChartGrid {
     }
 
     /** Round value to nearest greater or equal value of current grid order */
-    ceil(value) {
+    ceil(value: number): number {
         const nValue = this.roundToPrecision((value / this.valueStep), 2);
         const res = Math.ceil(nValue) * this.valueStep;
 
@@ -164,7 +164,7 @@ export class ChartGrid {
     }
 
     /** Set view range */
-    setViewRange(min, max) {
+    setViewRange(min: number, max: number) {
         this.viewMin = Math.min(min, max);
         this.viewMax = Math.max(min, max);
         this.viewDelta = Math.abs(max - min);
@@ -240,7 +240,7 @@ export class ChartGrid {
     }
 
     /** Scale view range of grid by specified count of steps */
-    addSteps(steps) {
+    addSteps(steps: number) {
         if (this.props.scaleAroundAxis && !this.isBoth()) {
             if (this.isPositive()) {
                 this.firstStep += steps * this.valueStep;
@@ -264,7 +264,7 @@ export class ChartGrid {
     }
 
     /** Scale view range of grid */
-    scaleViewRange(value) {
+    scaleViewRange(value: number) {
         let scaledMin = this.viewMin;
         let scaledMax = this.viewMax;
 
@@ -305,17 +305,18 @@ export class ChartGrid {
     }
 
     /** Obtain all values from chart data structure */
-    getAllValues(values: number[] | object[]) {
+    getAllValues(values: number[] | BaseChartDataSet[]): number[] {
         if (!values.length) {
             return [];
         }
 
         const [firstItem] = values;
-        if (!isObject(firstItem)) {
-            return values;
+        if (typeof firstItem === 'number') {
+            return values as number[];
         }
 
-        const dataValues = values.map((item) => item.data);
+        const dataSets = values as BaseChartDataSet[];
+        const dataValues = dataSets.map((item: BaseChartDataSet) => item.data);
         if (this.props.stacked) {
             const resIndex = dataValues.reduce((res, item, index) => (
                 (dataValues[res].length < item.length) ? index : res
@@ -331,7 +332,7 @@ export class ChartGrid {
     }
 
     /** Calculate grid parameters for specified values */
-    calculate(values: number[] | object[]) {
+    calculate(values: number[] | BaseChartDataSet[]) {
         const allValues = this.getAllValues(values);
         if (!allValues.length) {
             return;

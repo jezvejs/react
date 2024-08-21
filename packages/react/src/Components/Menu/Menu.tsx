@@ -228,7 +228,7 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
     };
 
-    const finishClick = (callback) => {
+    const finishClick = (callback: () => void) => {
         if (state.ignoreTouch) {
             setTimeout(() => {
                 handleMouseLeave();
@@ -241,7 +241,11 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
     };
 
     const toggleItem = (itemId: string | null) => {
-        setState(toggleSelectItem(itemId));
+        if (itemId === null) {
+            return;
+        }
+
+        setState((prev) => toggleSelectItem(prev, itemId));
     };
 
     const handleItemClick = (

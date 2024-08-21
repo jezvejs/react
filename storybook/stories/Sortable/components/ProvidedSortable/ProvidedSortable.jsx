@@ -15,8 +15,10 @@ export const ProvidedSortable = (props) => {
         shiftX: 0,
         shiftY: 0,
         dragging: false,
-        [sortableProps.id]: {
-            items: sortableProps.items,
+        zones: {
+            [sortableProps.id]: {
+                items: sortableProps.items,
+            },
         },
     };
 

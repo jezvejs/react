@@ -25,11 +25,11 @@ export const getLinePath = (
     const firstGroupIndex = state.getFirstVisibleGroupIndex(state);
     const groupWidth = state.getGroupOuterWidth(state);
     const coords = asArray(data?.values).map((value: number, index: number) => ({
-        x: state.getAlignedX({
+        x: state.getAlignedX?.({
             groupIndex: firstGroupIndex + index,
             groupWidth,
             alignColumns: state.alignColumns,
-        }, state),
+        }, state) ?? 0,
         y: value,
     }));
 

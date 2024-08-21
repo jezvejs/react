@@ -2,7 +2,7 @@ import { getCursorPos } from '@jezvejs/dom';
 import { useState } from 'react';
 import { flushSync } from 'react-dom';
 
-import { ControlledInput, ControlledInputHelpers, ControlledInputProps } from '../ControlledInput/ControlledInput.tsx';
+import { ControlledInput, ControlledInputHelpers } from '../ControlledInput/ControlledInput.tsx';
 
 import {
     dispatchInputEvent,
@@ -16,18 +16,11 @@ import {
     setCursor,
     stepCursor,
 } from './helpers.ts';
+import { DateInputProps, DateInputReplaceSelectionOptions } from './types.ts';
+import { ControlledInputEvent, ControlledInputProps } from '../ControlledInput/types.ts';
+import { InputModes } from '../Input/Input.tsx';
 
 const { getInputContent } = ControlledInputHelpers;
-
-interface DateInputReplaceSelectionOptions {
-    e?: UIEvent | null;
-    replaceAll?: boolean;
-}
-
-interface DateInputProps extends ControlledInputProps {
-    guideChar?: string,
-    locales?: string | string[],
-}
 
 const defaultProps: DateInputProps = {
     guideChar: '_',
@@ -58,7 +51,7 @@ export const DateInput = (p: DateInputProps) => {
         while (selection.length) {
             const char = selection.charAt(0);
             selection = selection.substr(1);
-            if (state.separator.includes(char)) {
+            if (state.separator?.includes(char)) {
                 res += char;
             } else {
                 res += props.guideChar;
@@ -86,7 +79,7 @@ export const DateInput = (p: DateInputProps) => {
         do {
             const char = beforeSelection.charAt(beforeSelection.length - 1);
             beforeSelection = beforeSelection.substr(0, beforeSelection.length - 1);
-            if (state.separator.includes(char)) {
+            if (state.separator?.includes(char)) {
                 afterSelection = char + afterSelection;
             } else {
                 afterSelection = props.guideChar + afterSelection;
@@ -127,11 +120,12 @@ export const DateInput = (p: DateInputProps) => {
             lastCursorPos += 1;
         }
 
-        while (selection.length) {
+        const separator = state.separator ?? '';
+        while (selection.length > 0) {
             const maskChar = selection.charAt(0);
-            selection = selection.substr(1);
+            selection = selection.substring(1);
 
-            if (state.separator.includes(maskChar)) {
+            if (separator.includes(maskChar)) {
                 res += maskChar;
                 if (lastCursorPos === res.length) {
                     lastCursorPos += 1;
@@ -173,7 +167,11 @@ export const DateInput = (p: DateInputProps) => {
 
         const range = (replaceAll)
             ? { start: 0, end: origValue.length }
-            : getCursorPos(e?.target);
+            : getCursorPos(e?.target as Element);
+
+        if (!range) {
+            return text;
+        }
 
         range.start = fixCursorPos(range.start, state);
         range.end = fixCursorPos(range.end, state);
@@ -185,14 +183,21 @@ export const DateInput = (p: DateInputProps) => {
         // Fix length of day and month values: prepend leading zero
         let fixedText = text;
         if (replaceAll) {
-            const expectedParts = text.split(state.separator);
+            const expectedParts = text.split(state.separator ?? '');
             if (expectedParts.length !== 3) {
                 return origValue;
             }
 
-            let day = expectedParts[state.dayRange.order];
-            let month = expectedParts[state.monthRange.order];
-            const year = expectedParts[state.yearRange.order];
+            const dayOrder = state.dayRange?.order ?? null;
+            const monthOrder = state.monthRange?.order ?? null;
+            const yearOrder = state.yearRange?.order ?? null;
+            if (dayOrder === null || monthOrder === null || yearOrder === null) {
+                return origValue;
+            }
+
+            let day = expectedParts[dayOrder];
+            let month = expectedParts[monthOrder];
+            const year = expectedParts[yearOrder];
 
             if (day.length === 1) {
                 day = `0${day}`;
@@ -234,14 +239,15 @@ export const DateInput = (p: DateInputProps) => {
         let value = fixedText + after;
         let res = beforeSelection;
         let valueToReplace = selection + afterSelection;
+        const separator = state.separator ?? '';
         while (valueToReplace.length > 0) {
             const maskChar = valueToReplace.charAt(0);
 
-            if (state.separator.includes(maskChar)) {
+            if (separator.includes(maskChar)) {
                 res += maskChar;
 
                 const char = value.charAt(0);
-                const isSeparatorChar = value.length > 0 && state.separator.includes(char);
+                const isSeparatorChar = value.length > 0 && separator.includes(char);
 
                 if (
                     !replaceAll
@@ -258,12 +264,12 @@ export const DateInput = (p: DateInputProps) => {
             if (value.length > 0) {
                 const char = value.charAt(0);
                 value = value.substring(1);
-                const isSeparatorChar = state.separator.includes(char);
+                const isSeparatorChar = separator.includes(char);
 
                 if (isSeparatorChar) {
-                    const lastSepPos = res.lastIndexOf(state.separator);
+                    const lastSepPos = res.lastIndexOf(separator);
                     const startPos = (lastSepPos !== -1)
-                        ? (lastSepPos + state.separator.length)
+                        ? (lastSepPos + separator.length)
                         : 0;
 
                     const rangeType = getRangeTypeByPosition(state.cursorPos, state);
@@ -299,15 +305,18 @@ export const DateInput = (p: DateInputProps) => {
         return res;
     };
 
-    const onValue = (value) => {
+    const onValue = (value: string) => {
         const content = replaceSelection(value, { replaceAll: true });
         const newState = handleExpectedContent(content, state);
 
         return renderValue({ ...state, ...newState });
     };
 
-    const onSelectCapture = (e) => {
-        const range = getCursorPos(e.target);
+    const onSelectCapture = (e: React.SyntheticEvent) => {
+        const range = getCursorPos(e.target as Element);
+        if (!range) {
+            return;
+        }
 
         setState((prev) => ({
             ...prev,
@@ -316,7 +325,7 @@ export const DateInput = (p: DateInputProps) => {
         }));
     };
 
-    const onValidateInput = (e) => {
+    const onValidateInput = (e: ControlledInputEvent) => {
         const { nativeEvent } = e;
         let expectedContent;
 
@@ -326,9 +335,12 @@ export const DateInput = (p: DateInputProps) => {
                 return;
             }
 
-            if (nativeEvent.inputType === 'deleteContentBackward') {
+            const inputEvent = nativeEvent as InputEvent;
+            const { inputType } = inputEvent;
+
+            if (inputType === 'deleteContentBackward') {
                 expectedContent = backspaceHandler();
-            } else if (nativeEvent.inputType === 'deleteContentForward' || nativeEvent.inputType === 'deleteByCut') {
+            } else if (inputType === 'deleteContentForward' || inputType === 'deleteByCut') {
                 expectedContent = deleteHandler();
             } else {
                 return;
@@ -347,18 +359,18 @@ export const DateInput = (p: DateInputProps) => {
             }));
         });
 
-        dispatchInputEvent(e.target);
+        dispatchInputEvent(e.target as HTMLInputElement);
     };
 
-    const inputProps = {
-        inputMode: 'decimal',
+    const inputProps: ControlledInputProps = {
+        inputMode: 'decimal' as InputModes,
         selectionStart: state.cursorPos,
         selectionEnd: state.selectionEnd,
         onValidateInput,
         onValue,
         onSelectCapture,
         renderValue: () => renderValue(state),
-        placeholder: props.placeholder ?? state.formatMask,
+        placeholder: props.placeholder ?? state.formatMask ?? '',
         onInput: props.onInput,
         onFocus: props.onFocus,
         onBlur: props.onBlur,
@@ -367,8 +379,6 @@ export const DateInput = (p: DateInputProps) => {
     };
 
     return (
-        <ControlledInput
-            {...inputProps}
-        />
+        <ControlledInput {...inputProps} />
     );
 };

@@ -39,7 +39,9 @@ export const BaseChartYAxisLabels = (props: BaseChartState) => {
         lastY = curY;
 
         const isZero = Math.abs(grid.toPrec(val)) === 0;
-        const tVal = (isZero) ? 0 : grid.toPrecString(val);
+        const tVal = (isZero)
+            ? 0
+            : parseFloat(grid.toPrecString(val));
 
         const label: BaseChartLabelProps = {
             id: step.toString(),

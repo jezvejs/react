@@ -80,18 +80,17 @@ export type LineChartDataPathComponent = React.ForwardRefExoticComponent<
 /**
  * LineChart DataSeries component
  */
-export type LineChartDataSeriesProps = LineChartState;
+export type LineChartDataSeriesProps = BaseChartState;
 
 export type LineChartDataSeriesComponent = React.FC<LineChartDataSeriesProps>;
 
 /**
  * LineChart child components
  */
-export interface LineChartComponents extends BaseChartComponents {
-    DataItem: LineChartDataItemComponent;
-    DataSeries: LineChartDataSeriesComponent;
-    DataPath: LineChartDataPathComponent;
-}
+export type LineChartComponents = BaseChartComponents & {
+    DataItem?: LineChartDataItemComponent;
+    DataPath?: LineChartDataPathComponent;
+};
 
 export interface LineChartAlignedXOptions {
     groupIndex: number;
@@ -103,15 +102,15 @@ export interface LineChartAlignedXOptions {
  * LineChart props
  */
 export interface LineChartProps extends BaseChartProps {
-    drawNodeCircles: boolean;
-    columnGap: number;
-    nodeCircleRadius: number;
+    drawNodeCircles?: boolean;
+    columnGap?: number;
+    nodeCircleRadius?: number;
 
-    getGroupWidth: (state: LineChartState) => number;
-    getColumnOuterWidth: (state: LineChartState) => number;
-    getX: (item: LineChartAlignedXOptions, groupWidth: number) => number;
-    getAlignedX: (options: LineChartAlignedXOptions, state: LineChartState) => number;
-    createItem: (data: LineChartItemProps, state: LineChartState) => LineChartDataItemType | null;
+    getGroupWidth?: (state: LineChartState) => number;
+    getColumnOuterWidth?: (state: LineChartState) => number;
+    getX?: (item: LineChartAlignedXOptions, groupWidth: number) => number;
+    getAlignedX?: (options: LineChartAlignedXOptions, state: LineChartState) => number;
+    createItem?: (data: LineChartItemProps, state: LineChartState) => LineChartDataItemType | null;
 
     components: LineChartComponents;
 }
@@ -123,6 +122,9 @@ export interface LineChartVisibleItems extends BaseChartVisibleItems {
     paths: LineChartDataPath[];
 }
 
+/**
+ * LineChart component state
+ */
 export interface LineChartState extends LineChartBaseState {
     popupTargetRef: React.LegacyRef<LineChartDataItemRef>;
     pinnedPopupTargetRef: React.LegacyRef<LineChartDataItemRef>;

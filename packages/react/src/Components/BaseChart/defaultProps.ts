@@ -43,6 +43,7 @@ export const defaultProps: BaseChartProps = {
     groupsGap: 10,
     marginTop: 10,
     alignColumns: 'left', // available values: 'left', 'right' and 'center'
+    scrollLeft: 0,
     // Grid behavior
     visibilityOffset: 100,
     scaleAroundAxis: true,
@@ -207,8 +208,7 @@ export const defaultProps: BaseChartProps = {
         return categories;
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isVisibleValue: (_) => true,
+    isVisibleValue: () => true,
 
     getVisibleItems: (state: BaseChartState) => {
         const firstItem = state.getFirstVisibleGroupIndex(state);
@@ -270,7 +270,6 @@ export const defaultProps: BaseChartProps = {
     // Components
     components: {
         Grid: BaseChartGrid,
-        DataSeries: null,
         XAxisLabels: BaseChartXAxisLabels,
         YAxisLabels: BaseChartYAxisLabels,
         Legend: BaseChartLegend,

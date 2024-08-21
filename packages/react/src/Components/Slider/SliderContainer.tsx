@@ -103,6 +103,10 @@ export const SliderContainer = (props: SliderContainerProps) => {
         animationFrameRef.current = requestAnimationFrame(() => {
             animationFrameRef.current = 0;
 
+            if (!contentRef.current) {
+                return;
+            }
+
             setState((prev) => ({
                 ...prev,
                 animate: true,
@@ -122,7 +126,7 @@ export const SliderContainer = (props: SliderContainerProps) => {
         });
     };
 
-    const switchTo = (num) => {
+    const switchTo = (num: number) => {
         const position = calculatePosition(num);
         if (position === false) {
             return;
@@ -132,7 +136,7 @@ export const SliderContainer = (props: SliderContainerProps) => {
 
         cancelAnimation();
 
-        setState((prev) => ({
+        setState((prev: SliderState) => ({
             ...prev,
             animate: false,
             waitingForAnimation: false,

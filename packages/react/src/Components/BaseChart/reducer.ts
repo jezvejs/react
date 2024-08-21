@@ -6,7 +6,12 @@ import {
     updateColumnWidth,
     getDataState,
 } from './helpers.ts';
-import { BaseChartState, BaseChartTarget } from './types.ts';
+import {
+    BaseChartDataCategory,
+    BaseChartSetDataParam,
+    BaseChartState,
+    BaseChartTarget,
+} from './types.ts';
 
 /** Updates state of component based on layout changes(scroll or resize) */
 const refreshView = (state: BaseChartState, layout: Partial<BaseChartState>) => {
@@ -71,7 +76,7 @@ const slice = createSlice({
         });
     },
 
-    setActiveCategory: (state: BaseChartState, activeCategory) => (
+    setActiveCategory: (state: BaseChartState, activeCategory: BaseChartDataCategory) => (
         (state.activeCategory === activeCategory)
             ? state
             : { ...state, activeCategory }
@@ -172,12 +177,13 @@ const slice = createSlice({
 
     resize: refreshView,
 
-    setData: (state: BaseChartState, { data, layout }) => {
+    setData: (state: BaseChartState, params: BaseChartSetDataParam) => {
+        const { data, layout } = params;
         if (state.data === data) {
             return state;
         }
 
-        let newState = {
+        let newState: BaseChartState = {
             ...getDataState(data, state),
             ...layout,
             activeTarget: null,
@@ -191,7 +197,7 @@ const slice = createSlice({
         return updateChartWidth(newState);
     },
 
-    scaleVisible: (state: BaseChartState, values) => (
+    scaleVisible: (state: BaseChartState, values: number[]) => (
         (state.autoScale && values?.length > 0)
             ? {
                 ...state,

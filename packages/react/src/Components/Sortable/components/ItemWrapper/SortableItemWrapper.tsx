@@ -14,6 +14,7 @@ import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.tsx'
 import { isPlaceholder } from '../../helpers.ts';
 
 import {
+    SortableAnimationTransform,
     SortableItemWrapperProps,
     SortableItemWrapperRef,
     SortableState,
@@ -57,12 +58,12 @@ export const SortableItemWrapper = forwardRef<
     const animationFrameRef = useRef(0);
     const clearTransitionRef = useRef<Callable | null>(null);
 
-    const setAnimationStage = (stage) => {
+    const setAnimationStage = (stage: AnimationStages) => {
         setAnimation((prev) => ({ ...prev, stage }));
     };
 
-    const setAnimationTransform = ({ initialTransform, offsetTransform }) => {
-        setAnimation((prev) => ({ ...prev, initialTransform, offsetTransform }));
+    const setAnimationTransform = (params: SortableAnimationTransform) => {
+        setAnimation((prev) => ({ ...prev, ...params }));
     };
 
     const cancelAnimation = () => {
@@ -144,13 +145,13 @@ export const SortableItemWrapper = forwardRef<
             !clearTransitionRef.current
             && animation.stage === AnimationStages.entered
         ) {
-            if (!props.animated) {
+            if (!props.animated || !innerRef.current.parentNode) {
                 setAnimationStage(AnimationStages.exiting);
                 return;
             }
 
             clearTransitionRef.current = afterTransition(
-                innerRef.current.parentNode,
+                innerRef.current.parentNode as Element,
                 {
                     elem: innerRef.current,
                     duration: props.transitionTimeout,
@@ -180,7 +181,7 @@ export const SortableItemWrapper = forwardRef<
     const isExiting = animation.stage === AnimationStages.exiting;
 
     const listItemProps = useMemo(() => {
-        const getItemState = (item) => ({
+        const getItemState = (item: SortableItemWrapperProps): SortableItemWrapperProps => ({
             ...item,
             className: classNames(
                 item.className,
@@ -209,18 +210,20 @@ export const SortableItemWrapper = forwardRef<
 
         if (props.initialTransform && props.offsetTransform) {
             if (props.animated && (isEntered || isExiting)) {
-                res.style.transitionProperty = 'transform, width';
+                res.style!.transitionProperty = 'transform, width';
             }
 
-            res.style.transform = (
-                (animation.offsetTransform && (isEntered || isExiting))
-                    ? animation.offsetTransform
-                    : animation.initialTransform
-            );
+            const transform = (animation.offsetTransform && (isEntered || isExiting))
+                ? animation.offsetTransform
+                : animation.initialTransform;
+
+            if (transform) {
+                res.style!.transform = transform;
+            }
         }
 
         if (props.targetRect) {
-            res.style.width = px(props.targetRect.width ?? 0);
+            res.style!.width = px(props.targetRect.width ?? 0);
         }
 
         const targetChild = props.targetRect?.childContainer;

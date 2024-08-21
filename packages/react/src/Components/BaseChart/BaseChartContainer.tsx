@@ -8,30 +8,22 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
+// Utils
 import { debounce, DebounceCancelFunction } from '../../utils/common.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
+import { StoreAction, StoreUpdater } from '../../utils/Store/Store.ts';
+import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
 
 import { actions } from './reducer.ts';
-import { getComponent, mapValues } from './helpers.ts';
+import { mapValues } from './helpers.ts';
 import { BaseChartPopupContainer } from './BaseChartPopupContainer.tsx';
-import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
-import { BaseChartState } from './types.ts';
-import { StoreAction, StoreUpdater } from '../../utils/Store/Store.ts';
-
-export interface BaseChartMeasuredLayout {
-    contentOffset?: {
-        top: number,
-        left: number,
-    },
-    scrollerWidth?: number,
-    scrollLeft?: number,
-    scrollWidth?: number,
-    containerWidth?: number,
-    containerHeight?: number,
-    xAxisLabelsHeight?: number,
-    height?: number,
-    chartHeight?: number,
-}
+import {
+    BaseChartDataSeriesComponent,
+    BaseChartItemSearchResult,
+    BaseChartMeasuredLayout,
+    BaseChartState,
+    BaseChartXAxisLabelsRef,
+} from './types.ts';
 
 export type BaseChartContainerRef = HTMLDivElement | null;
 
@@ -66,7 +58,7 @@ export const BaseChartContainer = forwardRef<
 
     const scrollerRef = useRef<HTMLDivElement | null>(null);
     const chartContentRef = useRef<SVGSVGElement | null>(null);
-    const xAxisLabelsRef = useRef<HTMLElement | null>(null);
+    const xAxisLabelsRef = useRef<BaseChartXAxisLabelsRef>(null);
     const popupRef = useRef<HTMLElement | null>(null);
     const pinnedPopupRef = useRef<HTMLElement | null>(null);
 
@@ -111,7 +103,7 @@ export const BaseChartContainer = forwardRef<
     };
 
     /** Activates specified target */
-    const activateTarget = (target) => {
+    const activateTarget = (target: BaseChartItemSearchResult) => {
         dispatch(actions.activateTarget(target));
     };
 
@@ -203,7 +195,7 @@ export const BaseChartContainer = forwardRef<
 
     /**
      * 'touchstart' event handler
-     * @param {TouchEvent} e
+     * @param {React.TouchEvent} e
      */
     const onTouchStart = (e: React.TouchEvent) => {
         if (e.touches) {
@@ -213,9 +205,9 @@ export const BaseChartContainer = forwardRef<
 
     /**
      * 'mousemove' event handler
-     * @param {MouseEvent} e
+     * @param {React.MouseEvent} e
      */
-    const onMouseMove = (e: React.MouseEvent /* | React.TouchEvent */) => {
+    const onMouseMove = (e: React.MouseEvent) => {
         if (!innerRef.current) {
             return;
         }
@@ -234,7 +226,7 @@ export const BaseChartContainer = forwardRef<
             props.onItemOut?.({ ...state.currentTarget, e });
         }
 
-        setState((prev) => ({
+        setState((prev: BaseChartState) => ({
             ...prev,
             currentTarget: target,
         }));
@@ -246,7 +238,7 @@ export const BaseChartContainer = forwardRef<
             return;
         }
 
-        if (state.activateOnHover) {
+        if (state.activateOnHover && target) {
             activateTarget(target);
         }
 
@@ -564,34 +556,39 @@ export const BaseChartContainer = forwardRef<
     if (!state?.components) {
         return null;
     }
+    const {
+        Grid,
+        XAxisLabels,
+        YAxisLabels,
+        Legend,
+        ActiveGroup,
+    } = state.components;
 
     // Grid
-    const Grid = getComponent('Grid', state);
-    const chartGrid = <Grid {...state} />;
+    const chartGrid = Grid && <Grid {...state} />;
 
     // x axis labels
-    const XAxisLabels = getComponent('XAxisLabels', state);
-    const xAxisLabels = <XAxisLabels {...state} ref={xAxisLabelsRef} />;
+    const xAxisLabels = XAxisLabels && (
+        <XAxisLabels {...state} ref={xAxisLabelsRef} />
+    );
 
     // y axis labels
-    const YAxisLabels = getComponent('YAxisLabels', state);
-    const yAxisLabels = <YAxisLabels {...state} />;
+    const yAxisLabels = YAxisLabels && <YAxisLabels {...state} />;
 
     // Legend
-    const Legend = getComponent('Legend', state);
-    const legend = props.showLegend && <Legend {...state} />;
+    const legend = props.showLegend && Legend && <Legend {...state} />;
 
     // Active group
-    const ActiveGroup = getComponent('ActiveGroup', state);
     const activeGroup = (
         state?.showActiveGroup
         && state?.activeTarget
+        && ActiveGroup
         && <ActiveGroup {...state} />
     );
 
     // Data series
-    const DataSeries = getComponent('DataSeries', state);
-    const series = (
+    const DataSeries = state.components.DataSeries as BaseChartDataSeriesComponent;
+    const series = DataSeries && (
         <DataSeries
             {...state}
             popupTargetRef={popupPosition.referenceRef}

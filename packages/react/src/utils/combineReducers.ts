@@ -1,10 +1,12 @@
+import { StoreReducer } from './Store/Store.ts';
+
 /**
  * Returns combined function for specified list of reducers
  *
  * @param  {...any} reducers
  * @returns {Function}
  */
-export const combineReducers = (...reducers) => (
+export const combineReducers = (...reducers: StoreReducer[]): StoreReducer => (
     (state, action) => {
         for (let i = 0; i < reducers.length; i += 1) {
             const reducer = reducers[i];

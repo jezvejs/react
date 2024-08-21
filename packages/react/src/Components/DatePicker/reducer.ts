@@ -18,6 +18,8 @@ import {
     DatePickerRangePart,
     DatePickerSetSelectionParams,
     DatePickerState,
+    DatePickerZoomInParams,
+    DatePickerZoomOutParams,
 } from './types.ts';
 
 // Reducers
@@ -28,7 +30,10 @@ const slice = createSlice({
             : { ...state, visible }
     ),
 
-    setRangePart: (state: DatePickerState, rangePart: DatePickerRangePart): DatePickerState => (
+    setRangePart: (
+        state: DatePickerState,
+        rangePart: DatePickerRangePart | null,
+    ): DatePickerState => (
         (state.rangePart === rangePart)
             ? state
             : { ...state, rangePart }
@@ -53,25 +58,24 @@ const slice = createSlice({
         secondViewTransition: false,
     }),
 
-    zoomIn: (state: DatePickerState, { date, secondViewTransition }): DatePickerState => (
+    zoomIn: (state: DatePickerState, params: DatePickerZoomInParams): DatePickerState => (
         ([YEAR_VIEW, YEARRANGE_VIEW].includes(state.viewType))
             ? {
                 ...state,
                 transition: 'zoomIn',
                 viewType: (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW,
-                date,
-                secondViewTransition,
+                ...params,
             }
             : state
     ),
 
-    zoomOut: (state: DatePickerState, { secondViewTransition }): DatePickerState => (
+    zoomOut: (state: DatePickerState, params: DatePickerZoomOutParams): DatePickerState => (
         ([MONTH_VIEW, YEAR_VIEW].includes(state.viewType))
             ? {
                 ...state,
                 transition: 'zoomOut',
                 viewType: (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW,
-                secondViewTransition,
+                ...params,
             }
             : state
     ),
@@ -141,7 +145,7 @@ const slice = createSlice({
             navigateToFirst = true,
         } = options;
 
-        if (!isDate(startDate)) {
+        if (!startDate || !isDate(startDate)) {
             return state;
         }
 
@@ -154,7 +158,7 @@ const slice = createSlice({
             newState.date = new Date(date);
         }
 
-        if (isDate(endDate)) {
+        if (endDate && isDate(endDate)) {
             const dateTo = endDate.getTime();
             newState.curRange = {
                 start: new Date(Math.min(date, dateTo)),

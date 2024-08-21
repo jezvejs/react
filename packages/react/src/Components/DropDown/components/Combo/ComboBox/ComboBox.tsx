@@ -81,7 +81,7 @@ export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
         ComboBoxControls,
     } = props.components ?? {};
 
-    const onDeleteSelectedItem = (itemId, e) => {
+    const onDeleteSelectedItem = (itemId: string | null, e: React.MouseEvent) => {
         props?.onDeleteSelectedItem?.({ itemId, e });
     };
 

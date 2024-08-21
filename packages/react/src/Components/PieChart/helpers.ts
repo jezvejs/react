@@ -1,7 +1,9 @@
 /* eslint-disable no-bitwise */
 
+import { CircularArcType, PieChartDataItem } from './types.ts';
+
 /** Calculate sum of array values */
-export const arraySum = (data) => {
+export const arraySum = (data: PieChartDataItem[]) => {
     if (!Array.isArray(data)) {
         throw new Error('Invalid data: array is expected');
     }
@@ -10,18 +12,17 @@ export const arraySum = (data) => {
 };
 
 /** Convert degrees to radians */
-export const toRadian = (val) => {
-    const fval = parseFloat(val);
-    if (Number.isNaN(fval)) {
+export const toRadian = (val: number): number => {
+    if (Number.isNaN(val)) {
         throw new Error('Invalid value');
     }
 
-    return (fval % 360) * (Math.PI / 180);
+    return (val % 360) * (Math.PI / 180);
 };
 
 /** Format value as hexadecimal */
-export const toHex = (val) => {
-    const v = parseInt(val, 10);
+export const toHex = (val: number | string): string => {
+    const v = (typeof val === 'string') ? parseInt(val, 10) : val;
     if (Number.isNaN(v)) {
         throw new Error('Invalid data');
     }
@@ -30,7 +31,7 @@ export const toHex = (val) => {
 };
 
 /** Format color as hexadecimal */
-export const hexColor = (val) => {
+export const hexColor = (val: number): string => {
     const r = (val & 0xFF0000) >> 16;
     const g = (val & 0x00FF00) >> 8;
     const b = (val & 0x0000FF);
@@ -39,25 +40,39 @@ export const hexColor = (val) => {
 };
 
 /** Format float value for SVG */
-export const svgValue = (val, prec = 5) => (
-    parseFloat(parseFloat(val).toFixed(prec))
+export const svgValue = (val: number, prec: number = 5): number => (
+    parseFloat(val.toFixed(prec))
 );
 
 /** Format circular arc command for SVG path element */
-export const circularArcCommand = (radius, large, clockwise, dx, dy) => (
+export const circularArcCommand = (
+    radius: number,
+    large: number,
+    clockwise: number,
+    dx: number,
+    dy: number,
+): string => (
     `a${radius} ${radius} 0 ${large} ${clockwise} ${dx} ${dy}`
 );
 
 /** Format circular arc command for SVG path element */
-export const circularArc = (x, y, radius, startDeg, arcDeg, offset, clockwise = true) => {
+export const circularArc = (
+    x: number,
+    y: number,
+    radius: number,
+    startDeg: number,
+    arcDeg: number,
+    offset?: number,
+    clockwise: boolean = true,
+): CircularArcType => {
     // center of circle point
-    let centerX = parseFloat(x);
-    let centerY = parseFloat(y);
+    let centerX = x;
+    let centerY = y;
     if (Number.isNaN(centerX) || Number.isNaN(centerY)) {
         throw new Error(`Invalid coordinates: (${x}; ${y})`);
     }
 
-    const r = parseFloat(radius);
+    const r = radius;
     if (Number.isNaN(r) || r === 0.0) {
         throw new Error(`Invalid radius: ${r}`);
     }
@@ -67,7 +82,7 @@ export const circularArc = (x, y, radius, startDeg, arcDeg, offset, clockwise = 
     const large = (a < Math.PI) ? 0 : 1;
 
     if (typeof offset !== 'undefined') {
-        const offs = parseFloat(offset);
+        const offs = offset;
         if (Number.isNaN(offs)) {
             throw new Error(`Invalid offset: ${offset}`);
         }

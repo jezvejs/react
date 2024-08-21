@@ -45,6 +45,8 @@ export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, 
         height: 0,
     };
     const commonSliderProps = {
+        origTop: 0,
+        origLeft: 0,
         top: 0,
         left: 0,
         shiftX: 0,

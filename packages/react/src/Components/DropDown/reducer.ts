@@ -9,7 +9,7 @@ import {
     createMenuItem,
     getAvailableItems,
 } from './helpers.ts';
-import { DropDownMenuItemProps, DropDownState } from './types.ts';
+import { DropDownCreateGroupParam, DropDownMenuItemProps, DropDownState } from './types.ts';
 import { MenuItemType } from '../Menu/types.ts';
 
 const {
@@ -21,8 +21,8 @@ const {
     pushItem,
 } = MenuHelpers;
 
-const deactivateAllItems = (items) => (
-    mapItems(items, (item) => ({ ...item, active: false }))
+const deactivateAllItems = (items: DropDownMenuItemProps[]) => (
+    mapItems(items, (item: DropDownMenuItemProps) => ({ ...item, active: false }))
 );
 
 /**
@@ -128,7 +128,7 @@ const slice = createSlice({
         items: (
             (!state.visible)
                 ? state.items
-                : deactivateAllItems(state.items)
+                : deactivateAllItems(state.items ?? [])
         ),
     }),
 
@@ -143,7 +143,7 @@ const slice = createSlice({
                 items: (
                     (visible)
                         ? state.items
-                        : deactivateAllItems(state.items)
+                        : deactivateAllItems(state.items ?? [])
                 ),
             }
     ),
@@ -160,7 +160,7 @@ const slice = createSlice({
         actSelItemIndex: -1,
         filtered: false,
         inputString: null,
-        items: deactivateAllItems(state.items),
+        items: deactivateAllItems(state.items ?? []),
     }),
 
     activateInput: (state: DropDownState) => ({
@@ -214,7 +214,7 @@ const slice = createSlice({
         items: (
             (index === -1)
                 ? state.items
-                : deactivateAllItems(state.items)
+                : deactivateAllItems(state.items ?? [])
         ),
     }),
 
@@ -258,7 +258,12 @@ const slice = createSlice({
                 newItem.items = [];
             }
 
-            items = pushItem(newItem, items);
+            const newItems = pushItem(newItem, items);
+            if (newItems === null) {
+                return;
+            }
+
+            items = newItems;
         }, options);
 
         const newState = {
@@ -318,16 +323,16 @@ const slice = createSlice({
         items: (
             pushItem(
                 createMenuItem(item, state),
-                structuredClone(state.items),
-            )
+                structuredClone(state.items ?? []),
+            )!
         ),
     }),
 
-    addGroup: (state: DropDownState, group) => ({
+    addGroup: (state: DropDownState, group: DropDownCreateGroupParam) => ({
         ...state,
         items: pushItem(
             createGroup(group, state),
-            structuredClone(state.items),
+            structuredClone(state.items ?? []),
         ),
     }),
 
@@ -336,7 +341,7 @@ const slice = createSlice({
         items: (
             createItems(items, state).reduce(
                 (prev, item) => pushItem(item, prev),
-                structuredClone(state.items),
+                structuredClone(state.items ?? []),
             )
         ),
     }),

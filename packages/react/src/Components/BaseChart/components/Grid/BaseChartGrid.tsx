@@ -1,30 +1,19 @@
+import { BaseChartGridProps } from '../../types.ts';
 import { BaseChartXAxisGrid } from './BaseChartXAxisGrid.tsx';
 import { BaseChartYAxisGrid } from './BaseChartYAxisGrid.tsx';
-
 import './BaseChartGrid.scss';
-
-export interface BaseChartGridProps {
-    grid: object,
-    yAxisGrid: boolean,
-    xAxisGrid: boolean,
-    chartWidth: number,
-    height: number,
-    getGroupOuterWidth: () => void,
-    getFirstVisibleGroupIndex: () => void,
-    getVisibleGroupsCount: () => void,
-}
 
 /**
  * BaseChartGrid component
  */
-export const BaseChartGrid = (props) => {
-    const gridProps = {
-        grid: null,
+export const BaseChartGrid = (props: BaseChartGridProps) => {
+    const defaultProps = {
         yAxisGrid: true,
         xAxisGrid: false,
-        getGroupOuterWidth: null,
-        getFirstVisibleGroupIndex: null,
-        getVisibleGroupsCount: null,
+    };
+
+    const gridProps = {
+        ...defaultProps,
         ...props,
     };
 

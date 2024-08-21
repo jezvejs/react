@@ -339,11 +339,12 @@ export class PopupPosition {
             return;
         }
 
-        const { style } = state.elem as HTMLElement;
+        const elem = state.elem as HTMLElement;
+        const { style } = elem;
         style.left = px(0);
         style.top = px(0);
 
-        transform(state.elem, '');
+        transform(elem, '');
     }
 
     renderPosition() {
@@ -352,13 +353,14 @@ export class PopupPosition {
             return;
         }
 
-        const { style } = state.elem as HTMLElement;
+        const elem = state.elem as HTMLElement;
+        const { style } = elem;
         const { left, top } = state.current;
 
         style.left = px(0);
         style.top = px(0);
 
-        transform(state.elem, `translate(${px(left ?? 0)}, ${px(top ?? 0)})`);
+        transform(elem, `translate(${px(left ?? 0)}, ${px(top ?? 0)})`);
     }
 
     calculateRefScroll() {

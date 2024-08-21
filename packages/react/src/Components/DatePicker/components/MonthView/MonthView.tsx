@@ -23,6 +23,13 @@ import {
 import { DatePickerWeekDaysParams } from '../WeekDaysHeader/WeekDaysHeader.tsx';
 import './MonthView.scss';
 
+export interface DatePickerMonthViewItemAttrs {
+    className?: string;
+    disabled?: boolean;
+    'data-date'?: string;
+    'data-value'?: string;
+}
+
 const DatePickerMonthViewItem = (props: DatePickerMonthViewItemProps) => {
     const {
         date,
@@ -39,7 +46,7 @@ const DatePickerMonthViewItem = (props: DatePickerMonthViewItemProps) => {
 
     const itemDate = date.getDate();
 
-    const itemProps = {
+    const itemProps: DatePickerMonthViewItemAttrs = {
         className: classNames(
             'dp__cell dp__month-view_cell dp__day-cell',
             {
@@ -55,8 +62,8 @@ const DatePickerMonthViewItem = (props: DatePickerMonthViewItemProps) => {
     };
 
     if (showOtherMonthDays || !isOtherMonth) {
-        itemProps['data-date'] = shiftDate(date, 0).getTime();
-        itemProps['data-value'] = itemDate;
+        itemProps['data-date'] = shiftDate(date, 0).getTime().toString();
+        itemProps['data-value'] = itemDate.toString();
     }
 
     const content = (showOtherMonthDays || !isOtherMonth) && itemDate;
@@ -170,7 +177,7 @@ export const DatePickerMonthView = forwardRef<
 
     // days
     const { showOtherMonthDays, fixedHeight } = props;
-    let week = getWeekDays(firstMonthDay, weekDayParams);
+    let week: Date[] | null = getWeekDays(firstMonthDay, weekDayParams);
     let weeks = 1;
     const items: DatePickerMonthViewItemProps[] = [];
 

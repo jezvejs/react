@@ -559,7 +559,7 @@ export class DragMaster {
         const handles = asArray(this.dragZone.handles);
 
         return handles.some((hnd: DragHandle) => {
-            let elem: Element | Element[] = [];
+            let elem: Element | Element[] | null = [];
 
             if (typeof hnd === 'object' && ('query' in hnd || 'elem' in hnd)) {
                 if ('query' in hnd) {

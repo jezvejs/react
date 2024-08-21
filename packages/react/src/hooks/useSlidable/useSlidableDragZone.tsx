@@ -3,7 +3,7 @@ import { useRef } from 'react';
 // Utils
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
-import { OnDragStartParams } from '../../utils/DragnDrop/types.ts';
+import { DragAvatarInitParam, OnDragStartParams } from '../../utils/DragnDrop/types.ts';
 import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
 import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { Point } from '../../utils/types.ts';
@@ -83,14 +83,15 @@ export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
                     return currentTargetElemRef.current;
                 },
 
-                initFromEvent({ downX, downY, e }) {
+                initFromEvent(params: DragAvatarInitParam) {
+                    const { downX, downY, e } = params;
                     const dragZoneEl = dragZone.dragZoneRef?.current as HTMLElement;
                     if (!dragZoneEl) {
                         return false;
                     }
 
                     const { allowMouse, allowTouch } = props;
-                    const isTouch = !!e.touches;
+                    const isTouch = ('touches' in e);
                     if (
                         (isTouch && !allowTouch)
                         || (!isTouch && !allowMouse)

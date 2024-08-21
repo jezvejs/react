@@ -2,7 +2,9 @@ import { useRef, forwardRef, useImperativeHandle } from 'react';
 
 // Utils
 import { minmax } from '../../utils/common.ts';
+import { RangeType } from '../../utils/types.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
+import { StoreUpdater } from '../../utils/Store/Store.ts';
 
 // Local components
 import { RangeSliderDragZone } from './components/RangeSliderDragZone.tsx';
@@ -11,11 +13,9 @@ import { RangeSliderBeforeArea } from './components/RangeSliderBeforeArea.tsx';
 import { RangeSliderAfterArea } from './components/RangeSliderAfterArea.tsx';
 
 import { positionToValue, valueToPosition, stepValue } from './helpers.ts';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 import {
     RangeSliderBeforeChangeType,
     RangeSliderProps,
-    RangeSliderRange,
     RangeSliderState,
     RangeSliderValue,
 } from './types.ts';
@@ -61,14 +61,14 @@ export const RangeSliderContainer = forwardRef<
         return step ?? (Math.abs(max - min) / 100);
     };
 
-    const posToValue = (pos, state) => {
+    const posToValue = (pos: number, state: RangeSliderState) => {
         const { maxPos } = state;
         const value = positionToValue(pos, state.min, state.max, maxPos);
 
-        return stepValue(value, state.step, state.precision);
+        return stepValue(value, state.step ?? 0, state.precision ?? 0);
     };
 
-    const valueToPos = (value) => {
+    const valueToPos = (value: number) => {
         const state = getState();
         return valueToPosition(value, state.min, state.max, state.maxPos);
     };
@@ -90,7 +90,7 @@ export const RangeSliderContainer = forwardRef<
             : value
     );
 
-    const changeRange = (range: RangeSliderRange, scroll = false) => {
+    const changeRange = (range: RangeType, scroll = false) => {
         const { start, end } = range;
 
         setState((prev) => ({ ...prev, start, end }));
@@ -128,7 +128,7 @@ export const RangeSliderContainer = forwardRef<
         };
 
         const range = beforeChange(newRange, 'start');
-        changeRange(range as RangeSliderRange);
+        changeRange(range as RangeType);
     };
 
     const onEndPosChange = (pos: number) => {
@@ -144,7 +144,7 @@ export const RangeSliderContainer = forwardRef<
         };
 
         const range = beforeChange(newRange, 'end');
-        changeRange(range as RangeSliderRange);
+        changeRange(range as RangeType);
     };
 
     const onPosChange = (pos: number, type: string | null = null) => {

@@ -23,7 +23,10 @@ import { DropDownGroupItem } from './components/Menu/GroupItem/GroupItem.tsx';
 import { DropDownGroupHeader } from './components/Menu/GroupHeader/GroupHeader.tsx';
 import { DropDownListPlaceholder } from './components/Menu/ListPlaceholder/ListPlaceholder.tsx';
 
-import { DropDownProps } from './types.ts';
+import { DropDownProps, DropDownState } from './types.ts';
+import { createMenuItem } from '../Menu/helpers.ts';
+import { MenuState } from '../Menu/types.ts';
+import { isAvailableItem } from './helpers.ts';
 
 export const defaultProps: DropDownProps = {
     id: '',
@@ -52,6 +55,9 @@ export const defaultProps: DropDownProps = {
     onGroupHeaderClick: null,
     onItemSelect: null,
     onChange: null,
+
+    createItem: (item, state) => createMenuItem(item, (state as object) as MenuState),
+    isAvailableItem: (item, state) => isAvailableItem(item, (state as object) as DropDownState),
 
     components: {
         Input: DropDownInput,

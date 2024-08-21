@@ -44,8 +44,9 @@ export interface DatePickerHeaderProps {
     secondTitle?: string | null;
     doubleView?: boolean;
     focusable?: boolean;
+    secondViewTransition?: boolean;
 
-    onClickTitle?: (params: object) => void;
+    onClickTitle?: (params: DatePickerTitleClickParams) => void;
     onClickPrev?: (params: object) => void;
     onClickNext?: (params: object) => void;
 }
@@ -92,7 +93,7 @@ export interface DatePickerMonthViewItemProps {
  */
 export interface DatePickerMonthViewProps {
     date: Date;
-    actDate: Date | null;
+    actDate: Date | Date[] | null;
     multiple: boolean;
     range: boolean;
     curRange: DatePickerRange;
@@ -163,6 +164,17 @@ export interface DatePickerYearRangeViewProps {
     components?: {
         Header?: DatePickerHeaderComponent | null;
     };
+}
+
+export interface DatePickerItem {
+    date: Date;
+}
+
+export interface DatePickerSearchResults {
+    item: DatePickerItem | null,
+    index: number,
+    itemView?: null,
+    secondViewTransition: boolean,
 }
 
 /**
@@ -243,7 +255,7 @@ export interface DatePickerProps {
  */
 export interface DatePickerState extends DatePickerProps {
     viewType: DatePickerViewType;
-    actDate: Date | null;
+    actDate: Date | Date[] | null;
     curRange: DatePickerRange;
     selRange: DatePickerRange;
     transition: string | null;
@@ -258,8 +270,34 @@ export interface DatePickerViewState extends DatePickerState {
     focusable: boolean;
 }
 
+/**
+ * setSelection() parameters
+ */
 export interface DatePickerSetSelectionParams {
-    startDate: Date;
-    endDate: Date;
+    startDate: Date | null;
+    endDate: Date | null;
     navigateToFirst: boolean;
+}
+
+/**
+ * zoomIn() action parameters
+ */
+export interface DatePickerZoomInParams {
+    date: Date;
+    secondViewTransition: boolean;
+}
+
+/**
+ * zoomOut() action parameters
+ */
+export interface DatePickerZoomOutParams {
+    secondViewTransition: boolean;
+}
+
+/**
+ * onClickTitle() callback parameters
+ */
+export interface DatePickerTitleClickParams {
+    e: React.MouseEvent;
+    secondViewTransition: boolean;
 }

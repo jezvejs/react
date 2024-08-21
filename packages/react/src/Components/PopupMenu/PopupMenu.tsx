@@ -10,6 +10,8 @@ import {
 import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.ts';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
 
+import { MenuItemProps } from '../Menu/types.ts';
+
 import { PopupMenuProps, PopupMenuState } from './types.ts';
 import './PopupMenu.scss';
 
@@ -47,6 +49,7 @@ export const PopupMenu = (p: PopupMenuProps) => {
         ...props,
         open: false,
         listenScroll: false,
+        ignoreTouch: false,
     });
 
     const onToggle = () => {
@@ -116,9 +119,9 @@ export const PopupMenu = (p: PopupMenuProps) => {
         window.removeEventListener('scroll', onScroll, { capture: true });
     };
 
-    const onItemClick = (item) => {
+    const onItemClick = (item: MenuItemProps) => {
         if (MenuHelpers.isCheckbox(item)) {
-            setState(MenuHelpers.toggleSelectItem(item.id));
+            setState((prev) => MenuHelpers.toggleSelectItem(prev, item.id));
         }
 
         if (props.hideOnSelect) {
@@ -143,9 +146,11 @@ export const PopupMenu = (p: PopupMenuProps) => {
         };
     }, [state.open, state.listenScroll]);
 
-    useEmptyClick(() => {
-        closeMenu();
-    }, [elem, reference], state.open);
+    useEmptyClick(
+        () => closeMenu(),
+        [elem?.current as Element, reference?.current as Element],
+        state.open,
+    );
 
     useEffect(() => {
         setState((prev) => ({

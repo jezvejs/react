@@ -1,5 +1,5 @@
 import { formatCoord } from '../../helpers.ts';
-import { BaseChartState } from '../../types.ts';
+import { BaseChartXAxisGridProps } from '../../types.ts';
 
 export interface BaseChartXAxisGridItemProps {
     id: string,
@@ -10,7 +10,7 @@ export interface BaseChartXAxisGridItemProps {
 /**
  * BaseChartXAxisGrid component
  */
-export const BaseChartXAxisGrid = (props: BaseChartState) => {
+export const BaseChartXAxisGrid = (props: BaseChartXAxisGridProps) => {
     const { grid, data } = props;
     if (!grid?.steps || !props.xAxisGrid) {
         return null;

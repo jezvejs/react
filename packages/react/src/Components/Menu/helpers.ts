@@ -204,7 +204,7 @@ export function forItems<T extends MenuItemProps = MenuItemProps>(
         throw new Error('Invalid callback parameter');
     }
 
-    const res = [];
+    const res: T[] = [];
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
@@ -437,42 +437,50 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
     return res;
 };
 
-export const toggleSelectItem = (itemId) => (state) => ({
-    ...state,
-    items: mapItems(
-        state.items,
-        (item) => {
-            if (item.id?.toString() === itemId) {
-                if (!item.selectable || item.disabled) {
-                    return item;
+export function toggleSelectItem<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string,
+): T {
+    return {
+        ...state,
+        items: mapItems(
+            state.items,
+            (item) => {
+                if (item.id?.toString() === itemId) {
+                    if (!item.selectable || item.disabled) {
+                        return item;
+                    }
+
+                    return {
+                        ...item,
+                        selected: (state.multiple) ? !item.selected : true,
+                    };
                 }
 
-                return {
-                    ...item,
-                    selected: (state.multiple) ? !item.selected : true,
-                };
-            }
-
-            return (state.multiple)
-                ? item
-                : { ...item, selected: false };
-        },
-        { includeGroupItems: state.allowActiveGroupHeader },
-    ),
-});
+                return (state.multiple)
+                    ? item
+                    : { ...item, selected: false };
+            },
+            { includeGroupItems: state.allowActiveGroupHeader },
+        ),
+    };
+}
 
 /**
  * Appends specified item to the end of list or group and returns resulting list
- * @param {Object} item
- * @param {Array} items
- * @returns {Array}
+ * @param {MenuItemProps} item
+ * @param {MenuItemProps[]} items
+ * @returns {MenuItemProps[] | null}
  */
-export const pushItem = (item, items) => {
+export const pushItem = (
+    item: MenuItemProps,
+    items: MenuItemProps[],
+): MenuItemProps[] => {
+    const res = items ?? [];
     if (!item) {
-        return null;
+        return res;
     }
 
-    const res = items;
     if (item.group) {
         const group = getGroupById(item.group, res);
         if (group) {
@@ -522,10 +530,10 @@ export const createMenuItem = <T extends MenuItemProps, S extends MenuState>(
 
 /**
  * Create menu items from specified array
- * @param {Object|Object[]} items
- * @param {Object} state
+ * @param {MenuItemProps | MenuItemProps[]} items
+ * @param {MenuState} state
  */
-export const createItems = (items, state) => (
+export const createItems = (items: MenuItemProps | MenuItemProps[], state: MenuState) => (
     mapItems(
         asArray(items),
         (item) => createMenuItem(item, state),
@@ -555,7 +563,7 @@ export const getInitialState = (
         },
     };
 
-    res.items = createItems(props.items, res);
+    res.items = createItems(props.items ?? [], res);
 
     return res;
 };

@@ -1,12 +1,7 @@
 import classNames from 'classnames';
+import { DropDownListPlaceholderComponent, DropDownListPlaceholderProps } from '../../../types.ts';
 import './ListPlaceholder.scss';
-
-export interface DropDownListPlaceholderProps {
-    content: string,
-    active: boolean,
-    selectable: boolean,
-    className: string,
-}
+import { MenuPlaceholderProps } from '../../../../Menu/types.ts';
 
 const defaultProps = {
     content: null,
@@ -14,10 +9,12 @@ const defaultProps = {
     selectable: false,
 };
 
-export const DropDownListPlaceholder = (p) => {
+export const DropDownListPlaceholder: DropDownListPlaceholderComponent = (
+    p: MenuPlaceholderProps,
+) => {
     const props = {
         ...defaultProps,
-        ...p,
+        ...(p as DropDownListPlaceholderProps),
     };
 
     return (

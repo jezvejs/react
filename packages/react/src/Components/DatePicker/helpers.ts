@@ -51,21 +51,6 @@ export const getInitialState = (props: DatePickerProps, defaultProps: DatePicker
     return res;
 };
 
-/** Compares order of view types and returns result */
-export const compareViewTypes = (a, b) => {
-    const typeMap = {
-        [MONTH_VIEW]: 1,
-        [YEAR_VIEW]: 2,
-        [YEARRANGE_VIEW]: 3,
-    };
-
-    if (!(a in typeMap) || !(b in typeMap)) {
-        throw new Error('Invalid view type');
-    }
-
-    return typeMap[a] - typeMap[b];
-};
-
 /** Returns previous date for specified view type */
 export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
     if (!isDate(date)) {
@@ -86,7 +71,7 @@ export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
 };
 
 /** Returns next date for specified view type */
-export const getNextViewDate = (date: Date, viewType) => {
+export const getNextViewDate = (date: Date, viewType: DatePickerViewType) => {
     if (!isDate(date)) {
         throw new Error('Invalid date');
     }
@@ -141,7 +126,7 @@ export const getHeaderTitle = (state: DatePickerHeaderTitleParam): string => {
 };
 
 /** Returns offsetHeight for specified component */
-export const getComponentHeight = (component) => (
+export const getComponentHeight = (component: HTMLElement): number => (
     component?.offsetHeight ?? 0
 );
 

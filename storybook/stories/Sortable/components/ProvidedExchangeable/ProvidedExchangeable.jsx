@@ -28,11 +28,13 @@ export const ProvidedExchangeable = (props) => {
         shiftX: 0,
         shiftY: 0,
         dragging: false,
-        [sourceProps.id]: {
-            items: sourceProps.items,
-        },
-        [destProps.id]: {
-            items: destProps.items,
+        zones: {
+            [sourceProps.id]: {
+                items: sourceProps.items,
+            },
+            [destProps.id]: {
+                items: destProps.items,
+            },
         },
     };
 

@@ -8,6 +8,7 @@ import {
     MenuGroupItemProps,
     MenuItemProps,
     MenuListProps,
+    MenuPlaceholderProps,
     MenuProps,
     MenuState,
     OnGroupHeaderClickParam,
@@ -152,7 +153,7 @@ export interface DropDownMenuComponents extends MenuComponents<DropDownMenuHeade
     MenuList: DropDownMenuListComponent,
     ListItem: DropDownMenuItemComponent,
     Check: ComponentType,
-    ListPlaceholder: ComponentType,
+    ListPlaceholder: DropDownListPlaceholderComponent | null,
     GroupItem: DropDownGroupItemComponent,
 }
 
@@ -161,23 +162,23 @@ export interface DropDownMenuComponents extends MenuComponents<DropDownMenuHeade
  */
 export interface DropDownMenuProps extends MenuProps<DropDownMenuHeaderProps> {
     /* Children menu items */
-    items: DropDownMenuItemProps[],
+    items: DropDownMenuItemProps[];
     /* Reference for Input element at custom menu header */
     inputRef: React.MutableRefObject<HTMLInputElement | null>;
     /* Shows menu popup */
-    visible?: boolean,
+    visible?: boolean;
     /* Shows filter input */
-    showInput?: boolean,
+    showInput?: boolean;
     /* Allows to filter items */
-    editable?: boolean,
+    editable?: boolean;
     /* Allows to select multiple items */
-    multiple: boolean,
-    filtered?: boolean,
-    className?: string,
+    multiple: boolean;
+    filtered?: boolean;
+    className?: string;
 
-    getItemById?: () => void,
-    getPlaceholderProps?: () => void,
-    onItemActivate: (itemId: string | null) => void,
+    getItemById?: () => void;
+    getPlaceholderProps?: () => void;
+    onItemActivate: (itemId: string | null) => void;
 
     onItemClick: (
         (
@@ -206,6 +207,17 @@ export type DropDownMenuComponent = React.ForwardRefExoticComponent<
 >;
 
 /**
+ * List placeholder component
+ */
+export interface DropDownListPlaceholderProps extends MenuPlaceholderProps {
+    content: string;
+    active: boolean;
+    selectable: boolean;
+}
+
+export type DropDownListPlaceholderComponent = React.FC<MenuPlaceholderProps>;
+
+/**
  * MenuList component
  */
 export type DropDownMenuListProps = MenuListProps;
@@ -224,10 +236,10 @@ export type DropDownPlaceholderComponent = React.FC<DropDownPlaceholderProps>;
  * Combo box single selection component
  */
 export interface DropDownSingleSelectionProps {
-    className?: string,
+    className?: string;
     item: {
-        title: string,
-    },
+        title: string;
+    };
 }
 
 export type DropDownSingleSelectionComponent = React.FC<DropDownSingleSelectionProps>;
@@ -248,17 +260,17 @@ export type DropDownToggleButtonComponent = React.FC<DropDownToggleButtonProps>;
  * Combo box controls container component
  */
 export interface DropDownComboBoxControlsProps {
-    multiple: boolean,
-    disabled: boolean,
-    showClearButton: boolean,
-    showToggleButton: boolean,
-    actSelItemIndex: number,
-    onClearSelection: () => void,
-    onToggle: () => void,
+    multiple: boolean;
+    disabled: boolean;
+    showClearButton: boolean;
+    showToggleButton: boolean;
+    actSelItemIndex: number;
+    onClearSelection: () => void;
+    onToggle: () => void;
     components: {
-        ToggleButton: DropDownToggleButtonComponent,
-        ClearButton: DropDownClearButtonComponent,
-    },
+        ToggleButton: DropDownToggleButtonComponent;
+        ClearButton: DropDownClearButtonComponent;
+    };
 }
 
 export type DropDownComboBoxControlsComponent = React.FC<DropDownComboBoxControlsProps>;
@@ -322,6 +334,16 @@ export interface DropDownSelectedItem {
 export type DropDownSelectionParam = DropDownSelectedItem[] | DropDownSelectedItem | null;
 
 /**
+ * createGroup() function params
+ */
+export interface DropDownCreateGroupParam {
+    id?: string;
+    title: string;
+    disabled?: boolean;
+    items?: DropDownMenuItemProps[];
+}
+
+/**
  * DropDown children components
  */
 export interface DropDownComponents {
@@ -336,7 +358,7 @@ export interface DropDownComponents {
     Check: ComponentType;
     GroupItem: DropDownGroupItemComponent;
     GroupHeader: DropDownGroupHeaderComponent;
-    ListPlaceholder: ComponentType;
+    ListPlaceholder: DropDownListPlaceholderComponent;
     MultipleSelection: DropDownMultipleSelectionComponent;
     MultiSelectionItem: DropDownMultiSelectionItemComponent;
     ComboBoxControls: DropDownComboBoxControlsComponent;

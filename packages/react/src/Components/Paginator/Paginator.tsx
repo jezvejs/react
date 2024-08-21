@@ -43,14 +43,15 @@ export const Paginator = (p: PaginatorProps) => {
         setState((prev) => ({ ...prev, pageNum }));
     };
 
-    const onChangePage = (e) => {
+    const onChangePage = (e: React.MouseEvent) => {
         if (!isFunction(props.onChange)) {
             return;
         }
 
         e.preventDefault();
 
-        const itemTarget = e.target.closest('.paginator-item');
+        const target = e.target as HTMLElement;
+        const itemTarget = target.closest('.paginator-item') as HTMLElement;
         if (!itemTarget || !itemTarget.dataset.page) {
             return;
         }

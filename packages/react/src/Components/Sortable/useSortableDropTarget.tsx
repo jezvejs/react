@@ -50,6 +50,9 @@ import {
     SortableItemsPositions,
     SortableDragAvatar,
     SortableListItemComponent,
+    SortablePositionType,
+    AnimationBox,
+    SortableZonePositionsMap,
 } from './types.ts';
 import { UseSortableDragZoneProps } from './useSortableDragZone.tsx';
 
@@ -75,7 +78,7 @@ export interface UseSortableDropTargetProps extends UseDropTargetProps {
     getItemsPositions?: (dragZone: DragZone | null) => SortableItemsPositions | null;
 
     updatePositions?: (options: {
-        name: string;
+        name: SortablePositionType;
         zoneIds: string | string[];
     }) => void;
 
@@ -377,8 +380,8 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
 
             this.checkPositionsCache?.(zoneIds);
 
-            toggleMeasureMode(dragZone?.elem, true);
-            toggleMeasureMode(targetDragZone?.elem, true);
+            toggleMeasureMode(dragZone?.elem as HTMLElement, true);
+            toggleMeasureMode(targetDragZone?.elem as HTMLElement, true);
 
             // Temporarily append item to the target container to save position of
             // item next after current last item
@@ -451,8 +454,8 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 insertAtElementPosition(dragZoneElem, dragZoneNodes);
             }
 
-            toggleMeasureMode(dragZone?.elem, false);
-            toggleMeasureMode(targetDragZone?.elem, false);
+            toggleMeasureMode(dragZone?.elem as HTMLElement, false);
+            toggleMeasureMode(targetDragZone?.elem as HTMLElement, false);
 
             // check drop target is already a placeholder
             if (isPlaceholder) {
@@ -556,15 +559,14 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
             return res;
         },
 
-        updatePositions(options: { name: string, zoneIds: string | string[]; }) {
+        updatePositions(options: { name: SortablePositionType, zoneIds: string | string[]; }) {
             const {
                 name = 'boxes',
                 zoneIds,
             } = options;
 
             const dragMaster = DragMaster.getInstance();
-            const newBoxes = {};
-
+            const newBoxes: SortableZonePositionsMap = {};
             const zones = asArray(zoneIds);
             for (let index = 0; index < zones.length; index += 1) {
                 const id = zones[index];
@@ -577,30 +579,37 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     return;
                 }
 
-                newBoxes[id] = this.getItemsPositions?.(dragZone);
-                if (!newBoxes[id]) {
+                const positions = this.getItemsPositions?.(dragZone);
+                if (!positions) {
                     return;
                 }
+
+                newBoxes[id] = positions;
             }
 
-            const findItemBox = (itemId) => {
-                const zoneId = zones.find((id) => newBoxes[id][itemId]);
-                return newBoxes[zoneId]?.[itemId] ?? {};
+            const findItemBox = (itemId: string | null | undefined): AnimationBox | null => {
+                if (itemId === null || typeof itemId === 'undefined') {
+                    return null;
+                }
+
+                const zoneId = zones.find((id: string) => newBoxes[id][itemId]);
+                const box = (zoneId) ? (newBoxes[zoneId]?.[itemId]) : null;
+                return box ?? null;
             };
 
-            const getItemBox = (item) => ({
-                ...findItemBox(item.id),
+            const getItemBox = (item: AnimationBox | SortableTreeItem): AnimationBox => ({
+                ...(findItemBox(item.id) ?? {}),
                 id: item.id,
                 ...(
-                    (item.items?.length > 0)
-                        ? { items: item.items.map(getItemBox) }
+                    ((item.items?.length ?? 0) > 0)
+                        ? { items: (item.items ?? []).map(getItemBox) }
                         : {}
                 ),
             });
 
             const useNextItems = (name !== 'boxes');
-            const mapZoneBoxes = (zoneId, state) => (
-                mapTreeItems(
+            const mapZoneBoxes = (zoneId: string, state: SortableState): AnimationBox[] => (
+                mapTreeItems<AnimationBox>(
                     (useNextItems)
                         ? getNextZoneItems(zoneId, state)
                         : getDragZoneItems(zoneId, state),
@@ -608,15 +617,15 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 )
             );
 
-            setState((prev) => {
-                const newState = {
+            setState((prev: SortableState) => {
+                const newState: SortableState = {
                     ...prev,
                     [name]: {
                         ...(prev[name] ?? {}),
                     },
                 };
 
-                Object.keys(newBoxes).forEach((id) => {
+                Object.keys(newBoxes).forEach((id: string) => {
                     newState[name][id] = mapZoneBoxes(id, newState);
                 });
 
@@ -632,7 +641,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
             }
 
             this.updatePositions?.({
-                name: 'boxes',
+                name: 'boxes' as SortablePositionType,
                 zoneIds,
             });
         },
@@ -640,7 +649,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
         /** Updates target positions */
         getTargetPositions(zoneIds: string[]) {
             this.updatePositions?.({
-                name: 'targetBoxes',
+                name: 'targetBoxes' as SortablePositionType,
                 zoneIds,
             });
         },
@@ -711,7 +720,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
             const animationDone = (deltaMov.x === 0 && deltaMov.y === 0);
 
             const isValidTargetRect = (
-                targetRect
+                !!targetRect
                 && Number.isFinite(targetRect.x)
                 && Number.isFinite(targetRect.y)
                 && Number.isFinite(targetRect.width)
@@ -726,9 +735,9 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
 
             const resTargetRect = (animationDone && isValidTargetRect)
                 ? targetRect
-                : itemTarget;
+                : (itemTarget ?? targetRect);
 
-            const res = {
+            const res: SortableItemRects = {
                 rect,
                 targetRect: structuredClone(resTargetRect),
                 zoneId,
@@ -847,8 +856,11 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 return [];
             }
 
-            const sourceParentItems = sourceParent.next ?? sourceParent.items ?? [];
-            const targetParentItems = targetParent.next ?? targetParent.items ?? [];
+            const sourceNext = ('next' in sourceParent) ? sourceParent.next : null;
+            const sourceParentItems = sourceNext ?? sourceParent.items ?? [];
+
+            const targetNext = ('next' in targetParent) ? targetParent.next : null;
+            const targetParentItems = targetNext ?? targetParent.items ?? [];
 
             const sourceItem = sourceParentItems[sourceIndex];
             const targetItem = targetParentItems[
@@ -877,7 +889,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 const globalSourceIndex = getIndexById(sourceItem.id, flatSourceItems);
 
                 const globalTargetItemId = (!targetItem && targetParentItems.length === 0)
-                    ? targetParent.id
+                    ? targetParentId
                     : targetItem.id;
                 const globalTargetIndex = getIndexById(globalTargetItemId, flatSourceItems);
 

@@ -1,69 +1,74 @@
-import { useRef, useState } from 'react';
 import classNames from 'classnames';
+import { useRef, useState } from 'react';
 
+// Utils
 import { minmax } from '../../utils/common.ts';
+import { StoreProviderContext } from '../../utils/Store/StoreProvider.tsx';
 
+// Global components
 import { BaseChartProps, BaseChartState } from '../BaseChart/types.ts';
+import { defaultProps as baseDefaultProps } from '../BaseChart/defaultProps.ts';
+
+// Histogram
 import { Histogram } from '../Histogram/Histogram.tsx';
+import { HistogramComponents, HistogramProps } from '../Histogram/types.ts';
+import { HistogramDataItem } from '../Histogram/components/DataItem/HistogramDataItem.tsx';
+import { HistogramDataSeries } from '../Histogram/components/DataSeries/HistogramDataSeries.tsx';
+
+// LineChart
+import { LineChartDataItem } from '../LineChart/components/DataItem/LineChartDataItem.tsx';
+import { LineChartDataPath } from '../LineChart/components/DataPath/LineChartDataPath.tsx';
+import { LineChartDataSeries } from '../LineChart/components/DataSeries/LineChartDataSeries.tsx';
 import { LineChart } from '../LineChart/LineChart.tsx';
+import { LineChartComponents, LineChartProps } from '../LineChart/types.ts';
+
 import { RangeSlider } from '../RangeSlider/RangeSlider.tsx';
-import { RangeSliderProps } from '../RangeSlider/types.ts';
+import { RangeSliderBeforeChangeType, RangeSliderProps, RangeSliderValue } from '../RangeSlider/types.ts';
 
 import {
+    getInitialState,
     getSliderChangeType,
     getSliderEnd,
     getSliderStart,
 } from './helpers.ts';
+import { RangeScrollChartChangeType, RangeScrollChartProps, RangeScrollChartState } from './types.ts';
 import './RangeScrollChart.scss';
-import { Store } from '../../utils/Store/Store.ts';
-
-export type RangeScrollChartData = BaseChartProps;
-
-export interface RangeScrollChartProps {
-    className: string,
-    type: 'histogram' | 'linechart',
-    hideScrollBar: boolean,
-    mainChart: RangeScrollChartData,
-    navigationChart: RangeScrollChartData,
-    navigationSlider: RangeSliderProps,
-}
 
 const chartTypesMap = {
     histogram: Histogram,
     linechart: LineChart,
 };
-const chartTypes = Object.keys(chartTypesMap);
 
 /**
  * RangeScrollChart component
  */
-export const RangeScrollChart = (props) => {
+export const RangeScrollChart = (props: RangeScrollChartProps) => {
     const {
-        type = chartTypes[0],
+        type = 'histogram',
         mainChart,
         navigationChart,
         navigationSlider,
     } = props;
 
-    const mainStoreRef = useRef<Store | null>(null);
-    const navStoreRef = useRef<Store | null>(null);
+    const mainStoreRef = useRef<StoreProviderContext | null>(null);
+    const navStoreRef = useRef<StoreProviderContext | null>(null);
 
-    const [state, setState] = useState({
-        ...props,
-        start: 0,
-        end: 1,
-        scrollLeft: 0,
-        columnWidth: 0,
-        groupsGap: 0,
-        scrollBarSize: 0,
-        chartScrollRequested: false,
-    });
+    const initialState = getInitialState(props);
+    const [state, setState] = useState<RangeScrollChartState>(initialState);
 
     const getMainState = (): BaseChartState => (
         (mainStoreRef.current?.getState() as BaseChartState) ?? null
     );
 
-    const onBeforeSliderChange = (value, changeType) => {
+    const onBeforeSliderChange = (
+        value: RangeSliderValue,
+        changeType: RangeScrollChartChangeType,
+    ): RangeSliderValue => {
+        // Skip single value because we working only with range
+        if (typeof value === 'number') {
+            return value;
+        }
+
         const mainState = getMainState();
         if (!mainState) {
             return value;
@@ -128,7 +133,11 @@ export const RangeScrollChart = (props) => {
 
         // Check new column width not exceeds value of 'maxColumnWidth' property
         if (columnWidth > maxColumnWidth) {
-            ({ start, end } = onBeforeSliderChange({ start, end }, 'resize'));
+            const changeResult = onBeforeSliderChange({ start, end }, 'resize');
+            if (typeof changeResult === 'number') {
+                return;
+            }
+            ({ start, end } = changeResult);
             columnWidth = maxColumnWidth;
             groupsGap = columnWidth / 4;
         }
@@ -174,8 +183,8 @@ export const RangeScrollChart = (props) => {
         } else if (scrollLeft > maxScroll) {
             start = 1 - delta;
         } else {
-            start = getSliderStart({ scrollLeft, scrollWidth });
-            end = getSliderEnd({ scrollLeft, scrollWidth, scrollerWidth });
+            start = getSliderStart(state);
+            end = getSliderEnd(state);
         }
 
         setState((prev) => ({
@@ -186,7 +195,12 @@ export const RangeScrollChart = (props) => {
         }));
     };
 
-    const onSliderChange = (value) => {
+    const onSliderChange = (value: RangeSliderValue) => {
+        // Skip single value because we working only with range
+        if (typeof value === 'number') {
+            return;
+        }
+
         const mainState = getMainState();
         if (!mainState) {
             return;
@@ -212,7 +226,11 @@ export const RangeScrollChart = (props) => {
 
         // Check new column width not exceeds value of 'maxColumnWidth' property
         if (columnWidth > maxColumnWidth) {
-            ({ start, end } = onBeforeSliderChange(value, changeType));
+            const changeResult = onBeforeSliderChange(value, changeType);
+            if (typeof changeResult === 'number') {
+                return;
+            }
+            ({ start, end } = changeResult);
             columnWidth = maxColumnWidth;
             groupsGap = columnWidth / 4;
         }
@@ -224,7 +242,7 @@ export const RangeScrollChart = (props) => {
         const maxScroll = Math.max(0, contentWidth - scrollerWidth);
         const scrollLeft = minmax(0, maxScroll, start * contentWidth);
 
-        setState((prev) => ({
+        setState((prev: RangeScrollChartState) => ({
             ...prev,
             start,
             end,
@@ -235,7 +253,12 @@ export const RangeScrollChart = (props) => {
         }));
     };
 
-    const onSliderScroll = (value) => {
+    const onSliderScroll = (value: RangeSliderValue) => {
+        // Skip single value because we working only with range
+        if (typeof value === 'number') {
+            return;
+        }
+
         const mainState = getMainState();
         if (!mainState) {
             return;
@@ -269,20 +292,28 @@ export const RangeScrollChart = (props) => {
         }));
     };
 
-    const onMainStoreReady = (store) => {
+    const onMainStoreReady = (store: StoreProviderContext) => {
         mainStoreRef.current = store;
     };
 
-    const onNavStoreReady = (store) => {
+    const onNavStoreReady = (store: StoreProviderContext) => {
         navStoreRef.current = store;
     };
+
+    if (!(type in chartTypesMap)) {
+        return null;
+    }
 
     const ChartComponent = chartTypesMap[type];
 
     // Main chart
-    const mainChartProps = {
+    const mainDefaultProps = {
         height: 300,
         resizeTimeout: 0,
+    };
+
+    const mainChartProps: Partial<BaseChartProps> = {
+        ...mainDefaultProps,
         ...mainChart,
 
         allowLastXAxisLabelOverflow: false,
@@ -296,10 +327,51 @@ export const RangeScrollChart = (props) => {
         onStoreReady: onMainStoreReady,
     };
 
-    const main = <ChartComponent {...mainChartProps} />;
+    let main = null;
+    if (type === 'linechart') {
+        const defaultProps = {
+            drawNodeCircles: false,
+            columnGap: 8,
+            nodeCircleRadius: 3,
+        };
+
+        const components: LineChartComponents = {
+            ...(baseDefaultProps.components ?? {}),
+            ...(mainChartProps.components ?? {}),
+            DataItem: LineChartDataItem,
+            DataPath: LineChartDataPath,
+            DataSeries: LineChartDataSeries,
+        };
+        const lineChartProps: LineChartProps = {
+            ...baseDefaultProps,
+            ...defaultProps,
+            ...mainChartProps,
+            components,
+        };
+
+        main = (
+            <LineChart {...lineChartProps} />
+        );
+    } else {
+        const components: HistogramComponents = {
+            ...(baseDefaultProps.components ?? {}),
+            ...(mainChartProps.components ?? {}),
+            DataItem: HistogramDataItem,
+            DataSeries: HistogramDataSeries,
+        };
+        const histogramProps: HistogramProps = {
+            ...baseDefaultProps,
+            ...mainChartProps,
+            components,
+        };
+
+        main = (
+            <Histogram {...histogramProps} />
+        );
+    }
 
     // Range slider
-    const rangeSliderProps = {
+    const rangeSliderProps: RangeSliderProps = {
         ...navigationSlider,
         range: true,
         className: 'range-scroll-chart__range-slider',
@@ -308,17 +380,26 @@ export const RangeScrollChart = (props) => {
         step: null,
         beforeArea: true,
         afterArea: true,
-        onBeforeChange: (value, changeType) => onBeforeSliderChange(value, changeType),
+        onBeforeChange: (
+            value: RangeSliderValue,
+            changeType: RangeSliderBeforeChangeType,
+        ): RangeSliderValue => (
+            onBeforeSliderChange(value, changeType as RangeScrollChartChangeType)
+        ),
         onChange: (value) => onSliderChange(value),
         onScroll: (value) => onSliderScroll(value),
     };
     const rangeSlider = <RangeSlider {...rangeSliderProps} />;
 
     // Navigation chart
-    const navChartProps = {
+    const navDefaultProps = {
         height: 100,
         marginTop: 0,
         resizeTimeout: 0,
+    };
+
+    const navChartProps: BaseChartProps = {
+        ...navDefaultProps,
         ...navigationChart,
         className: 'range-scroll-chart__nav-chart',
         fitToWidth: true,
