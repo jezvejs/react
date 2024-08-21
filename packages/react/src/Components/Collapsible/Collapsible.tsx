@@ -1,23 +1,27 @@
 import {
-    ReactNode,
     useCallback,
     useEffect,
     useState,
 } from 'react';
 import classNames from 'classnames';
+import { CollapsibleProps, CollapsibleState } from './types.ts';
 
 import './Collapsible.scss';
 
-export interface CollapsibleProps {
-    id: string,
-    className: string,
-    expanded: boolean,
-    animated: boolean,
-    toggleOnClick: boolean,
-    header: ReactNode,
-    children: ReactNode,
-    onStateChange: (expanded: boolean) => void,
-}
+export const defaultProps: CollapsibleState = {
+    expanded: false,
+    animated: false,
+    toggleOnClick: true,
+    header: 'Show',
+
+    /* Content measured flag */
+    animationReady: false,
+    animationInProgress: false,
+    /* Used to prevent animation on first render */
+    changed: false,
+    /* Measured height of child content */
+    expandedHeight: undefined,
+};
 
 /**
  * Collapsible component
@@ -32,7 +36,7 @@ export const Collapsible = (props: CollapsibleProps) => {
         ...rest
     } = props;
 
-    const [state, setState] = useState({
+    const [state, setState] = useState<CollapsibleState>({
         expanded,
         animated,
         toggleOnClick,
@@ -47,7 +51,7 @@ export const Collapsible = (props: CollapsibleProps) => {
         expandedHeight: undefined,
     });
 
-    const contentRef = useCallback((node) => {
+    const contentRef = useCallback((node: HTMLDivElement | null) => {
         if (node) {
             setState((prev) => ({
                 ...prev,
@@ -58,14 +62,14 @@ export const Collapsible = (props: CollapsibleProps) => {
     }, []);
 
     useEffect(() => {
-        setState((prev) => (
+        setState((prev: CollapsibleState) => (
             (props.expanded === prev.expanded)
                 ? prev
                 : {
                     ...prev,
                     expanded: props.expanded,
                     changed: true,
-                    animationInProgress: prev.animated,
+                    animationInProgress: !!prev.animated,
                 }
         ));
     }, [props.expanded]);
@@ -73,11 +77,11 @@ export const Collapsible = (props: CollapsibleProps) => {
     const toggle = () => {
         const newExpanded = !state.expanded;
 
-        setState((prev) => ({
+        setState((prev: CollapsibleState) => ({
             ...prev,
             expanded: !prev.expanded,
             changed: true,
-            animationInProgress: prev.animated,
+            animationInProgress: !!prev.animated,
         }));
 
         if (onStateChange) {
@@ -92,7 +96,7 @@ export const Collapsible = (props: CollapsibleProps) => {
     };
 
     const handleTransitionEnd = () => {
-        setState((prev) => ({
+        setState((prev: CollapsibleState) => ({
             ...prev,
             animationInProgress: false,
             changed: false,

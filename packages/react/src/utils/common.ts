@@ -61,8 +61,8 @@ export function debounce(
 
     let timeout: number = 0;
 
-    const run = function (...args) {
-        const callFunc = () => func(...args);
+    const run = function () {
+        const callFunc = () => func();
 
         const later = () => {
             timeout = 0;

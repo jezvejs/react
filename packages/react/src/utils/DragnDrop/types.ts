@@ -61,6 +61,12 @@ export interface DragAvatarInfo {
     mouseShift: Point;
 }
 
+export interface DragAvatarInitParam {
+    downX: number,
+    downY: number,
+    e: TouchEvent | MouseEvent,
+}
+
 /**
  * Dragging element
  */
@@ -70,13 +76,7 @@ export interface DragAvatar {
     dragZone?: DragZone | null,
     dropTarget?: DropTarget | null,
 
-    initFromEvent: (
-        params: {
-            downX: number,
-            downY: number,
-            e: TouchEvent | MouseEvent,
-        },
-    ) => boolean,
+    initFromEvent: (params: DragAvatarInitParam) => boolean,
 
     getTargetElem: () => Element | null,
     getDragInfo: (e?: TouchEvent | MouseEvent | Event) => DragAvatarInfo,

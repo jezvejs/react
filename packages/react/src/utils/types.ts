@@ -1,3 +1,5 @@
+import { SVGAttributes } from 'react';
+
 /**
  * Native event listener used by .addEventListener() and .removeEventListener() methods
  */
@@ -37,3 +39,23 @@ export interface Point {
     x: number;
     y: number;
 }
+
+/**
+ * Range type
+ */
+export interface RangeType {
+    start: number;
+    end: number;
+}
+
+/**
+ * Indexed CSS style object
+ */
+export type StyleDeclaration = Partial<CSSStyleDeclaration> & { [propName: string]: string };
+
+/**
+ * Indexed SVG attributes object
+ */
+export type IndexedSVGAttributes<T> = Partial<SVGAttributes<T>> & {
+    [propName: string]: string;
+};

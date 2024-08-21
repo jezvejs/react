@@ -3,27 +3,13 @@ import classNames from 'classnames';
 import { ColorItem } from '../ColorItem/ColorItem.tsx';
 import { Input } from '../Input/Input.tsx';
 
+import { ColorInputProps } from './types.ts';
 import './ColorInput.scss';
-
-export interface ColorInputProps {
-    className: string,
-    inputId: string,
-    value: string,
-    colorProp: string,
-    form: string,
-    name: string,
-    tabIndex: number,
-    disabled: boolean,
-    onInput: () => void,
-    onChange: () => void,
-    onFocus: () => void,
-    onBlur: () => void,
-}
 
 /**
  * ColorInput component
  */
-export const ColorInput = (props) => {
+export const ColorInput = (props: ColorInputProps) => {
     const {
         value = '',
         colorProp = '--color-item-value',
@@ -32,10 +18,10 @@ export const ColorInput = (props) => {
         form,
         tabIndex,
         disabled = false,
-        onInput = null,
-        onChange = null,
-        onFocus = null,
-        onBlur = null,
+        onInput,
+        onChange,
+        onFocus,
+        onBlur,
     } = props;
 
     const containerProps = {

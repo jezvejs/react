@@ -1,12 +1,12 @@
-import { ReactNode } from 'react';
+import { MenuItemType } from '../Menu/types.ts';
 
 export interface TabListItemProps {
     id: string,
-    type?: string,
+    type: MenuItemType,
     className?: string,
-    title?: string,
-    icon?: ReactNode,
-    content?: ReactNode,
+    title: string,
+    icon?: React.ComponentType,
+    content?: React.ReactNode,
 }
 
 export interface TabListProps {

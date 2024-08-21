@@ -3,10 +3,10 @@
     "compilerOptions": {
         "composite": true,
         "tsBuildInfoFile": "../../node_modules/.tmp/tsconfig.app.tsbuildinfo",
-        "target": "ES2020",
+        "target": "ES2023",
         "useDefineForClassFields": true,
         "lib": [
-            "ES2020",
+            "ES2023",
             "DOM",
             "DOM.Iterable"
         ],
@@ -20,8 +20,6 @@
         "moduleDetection": "force",
         "noEmit": true,
         "jsx": "react-jsx",
-        /* TODO: remove me */
-        "noImplicitAny": false,
         /* Linting */
         "strict": true,
         "noUnusedLocals": true,

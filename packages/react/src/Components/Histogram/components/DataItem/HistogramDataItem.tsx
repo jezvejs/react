@@ -1,11 +1,13 @@
-import { CSSProperties, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import classNames from 'classnames';
 
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
+import { IndexedSVGAttributes, StyleDeclaration } from '../../../../utils/types.ts';
 
 import { formatCoord } from '../../../BaseChart/helpers.ts';
 
 import {
+    HistogramDataItemAttrs,
     HistogramDataItemComponent,
     HistogramDataItemProps,
     HistogramDataItemRef,
@@ -15,13 +17,7 @@ import './HistogramDataItem.scss';
 
 const animateAttributes = ['y', 'height'];
 
-export interface HistogramDataItemAttrs {
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    style?: CSSProperties,
-}
+type SVGRectAttrs = IndexedSVGAttributes<SVGRectElement>;
 
 /**
  * HistogramDataItem component
@@ -67,13 +63,13 @@ export const HistogramDataItem: HistogramDataItemComponent = forwardRef<
             }
 
             if (state.animateNow) {
-                attrs.style[key] = formatCoord(value, true);
+                (attrs.style as StyleDeclaration)[key] = formatCoord(value, true);
             } else {
-                attrs.style[key] = '';
-                attrs[key] = formatCoord(value);
+                (attrs.style as StyleDeclaration)[key] = '';
+                (attrs as SVGRectAttrs)[key] = formatCoord(value);
             }
         } else {
-            attrs[key] = formatCoord(value);
+            (attrs as SVGRectAttrs)[key] = formatCoord(value);
         }
     });
 

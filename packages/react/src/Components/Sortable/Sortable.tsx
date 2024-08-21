@@ -16,11 +16,11 @@ import { SortableDragAvatar } from './SortableDragAvatar.tsx';
 
 import {
     clearTransform,
-    distinctValues,
     findTreeItemIndex,
     formatOffsetMatrix,
     getDragZoneItems,
     getNextZoneItems,
+    getPossibleZoneIds,
     getSourcePosition,
     getTreeItemById,
     mapNextZones,
@@ -30,7 +30,9 @@ import {
 import {
     SortableAvatarProps,
     SortableItemPosition,
+    SortableItemWrapperProps,
     SortableProps,
+    SortableSaveItemMoveParam,
     SortableState,
     SortableTreeItem,
 } from './types.ts';
@@ -46,7 +48,6 @@ export type SortableRef = HTMLElement | null;
 // eslint-disable-next-line react/display-name
 export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
     const defaultProps = {
-        onSort: null,
         animatedClass: 'animated',
         transitionTimeout: 300,
         dragClass: 'drag',
@@ -74,26 +75,26 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
     const getState = () => dragDrop?.getState() as SortableState ?? null;
     const setState = (update: StoreUpdater) => dragDrop?.setState(update);
 
-    const getItems = (dragZoneId: string | null | undefined = props.id) => {
+    const getItems = (dragZoneId: string | null) => {
         const state = getState();
         return getDragZoneItems(dragZoneId, state);
     };
 
-    const findItemById = (id: string | null, dragZoneId: string | null | undefined = props.id) => {
+    const findItemById = (itemId: string | null, dragZoneId: string | null) => {
         const items = getItems(dragZoneId);
-        return getTreeItemById(id, items);
+        return getTreeItemById(itemId, items);
     };
 
     const isShowAvatar = () => {
         const state = getState();
         return (
-            state.dragging
+            !!state.dragging
             && (state.itemId ?? null) !== null
             && (props.id === state.origSortPos?.zoneId)
         );
     };
 
-    const getDraggingItem = () => {
+    const getDraggingItem = (): SortableTreeItem | null => {
         if (!isShowAvatar()) {
             return null;
         }
@@ -103,16 +104,19 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             return null;
         }
 
-        const items = getItems(state.sortPosition?.zoneId);
+        const sortPositionZone = state.sortPosition?.zoneId ?? null;
+
+        const items = getItems(sortPositionZone);
         const itemsRes = getTreeItemById(state.itemId, items);
+        if (itemsRes) {
+            return itemsRes;
+        }
 
-        const next = getNextZoneItems(state.sortPosition?.zoneId, state);
-        const nextRes = getTreeItemById(state.itemId, next);
-
-        return itemsRes ?? nextRes;
+        const next = getNextZoneItems(sortPositionZone, state);
+        return getTreeItemById(state.itemId, next);
     };
 
-    const saveItemMove = (move) => {
+    const saveItemMove = (move: SortableSaveItemMoveParam) => {
         setState((prev: SortableState) => {
             const sourceZoneId = prev.sortPosition?.zoneId ?? null;
             const targetZoneId = move.sortPosition?.zoneId ?? null;
@@ -124,18 +128,21 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 ...prev,
             };
 
-            newState[sourceZoneId] = {
-                ...(prev[sourceZoneId] ?? {}),
+            const prevSourceZone = prev.zones[sourceZoneId] ?? {};
+
+            newState.zones[sourceZoneId] = {
+                ...prevSourceZone,
                 items: [
-                    ...(prev[sourceZoneId].next ?? prev[sourceZoneId].items),
+                    ...(prevSourceZone.next ?? prevSourceZone.items),
                 ],
             };
 
             if (targetZoneId !== sourceZoneId) {
-                newState[targetZoneId] = {
-                    ...(prev[targetZoneId] ?? {}),
+                const prevTargetZone = prev.zones[targetZoneId] ?? {};
+                newState.zones[targetZoneId] = {
+                    ...prevTargetZone,
                     items: [
-                        ...(prev[targetZoneId].next ?? prev[targetZoneId].items),
+                        ...(prevTargetZone.next ?? prevTargetZone.items),
                     ],
                 };
             }
@@ -143,9 +150,9 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             newState = moveTreeItem(newState, {
                 source: {
                     id: newState.origSortPos?.id,
-                    index: newState.sortPosition?.index,
-                    parentId: newState.sortPosition?.parentId,
-                    zoneId: newState.sortPosition?.zoneId,
+                    index: newState.sortPosition?.index ?? -1,
+                    parentId: newState.sortPosition?.parentId ?? null,
+                    zoneId: newState.sortPosition?.zoneId ?? null,
                 },
                 target: {
                     id: move.sortPosition.id,
@@ -165,15 +172,16 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                     ...move.sortPosition,
                 },
                 [sourceZoneId]: {
-                    ...(prev[sourceZoneId] ?? {}),
-                    next: [...(newState[sourceZoneId].items ?? [])],
+                    ...(prev.zones[sourceZoneId] ?? {}),
+                    next: [...(newState.zones[sourceZoneId].items ?? [])],
                 },
             };
 
             if (targetZoneId !== sourceZoneId) {
-                res[targetZoneId] = {
-                    ...(prev[targetZoneId] ?? {}),
-                    next: [...(newState[targetZoneId].items ?? [])],
+                const prevTargetZone = prev.zones[targetZoneId] ?? {};
+                res.zones[targetZoneId] = {
+                    ...prevTargetZone,
+                    next: [...(newState.zones[targetZoneId].items ?? [])],
                 };
             }
 
@@ -190,16 +198,16 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
 
             const sourceZoneId = source.zoneId;
             const targetZoneId = prev.sortPosition?.zoneId ?? null;
-            if (targetZoneId === null) {
+            if (sourceZoneId === null || targetZoneId === null) {
                 return prev;
             }
 
             let newState: SortableState = {
                 ...prev,
                 [sourceZoneId]: {
-                    ...(prev[sourceZoneId] ?? {}),
+                    ...(prev.zones[sourceZoneId] ?? {}),
                     items: [
-                        ...(prev[sourceZoneId].next ?? prev[sourceZoneId].items),
+                        ...(prev.zones[sourceZoneId].next ?? prev.zones[sourceZoneId].items),
                     ],
                 },
             };
@@ -208,9 +216,9 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 newState = {
                     ...newState,
                     [targetZoneId]: {
-                        ...(prev[targetZoneId] ?? {}),
+                        ...(prev.zones[targetZoneId] ?? {}),
                         items: [
-                            ...(prev[targetZoneId].next ?? prev[targetZoneId].items),
+                            ...(prev.zones[targetZoneId].next ?? prev.zones[targetZoneId].items),
                         ],
                     },
                     sourcePosition: {
@@ -225,13 +233,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
 
     const clearItemsTransform = () => {
         setState((prev: SortableState) => {
-            const zoneIds = distinctValues([
-                prev.origSortPos?.zoneId,
-                prev.sourcePosition?.zoneId,
-                prev.prevPosition?.zoneId,
-                prev.sortPosition?.zoneId,
-            ]);
-
+            const zoneIds = getPossibleZoneIds(prev);
             const newState = mapZones(prev, zoneIds, clearTransform);
             return mapNextZones(newState, zoneIds, clearTransform);
         });
@@ -326,7 +328,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 return;
             }
 
-            const setTransform = (item) => {
+            const setTransform = (item: SortableItemWrapperProps) => {
                 const found = animateElems?.find((i) => i.id === item.id);
                 if (!found) {
                     return item;
@@ -387,12 +389,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             setState((prev: SortableState) => (
                 mapZones(
                     prev,
-                    [
-                        prev.origSortPos?.zoneId,
-                        prev.sourcePosition?.zoneId,
-                        prev.prevPosition?.zoneId,
-                        prev.sortPosition?.zoneId,
-                    ],
+                    getPossibleZoneIds(prev),
                     setTransform,
                 )
             ));
@@ -410,7 +407,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         onSortEnd() {
             const state = getState();
             const source = getSourcePosition(state);
-            if (!source || !state.origSortPos || !state.sortPosition) {
+            if (!source || !state.origSortPos?.id || !state.sortPosition) {
                 return;
             }
 
@@ -508,7 +505,6 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
 
     const avatarProps: SortableAvatarProps | null = draggingItem && ({
         columns: [],
-
         ...draggingItem,
 
         className: classNames(
@@ -537,7 +533,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         table: props.table,
     };
 
-    const avatar = (Avatar && draggingItem && (
+    const avatar = (Avatar && draggingItem && avatarProps && (
         <SortableDragAvatar {...avatarWrapperProps} >
             <Avatar {...avatarProps} ref={avatarRef} />
         </SortableDragAvatar>
@@ -562,7 +558,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         props.id,
     ]);
 
-    const zoneItems = getItems();
+    const zoneItems = getItems(props.id ?? null);
     const listItems = useMemo(() => zoneItems, [zoneItems, state.dragging]);
 
     const ItemComponent = SortableItemWrapper;

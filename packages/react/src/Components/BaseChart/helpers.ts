@@ -1,9 +1,10 @@
-import { asArray, isFunction, isObject } from '@jezvejs/types';
+import { isFunction, isObject } from '@jezvejs/types';
 import { minmax } from '../../utils/common.ts';
 import {
     BaseChartBaseItem,
     BaseChartDataCategory,
     BaseChartDataGroup,
+    BaseChartDataItemsGroup,
     BaseChartDataProp,
     BaseChartDataSerie,
     BaseChartDataSet,
@@ -13,21 +14,6 @@ import {
 } from './types.ts';
 
 const SVG_VALUE_PRECISION = 3;
-
-/**
- * Returns array of items filtered by specified query object
- *
- * @param {Array} items
- * @param {object} query
- * @returns {Array}
- */
-export const findItem = (items, query) => {
-    const condition = Object.keys(query);
-    return asArray(items).filter((item) => (
-        !!item
-        && condition.every((prop) => item[prop] === query[prop])
-    ));
-};
 
 /**
  * Returns true if objects target to the same data items
@@ -186,28 +172,34 @@ export const getSeriesByIndex = (
 };
 
 /** Return array of values */
-export const mapValues = (items) => {
+export const mapValues = (
+    items: BaseChartBaseItem[] | BaseChartDataItemsGroup[],
+): number[] | null => {
     if (!items || !Array.isArray(items)) {
         return null;
     }
 
-    return items.flat().map((item) => item.value + item.valueOffset);
+    return items.flat().map((item: BaseChartBaseItem | null) => (
+        (item)
+            ? (item.value + item.valueOffset)
+            : 0
+    ));
 };
 
 /**
  * Returns specified value rounded to default precision for SVG
  *
- * @param {number|string} value
+ * @param {number} value
  * @param {boolean} asPixels
  * @returns {string}
  */
-export const formatCoord = (value, asPixels = false) => {
-    const fmt = parseFloat(parseFloat(value).toFixed(SVG_VALUE_PRECISION)).toString();
+export const formatCoord = (value: number, asPixels: boolean = false) => {
+    const fmt = parseFloat(value.toFixed(SVG_VALUE_PRECISION)).toString();
     return (asPixels) ? `${fmt}px` : fmt;
 };
 
 /** Updates width of chart component */
-export const updateChartWidth = (state) => {
+export const updateChartWidth = (state: BaseChartState): BaseChartState => {
     const groupsWidth = (isFunction(state.getGroupOuterWidth))
         ? state.groupsCount * state.getGroupOuterWidth(state)
         : 0;
@@ -221,7 +213,7 @@ export const updateChartWidth = (state) => {
 };
 
 /** Calculate width and margin of bar for fitToWidth option */
-export const updateColumnWidth = (state) => {
+export const updateColumnWidth = (state: BaseChartState): BaseChartState => {
     if (!state.fitToWidth) {
         return state;
     }
@@ -375,14 +367,4 @@ export const findItemByEvent = (
         index,
         series: state.getSeriesByIndex(index, state),
     };
-};
-
-/** Returns component for specified name */
-export const getComponent = (name, state) => {
-    const res = state?.components?.[name] ?? null;
-    if (!res) {
-        throw new Error(`Invalid ${name} component`);
-    }
-
-    return res;
 };

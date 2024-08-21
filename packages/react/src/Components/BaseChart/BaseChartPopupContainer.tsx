@@ -1,30 +1,29 @@
 import { forwardRef } from 'react';
 import classNames from 'classnames';
-import { BaseChartState, BaseChartTarget } from './types.ts';
-import { getComponent } from './helpers.ts';
-
-type BaseChartPopupContainerRef = HTMLDivElement | null;
-
-export interface BaseChartPopupContainerProps extends BaseChartState {
-    target?: BaseChartTarget,
-}
+import {
+    BaseChartPopupContainerComponent,
+    BaseChartPopupContainerProps,
+    BaseChartPopupContainerRef,
+    BaseChartState,
+    BaseChartTarget,
+} from './types.ts';
 
 /**
  * BaseChartPopupContainer component
  */
 // eslint-disable-next-line react/display-name
-export const BaseChartPopupContainer = forwardRef<
+export const BaseChartPopupContainer: BaseChartPopupContainerComponent = forwardRef<
     BaseChartPopupContainerRef,
     BaseChartPopupContainerProps
 >((props, ref) => {
-    const defaultPopupContent = (target: object, state: object) => {
+    const defaultPopupContent = (target: BaseChartTarget, state: BaseChartState) => {
         if (!target) {
             return null;
         }
 
-        const ChartPopup = getComponent('ChartPopup', state);
+        const { ChartPopup } = state.components;
 
-        return (
+        return ChartPopup && (
             <ChartPopup
                 {...state}
                 target={target}

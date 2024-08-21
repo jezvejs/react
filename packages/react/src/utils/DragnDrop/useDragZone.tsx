@@ -9,6 +9,7 @@ import { DragMaster } from './DragMaster.ts';
 import { useDragnDrop } from './DragnDropProvider.tsx';
 import {
     DragAvatarInfo,
+    DragAvatarInitParam,
     DragnDropState,
     DragZone,
     OnDragStartParams,
@@ -78,14 +79,14 @@ export function useDragZone(props: UseDragZoneProps) {
                         return currentTargetElemRef.current;
                     },
 
-                    initFromEvent({ downX, downY }) {
+                    initFromEvent(params: DragAvatarInitParam) {
                         const offset = getOffset(dragZoneRef.current);
                         setState((prev: DragnDropState) => ({
                             ...prev,
                             origLeft: prev.left,
                             origTop: prev.top,
-                            shiftX: downX - offset.left,
-                            shiftY: downY - offset.top,
+                            shiftX: params.downX - offset.left,
+                            shiftY: params.downY - offset.top,
                         }));
 
                         return true;

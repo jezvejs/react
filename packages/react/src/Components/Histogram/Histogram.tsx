@@ -8,6 +8,7 @@ import { HistogramDataSeries } from './components/DataSeries/HistogramDataSeries
 
 import {
     HistogramAlignedXOptions,
+    HistogramComponents,
     HistogramDataItemType,
     HistogramItemProps,
     HistogramProps,
@@ -24,7 +25,13 @@ export const Histogram = (props: HistogramProps) => {
         xAxisGrid: false,
     };
 
-    const chartProps = {
+    const components: HistogramComponents = {
+        ...props.components,
+        DataItem: HistogramDataItem,
+        DataSeries: HistogramDataSeries,
+    };
+
+    const chartProps: HistogramProps = {
         ...defaultProps,
         ...props,
 
@@ -32,7 +39,7 @@ export const Histogram = (props: HistogramProps) => {
         className: classNames('histogram', props.className),
 
         getColumnOuterWidth: (state: HistogramState): number => (
-            state.columnWidth + state.columnGap
+            state.columnWidth + (state.columnGap ?? 0)
         ),
 
         /** Returns current count of columns in group */
@@ -45,12 +52,13 @@ export const Histogram = (props: HistogramProps) => {
         },
 
         getGroupWidth: (state: HistogramState): number => (
-            state.getColumnOuterWidth(state) * state.columnsInGroup - state.columnGap
+            (state.getColumnOuterWidth?.(state) ?? 0) * state.columnsInGroup
+            - (state.columnGap ?? 0)
         ),
 
         getGroupOuterWidth: (state: BaseChartState): number => {
             const chartState = state as HistogramState;
-            return chartState.getGroupWidth(chartState) + chartState.groupsGap;
+            return (chartState.getGroupWidth?.(chartState) ?? 0) + chartState.groupsGap;
         },
 
         getX: (item: HistogramDataItemType, groupWidth: number, columnWidth: number): number => (
@@ -70,7 +78,7 @@ export const Histogram = (props: HistogramProps) => {
                 return NaN;
             }
 
-            let x = state.getX(item, groupWidth, columnWidth);
+            let x = state.getX?.(item, groupWidth, columnWidth) ?? 0;
             if (alignColumns === 'right') {
                 x += groupsGap;
             } else if (alignColumns === 'center') {
@@ -107,7 +115,7 @@ export const Histogram = (props: HistogramProps) => {
             let index = -1;
 
             const chartState = state as HistogramState;
-            const groupWidth = chartState.getGroupWidth(chartState);
+            const groupWidth = chartState.getGroupWidth?.(chartState) ?? 0;
             const groupOuterWidth = chartState.getGroupOuterWidth(chartState);
             const groupX = groupOuterWidth * result.index;
             let x = result?.x ?? 0;
@@ -154,7 +162,7 @@ export const Histogram = (props: HistogramProps) => {
                 index = -1;
             }
 
-            const res = {
+            const res: BaseChartItemSearchResult = {
                 item,
                 index,
                 group: result.item,
@@ -189,7 +197,7 @@ export const Histogram = (props: HistogramProps) => {
             const y1 = grid.getY(value + valueOffset);
             const height = grid.roundToPrecision(Math.abs(y0 - y1), 1);
             const groupWidth = state.getGroupOuterWidth(state);
-            const columnWidth = state.getColumnOuterWidth(state);
+            const columnWidth = state.getColumnOuterWidth?.(state) ?? 0;
 
             const itemProps: HistogramDataItemType = {
                 ...data,
@@ -205,22 +213,18 @@ export const Histogram = (props: HistogramProps) => {
                 stacked: state.data?.stacked ?? false,
             };
 
-            itemProps.x = state.getAlignedX({
+            itemProps.x = state.getAlignedX?.({
                 item: itemProps,
                 groupWidth,
                 columnWidth,
                 alignColumns: state.alignColumns,
                 groupsGap: state.groupsGap,
-            }, state);
+            }, state) ?? 0;
 
             return itemProps;
         },
 
-        components: {
-            ...props.components,
-            DataItem: HistogramDataItem,
-            DataSeries: HistogramDataSeries,
-        },
+        components,
     };
 
     return (

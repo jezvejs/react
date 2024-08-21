@@ -1,11 +1,22 @@
 import { minmax } from '../../utils/common.ts';
+import { RangeSliderAxisType } from './types.ts';
 
-export const valueToPosition = (value, minValue, maxValue, maxPos) => {
+export const valueToPosition = (
+    value: number,
+    minValue: number,
+    maxValue: number,
+    maxPos: number,
+): number => {
     const fixedValue = minmax(minValue, maxValue, value);
     return maxPos * Math.abs((fixedValue - minValue) / (minValue - maxValue));
 };
 
-export const positionToValue = (pos, minValue, maxValue, maxPos) => (
+export const positionToValue = (
+    pos: number,
+    minValue: number,
+    maxValue: number,
+    maxPos: number,
+): number => (
     minmax(
         minValue,
         maxValue,
@@ -13,8 +24,8 @@ export const positionToValue = (pos, minValue, maxValue, maxPos) => (
     )
 );
 
-export const getStepPrecision = (step) => {
-    if (!Number.isFinite(step) || step === 0) {
+export const getStepPrecision = (step: number | null): number | null => {
+    if (!Number.isFinite(step) || step === 0 || step === null) {
         return null;
     }
 
@@ -28,26 +39,29 @@ export const getStepPrecision = (step) => {
     return (exp < 0) ? -exp : 1;
 };
 
-export const roundToPrecision = (value, prec) => (
+export const roundToPrecision = (value: number, prec: number): number => (
     Number.isFinite(prec)
         ? parseFloat(value.toFixed(prec))
         : value
 );
 
-export const stepValue = (value, step, prec) => (
-    Number.isFinite(prec)
+export const stepValue = (value: number, step: number, prec: number): number => (
+    (Number.isFinite(prec) && step !== 0)
         ? roundToPrecision(Math.round(value / step) * step, prec)
         : value
 );
 
-export const getMaxPos = (slider, props) => {
+export const getMaxPos = (
+    slider: HTMLElement | null,
+    axis: RangeSliderAxisType,
+): number => {
     if (!slider?.offsetParent) {
         return 0;
     }
 
     const rect = slider.getBoundingClientRect();
     const offset = slider.offsetParent.getBoundingClientRect();
-    return (props?.axis === 'x')
+    return (axis === 'x')
         ? (offset.width - rect.width)
         : (offset.height - rect.height);
 };

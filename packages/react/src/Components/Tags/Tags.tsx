@@ -10,7 +10,7 @@ export const TagsHelpers = {
     removeItemsById,
 };
 
-export type ClickEventType = React.TouchEvent<Element> | React.MouseEvent<Element, MouseEvent>;
+export type ClickEventType = React.MouseEvent<Element, MouseEvent>;
 
 export interface TagsProps<T extends TagProps = TagProps> {
     className?: string;
@@ -78,7 +78,7 @@ export function Tags<T extends TagProps = TagProps>(p: TagsProps<T>) {
      * Item click event handler
      * @param {Event} e - click event object
      */
-    const onItemClick = (e: React.TouchEvent | React.MouseEvent) => {
+    const onItemClick = (e: React.MouseEvent) => {
         e?.stopPropagation();
 
         const target = e?.target as HTMLElement;

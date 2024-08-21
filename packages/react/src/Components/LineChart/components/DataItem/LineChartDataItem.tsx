@@ -1,8 +1,10 @@
 import { CSSProperties, forwardRef } from 'react';
 import classNames from 'classnames';
 
-import { formatCoord } from '../../../BaseChart/helpers.ts';
+import { IndexedSVGAttributes, StyleDeclaration } from '../../../../utils/types.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
+
+import { formatCoord } from '../../../BaseChart/helpers.ts';
 
 import {
     LineChartDataItemComponent,
@@ -13,6 +15,8 @@ import {
 import './LineChartDataItem.scss';
 
 const animateAttributes = ['cy'];
+
+type SVGCircleAttrs = IndexedSVGAttributes<SVGCircleElement>;
 
 export interface LineChartDataItemAttrs {
     cx: number,
@@ -63,13 +67,13 @@ export const LineChartDataItem: LineChartDataItemComponent = forwardRef<
             }
 
             if (state.animateNow) {
-                attrs.style[key] = formatCoord(value, true);
+                (attrs.style as StyleDeclaration)[key] = formatCoord(value, true);
             } else {
-                attrs.style[key] = '';
-                attrs[key] = formatCoord(value);
+                (attrs.style as StyleDeclaration)[key] = '';
+                (attrs as SVGCircleAttrs)[key] = formatCoord(value);
             }
         } else {
-            attrs[key] = formatCoord(value);
+            (attrs as SVGCircleAttrs)[key] = formatCoord(value);
         }
     });
 

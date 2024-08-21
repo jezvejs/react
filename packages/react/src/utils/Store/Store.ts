@@ -1,5 +1,3 @@
-import { isFunction } from '@jezvejs/types';
-
 export type StoreActionPayload = object | string | number | boolean | bigint | symbol | null;
 
 export interface StoreActionObject {
@@ -50,7 +48,7 @@ export class Store {
     storeAPI: StoreActionAPI | null = null;
 
     constructor(reducer: StoreReducer, options: StoreOptions = {}) {
-        if (!isFunction(reducer)) {
+        if (typeof reducer !== 'function') {
             throw new Error('Expected reducer to be a function');
         }
 
@@ -104,7 +102,7 @@ export class Store {
     }
 
     subscribe(listener: StoreListener) {
-        if (!isFunction(listener)) {
+        if (typeof listener !== 'function') {
             throw new Error('Expected listener to be a function');
         }
 

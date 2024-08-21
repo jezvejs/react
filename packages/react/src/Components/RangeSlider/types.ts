@@ -1,14 +1,22 @@
+import { RangeType } from '../../utils/types.ts';
+
 export interface RangeSliderAreaProps {
     top: number;
     left: number;
+
+    origTop: number;
+    origLeft: number;
+
     shiftX: number;
     shiftY: number;
+
     offset: {
         top: number;
         left: number;
         width: number;
         height: number;
     };
+
     rect: {
         top: number;
         left: number;
@@ -17,12 +25,9 @@ export interface RangeSliderAreaProps {
     };
 }
 
-export interface RangeSliderRange {
-    start: number;
-    end: number;
-}
+export type RangeSliderValue = number | RangeType;
 
-export type RangeSliderValue = number | RangeSliderRange;
+export type RangeSliderAxisType = 'x' | 'y';
 
 export type RangeSliderBeforeChangeType = 'value' | 'start' | 'end';
 
@@ -30,7 +35,7 @@ export type RangeSliderBeforeChangeType = 'value' | 'start' | 'end';
  * Before area component props
  */
 export interface RangeSliderBeforeAreaProps {
-    axis: 'x' | 'y',
+    axis: RangeSliderAxisType,
     range: boolean,
     beforeArea: boolean,
 }
@@ -39,7 +44,7 @@ export interface RangeSliderBeforeAreaProps {
  * After area component props
  */
 export interface RangeSliderAfterAreaProps {
-    axis: 'x' | 'y',
+    axis: RangeSliderAxisType,
     range: boolean,
     afterArea: boolean,
 }
@@ -49,7 +54,7 @@ export interface RangeSliderAfterAreaProps {
  */
 export interface RangeSliderSelectedAreaProps {
     id: string,
-    axis: 'x' | 'y',
+    axis: RangeSliderAxisType,
     range: boolean,
 }
 
@@ -60,11 +65,43 @@ export type RangeSliderValueSliderType = 'startSlider' | 'endSlider';
  */
 export interface RangeSliderValueSliderProps {
     id: string,
-    axis: 'x' | 'y',
+    axis: RangeSliderAxisType,
     type: RangeSliderValueSliderType,
     tabIndex?: number,
     disabled?: boolean,
 }
+
+/**
+ * RangeSlider drag zone
+ */
+export interface RangeSliderDragZoneProps {
+    id: string;
+    axis: RangeSliderAxisType;
+    type?: 'startSlider' | 'endSlider' | 'selectedArea';
+    range: boolean;
+    onPosChange: (position: number) => void;
+}
+
+export type RangeSliderDragZoneRef = HTMLDivElement | null;
+
+/**
+ * RangeSlider drop target
+ */
+export interface RangeSliderDropTargetProps {
+    id: string;
+    className: string;
+    axis: RangeSliderAxisType;
+    disabled: boolean;
+
+    children: React.ReactNode;
+
+    onClickCapture: (e: React.MouseEvent) => void;
+    onFocusCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
+    onBlurCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
+    onKeyDownCapture: (e: React.KeyboardEvent) => void;
+}
+
+export type RangeSliderDropTargetRef = HTMLDivElement | null;
 
 /**
  * RangeSlider component props
@@ -76,10 +113,10 @@ export interface RangeSliderProps {
     value: number,
     start: number,
     end: number,
-    axis: 'x' | 'y',
+    axis: RangeSliderAxisType,
     min: number,
     max: number,
-    step: number,
+    step: number | null,
     disabled: boolean,
     range: boolean,
     beforeArea: boolean,

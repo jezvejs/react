@@ -8,6 +8,22 @@ export interface PieChartDataItem {
 export type PieChartColorItem = number;
 
 /**
+ * SVG circular arc
+ */
+export interface CircularArcType {
+    centerX: number;
+    centerY: number;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    deltaX: number;
+    deltaY: number;
+    large: number;
+    command: string;
+}
+
+/**
  * Pie chart sector props
  */
 export interface PieChartSectorProps {

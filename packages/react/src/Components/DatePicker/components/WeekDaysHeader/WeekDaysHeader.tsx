@@ -23,14 +23,14 @@ const DatePickerWeekDaysHeaderItem = (props: DatePickerWeekDaysHeaderItemProps) 
 export interface DatePickerWeekDaysParams {
     locales?: string | string[],
     options?: {
-        firstDay?: number | null,
+        firstDay?: number,
     },
 }
 
 export const DatePickerWeekDaysHeader = (props: DatePickerWeekDaysHeaderProps) => {
     const {
         locales = [],
-        firstDay = null,
+        firstDay,
     } = props;
 
     const params: DatePickerWeekDaysParams = {

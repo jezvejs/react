@@ -11,6 +11,7 @@ import { LineChartDataSeries } from './components/DataSeries/LineChartDataSeries
 
 import {
     LineChartAlignedXOptions,
+    LineChartComponents,
     LineChartDataItemType,
     LineChartItemProps,
     LineChartProps,
@@ -30,6 +31,13 @@ export const LineChart = (props: LineChartProps) => {
         scaleAroundAxis: false,
     };
 
+    const components: LineChartComponents = {
+        ...props.components,
+        DataItem: LineChartDataItem,
+        DataPath: LineChartDataPath,
+        DataSeries: LineChartDataSeries,
+    };
+
     const chartProps: LineChartProps = {
         ...defaultProps,
         ...props,
@@ -42,7 +50,7 @@ export const LineChart = (props: LineChartProps) => {
         ),
 
         getColumnOuterWidth: (state: LineChartState): number => (
-            state.columnWidth + state.columnGap
+            (state.columnWidth ?? 0) + (state.columnGap ?? 0)
         ),
 
         /** Returns current count of columns in group */
@@ -55,12 +63,13 @@ export const LineChart = (props: LineChartProps) => {
         },
 
         getGroupWidth: (state: LineChartState): number => (
-            state.getColumnOuterWidth(state) * state.columnsInGroup - state.columnGap
+            (state.getColumnOuterWidth?.(state) ?? 0) * state.columnsInGroup
+            - (state.columnGap ?? 0)
         ),
 
         getGroupOuterWidth: (state: BaseChartState): number => {
             const chartState = state as LineChartState;
-            return chartState.getGroupWidth(chartState) + chartState.groupsGap;
+            return (chartState.getGroupWidth?.(chartState) ?? 0) + chartState.groupsGap;
         },
 
         getX: (item: LineChartAlignedXOptions, groupWidth: number): number => (
@@ -76,7 +85,7 @@ export const LineChart = (props: LineChartProps) => {
                 alignColumns = 'left',
             } = options;
 
-            let x = state.getX(options, groupWidth);
+            let x = state.getX?.(options, groupWidth) ?? 0;
             if (alignColumns === 'right') {
                 x += groupWidth;
             } else if (alignColumns === 'center') {
@@ -171,24 +180,19 @@ export const LineChart = (props: LineChartProps) => {
                 valueOffset,
                 cx: 0,
                 cy: grid.getY(value + valueOffset),
-                r: state.nodeCircleRadius,
+                r: state.nodeCircleRadius ?? 0,
             };
 
-            itemProps.cx = state.getAlignedX({
+            itemProps.cx = state.getAlignedX?.({
                 groupIndex: itemProps.groupIndex,
                 groupWidth,
                 alignColumns,
-            }, state);
+            }, state) ?? 0;
 
             return itemProps;
         },
 
-        components: {
-            ...props.components,
-            DataItem: LineChartDataItem,
-            DataPath: LineChartDataPath,
-            DataSeries: LineChartDataSeries,
-        },
+        components,
     };
 
     return (

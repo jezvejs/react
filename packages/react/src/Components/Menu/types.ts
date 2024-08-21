@@ -61,7 +61,7 @@ export interface MenuItemProps {
     type: MenuItemType;
     group?: string | null;
 
-    className: string;
+    className?: string;
     title: string;
     url?: string;
 
@@ -109,7 +109,7 @@ export interface MenuGroupItemProps {
     title: string;
     items: MenuItemProps[];
 
-    className: string;
+    className?: string;
     header: MenuGroupHeaderProps;
     list: MenuListProps;
 
@@ -165,7 +165,7 @@ export interface MenuPlaceholderProps {
     className?: string;
 }
 
-export type MenuPlaceholderComponent = ComponentType<MenuPlaceholderProps>;
+export type MenuPlaceholderComponent = React.FC<MenuPlaceholderProps>;
 
 export type MenuItemComponent = React.FC<MenuItemProps> & { selector: string; };
 

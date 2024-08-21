@@ -15,7 +15,7 @@ export const PieChart = (props: PieChartProps) => {
         colors = [],
     } = props;
 
-    const getNextColor = (val) => {
+    const getNextColor = (val: number) => {
         if (!val) {
             return colors[0];
         }
@@ -125,9 +125,9 @@ export const PieChart = (props: PieChartProps) => {
 
                     const sectorProps = {
                         ...sector,
-                        onItemClick: (e) => onItemClick(e, sector),
-                        onItemOver: (e) => onItemOver(e, sector),
-                        onItemOut: (e) => onItemOut(e, sector),
+                        onItemClick: (e: React.MouseEvent) => onItemClick(e, sector),
+                        onItemOver: (e: React.MouseEvent) => onItemOver(e, sector),
+                        onItemOut: (e: React.MouseEvent) => onItemOut(e, sector),
                     };
 
                     start += item.arc;

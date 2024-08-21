@@ -7,7 +7,9 @@ import {
     trimDecimalPlaces,
 } from '@jezvejs/number';
 
-import { ControlledInput, ControlledInputProps } from '../ControlledInput/ControlledInput.tsx';
+import { ControlledInput } from '../ControlledInput/ControlledInput.tsx';
+import { ControlledInputProps } from '../ControlledInput/types.ts';
+import { InputProps } from '../Input/Input.tsx';
 
 export interface DecimalInputProps extends ControlledInputProps {
     min: number,
@@ -38,7 +40,7 @@ export const DecimalInput = (p: DecimalInputProps) => {
         }
 
         const fixed = fixFloat(value);
-        if (!isNumberString(fixed)) {
+        if (fixed === null || !isNumberString(fixed)) {
             return false;
         }
 
@@ -71,11 +73,15 @@ export const DecimalInput = (p: DecimalInputProps) => {
         return true;
     };
 
-    const renderValue = (state: DecimalInputProps) => (
-        (typeof state.digits === 'number')
-            ? trimDecimalPlaces(state.value, state.digits)
-            : state.value
-    );
+    const renderValue = (state: InputProps): string => {
+        const decState = state as DecimalInputProps;
+        const res = (
+            (decState.value && (typeof decState.digits === 'number'))
+                ? trimDecimalPlaces(decState.value, decState.digits)
+                : decState.value
+        );
+        return res ?? '';
+    };
 
     const inputProps = {
         isValidValue,

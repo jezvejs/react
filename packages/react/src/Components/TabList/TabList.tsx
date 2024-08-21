@@ -6,7 +6,7 @@ import { MenuDefProps, MenuList, MenuHelpers } from '../Menu/Menu.tsx';
 import { TabListItemProps, TabListProps } from './types.ts';
 import { generateId, selectItem } from './helpers.ts';
 import './TabList.scss';
-import { MenuListProps } from '../Menu/types.ts';
+import { MenuListProps, MenuState } from '../Menu/types.ts';
 
 const defaultProps = {
     items: [],
@@ -49,7 +49,7 @@ export const TabList = (p: TabListProps) => {
         ...props,
         id: props.id ?? `tabs${generateId()}`,
         className: 'tab-list_header',
-        items: MenuHelpers.createItems(state.items, state),
+        items: MenuHelpers.createItems(state.items ?? [], (state as object) as MenuState),
         getItemProps: MenuHelpers.getItemProps,
         onItemClick: onChange,
         components: {

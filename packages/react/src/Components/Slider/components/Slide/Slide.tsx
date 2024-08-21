@@ -1,10 +1,17 @@
 import { SlideProps } from '../../types.ts';
 import './Slide.scss';
 
+export interface SlideAttrs {
+    className?: string;
+    style?: React.CSSProperties;
+    'data-id'?: string;
+    'data-name'?: string;
+}
+
 export const Slide = (props: SlideProps) => {
     const { content } = props;
 
-    const slideProps = {
+    const slideProps: SlideAttrs = {
         className: 'slide',
         style: {
             width: props.width,

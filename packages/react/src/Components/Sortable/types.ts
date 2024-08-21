@@ -1,5 +1,4 @@
 import {
-    CSSProperties,
     ForwardRefExoticComponent,
     RefAttributes,
 } from 'react';
@@ -19,46 +18,58 @@ export type GetGroupFunction = (elem: Element | null) => string | null;
 /**
  * Sortable item type
  */
-export interface SortableTreeItem {
-    id: string,
-    items?: SortableTreeItem[],
+export interface SortableTreeItem extends BaseTreeItem {
+    id: string;
+    items?: SortableTreeItem[];
 
     title?: string;
     className?: string;
     group?: string;
     placeholder?: boolean;
-    style?: CSSProperties,
+    style?: React.CSSProperties,
 
     animationInProgress?: boolean;
 
-    initialOffset?: Point;
-    initialTransform?: string;
-    offset?: Point;
-    offsetTransform?: string;
+    initialOffset?: Point | null;
+    initialTransform?: string | null;
+    offset?: Point | null;
+    offsetTransform?: string | null;
 
-    rect: AnimationBox;
-    targetRect: AnimationBox;
+    rect?: AnimationBox;
+    targetRect?: AnimationBox;
 
     parent?: ItemOffset | null;
 }
 
-/**
- * Callback used by findTreeItem() and filterTreeItems() functions
- */
-export type SortableTreeFilterCallback = (
-    item: SortableTreeItem,
-    index: number,
-    arr: SortableTreeItem[],
-) => boolean;
+export interface BaseTreeItem {
+    id: string;
+    items?: BaseTreeItem[];
+}
+
+export interface TreeFilterCallback<
+    T extends BaseTreeItem = BaseTreeItem,
+    R = boolean,
+> {
+    (item: T, index?: number, arr?: T[]): R;
+}
 
 /**
  * Position of sortable item at parent container and drag zone
  */
 export interface SortableItemPosition {
-    id: string | null;
+    id?: string | null;
     parentId: string | null;
     index: number;
     zoneId: string | null;
+}
+
+/**
+ * moveTreeItem() reducer function params
+ */
+export interface MoveTreeItemParam {
+    source: SortableItemPosition;
+    target: SortableItemPosition;
+    swapWithPlaceholder?: boolean;
 }
 
 /**
@@ -76,7 +87,7 @@ export interface SortableAvatarColumn {
 
 export interface SortableAvatarState {
     className: string;
-    style?: CSSProperties;
+    style?: React.CSSProperties;
     columns: SortableAvatarColumn[];
 }
 
@@ -93,8 +104,8 @@ export interface SortableNodePosition {
 /**
  * Sortable item position and dimensions
  */
-export interface AnimationBox {
-    id?: string;
+export interface AnimationBox extends BaseTreeItem {
+    id: string;
     x?: number;
     y?: number;
     top?: number;
@@ -104,6 +115,7 @@ export interface AnimationBox {
     width?: number;
     height?: number;
     childContainer?: AnimationBox | null;
+    items?: AnimationBox[];
 }
 
 /**
@@ -156,36 +168,36 @@ export type SortableAvatarComponent = SortableListItemComponent;
 /**
  * 'ItemWrapper' component props
  */
-export interface SortableItemWrapperProps {
-    id?: string,
-    items?: SortableTreeItem[],
+export interface SortableItemWrapperProps extends SortableTreeItem {
+    id: string;
+    items?: SortableTreeItem[];
 
-    group?: string,
-    zoneId?: string,
+    group?: string;
+    zoneId?: string;
 
-    title?: string,
+    title?: string;
 
-    className?: string,
-    style?: CSSProperties,
+    className?: string;
+    style?: React.CSSProperties;
 
-    placeholderClass?: string,
-    animatedClass?: string,
-    placeholder?: boolean,
-    animated?: boolean,
-    transitionTimeout?: number,
+    placeholderClass?: string;
+    animatedClass?: string;
+    placeholder?: boolean;
+    animated?: boolean;
+    transitionTimeout?: number;
 
-    initialTransform?: string,
-    offsetTransform?: string,
+    initialTransform?: string | null;
+    offsetTransform?: string | null;
 
-    rect?: AnimationBox,
-    targetRect?: AnimationBox,
-    childContainer?: AnimationBox,
+    rect?: AnimationBox;
+    targetRect?: AnimationBox;
+    childContainer?: AnimationBox;
 
     components?: {
-        ItemWrapper?: SortableListItemComponent,
+        ItemWrapper?: SortableListItemComponent;
         ListItem?: SortableListItemComponent;
         Avatar?: SortableAvatarComponent;
-    },
+    };
 }
 
 /**
@@ -234,10 +246,18 @@ export interface OnSortParam {
     sourceZoneId: string | null;
     sourceParentId: string | null;
 
-    targetId: string | null;
+    targetId?: string | null;
     targetIndex: number;
     targetZoneId: string | null;
     targetParentId: string | null;
+}
+
+/**
+ * saveItemMove() function params
+ */
+export interface SortableSaveItemMoveParam {
+    sortPosition: SortableItemPosition;
+    swapWithPlaceholder: boolean;
 }
 
 /**
@@ -262,7 +282,15 @@ export interface SortableMoveInfo {
 }
 
 /**
- * Sortable propss
+ * setAnimationTransform() function params
+ */
+export interface SortableAnimationTransform {
+    initialTransform?: string | null;
+    offsetTransform?: string | null;
+}
+
+/**
+ * Sortable props
  */
 export interface SortableProps {
     id?: string;
@@ -285,16 +313,53 @@ export interface SortableProps {
     },
 }
 
+export interface SortableZone {
+    items: SortableTreeItem[];
+    next?: SortableTreeItem[];
+}
+
+/**
+ * Map of sortable item positions arrays for drag zones:
+ *
+ * {
+ *     [zoneId1]: [
+ *         { id1, x, y, ... }, // AnimationBox
+ *         { id2, x, y, ..., items: [
+ *             { id2_1, x, y, ... }, // children items
+ *         ] },
+ *     ],
+ * }
+ */
+export interface SortableZonePositions {
+    [id: string]: AnimationBox[];
+}
+
+/**
+ * Map of sortable item positions maps for drag zones:
+ *
+ * {
+ *     [zoneId1]: {
+ *         [id1]: { id1, x, y, ... }, // AnimationBox
+ *         [id2]: { id2, x, y, ... },
+ *         [id2_1]: { id2_1, x, y, ... },
+ *     },
+ * }
+ */
+export interface SortableZonePositionsMap {
+    [id: string]: SortableItemsPositions;
+}
+
+export type SortablePositionType = 'boxes' | 'targetBoxes';
+
 /**
  * Sortable state
  */
 export interface SortableState extends DragnDropState, SortableProps {
-    boxes: {
-        [id: string]: AnimationBox;
+    zones: {
+        [id: string]: SortableZone;
     },
-    targetBoxes: {
-        [id: string]: AnimationBox;
-    },
+    boxes: SortableZonePositions;
+    targetBoxes: SortableZonePositions;
     origSortPos: SortableItemPosition | null;
     sourcePosition: SortableItemPosition | null;
     prevPosition: SortableItemPosition | null;

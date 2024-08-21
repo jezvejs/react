@@ -1,8 +1,8 @@
-import { getWeekDays, getWeekdayShort } from '@jezvejs/datetime';
+import { getWeekDays, getWeekdayShort, LocalesType } from '@jezvejs/datetime';
 import classNames from 'classnames';
 
 import { Menu } from '../Menu/Menu.tsx';
-import { MenuProps } from '../Menu/types.ts';
+import { MenuItemType, MenuProps } from '../Menu/types.ts';
 import './WeekDaySelect.scss';
 
 export interface WeekDaySelectProps extends MenuProps {
@@ -11,7 +11,7 @@ export interface WeekDaySelectProps extends MenuProps {
 }
 
 interface WeekDayParams {
-    locales?: string | string[],
+    locales?: LocalesType,
     options?: {
         firstDay?: number,
     },
@@ -28,26 +28,29 @@ export const WeekDaySelect = (p: WeekDaySelectProps) => {
         ...p,
     };
 
-    const menuProps = {
+    const { locales, firstDay } = props;
+
+    const menuProps: MenuProps = {
         ...props,
         className: classNames('weekday-select', props.className),
     };
 
     const weekDayParams: WeekDayParams = {
-        locales: menuProps.locales,
+        locales,
         options: {},
     };
-    if (typeof props.firstDay === 'number') {
+    if (typeof firstDay === 'number') {
         weekDayParams.options = {
-            firstDay: props.firstDay,
+            firstDay,
         };
     }
 
     const weekDays = getWeekDays(new Date(), weekDayParams);
     menuProps.items = weekDays.map((weekday: Date) => ({
         id: weekday.getDay().toString(),
-        title: getWeekdayShort(weekday, props.locales),
+        title: getWeekdayShort(weekday, locales),
         selectable: true,
+        type: props.defaultItemType as MenuItemType,
     }));
 
     return (

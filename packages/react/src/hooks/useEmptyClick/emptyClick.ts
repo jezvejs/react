@@ -26,13 +26,14 @@ const onEmptyClick = (e: Event, callback: EmptyClickCallback, elem: Element | El
     }
 
     if (e) {
+        const target = e.target as HTMLElement;
+
         notExcluded = elems.every((el: string) => {
             const currentElem = ((typeof el === 'string') ? ge(el) : el) || null;
-
             return ((
                 currentElem
-                && !currentElem.contains(e.target)
-                && currentElem !== e.target
+                && !currentElem.contains(target)
+                && currentElem !== target
             ) || !currentElem);
         });
     }

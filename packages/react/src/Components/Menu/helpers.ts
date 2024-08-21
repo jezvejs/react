@@ -204,7 +204,7 @@ export function forItems<T extends MenuItemProps = MenuItemProps>(
         throw new Error('Invalid callback parameter');
     }
 
-    const res = [];
+    const res: T[] = [];
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
@@ -437,7 +437,9 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
     return res;
 };
 
-export const toggleSelectItem = (itemId) => (state) => ({
+export const toggleSelectItem = <T extends MenuProps = MenuState>(
+    itemId: string,
+) => (state: T) => ({
     ...state,
     items: mapItems(
         state.items,
@@ -463,16 +465,19 @@ export const toggleSelectItem = (itemId) => (state) => ({
 
 /**
  * Appends specified item to the end of list or group and returns resulting list
- * @param {Object} item
- * @param {Array} items
- * @returns {Array}
+ * @param {MenuItemProps} item
+ * @param {MenuItemProps[]} items
+ * @returns {MenuItemProps[] | null}
  */
-export const pushItem = (item, items) => {
+export const pushItem = (
+    item: MenuItemProps,
+    items: MenuItemProps[],
+): MenuItemProps[] => {
+    const res = items ?? [];
     if (!item) {
-        return null;
+        return res;
     }
 
-    const res = items;
     if (item.group) {
         const group = getGroupById(item.group, res);
         if (group) {
@@ -522,10 +527,10 @@ export const createMenuItem = <T extends MenuItemProps, S extends MenuState>(
 
 /**
  * Create menu items from specified array
- * @param {Object|Object[]} items
- * @param {Object} state
+ * @param {MenuItemProps | MenuItemProps[]} items
+ * @param {MenuState} state
  */
-export const createItems = (items, state) => (
+export const createItems = (items: MenuItemProps | MenuItemProps[], state: MenuState) => (
     mapItems(
         asArray(items),
         (item) => createMenuItem(item, state),
@@ -555,7 +560,7 @@ export const getInitialState = (
         },
     };
 
-    res.items = createItems(props.items, res);
+    res.items = createItems(props.items ?? [], res);
 
     return res;
 };

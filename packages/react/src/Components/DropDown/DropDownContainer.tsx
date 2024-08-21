@@ -1,5 +1,5 @@
 import { removeEvents, setEvents, getCursorPos } from '@jezvejs/dom';
-import {
+import React, {
     useRef,
     useEffect,
     forwardRef,
@@ -265,7 +265,7 @@ export const DropDownContainer = forwardRef<
     const setChanged = () => dispatch(actions.setChanged());
 
     /** Shows or hides drop down menu */
-    const showMenu = (val) => dispatch(actions.showMenu(val));
+    const showMenu = (val: boolean) => dispatch(actions.showMenu(val));
 
     /** Toggle shows/hides menu */
     const toggleMenu = () => dispatch(actions.toggleShowMenu());
@@ -291,7 +291,7 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Creates new item and add it to the list */
-    const addItem = (item) => dispatch(actions.addItem(item));
+    const addItem = (item: Partial<DropDownMenuItemProps>) => dispatch(actions.addItem(item));
 
     const removeCreatableMenuItem = () => (
         dispatch(actions.removeCreatableMenuItem())
@@ -336,7 +336,7 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Show only items containing specified string */
-    const filter = (inputString) => {
+    const filter = (inputString: string) => {
         if (state.inputString === inputString) {
             return;
         }
@@ -473,6 +473,7 @@ export const DropDownContainer = forwardRef<
 
         if (
             !allowCreate
+            || (inputString === null)
             || !((inputString?.length ?? 0) > 0)
         ) {
             return;
@@ -508,7 +509,7 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Handles user item select event */
-    const handleItemSelect = (item) => {
+    const handleItemSelect = (item: DropDownMenuItemProps) => {
         if (!item || item.disabled) {
             return;
         }
@@ -678,19 +679,20 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Click by delete button of selected item event handler */
-    const onDeleteSelectedItem = ({ e }) => {
+    const onDeleteSelectedItem = ({ e }: { e: React.MouseEvent | React.KeyboardEvent; }) => {
         const current = getState() as DropDownState;
         if (!state.multiple || !e) {
             return;
         }
 
+        const target = e.target as HTMLElement;
         const isClick = (e.type === 'click');
-        if (isClick && !isSelectionItemDeleteButtonTarget(e.target)) {
+        if (isClick && !isSelectionItemDeleteButtonTarget(target)) {
             return;
         }
 
         const index = (isClick)
-            ? getSelectedItemIndex(e.target)
+            ? getSelectedItemIndex(target)
             : current.actSelItemIndex;
         if (index === -1) {
             return;
@@ -703,7 +705,8 @@ export const DropDownContainer = forwardRef<
 
         e.stopPropagation();
 
-        const isBackspace = (e.type === 'keydown' && e.code === 'Backspace');
+        const ke = e as React.KeyboardEvent;
+        const isBackspace = (e.type === 'keydown' && ke.code === 'Backspace');
         let itemToActivate;
         if (isBackspace) {
             if (index === 0) {
@@ -732,7 +735,7 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Handler for left or right arrow keys */
-    const onSelectionNavigate = (e) => {
+    const onSelectionNavigate = (e: React.KeyboardEvent) => {
         const current = getState() as DropDownState;
         if (!state.multiple) {
             return;
@@ -932,7 +935,7 @@ export const DropDownContainer = forwardRef<
         setActive(itemId);
     };
 
-    const onGroupHeaderClick = ({ item }) => {
+    const onGroupHeaderClick = ({ item }: { item: DropDownMenuItemProps; }) => {
         handleGroupItemSelect(item);
     };
 
@@ -979,7 +982,11 @@ export const DropDownContainer = forwardRef<
         closeMenu();
     }, []);
 
-    useEmptyClick(closeMenuCached, [elem, reference], state.visible);
+    useEmptyClick(
+        closeMenuCached,
+        [elem?.current as Element, reference?.current as Element],
+        state.visible,
+    );
 
     const { Menu, ComboBox } = state.components;
 

@@ -1,9 +1,7 @@
-import { isFunction } from '@jezvejs/types';
 import { useCallback } from 'react';
-
-import { Input, InputProps } from '../Input/Input.tsx';
-
+import { Input } from '../Input/Input.tsx';
 import { getInputContent, replaceSelection } from './helpers.ts';
+import { ControlledInputEvent, ControlledInputProps } from './types.ts';
 
 const autoFeatures = {
     autoComplete: 'off',
@@ -17,36 +15,27 @@ export const ControlledInputHelpers = {
     replaceSelection,
 };
 
-export interface ControlledInputProps extends InputProps {
-    selectionStart?: number,
-    selectionEnd?: number,
-    handleValueProperty?: boolean,
-    disableAutoFeatures?: boolean,
-    isValidValue?: () => void,
-    onValidateInput?: () => void,
-    onValue?: () => void,
-}
-
-export const ControlledInput = (props) => {
+export const ControlledInput = (props: ControlledInputProps) => {
     const {
         handleValueProperty = true,
         disableAutoFeatures = true,
-        isValidValue = null,
-        onValidateInput = null,
-        onValue = null,
+        isValidValue,
+        onValidateInput,
+        onValue,
         selectionStart,
         selectionEnd,
         ...childProps
     } = props;
 
-    const validate = (value) => (
-        isFunction(isValidValue) ? isValidValue(value) : true
+    const validate = (value: string) => (
+        (typeof isValidValue === 'function') ? isValidValue(value) : true
     );
 
-    const defaultValidateHandler = (e) => {
+    const defaultValidateHandler = (e: ControlledInputEvent) => {
         const inputContent = getInputContent(e) ?? '';
 
-        const expectedContent = replaceSelection(e.target, inputContent);
+        const target = e.target as HTMLInputElement;
+        const expectedContent = replaceSelection(target, inputContent);
         const res = validate(expectedContent);
         if (!res) {
             e.preventDefault();
@@ -54,11 +43,11 @@ export const ControlledInput = (props) => {
         }
     };
 
-    const validateInput = isFunction(onValidateInput)
+    const validateInput = (typeof onValidateInput === 'function')
         ? onValidateInput
         : defaultValidateHandler;
 
-    const onChange = (e) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         validateInput(e);
 
         if (!e.defaultPrevented) {
@@ -69,11 +58,11 @@ export const ControlledInput = (props) => {
     /**
      * Verifies update of input value and returns valid value
      */
-    const defaultValuehandler = (value, prev) => (
+    const defaultValuehandler = (value: string, prev: string) => (
         validate(value) ? value : prev
     );
 
-    const handleValue = isFunction(onValue)
+    const handleValue = (typeof onValue === 'function')
         ? onValue
         : defaultValuehandler;
 
@@ -99,7 +88,7 @@ export const ControlledInput = (props) => {
         });
     };
 
-    const contentRef = useCallback((node) => {
+    const contentRef = useCallback((node: HTMLInputElement | null) => {
         if (!node) {
             return;
         }
@@ -109,8 +98,8 @@ export const ControlledInput = (props) => {
         }
 
         const elem = node;
-        elem.selectionStart = selectionStart;
-        elem.selectionEnd = selectionEnd;
+        elem.selectionStart = selectionStart ?? null;
+        elem.selectionEnd = selectionEnd ?? null;
     }, [handleValueProperty, selectionStart, selectionEnd]);
 
     const autoProps = (disableAutoFeatures)

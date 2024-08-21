@@ -15,8 +15,9 @@ import {
  * HistogramDataSeries component
  */
 export const HistogramDataSeries: HistogramDataSeriesComponent = (
-    props: HistogramDataSeriesProps,
+    p: HistogramDataSeriesProps,
 ) => {
+    const props = p as HistogramState;
     const store = useStore();
 
     const { dataSets, activeTarget, grid } = props;
@@ -76,7 +77,10 @@ export const HistogramDataSeries: HistogramDataSeriesComponent = (
                     animateNow: props.animateNow,
                 };
 
-                const item = props.createItem(itemProps, props);
+                const item = props.createItem?.(itemProps, props);
+                if (!item) {
+                    return;
+                }
 
                 group.push(item);
 

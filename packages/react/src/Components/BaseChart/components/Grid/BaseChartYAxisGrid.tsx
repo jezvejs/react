@@ -1,8 +1,4 @@
-export interface BaseChartYAxisGridProps {
-    grid: object,
-    chartWidth: number,
-    height: number,
-}
+import { BaseChartYAxisGridProps } from '../../types.ts';
 
 export interface BaseChartYAxisGridItemProps {
     id: string,
@@ -13,7 +9,7 @@ export interface BaseChartYAxisGridItemProps {
 /**
  * BaseChartYAxisGrid component
  */
-export const BaseChartYAxisGrid = (props) => {
+export const BaseChartYAxisGrid = (props: BaseChartYAxisGridProps) => {
     const { grid, height } = props;
     if (!grid) {
         return null;

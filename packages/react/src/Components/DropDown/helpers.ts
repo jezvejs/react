@@ -1,7 +1,15 @@
 import { asArray } from '@jezvejs/types';
+
 import { MenuHelpers } from '../Menu/Menu.tsx';
-import { DropDownMenuItemProps, DropDownProps, DropDownState } from './types.ts';
-import { MenuState } from '../Menu/types.ts';
+import { MenuItemType, MenuState } from '../Menu/types.ts';
+
+import {
+    DropDownCreateGroupParam,
+    DropDownGroupItemProps,
+    DropDownMenuItemProps,
+    DropDownProps,
+    DropDownState,
+} from './types.ts';
 
 /** Returns array of selected items */
 export const getSelectedItems = (state: DropDownState) => (
@@ -11,7 +19,7 @@ export const getSelectedItems = (state: DropDownState) => (
 );
 
 /** Returns true is item is visible */
-export const isVisibleItem = (item: DropDownMenuItemProps, state: DropDownState) => (
+export const isVisibleItem = (item: DropDownMenuItemProps, state: DropDownState) => !!(
     (state?.filtered)
         ? (item?.matchFilter && !item.hidden)
         : (item && !item.hidden)
@@ -21,7 +29,7 @@ export const isVisibleItem = (item: DropDownMenuItemProps, state: DropDownState)
 export const getVisibleItems = (state: DropDownState | DropDownMenuItemProps) => (
     MenuHelpers.toFlatList<DropDownMenuItemProps>(state?.items ?? [], {
         includeGroupItems: (state as DropDownState).allowActiveGroupHeader,
-    }).filter((item: DropDownMenuItemProps) => (
+    }).filter((item: DropDownMenuItemProps): boolean => (
         (item.type === 'group' && getVisibleItems(item).length > 0)
         || (item.type !== 'group' && isVisibleItem(item, state as DropDownState))
     ))
@@ -29,22 +37,30 @@ export const getVisibleItems = (state: DropDownState | DropDownMenuItemProps) =>
 
 /**
  * Returns list items of specified group
- * @param {Object} group - group object
- * @param {Object} state - state object
+ * @param {DropDownGroupItemProps} group - group object
+ * @param {DropDownState} state - state object
+ * @returns {DropDownMenuItemProps[]}
  */
-export const getGroupItems = (group, state: DropDownState) => (
+export const getGroupItems = (
+    group: DropDownGroupItemProps | null,
+    state: DropDownState,
+): DropDownMenuItemProps[] => (
     MenuHelpers.getItemById<DropDownMenuItemProps>(
-        group?.id,
+        group?.id ?? null,
         state.items ?? [],
     )?.items ?? []
 );
 
 /**
  * Returns visible list items of specified group
- * @param {Object} group - group object
- * @param {Object} state - state object
+ * @param {DropDownGroupItemProps} group - group object
+ * @param {DropDownState} state - state object
+ * @returns {DropDownMenuItemProps[]}
  */
-export const getVisibleGroupItems = (group, state: DropDownState) => (
+export const getVisibleGroupItems = (
+    group: DropDownGroupItemProps | null,
+    state: DropDownState,
+): DropDownMenuItemProps[] => (
     getGroupItems(group, state).filter((item) => (
         isVisibleItem(item, state)
     ))
@@ -118,8 +134,13 @@ export const createMenuItem = (
         active: false,
     };
 
-    return (typeof state.createItem === 'function')
-        ? state.createItem(res, state)
+    const isValidCallback = (
+        typeof state.createItem === 'function'
+        && state.createItem !== createMenuItem
+    );
+
+    return (isValidCallback)
+        ? state.createItem!(res, state)
         : res;
 };
 
@@ -132,7 +153,7 @@ export const createItems = (
     items: DropDownMenuItemProps | DropDownMenuItemProps[],
     state: DropDownState,
 ): DropDownMenuItemProps[] => (
-    MenuHelpers.mapItems(
+    MenuHelpers.mapItems<DropDownMenuItemProps>(
         asArray(items),
         (item) => createMenuItem(item, state),
         { includeGroupItems: state.allowActiveGroupHeader },
@@ -145,9 +166,11 @@ export const generateGroupId = (state: DropDownState) => (
 
 /**
  * Create new group
- * @param {string} label
  */
-export const createGroup = (options, state) => {
+export const createGroup = (
+    options: DropDownCreateGroupParam,
+    state: DropDownState,
+): DropDownMenuItemProps => {
     const {
         title,
         disabled = false,
@@ -155,9 +178,9 @@ export const createGroup = (options, state) => {
         ...rest
     } = options;
 
-    const group = {
+    const group: DropDownMenuItemProps = {
         id: options.id?.toString() ?? generateGroupId(state),
-        type: 'group',
+        type: 'group' as MenuItemType,
         title,
         disabled,
         items,
