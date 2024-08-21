@@ -437,32 +437,34 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
     return res;
 };
 
-export const toggleSelectItem = <T extends MenuProps = MenuState>(
+export function toggleSelectItem<T extends MenuProps = MenuState>(
     state: T,
     itemId: string,
-) => ({
-    ...state,
-    items: mapItems(
-        state.items,
-        (item) => {
-            if (item.id?.toString() === itemId) {
-                if (!item.selectable || item.disabled) {
-                    return item;
+): T {
+    return {
+        ...state,
+        items: mapItems(
+            state.items,
+            (item) => {
+                if (item.id?.toString() === itemId) {
+                    if (!item.selectable || item.disabled) {
+                        return item;
+                    }
+
+                    return {
+                        ...item,
+                        selected: (state.multiple) ? !item.selected : true,
+                    };
                 }
 
-                return {
-                    ...item,
-                    selected: (state.multiple) ? !item.selected : true,
-                };
-            }
-
-            return (state.multiple)
-                ? item
-                : { ...item, selected: false };
-        },
-        { includeGroupItems: state.allowActiveGroupHeader },
-    ),
-});
+                return (state.multiple)
+                    ? item
+                    : { ...item, selected: false };
+            },
+            { includeGroupItems: state.allowActiveGroupHeader },
+        ),
+    };
+}
 
 /**
  * Appends specified item to the end of list or group and returns resulting list

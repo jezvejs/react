@@ -30,7 +30,7 @@
     "dependencies": {
         "@jezvejs/datetime": "^1.1.0",
         "@jezvejs/dom": "^1.1.0",
-        "@jezvejs/react": "^1.2.0",
+        "@jezvejs/react": "^1.2.1",
         "@jezvejs/types": "^1.0.0",
         "@storybook/preview-api": "^8.2.9",
         "@vitejs/plugin-react": "^4.3.1",
@@ -38,7 +38,7 @@
         "prop-types": "^15.8.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "vite": "^5.4.1",
+        "vite": "^5.4.2",
         "vite-plugin-svgr": "^4.2.0"
     }
 }
