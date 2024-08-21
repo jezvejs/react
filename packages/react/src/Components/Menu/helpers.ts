@@ -438,8 +438,9 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
 };
 
 export const toggleSelectItem = <T extends MenuProps = MenuState>(
+    state: T,
     itemId: string,
-) => (state: T) => ({
+) => ({
     ...state,
     items: mapItems(
         state.items,

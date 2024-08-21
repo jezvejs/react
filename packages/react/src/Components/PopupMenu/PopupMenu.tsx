@@ -121,7 +121,7 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
     const onItemClick = (item: MenuItemProps) => {
         if (MenuHelpers.isCheckbox(item)) {
-            setState(MenuHelpers.toggleSelectItem(item.id));
+            setState((prev) => MenuHelpers.toggleSelectItem(prev, item.id));
         }
 
         if (props.hideOnSelect) {

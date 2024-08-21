@@ -245,7 +245,7 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        setState(toggleSelectItem(itemId));
+        setState((prev) => toggleSelectItem(prev, itemId));
     };
 
     const handleItemClick = (
