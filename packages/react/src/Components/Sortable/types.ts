@@ -147,7 +147,7 @@ export interface SortableItemAnimation extends SortableItemPosition {
 export interface OnSortMoveParam {
     targetId: string | null;
     targetIndex: number;
-    parentId: string | null;
+    targetParentId: string | null;
     targetZoneId: string | null;
     swapWithPlaceholder: boolean;
     animateElems: SortableItemAnimation[] | null;

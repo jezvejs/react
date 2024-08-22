@@ -289,7 +289,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         onSortMove({
             targetId,
             targetIndex,
-            parentId,
+            targetParentId,
             targetZoneId,
             swapWithPlaceholder,
             animateElems,
@@ -301,13 +301,13 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             // Skip the same item
             if (
                 targetId === sourceId
-                && parentId === state.sortPosition?.parentId
+                && targetParentId === state.sortPosition?.parentId
                 && targetZoneId === sourceZoneId
             ) {
                 return;
             }
 
-            if (targetId === parentId && !props.tree) {
+            if (targetId === targetParentId && !props.tree) {
                 return;
             }
 
@@ -316,7 +316,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             if (
                 targetId === null
                 && state.targetId !== null
-                && parentId === state.sortPosition?.parentId
+                && targetParentId === state.sortPosition?.parentId
                 && targetZoneId === sourceZoneId
             ) {
                 return;
@@ -380,7 +380,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 sortPosition: {
                     id: targetId,
                     index: targetIndex,
-                    parentId,
+                    parentId: targetParentId,
                     zoneId: targetZoneId,
                 },
                 swapWithPlaceholder,

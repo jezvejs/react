@@ -520,7 +520,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     targetId: moveInfo.targetId,
                     targetIndex: moveInfo.targetIndex,
                     targetZoneId: moveInfo.targetZoneId,
-                    parentId: moveInfo.targetParentId,
+                    targetParentId: moveInfo.targetParentId,
                     swapWithPlaceholder,
                     animateElems,
                 });
