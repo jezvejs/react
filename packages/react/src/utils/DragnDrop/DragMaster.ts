@@ -513,7 +513,7 @@ export class DragMaster {
 
     /** Document mouse up event handler */
     mouseUp(e: TouchEvent | MouseEvent) {
-        if (!this.isTouch && e.which !== 1) {
+        if (!this.isTouch && (e as MouseEvent).button !== 0) {
             return;
         }
 

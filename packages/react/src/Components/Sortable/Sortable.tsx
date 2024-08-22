@@ -126,6 +126,9 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
 
             let newState = {
                 ...prev,
+                zones: {
+                    ...prev.zones,
+                },
             };
 
             const prevSourceZone = prev.zones[sourceZoneId] ?? {};
@@ -171,9 +174,12 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 sortPosition: {
                     ...move.sortPosition,
                 },
-                [sourceZoneId]: {
-                    ...(prev.zones[sourceZoneId] ?? {}),
-                    next: [...(newState.zones[sourceZoneId].items ?? [])],
+                zones: {
+                    ...(prev.zones ?? {}),
+                    [sourceZoneId]: {
+                        ...(prev.zones[sourceZoneId] ?? {}),
+                        next: [...(newState.zones[sourceZoneId].items ?? [])],
+                    },
                 },
             };
 
@@ -202,24 +208,33 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 return prev;
             }
 
+            const prevSourceZone = prev.zones[sourceZoneId] ?? {};
+
             let newState: SortableState = {
                 ...prev,
-                [sourceZoneId]: {
-                    ...(prev.zones[sourceZoneId] ?? {}),
-                    items: [
-                        ...(prev.zones[sourceZoneId].next ?? prev.zones[sourceZoneId].items),
-                    ],
+                zones: {
+                    ...prev.zones,
+                    [sourceZoneId]: {
+                        ...prevSourceZone,
+                        items: [
+                            ...(prevSourceZone.next ?? prevSourceZone.items),
+                        ],
+                    },
                 },
             };
 
             if (targetZoneId !== sourceZoneId) {
+                const prevTargetZone = prev.zones[targetZoneId] ?? {};
                 newState = {
                     ...newState,
-                    [targetZoneId]: {
-                        ...(prev.zones[targetZoneId] ?? {}),
-                        items: [
-                            ...(prev.zones[targetZoneId].next ?? prev.zones[targetZoneId].items),
-                        ],
+                    zones: {
+                        ...newState.zones,
+                        [targetZoneId]: {
+                            ...prevTargetZone,
+                            items: [
+                                ...(prevTargetZone.next ?? prevTargetZone.items),
+                            ],
+                        },
                     },
                     sourcePosition: {
                         ...newState.sortPosition,
@@ -289,7 +304,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         onSortMove({
             targetId,
             targetIndex,
-            parentId,
+            targetParentId,
             targetZoneId,
             swapWithPlaceholder,
             animateElems,
@@ -301,13 +316,13 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             // Skip the same item
             if (
                 targetId === sourceId
-                && parentId === state.sortPosition?.parentId
+                && targetParentId === state.sortPosition?.parentId
                 && targetZoneId === sourceZoneId
             ) {
                 return;
             }
 
-            if (targetId === parentId && !props.tree) {
+            if (targetId === targetParentId && !props.tree) {
                 return;
             }
 
@@ -316,7 +331,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
             if (
                 targetId === null
                 && state.targetId !== null
-                && parentId === state.sortPosition?.parentId
+                && targetParentId === state.sortPosition?.parentId
                 && targetZoneId === sourceZoneId
             ) {
                 return;
@@ -380,7 +395,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 sortPosition: {
                     id: targetId,
                     index: targetIndex,
-                    parentId,
+                    parentId: targetParentId,
                     zoneId: targetZoneId,
                 },
                 swapWithPlaceholder,

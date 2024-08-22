@@ -520,7 +520,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     targetId: moveInfo.targetId,
                     targetIndex: moveInfo.targetIndex,
                     targetZoneId: moveInfo.targetZoneId,
-                    parentId: moveInfo.targetParentId,
+                    targetParentId: moveInfo.targetParentId,
                     swapWithPlaceholder,
                     animateElems,
                 });
@@ -1032,7 +1032,6 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     res.push({
                         id: item?.id,
                         index,
-                        // zoneId: sourceZoneId,
                         parentId: sourceParentId,
                         ...itemRects,
                     });
@@ -1048,7 +1047,6 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 res.push({
                     id: sourceItem?.id,
                     index: sourceIndex,
-                    // zoneId: sourceZoneId,
                     parentId: sourceParentId,
                     ...movingItemRects,
                 });
@@ -1068,7 +1066,6 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     res.push({
                         id: item?.id,
                         index,
-                        // zoneId: targetZoneId,
                         parentId: targetParentId,
                         ...itemRects,
                     });

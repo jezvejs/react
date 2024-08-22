@@ -500,6 +500,9 @@ export const moveTreeItem = (state: SortableState, options: MoveTreeItemParam): 
             zoneId: target.zoneId,
         },
         swapWithPlaceholder,
+        zones: {
+            ...state.zones,
+        },
     };
 
     // Remove item from source list
@@ -655,7 +658,12 @@ export function mapZones<Item extends BaseTreeItem = SortableTreeItem>(
     callback: TreeFilterCallback<Item, Item>,
 ): SortableState {
     const ids: string[] = [];
-    let newState = state;
+    let newState = {
+        ...state,
+        zones: {
+            ...state.zones,
+        },
+    };
 
     asArray(zoneIds).forEach((zoneId: string) => {
         const id = zoneId ?? null;
@@ -683,7 +691,12 @@ export function mapNextZones<Item extends BaseTreeItem = SortableTreeItem>(
     callback: TreeFilterCallback<Item, Item>,
 ): SortableState {
     const ids: string[] = [];
-    let newState = state;
+    let newState = {
+        ...state,
+        zones: {
+            ...state.zones,
+        },
+    };
 
     asArray(zoneIds).forEach((zoneId: string) => {
         const id = zoneId ?? null;
