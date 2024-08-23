@@ -68,6 +68,9 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         components,
         ...commonProps
     } = props;
+    if ('items' in commonProps) {
+        delete commonProps.items;
+    }
 
     const Avatar = components?.Avatar ?? components?.ListItem;
 
