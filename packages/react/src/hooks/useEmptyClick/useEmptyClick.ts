@@ -2,9 +2,11 @@ import { asArray } from '@jezvejs/types';
 import { useEffect, useRef } from 'react';
 import { setEmptyClick, removeEmptyClick, EmptyClickCallback } from './emptyClick.ts';
 
+type ElemRef = React.MutableRefObject<HTMLElement | null>;
+
 export function useEmptyClick(
     callback: EmptyClickCallback,
-    elem: Element | Element[],
+    elem: ElemRef | ElemRef[],
     enabled: boolean = true,
 ) {
     const timeoutRef = useRef<number>(0);

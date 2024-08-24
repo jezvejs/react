@@ -984,7 +984,7 @@ export const DropDownContainer = forwardRef<
 
     useEmptyClick(
         closeMenuCached,
-        [elem?.current as Element, reference?.current as Element],
+        [elem, reference],
         state.visible,
     );
 
