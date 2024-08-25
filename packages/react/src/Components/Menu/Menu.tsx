@@ -232,10 +232,10 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         if (state.ignoreTouch) {
             setTimeout(() => {
                 handleMouseLeave();
+                enableTouch();
                 callback();
             });
         } else {
-            enableTouch();
             callback();
         }
     };
@@ -446,9 +446,11 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
     listProps.itemSelector = listProps.components?.ListItem?.selector ?? null;
 
-    const menuList = List && (
-        <List {...listProps} />
-    );
+    const menuList = useMemo(() => (
+        List && (
+            <List {...listProps} />
+        )
+    ), [state.items, state.activeItem]);
 
     const menuFooter = Footer && (
         <Footer {...(props.footer ?? {})} />
