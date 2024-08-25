@@ -228,6 +228,20 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
     };
 
+    const cancelClick = () => {
+        if (state.ignoreTouch) {
+            setTimeout(() => {
+                handleMouseLeave();
+                enableTouch();
+            });
+        }
+    };
+
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        cancelClick();
+    };
+
     const finishClick = (callback: () => void) => {
         if (state.ignoreTouch) {
             setTimeout(() => {
@@ -308,11 +322,6 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
     };
 
     const handleKey = (e: React.KeyboardEvent) => {
-        /*
-        const availCallback = (item: MenuItemProps): boolean => (
-            props.isAvailableItem?.(item, state) ?? true
-        );
-        */
         const availCallback = (item: MenuItemProps): boolean => (
             props.isAvailableItem?.(item, state) ?? true
         );
@@ -472,6 +481,7 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         onTouchStartCapture: handleTouchStart,
         onKeyDownCapture: handleKey,
         onScrollCapture: handleScroll,
+        onContextMenuCapture: handleContextMenu,
     };
 
     if (tabIndex !== null) {

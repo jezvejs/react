@@ -293,4 +293,5 @@ export interface MenuAttrs {
     onTouchStartCapture: (e: React.TouchEvent) => void;
     onKeyDownCapture: (e: React.KeyboardEvent) => void;
     onScrollCapture: (e: React.UIEvent) => void;
+    onContextMenuCapture: (e: React.MouseEvent) => void;
 }
