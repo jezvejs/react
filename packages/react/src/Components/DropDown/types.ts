@@ -81,12 +81,7 @@ export interface OptGroupProps {
     items: OptionProps[],
 }
 
-export interface DropDownNativeSelectProps {
-    id: string,
-    tabIndex?: number,
-    disabled?: boolean,
-    multiple?: boolean,
-    onChange?: React.ChangeEventHandler<HTMLSelectElement> | undefined,
+export interface DropDownNativeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     items: (OptionProps | OptGroupProps)[],
 }
 

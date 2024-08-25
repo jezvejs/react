@@ -10,11 +10,15 @@ import React, {
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 
+// Utils
 import { DebounceRunFunction, px } from '../../utils/common.ts';
+import { ListenerFunctionsGroup, ListenersGroup } from '../../utils/types.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
 
 // Common components
 import { MenuHelpers } from '../Menu/Menu.tsx';
+import { MenuItemProps, OnGroupHeaderClickParam } from '../Menu/types.ts';
+
 // Common hooks
 import { useDebounce } from '../../hooks/useDebounce/useDebounce.ts';
 import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.ts';
@@ -42,8 +46,6 @@ import {
     DropDownSelectedItem,
     DropDownState,
 } from './types.ts';
-import { MenuItemProps, OnGroupHeaderClickParam } from '../Menu/types.ts';
-import { ListenerFunctionsGroup, ListenersGroup } from '../../utils/types.ts';
 
 type DropDownRef = HTMLDivElement | null;
 
@@ -224,7 +226,7 @@ export const DropDownContainer = forwardRef<
         !isChildElement(e.relatedTarget as HTMLElement)
     );
 
-    /** Return selected items data for 'itemselect' and 'change' events */
+    /** Returns selected items data for 'itemselect' and 'change' events */
     const getSelectionData = (): DropDownSelectedItem[] | DropDownSelectedItem | null => {
         const selectedItems = getSelectedItems(getState() as DropDownState)
             .map((item) => ({ id: item.id, value: item.title }));
@@ -234,6 +236,18 @@ export const DropDownContainer = forwardRef<
         }
 
         return (selectedItems.length > 0) ? selectedItems[0] : null;
+    };
+
+    /** Returns value for NativeSelect component */
+    const getNativeSelectValue = (): string | string[] | undefined => {
+        const selectedItems = getSelectedItems(getState() as DropDownState)
+            .map((item) => item.id);
+
+        if (state.multiple) {
+            return selectedItems;
+        }
+
+        return (selectedItems.length > 0) ? selectedItems[0] : undefined;
     };
 
     /** Send current selection data to 'itemselect' event handler */
@@ -249,7 +263,8 @@ export const DropDownContainer = forwardRef<
      * 'change' event occurs after user finnished selection of item(s) and menu was hidden
      */
     const sendChangeEvent = () => {
-        if (!state.changed) {
+        const { changed } = getState() as DropDownState;
+        if (!changed) {
             return;
         }
 
@@ -678,6 +693,14 @@ export const DropDownContainer = forwardRef<
         handleItemSelect(target);
     };
 
+    /** Native select 'change' event handler */
+    const onNativeSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selected = Array.from(e.target.selectedOptions);
+        const ids = selected.map((option) => option.value);
+
+        dispatch(actions.setSelection(ids));
+    };
+
     /** Click by delete button of selected item event handler */
     const onDeleteSelectedItem = ({ e }: { e: React.MouseEvent | React.KeyboardEvent; }) => {
         const current = getState() as DropDownState;
@@ -1095,6 +1118,8 @@ export const DropDownContainer = forwardRef<
         disabled: props.disabled,
         multiple: props.multiple,
         items: state.items ?? [],
+        value: getNativeSelectValue(),
+        onChange: onNativeSelectChange,
     };
     if (selectTabIndex !== null) {
         nativeSelectProps.tabIndex = selectTabIndex;

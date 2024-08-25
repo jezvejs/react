@@ -49,6 +49,7 @@ export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
 
     const {
         id,
+        value,
         multiple,
         disabled,
         onChange,
@@ -56,6 +57,7 @@ export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
 
     const selectProps: React.SelectHTMLAttributes<HTMLSelectElement> = {
         id,
+        value,
         multiple,
         disabled,
         onChange,
