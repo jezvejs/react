@@ -48,14 +48,8 @@ export type DropDownValidInputTypes =
     | 'text'
     | 'url';
 
-export interface DropDownInputProps {
-    id?: string,
-    className?: string,
-    value?: string,
+export interface DropDownInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     type?: DropDownValidInputTypes,
-    placeholder?: string,
-    tabIndex?: number,
-    disabled?: boolean,
     onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
@@ -221,8 +215,7 @@ export type DropDownMenuListComponent = React.FC<DropDownMenuListProps>;
 /**
  * Combo box placeholder component
  */
-export interface DropDownPlaceholderProps {
-    className?: string,
+export interface DropDownPlaceholderProps extends React.HTMLAttributes<HTMLSpanElement> {
     placeholder: string,
 }
 export type DropDownPlaceholderComponent = React.FC<DropDownPlaceholderProps>;

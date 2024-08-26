@@ -68,7 +68,7 @@ export const DropDownContainer = forwardRef<
 
     const inputElem = useRef<HTMLInputElement | null>(null);
     const focusedElem = useRef<HTMLElement | null>(null);
-    const selectElem = useRef(null);
+    const selectElem = useRef<HTMLSelectElement | null>(null);
 
     const allowScrollAndResize = !state?.isTouch || !isEditable(state);
 
@@ -181,6 +181,16 @@ export const DropDownContainer = forwardRef<
             )
         );
     };
+
+    /** Returns true if element is input */
+    const isInputTarget = (target: HTMLElement | null) => (
+        target === getInput()
+    );
+
+    /** Returns true if element is main container */
+    const isContainer = (target: HTMLElement | null) => (
+        target === innerRef?.current
+    );
 
     /** Returns true if element is clear button or its child */
     const isClearButtonTarget = (target: HTMLElement) => {
@@ -394,7 +404,7 @@ export const DropDownContainer = forwardRef<
 
         if (
             props.enableFilter
-            && focusedElem?.current !== inputEl
+            && !isInputTarget(focusedElem?.current)
             && state.actSelItemIndex === -1
         ) {
             inputEl.focus();
@@ -569,11 +579,6 @@ export const DropDownContainer = forwardRef<
     };
 
     const onClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (e.type === 'touchstart') {
-            dispatch(actions.confirmTouch());
-            return;
-        }
-
         const target = e.target as HTMLElement;
         const validTarget = isValidToggleTarget(target);
 
@@ -621,13 +626,13 @@ export const DropDownContainer = forwardRef<
         }
 
         activate(true);
-        const inputEl = getInput();
 
         const target = e.target as HTMLElement;
+        const isInput = isInputTarget(target);
         const index = getSelectedItemIndex(target);
         if (index !== -1) {
             activateSelectedItem(index);
-        } else if (target === inputEl) {
+        } else if (isInput) {
             activateInput();
         }
 
@@ -639,7 +644,7 @@ export const DropDownContainer = forwardRef<
         if (
             !state.multiple
             && props.blurInputOnSingleSelect
-            && target === innerRef?.current
+            && isContainer(target)
         ) {
             return;
         }
@@ -660,7 +665,7 @@ export const DropDownContainer = forwardRef<
         if (
             index === -1
             && !isClearButtonTarget(target)
-            && target !== inputEl
+            && !isInput
         ) {
             focusInputIfNeeded(true, itemId);
         }
@@ -1126,7 +1131,7 @@ export const DropDownContainer = forwardRef<
     }
 
     const nativeSelect = props.useNativeSelect && NativeSelect && (
-        <NativeSelect {...nativeSelectProps} />
+        <NativeSelect {...nativeSelectProps} ref={selectElem} />
     );
 
     const style: CSSProperties = {};
