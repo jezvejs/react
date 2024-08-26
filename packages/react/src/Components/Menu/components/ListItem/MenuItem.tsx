@@ -130,7 +130,7 @@ export const MenuItem: MenuItemComponent = (p: MenuItemProps) => {
         return <a {...commonProps}>{content}</a>;
     }
 
-    const btnType = type as NativeButtonType;
+    const btnType = (isCheckbox) ? 'button' : (type as NativeButtonType);
     return (
         <button
             {...commonProps}
