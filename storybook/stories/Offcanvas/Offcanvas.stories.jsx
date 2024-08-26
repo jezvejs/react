@@ -1,9 +1,12 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
+import { useState } from 'react';
 import { Offcanvas } from '@jezvejs/react';
-import './Offcanvas.stories.scss';
-import { useMemo, useState } from 'react';
+
+import { usePortalElement } from '../../hooks/usePortalElement.jsx';
 import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+
+import './Offcanvas.stories.scss';
 
 export default {
     title: 'Components/Offcanvas',
@@ -15,9 +18,7 @@ export default {
 };
 
 const OpenOffcanvas = (args) => {
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
+    const portalElement = usePortalElement();
     const [state, setState] = useState({
         visible: false,
     });

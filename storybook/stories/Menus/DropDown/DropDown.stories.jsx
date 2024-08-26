@@ -1,7 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { DropDown, Tags } from '@jezvejs/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+
+import { usePortalElement } from '../../../hooks/usePortalElement.jsx';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';
@@ -50,9 +52,7 @@ export const Inline = {
     },
     decorators: [heightDecorator],
     render: function Render() {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+        const portalElement = usePortalElement();
 
         const args1 = {
             className: 'dd__container_no-shrink',
@@ -92,9 +92,7 @@ export const FixedMenu = {
     },
     decorators: [fixedDecorator],
     render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+        const portalElement = usePortalElement();
 
         return (
             <DropDown {...args} container={portalElement} />
@@ -142,9 +140,7 @@ export const AttachToInline = {
     },
     decorators: [textDecorator],
     render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+        const portalElement = usePortalElement();
 
         return (
             <>
@@ -163,9 +159,7 @@ export const Clipping = {
     },
     decorators: [textDecorator],
     render: function Render() {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+        const portalElement = usePortalElement();
 
         const args1 = {
             static: true,
@@ -501,9 +495,7 @@ export const FullScreen = {
     },
     decorators: [textDecorator],
     render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+        const portalElement = usePortalElement();
 
         return (
             <DropDown {...args} container={portalElement} />
@@ -522,9 +514,7 @@ export const FullScreenFilterMultiple = {
     },
     decorators: [textDecorator],
     render: function Render(args) {
-        const portalElement = useMemo(() => (
-            document.getElementById('custom-root')
-        ), []);
+        const portalElement = usePortalElement();
 
         return (
             <DropDown {...args} container={portalElement} />
