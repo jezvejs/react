@@ -590,6 +590,7 @@ export const DropDownContainer = forwardRef<
             state.waitForScroll
             || isMenuTarget(target)
             || isClearButtonTarget(target)
+            || (state.visible && isInputTarget(target))
             || isSelectionItemDeleteButtonTarget(target)
             || !validTarget
         ) {
