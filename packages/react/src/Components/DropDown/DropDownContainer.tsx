@@ -602,7 +602,7 @@ export const DropDownContainer = forwardRef<
         toggleMenu();
 
         if (!props.openOnFocus) {
-            setTimeout(() => focusInputIfNeeded());
+            focusInputIfNeeded();
         }
     };
 
