@@ -1160,6 +1160,7 @@ export const DropDownContainer = forwardRef<
             )}
             tabIndex={tabIndex}
             onClickCapture={onClick}
+            onClick={() => focusInputIfNeeded()}
             onFocusCapture={onFocus}
             onBlurCapture={onBlur}
             onKeyDownCapture={onKey}
