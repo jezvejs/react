@@ -475,10 +475,14 @@ export const DropDownContainer = forwardRef<
 
     /** Starts to listen events of visual viewport and window */
     const listenWindowEvents = () => {
-        if (state.visible && state.listeningWindow) {
-            setEvents(window.visualViewport, viewportEvents);
-            setEvents(window, windowEvents);
+        if (state.listeningWindow) {
+            return;
         }
+
+        setEvents(window.visualViewport, viewportEvents);
+        setEvents(window, windowEvents);
+
+        dispatch(actions.startWindowListening());
     };
 
     /** Stops listening events of visual viewport and window */
