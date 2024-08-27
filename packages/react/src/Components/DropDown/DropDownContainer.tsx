@@ -934,14 +934,14 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Handler for 'input' event of text field  */
-    const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if (props.enableFilter) {
             const target = e?.target as HTMLInputElement;
             filter(target?.value);
         }
 
-        props?.onInput?.(e);
-    };
+        props.onInput?.(e);
+    }, [props.enableFilter, props.onInput]);
 
     /** Handler for 'clear selection' button click */
     const onClearSelection = () => {
@@ -971,7 +971,16 @@ export const DropDownContainer = forwardRef<
         updateListPosition();
     };
 
-    const onWindowScroll = () => {
+    const onWindowScroll = (e: Event) => {
+        const target = e.target as HTMLElement;
+        if (
+            reference.current
+            && !target?.contains(reference.current)
+            && !target?.contains(elem.current)
+        ) {
+            return;
+        }
+
         updateListPosition();
     };
 
@@ -1139,35 +1148,36 @@ export const DropDownContainer = forwardRef<
         style.height = px(state.fullScreenHeight);
     }
 
+    const containerProps = {
+        id: props.id,
+        className: classNames(
+            {
+                dd__container: !attachedTo,
+                dd__container_attached: !!attachedTo,
+                dd__container_static: !props.listAttach && props.static,
+                dd__container_multiple: !!state.multiple,
+                dd__container_active: !!state.active,
+                dd__open: !state.fixedMenu && !!state.visible,
+                dd__editable: isEditable(getState() as DropDownState),
+                dd__list_active: isEditable(getState() as DropDownState),
+                dd__fullscreen: !!state.fullScreen,
+                dd__container_native: !!state.useNativeSelect,
+                dd__container_disabled: !!props.disabled,
+            },
+            props.className,
+        ),
+        tabIndex,
+        onClickCapture: onClick,
+        onClick: () => focusInputIfNeeded(),
+        onFocusCapture: onFocus,
+        onBlurCapture: onBlur,
+        onKeyDownCapture: onKey,
+        'data-value': selectedIds,
+        style,
+    };
+
     return (
-        <div
-            id={props.id}
-            className={classNames(
-                {
-                    dd__container: !attachedTo,
-                    dd__container_attached: !!attachedTo,
-                    dd__container_static: !props.listAttach && props.static,
-                    dd__container_multiple: !!state.multiple,
-                    dd__container_active: !!state.active,
-                    dd__open: !state.fixedMenu && !!state.visible,
-                    dd__editable: isEditable(state),
-                    dd__list_active: isEditable(state),
-                    dd__fullscreen: !!state.fullScreen,
-                    dd__container_native: !!state.useNativeSelect,
-                    dd__container_disabled: !!props.disabled,
-                },
-                props.className,
-            )}
-            tabIndex={tabIndex}
-            onClickCapture={onClick}
-            onClick={() => focusInputIfNeeded()}
-            onFocusCapture={onFocus}
-            onBlurCapture={onBlur}
-            onKeyDownCapture={onKey}
-            data-value={selectedIds}
-            ref={innerRef}
-            style={style}
-        >
+        <div {...containerProps} ref={innerRef}>
             {props.listAttach && (
                 <div ref={referenceRef} >
                     {attachedTo}
