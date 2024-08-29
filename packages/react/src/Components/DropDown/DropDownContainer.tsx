@@ -6,6 +6,7 @@ import React, {
     useImperativeHandle,
     useCallback,
     CSSProperties,
+    useMemo,
 } from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
@@ -338,7 +339,7 @@ export const DropDownContainer = forwardRef<
     };
 
     const getItem = (itemId: string | null) => (
-        MenuHelpers.getItemById(itemId, state.items ?? [])
+        MenuHelpers.getItemById(itemId, (getState() as DropDownState).items ?? [])
     );
 
     /** Deselect specified item */
@@ -362,7 +363,8 @@ export const DropDownContainer = forwardRef<
 
     /** Show only items containing specified string */
     const filter = (inputString: string) => {
-        if (state.inputString === inputString) {
+        const st = getState() as DropDownState;
+        if (st.inputString === inputString) {
             return;
         }
 
@@ -381,7 +383,7 @@ export const DropDownContainer = forwardRef<
     /** Set active state for specified list item */
     const setActive = (itemId: string | null) => {
         const itemToActivate = getItem(itemId);
-        const activeItem = getActiveItem(state);
+        const activeItem = getActiveItem(getState() as DropDownState);
         if (
             (activeItem && itemToActivate && activeItem.id === itemToActivate.id)
             || (!activeItem && !itemToActivate)
@@ -930,7 +932,6 @@ export const DropDownContainer = forwardRef<
             e.preventDefault();
 
             activateItem(newItem.id);
-            setActive(newItem.id);
         }
 
         if (focusInput) {
@@ -1060,49 +1061,54 @@ export const DropDownContainer = forwardRef<
     const showInput = props.listAttach && props.enableFilter;
 
     // Menu
-    const menuProps: DropDownMenuProps = {
-        ...state,
-        items: state.items ?? [],
-        inputRef: inputElem,
-        disabled: props.disabled,
-        className: classNames({
-            dd__list_fixed: !!state.fixedMenu,
-            dd__list_open: !!state.fixedMenu && !!state.visible,
-        }),
-        itemSelector: '.menu-item',
-        tabThrough: false,
-        activeItem: null,
-        editable,
-        onItemClick,
-        onInput,
-        onDeleteSelectedItem,
-        onClearSelection,
-        onItemActivate,
-        onGroupHeaderClick,
-        components: {
-            ...state.components,
-            Header: (showInput) ? DropDownMenuHeader : null,
-        },
-    };
+    const menu = useMemo(() => {
+        const st = getState() as DropDownState;
+        const activeItem = getActiveItem(st);
 
-    if (showInput) {
-        menuProps.header = {
+        const menuProps: DropDownMenuProps = {
+            ...st,
+            items: st.items ?? [],
             inputRef: inputElem,
             disabled: props.disabled,
-            inputString: state.inputString ?? '',
-            inputPlaceholder: props.placeholder,
-            useSingleSelectionAsPlaceholder: props.useSingleSelectionAsPlaceholder,
-            multiple: props.multiple,
+            className: classNames({
+                dd__list_fixed: !!st.fixedMenu,
+                dd__list_open: !!st.fixedMenu && !!st.visible,
+            }),
+            itemSelector: '.menu-item',
+            tabThrough: false,
+            activeItem: activeItem?.id ?? null,
+            editable,
+            onItemClick,
             onInput,
+            onDeleteSelectedItem,
+            onClearSelection,
+            onItemActivate,
+            onGroupHeaderClick,
             components: {
-                Input: props.components.Input,
+                ...st.components,
+                Header: (showInput) ? DropDownMenuHeader : null,
             },
         };
-    }
 
-    const menu = state.visible && (
-        <Menu {...menuProps} ref={elementRef} />
-    );
+        if (showInput) {
+            menuProps.header = {
+                inputRef: inputElem,
+                disabled: props.disabled,
+                inputString: st.inputString ?? '',
+                inputPlaceholder: props.placeholder,
+                useSingleSelectionAsPlaceholder: props.useSingleSelectionAsPlaceholder,
+                multiple: props.multiple,
+                onInput,
+                components: {
+                    Input: props.components.Input,
+                },
+            };
+        }
+
+        return st.visible && (
+            <Menu {...menuProps} ref={elementRef} />
+        );
+    }, [state.items, state.visible, state.inputString]);
 
     // Menu popup
     const container = props.container ?? document.body;

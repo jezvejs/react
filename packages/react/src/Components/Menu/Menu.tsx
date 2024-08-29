@@ -475,7 +475,6 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         id: props.id,
         className: classNames('menu', className),
         disabled,
-
         onFocusCapture: handleFocus,
         onBlurCapture: handleBlur,
         onTouchStartCapture: handleTouchStart,
