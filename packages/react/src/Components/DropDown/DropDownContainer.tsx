@@ -829,13 +829,13 @@ export const DropDownContainer = forwardRef<
     const onKey = (e: React.KeyboardEvent) => {
         e.stopPropagation();
 
-        const editable = isEditable(state);
+        const enableFilter = isEditable(state);
         const { multiple, showMultipleSelection, listAttach } = props;
         const inputEl = getInput();
         let newItem: MenuItemProps | null = null;
 
         let allowSelectionNavigate = multiple && showMultipleSelection && !listAttach;
-        if (allowSelectionNavigate && editable && e.target === inputEl) {
+        if (allowSelectionNavigate && enableFilter && e.target === inputEl) {
             // Check cursor is at start of input
             const cursorPos = getCursorPos(inputEl);
             if (cursorPos?.start !== 0 || cursorPos.start !== cursorPos.end) {
@@ -877,7 +877,7 @@ export const DropDownContainer = forwardRef<
         const activeItem = getActiveItem(state);
         let focusInput = false;
 
-        if (e.code === 'Space' && !editable) {
+        if (e.code === 'Space' && !enableFilter) {
             toggleMenu();
             e.preventDefault();
         } else if (e.code === 'ArrowDown') {
@@ -1003,6 +1003,7 @@ export const DropDownContainer = forwardRef<
         SHOW_LIST_SCROLL_TIMEOUT,
     ) as DebounceRunFunction;
 
+    // Handle window/viewport event listeners
     useEffect(() => {
         if (state.visible) {
             listenWindowEvents();
@@ -1015,11 +1016,20 @@ export const DropDownContainer = forwardRef<
         };
     }, [state.visible, state.listeningWindow]);
 
+    // Update position of menu popup
     useEffect(() => {
         if (state.visible) {
             setTimeout(() => updateListPosition());
         }
     }, [state.visible, state.items, state.inputString]);
+
+    // Update disabled state
+    useEffect(() => {
+        const st = getState() as DropDownState;
+        if (props.disabled !== st.disabled) {
+            dispatch(actions.toggleEnable());
+        }
+    }, [props.disabled]);
 
     const closeMenuCached = useCallback(() => {
         closeMenu();
