@@ -1,3 +1,5 @@
+// Uncomment to enable copying console messages to Storybook Actions tab
+// import '@storybook/addon-console';
 import packageJSON from '@jezvejs/react/package.json';
 
 const [major, minor, patch] = packageJSON.version.split('.');
