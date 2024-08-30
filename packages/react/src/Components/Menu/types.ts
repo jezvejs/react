@@ -145,6 +145,8 @@ export interface MenuListProps {
     beforeContent?: boolean;
     afterContent?: boolean;
 
+    placeholder?: MenuPlaceholderProps | null;
+
     onItemClick?: (itemId: string | null, e: React.MouseEvent) => void;
     onMouseEnter?: (itemId: string | null, e: React.MouseEvent) => void;
     onMouseLeave?: (itemId: string | null, e: React.MouseEvent) => void;
@@ -155,6 +157,8 @@ export interface MenuListProps {
 
     getItemDefaultProps?: (() => Partial<MenuItemProps>) | null;
 
+    getPlaceholderProps?: ((state: MenuListProps) => (MenuPlaceholderProps | null)) | null;
+
     components: MenuCommonComponents;
 }
 
@@ -163,6 +167,9 @@ export interface MenuListProps {
  */
 export interface MenuPlaceholderProps {
     className?: string;
+    active?: boolean;
+    selectable?: boolean;
+    content?: React.ReactNode;
 }
 
 export type MenuPlaceholderComponent = React.FC<MenuPlaceholderProps>;
@@ -251,6 +258,8 @@ export interface MenuProps<
     header?: HeaderProps | null;
     /* Props to pass to Footer component */
     footer?: FooterProps | null;
+    /* Props to pass to ListPlaceholder component */
+    placeholder?: MenuPlaceholderProps | null;
 
     onItemClick: (
         (
@@ -266,6 +275,8 @@ export interface MenuProps<
     ) | null;
 
     getItemDefaultProps?: (() => Partial<MenuItemProps>) | null;
+
+    getPlaceholderProps?: ((state: MenuListProps) => (MenuPlaceholderProps | null)) | null;
 
     onGroupHeaderClick?: ((params: OnGroupHeaderClickParam) => void) | null;
 
@@ -293,4 +304,5 @@ export interface MenuAttrs {
     onTouchStartCapture: (e: React.TouchEvent) => void;
     onKeyDownCapture: (e: React.KeyboardEvent) => void;
     onScrollCapture: (e: React.UIEvent) => void;
+    onContextMenuCapture: (e: React.MouseEvent) => void;
 }

@@ -1,15 +1,13 @@
 import PropTypes from 'prop-types';
-import { useMemo } from 'react';
 import { DropDown } from '@jezvejs/react';
 import { BlueBox } from '../BlueBox/BlueBox.jsx';
+import { usePortalElement } from '../../../../../hooks/usePortalElement.jsx';
 
 export const AttachedToBlock = ({
     boxId = 'box',
     ...props
 }) => {
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
+    const portalElement = usePortalElement();
 
     return (
         <DropDown {...props} container={portalElement}>

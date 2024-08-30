@@ -20,7 +20,7 @@ const Option = (props: OptionProps) => (
 const OptGroup = (props: OptGroupProps) => (
     <optgroup label={props.title} disabled={props.disabled}>
         {props.items.map((item: OptionProps) => (
-            <Option key={`opt_${Date.now()}${item.id}`} {...props} />
+            <Option key={`opt_${props.id}_${item.id}`} {...props} />
         ))}
     </optgroup>
 );
@@ -49,6 +49,7 @@ export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
 
     const {
         id,
+        value,
         multiple,
         disabled,
         onChange,
@@ -56,6 +57,7 @@ export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
 
     const selectProps: React.SelectHTMLAttributes<HTMLSelectElement> = {
         id,
+        value,
         multiple,
         disabled,
         onChange,
@@ -73,7 +75,7 @@ export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
             {props.items.map((item: OptionProps | OptGroupProps) => (
                 <NativeSelectListItem
                     {...item}
-                    key={`opt_${Date.now()}${props.id}`}
+                    key={`opt_${props.id}_${item.id}`}
                 />
             ))}
         </select>

@@ -9,13 +9,12 @@ import {
     UseDropTargetProps,
 } from '../../utils/DragnDrop/index.ts';
 import {
-    DragZone,
     DragAvatar,
-    OnDragEndParams,
+    DragZone,
     OnDragCancelParams,
+    OnDragEndParams,
 } from '../../utils/DragnDrop/types.ts';
 import { StoreUpdater } from '../../utils/Store/Store.ts';
-import { Point } from '../../utils/types.ts';
 
 import {
     distinctValues,
@@ -38,20 +37,21 @@ import {
     toggleMeasureMode,
 } from './helpers.ts';
 import {
+    AnimationBox,
     GetGroupFunction,
-    OnSortMoveParam,
+    ItemOffset,
     OnSortCancelParam,
     OnSortEndParam,
-    SortableMoveInfo,
+    OnSortMoveParam,
+    SortableDragAvatar,
     SortableItemAnimation,
     SortableItemRects,
+    SortableItemsPositions,
+    SortableListItemComponent,
+    SortableMoveInfo,
+    SortablePositionType,
     SortableState,
     SortableTreeItem,
-    SortableItemsPositions,
-    SortableDragAvatar,
-    SortableListItemComponent,
-    SortablePositionType,
-    AnimationBox,
     SortableZonePositionsMap,
 } from './types.ts';
 import { UseSortableDragZoneProps } from './useSortableDragZone.tsx';
@@ -777,7 +777,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     : asArray(items).findIndex((item: SortableTreeItem) => (item?.id === id))
             );
 
-            const getParentOffset = (itemId: string, zoneId: string) => {
+            const getParentOffset = (itemId: string, zoneId: string): ItemOffset | null => {
                 const next = getNextZoneItems(zoneId, state);
                 const parent = findTreeItemParentById(next, itemId);
                 const parentId = parent?.id ?? null;
@@ -808,34 +808,37 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 const initialOffset = (
                     prevParentItem?.offset ?? prevParentItem?.initialOffset ?? ({ x: 0, y: 0 })
                 );
-                const offset = {
+                const offset: ItemOffset = {
                     id: parentId,
-                    x: ((targetRect.left ?? 0) - (rect.left ?? 0)) + initialOffset.x,
-                    y: ((targetRect.top ?? 0) - (rect.top ?? 0)) + initialOffset.y,
+                    x: ((targetRect.left ?? 0) - (rect.left ?? 0)) - initialOffset.x,
+                    y: ((targetRect.top ?? 0) - (rect.top ?? 0)) - initialOffset.y,
                 };
 
                 return offset;
             };
 
-            const getRecursiveParentOffset = (itemId: string, zoneId: string) => {
+            const getRecursiveParentOffset = (
+                itemId: string,
+                zoneId: string,
+                targetItemId: string | null = null,
+            ): ItemOffset | null => {
                 let currentItemId = itemId;
-                let parentOffset: Point | null = null;
+                let parentOffset: ItemOffset | null = null;
 
-                while (currentItemId) {
+                while (currentItemId && currentItemId !== targetItemId) {
                     const offset = getParentOffset(currentItemId, zoneId);
                     if (!offset) {
                         break;
                     }
 
                     if (!parentOffset) {
-                        parentOffset = {
-                            x: 0,
-                            y: 0,
-                        };
+                        parentOffset = { ...offset };
+                    } else {
+                        parentOffset.x += offset.x;
+                        parentOffset.y += offset.y;
+                        parentOffset.id = offset.id;
                     }
 
-                    parentOffset.x += offset.x;
-                    parentOffset.y += offset.y;
                     currentItemId = offset.id;
                 }
 

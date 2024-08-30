@@ -1,7 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { Popup } from '@jezvejs/react';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+
+import { usePortalElement } from '../../hooks/usePortalElement.jsx';
 
 import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
 import { OkBtn } from '../../Components/ActionButton/OkBtn.jsx';
@@ -21,9 +23,7 @@ export default {
 const placeholderMsg = 'Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem.';
 
 const LaunchPopupForResult = (args) => {
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
+    const portalElement = usePortalElement();
     const [state, setState] = useState({
         visible: false,
         result: null,
@@ -63,9 +63,7 @@ const LaunchPopupForResult = (args) => {
 };
 
 const LaunchPopup = (args) => {
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
+    const portalElement = usePortalElement();
     const [state, setState] = useState({
         visible: false,
     });

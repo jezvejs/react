@@ -93,6 +93,10 @@ export const MenuList = (p: MenuListProps) => {
         state.getItemProps?.(item, state) ?? item
     );
 
+    const getPlaceholderProps = (state: MenuListProps) => (
+        state.getPlaceholderProps?.(state) ?? state.placeholder ?? {}
+    );
+
     const containerProps = {
         className: classNames(
             'menu-list',
@@ -109,8 +113,9 @@ export const MenuList = (p: MenuListProps) => {
         onMouseOut: onMouseLeave,
     };
 
-    const placeholderProps = {
-    };
+    const placeholderProps = (props.items.length === 0)
+        ? getPlaceholderProps(props)
+        : {};
 
     return (
         <div {...containerProps}>

@@ -14,6 +14,8 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@storybook/addon-actions": "^8.2.9",
+        "@storybook/addon-console": "^3.0.0",
         "@storybook/addon-essentials": "^8.2.9",
         "@storybook/addon-interactions": "^8.2.9",
         "@storybook/addon-links": "^8.2.9",
@@ -30,7 +32,7 @@
     "dependencies": {
         "@jezvejs/datetime": "^1.1.0",
         "@jezvejs/dom": "^1.1.0",
-        "@jezvejs/react": "^1.2.2",
+        "@jezvejs/react": "^1.2.3",
         "@jezvejs/types": "^1.0.0",
         "@storybook/preview-api": "^8.2.9",
         "@vitejs/plugin-react": "^4.3.1",

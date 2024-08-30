@@ -39,6 +39,7 @@ export const DropDownInput: DropDownInputComponent = forwardRef<
         type,
         placeholder,
         disabled,
+        hidden,
     } = props;
 
     const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +54,9 @@ export const DropDownInput: DropDownInputComponent = forwardRef<
         type: type as DropDownValidInputTypes,
         placeholder,
         disabled,
+        hidden,
         onInput,
+        onChange: onInput,
     };
 
     if (!disabled) {

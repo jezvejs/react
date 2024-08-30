@@ -15,13 +15,14 @@ export const DropDownPlaceholder: DropDownPlaceholderComponent = (
     };
 
     const placeholder = props.placeholder ?? '';
+    const placeholderProps = {
+        ...props,
+        className: classNames('dd__placeholder', props.className),
+        title: placeholder,
+    };
 
     return (
-        <span
-            {...props}
-            className={classNames('dd__placeholder', props.className)}
-            title={placeholder}
-        >
+        <span {...placeholderProps} >
             {placeholder}
         </span>
     );

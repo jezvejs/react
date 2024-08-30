@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 
 import { useStore } from '../../../../../utils/Store/StoreProvider.tsx';
 
@@ -127,14 +127,27 @@ export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
     };
 
     // Input
-    const inputProps: DropDownInputProps = {
+    const input = useMemo(() => {
+        const inputProps: DropDownInputProps = {
+            placeholder,
+            onInput: (onInput ?? undefined),
+            disabled,
+        };
+        if (editable) {
+            inputProps.value = props.inputString ?? ((multiple) ? '' : str);
+        } else {
+            inputProps.hidden = true;
+        }
+
+        return Input && <Input {...inputProps} ref={props.inputRef} />;
+    }, [
         placeholder,
-        onInput: (onInput ?? undefined),
         disabled,
-    };
-    if (editable) {
-        inputProps.value = props.inputString ?? ((multiple) ? '' : str);
-    }
+        editable,
+        props.inputString,
+        multiple,
+        str,
+    ]);
 
     return (
         <div
@@ -145,7 +158,7 @@ export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
                 {multipleSelection}
                 {showPlaceholder && <Placeholder {...placeholderProps} />}
                 {showSingleSelection && <SingleSelection item={selectedItem} />}
-                {editable && Input && <Input {...inputProps} ref={props.inputRef} />}
+                {input}
             </div>
             <ComboBoxControls {...props} />
         </div>

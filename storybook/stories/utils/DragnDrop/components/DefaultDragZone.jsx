@@ -3,10 +3,11 @@ import {
     forwardRef,
     useEffect,
     useImperativeHandle,
-    useMemo,
     useRef,
 } from 'react';
 import PropTypes from 'prop-types';
+
+import { usePortalElement } from '../../../../hooks/usePortalElement.jsx';
 
 import { Box } from './Box.jsx';
 import { OriginalDragAvatar } from './OriginalDragAvatar.jsx';
@@ -24,9 +25,7 @@ export const DefaultDragZone = forwardRef((props, ref) => {
 
     const { state, setState } = useDragnDrop();
 
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
+    const portalElement = usePortalElement();
 
     const {
         showOriginal,

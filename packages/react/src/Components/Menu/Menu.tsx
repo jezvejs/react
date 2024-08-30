@@ -228,14 +228,28 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
     };
 
+    const cancelClick = () => {
+        if (state.ignoreTouch) {
+            setTimeout(() => {
+                handleMouseLeave();
+                enableTouch();
+            });
+        }
+    };
+
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        cancelClick();
+    };
+
     const finishClick = (callback: () => void) => {
         if (state.ignoreTouch) {
             setTimeout(() => {
                 handleMouseLeave();
+                enableTouch();
                 callback();
             });
         } else {
-            enableTouch();
             callback();
         }
     };
@@ -308,11 +322,6 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
     };
 
     const handleKey = (e: React.KeyboardEvent) => {
-        /*
-        const availCallback = (item: MenuItemProps): boolean => (
-            props.isAvailableItem?.(item, state) ?? true
-        );
-        */
         const availCallback = (item: MenuItemProps): boolean => (
             props.isAvailableItem?.(item, state) ?? true
         );
@@ -446,9 +455,11 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
     listProps.itemSelector = listProps.components?.ListItem?.selector ?? null;
 
-    const menuList = List && (
-        <List {...listProps} />
-    );
+    const menuList = useMemo(() => (
+        List && (
+            <List {...listProps} />
+        )
+    ), [state.items, state.activeItem]);
 
     const menuFooter = Footer && (
         <Footer {...(props.footer ?? {})} />
@@ -464,12 +475,12 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         id: props.id,
         className: classNames('menu', className),
         disabled,
-
         onFocusCapture: handleFocus,
         onBlurCapture: handleBlur,
         onTouchStartCapture: handleTouchStart,
         onKeyDownCapture: handleKey,
         onScrollCapture: handleScroll,
+        onContextMenuCapture: handleContextMenu,
     };
 
     if (tabIndex !== null) {

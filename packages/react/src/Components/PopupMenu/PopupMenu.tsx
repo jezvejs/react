@@ -148,7 +148,7 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
     useEmptyClick(
         () => closeMenu(),
-        [elem?.current as Element, reference?.current as Element],
+        [elem, reference],
         state.open,
     );
 

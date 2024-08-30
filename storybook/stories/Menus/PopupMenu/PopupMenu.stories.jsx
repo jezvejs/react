@@ -1,8 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { PopupMenu } from '@jezvejs/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
+import { usePortalElement } from '../../../hooks/usePortalElement.jsx';
 import { MenuButton } from '../../../Components/MenuButton/MenuButton.jsx';
 
 import { getDefaultItems } from './data.js';
@@ -18,9 +19,7 @@ export default {
 };
 
 const PopupMenuDemo = (args) => {
-    const portalElement = useMemo(() => (
-        document.getElementById('custom-root')
-    ), []);
+    const portalElement = usePortalElement();
     const [state, setState] = useState({
         ...args,
         open: false,
