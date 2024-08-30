@@ -701,6 +701,11 @@ export const DropDownContainer = forwardRef<
         toggleMenu();
     };
 
+    const renderNotFound = () => ({
+        selectable: false,
+        content: state.noResultsMessage,
+    });
+
     const onItemClick = (target: DropDownMenuItemProps) => {
         handleItemSelect(target);
     };
@@ -1077,6 +1082,7 @@ export const DropDownContainer = forwardRef<
 
         const menuProps: DropDownMenuProps = {
             ...st,
+            placeholder: null,
             items: st.items ?? [],
             inputRef: inputElem,
             disabled: props.disabled,
@@ -1088,6 +1094,7 @@ export const DropDownContainer = forwardRef<
             tabThrough: false,
             activeItem: activeItem?.id ?? null,
             editable,
+            getPlaceholderProps: renderNotFound,
             onItemClick,
             onInput,
             onDeleteSelectedItem,

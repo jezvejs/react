@@ -166,7 +166,7 @@ export interface DropDownMenuProps extends MenuProps<DropDownMenuHeaderProps> {
     className?: string;
 
     getItemById?: () => void;
-    getPlaceholderProps?: () => void;
+
     onItemActivate: (itemId: string | null) => void;
 
     onItemClick: (
