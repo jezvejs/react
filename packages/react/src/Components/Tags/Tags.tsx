@@ -79,8 +79,6 @@ export function Tags<T extends TagProps = TagProps>(p: TagsProps<T>) {
      * @param {Event} e - click event object
      */
     const onItemClick = (e: React.MouseEvent) => {
-        e?.stopPropagation();
-
         const target = e?.target as HTMLElement;
         const closestElem = getClosestItemElement(target) as HTMLElement;
         const itemId = closestElem?.dataset?.id ?? null;
