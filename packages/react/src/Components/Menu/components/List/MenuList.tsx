@@ -1,4 +1,6 @@
 import classNames from 'classnames';
+import { useMemo } from 'react';
+
 import { getClosestItemElement, getItemSelector } from '../../helpers.ts';
 import {
     MenuGroupHeaderProps,
@@ -6,6 +8,7 @@ import {
     MenuItemProps,
     MenuListProps,
 } from '../../types.ts';
+
 import './MenuList.scss';
 
 const defaultProps = {
@@ -97,7 +100,7 @@ export const MenuList = (p: MenuListProps) => {
         state.getPlaceholderProps?.(state) ?? state.placeholder ?? {}
     );
 
-    const containerProps = {
+    const containerProps = useMemo(() => ({
         className: classNames(
             'menu-list',
             {
@@ -111,23 +114,28 @@ export const MenuList = (p: MenuListProps) => {
         onMouseLeave,
         onMouseOver: onMouseEnter,
         onMouseOut: onMouseLeave,
-    };
+    }), [props.beforeContent, props.afterContent, props.className]);
 
-    const placeholderProps = (props.items.length === 0)
-        ? getPlaceholderProps(props)
-        : {};
+    const placeholderProps = useMemo(() => (
+        (props.items.length === 0)
+            ? getPlaceholderProps(props)
+            : {}
+    ), [props.items, props.placeholder, props.getPlaceholderProps]);
+
+    const listContent = useMemo(() => (
+        (props.items.length > 0)
+            ? props.items.map((item) => (
+                <ItemComponent
+                    {...itemProps(item, props)}
+                    key={item.id}
+                />
+            ))
+            : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
+    ), [props.items]);
 
     return (
         <div {...containerProps}>
-            {(props.items.length > 0)
-                ? props.items.map((item) => (
-                    <ItemComponent
-                        {...itemProps(item, props)}
-                        key={item.id}
-                    />
-                ))
-                : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
-            }
+            {listContent}
         </div>
     );
 };
