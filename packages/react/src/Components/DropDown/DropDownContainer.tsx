@@ -937,6 +937,7 @@ export const DropDownContainer = forwardRef<
             e.preventDefault();
 
             activateItem(newItem.id);
+            setActive(newItem.id);
         }
 
         if (focusInput) {
