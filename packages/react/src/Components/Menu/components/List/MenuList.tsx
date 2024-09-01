@@ -36,6 +36,10 @@ export const MenuList = (p: MenuListProps) => {
         return closestElem?.dataset?.id ?? null;
     };
 
+    /**
+     * 'click' event handler
+     * @param {React.MouseEvent} e
+     */
     const onClick = (e: React.MouseEvent) => {
         e?.stopPropagation();
 
@@ -47,11 +51,19 @@ export const MenuList = (p: MenuListProps) => {
         props.onItemClick?.(itemId, e);
     };
 
+    /**
+     * 'mouseenter' and 'mouseover' events handler
+     * @param {React.MouseEvent} e
+     */
     const onMouseEnter = (e: React.MouseEvent) => {
         const itemId = getItemIdByElem(e?.target as HTMLElement);
         props.onMouseEnter?.(itemId, e);
     };
 
+    /**
+     * 'mouseleave' and 'mouseout' events handler
+     * @param {React.MouseEvent} e
+     */
     const onMouseLeave = (e: React.MouseEvent) => {
         const itemId = getItemIdByElem(e?.relatedTarget as HTMLElement);
         props.onMouseLeave?.(itemId, e);

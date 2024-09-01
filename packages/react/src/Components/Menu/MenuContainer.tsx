@@ -98,7 +98,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         ))
     );
 
-    const handleFocus = (e: React.FocusEvent) => {
+    /**
+     * Captured 'focus' event handler
+     * @param {React.FocusEvent} e
+     */
+    const onFocus = (e: React.FocusEvent) => {
         const target = e?.target as HTMLElement;
         if (innerRef?.current === target) {
             return;
@@ -112,7 +116,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setActive(itemId);
     };
 
-    const handleBlur = (e: React.FocusEvent) => {
+    /**
+     * Captured 'blur' event handler
+     * @param {React.FocusEvent} e
+     */
+    const onBlur = (e: React.FocusEvent) => {
         if (!innerRef?.current) {
             return;
         }
@@ -123,7 +131,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setActive(null);
     };
 
-    const handleTouchStart = (e: React.TouchEvent) => {
+    /**
+     * Captured 'touchstart' event handler
+     * @param {React.FocusEvent} e
+     */
+    const onTouchStart = (e: React.TouchEvent) => {
         if (e.touches) {
             disableTouch();
         }
@@ -175,7 +187,12 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
     };
 
-    const handleMouseEnter = (itemId: string | null, e: React.MouseEvent) => {
+    /**
+     * 'mouseenter' and 'mouseover' events handler
+     * @param {string | null} itemId
+     * @param {React.MouseEvent} e
+     */
+    const onMouseEnter = (itemId: string | null, e: React.MouseEvent) => {
         const st = getState() as MenuState;
         if (
             st.ignoreTouch
@@ -207,7 +224,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         activateItem(itemId);
     };
 
-    const handleMouseLeave = (relItemId?: string | null) => {
+    /**
+     * 'mouseleave' and 'mouseout' events handler
+     * @param relItemId
+     */
+    const onMouseLeave = (relItemId?: string | null) => {
         const st = getState() as MenuState;
         if (
             st.activeItem === null
@@ -232,13 +253,13 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const st = getState() as MenuState;
         if (st.ignoreTouch) {
             setTimeout(() => {
-                handleMouseLeave();
+                onMouseLeave();
                 enableTouch();
             });
         }
     };
 
-    const handleContextMenu = (e: React.MouseEvent) => {
+    const onContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
         cancelClick();
     };
@@ -247,7 +268,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const st = getState() as MenuState;
         if (st.ignoreTouch) {
             setTimeout(() => {
-                handleMouseLeave();
+                onMouseLeave();
                 enableTouch();
                 callback();
             });
@@ -264,7 +285,12 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setState((prev: MenuState) => toggleSelectItem(prev, itemId));
     };
 
-    const handleItemClick = (
+    /**
+     * Item click event handler
+     * @param itemId
+     * @param e
+     */
+    const onItemClick = (
         itemId: string | null,
         e: React.MouseEvent | React.KeyboardEvent<Element>,
     ) => {
@@ -321,7 +347,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         finishClick(() => props.onItemClick?.(clickedItem, e));
     };
 
-    const handleKey = (e: React.KeyboardEvent) => {
+    const onKeyDown = (e: React.KeyboardEvent) => {
         const st = getState() as MenuState;
 
         const availCallback = (item: MenuItemProps): boolean => (
@@ -376,14 +402,14 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
         if (e.key === 'Enter') {
             if (st.activeItem) {
-                handleItemClick(st.activeItem, e);
+                onItemClick(st.activeItem, e);
             }
 
             e.preventDefault();
         }
     };
 
-    const handleScroll = () => {
+    const onScroll = () => {
     };
 
     useEffect(() => {
@@ -464,9 +490,9 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             id: st.id!,
             items: st.items ?? [],
             getItemProps: MenuHelpers.getItemProps,
-            onItemClick: handleItemClick,
-            onMouseEnter: handleMouseEnter,
-            onMouseLeave: handleMouseLeave,
+            onItemClick,
+            onMouseEnter,
+            onMouseLeave,
         };
 
         listProps.itemSelector = listProps.components?.ListItem?.selector ?? null;
@@ -492,12 +518,12 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             id: props.id,
             className: classNames('menu', st.className),
             disabled,
-            onFocusCapture: handleFocus,
-            onBlurCapture: handleBlur,
-            onTouchStartCapture: handleTouchStart,
-            onKeyDownCapture: handleKey,
-            onScrollCapture: handleScroll,
-            onContextMenuCapture: handleContextMenu,
+            onFocusCapture: onFocus,
+            onBlurCapture: onBlur,
+            onTouchStartCapture: onTouchStart,
+            onKeyDownCapture: onKeyDown,
+            onScrollCapture: onScroll,
+            onContextMenuCapture: onContextMenu,
             tabIndex: tabIndex ?? -1,
         };
 
