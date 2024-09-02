@@ -425,14 +425,11 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
         disabled: item.disabled || state.disabled,
         checkboxSide: item.checkboxSide || state.checkboxSide,
         renderNotSelected: item.renderNotSelected || state.renderNotSelected,
-        activeItem: state.activeItem,
         tabThrough: state.tabThrough,
         type: item.type ?? state.defaultItemType,
         beforeContent: item.beforeContent || state.beforeContent,
         afterContent: item.afterContent || state.afterContent,
-        components: {
-            Check: state.components.Check!,
-        },
+        components: state.components,
     };
 
     return res;
@@ -556,7 +553,6 @@ export const getInitialState = (
     const res: MenuState = {
         ...(defProps ?? {}),
         ...props,
-        activeItem: null,
         ignoreTouch: false,
         components: {
             ...(defProps?.components ?? {}),

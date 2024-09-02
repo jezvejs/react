@@ -1,4 +1,4 @@
-import { FunctionComponent, SVGProps } from 'react';
+import { FunctionComponent, memo, SVGProps } from 'react';
 import classNames from 'classnames';
 import {
     MenuItemComponent,
@@ -30,7 +30,8 @@ const defaultProps = {
 /**
  * MenuItem component
  */
-export const MenuItem: MenuItemComponent = (p: MenuItemProps) => {
+// eslint-disable-next-line react/display-name
+export const MenuItem: MenuItemComponent = memo<MenuItemProps>((p: MenuItemProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -48,7 +49,6 @@ export const MenuItem: MenuItemComponent = (p: MenuItemProps) => {
         url,
         iconAlign,
         checkboxSide,
-        activeItem,
         before,
         after,
     } = props;
@@ -65,7 +65,7 @@ export const MenuItem: MenuItemComponent = (p: MenuItemProps) => {
                 'link-menu-item': isLink,
                 'checkbox-menu-item': isCheckbox,
                 'menu-item_selected': !!props.selected,
-                'menu-item_active': (activeItem && props.id === activeItem),
+                'menu-item_active': !!props.active,
             },
             className,
         ),
@@ -139,6 +139,6 @@ export const MenuItem: MenuItemComponent = (p: MenuItemProps) => {
             {content}
         </button>
     );
-};
+});
 
 MenuItem.selector = '.menu-item';

@@ -4,7 +4,7 @@ import {
     ReactNode,
     SetStateAction,
 } from 'react';
-import { StoreDispatchFunction } from '../../utils/Store/Store.ts';
+import { StoreDispatchFunction, StoreReducersList } from '../../utils/Store/Store.ts';
 
 export type MenuItemContentAlign = 'left' | 'right';
 
@@ -87,9 +87,7 @@ export interface MenuItemProps {
     icon?: ComponentType;
     items?: MenuItemProps[];
 
-    components?: {
-        Check: ComponentType | null;
-    };
+    components?: MenuCommonComponents;
 }
 
 /**
@@ -174,9 +172,16 @@ export interface MenuPlaceholderProps {
 
 export type MenuPlaceholderComponent = React.FC<MenuPlaceholderProps>;
 
-export type MenuItemComponent = React.FC<MenuItemProps> & { selector: string; };
+type WithSelector = {
+    selector?: string;
+};
 
-export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & { selector: string; };
+export type MenuItemComponent = (
+    (React.FC<MenuItemProps> & WithSelector)
+    | (React.MemoExoticComponent<React.FC<MenuItemProps>> & WithSelector)
+);
+
+export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & WithSelector;
 
 /**
  * Menu group header component
@@ -186,7 +191,7 @@ export interface MenuGroupHeaderProps {
     className?: string;
 }
 
-export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & { selector: string; };
+export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & WithSelector;
 
 export interface MenuCommonComponents {
     List?: ComponentType<MenuListProps>;
@@ -254,6 +259,9 @@ export interface MenuProps<
     /* Identified or active menu item */
     activeItem: string | null;
 
+    /* Additional reducers */
+    reducers?: StoreReducersList | null;
+
     /* Props to pass to Header component */
     header?: HeaderProps | null;
     /* Props to pass to Footer component */
@@ -292,17 +300,14 @@ export interface MenuState extends MenuProps {
 /**
  * Attributes of Menu component root element
  */
-export interface MenuAttrs {
-    id?: string;
-    className?: string;
+export interface MenuAttrs extends React.HTMLAttributes<HTMLDivElement> {
     disabled?: boolean;
-    tabIndex?: number;
     'data-parent'?: string;
 
-    onFocusCapture: (e: React.FocusEvent) => void;
-    onBlurCapture: (e: React.FocusEvent) => void;
-    onTouchStartCapture: (e: React.TouchEvent) => void;
-    onKeyDownCapture: (e: React.KeyboardEvent) => void;
-    onScrollCapture: (e: React.UIEvent) => void;
-    onContextMenuCapture: (e: React.MouseEvent) => void;
+    onFocusCapture?: (e: React.FocusEvent) => void;
+    onBlurCapture?: (e: React.FocusEvent) => void;
+    onTouchStartCapture?: (e: React.TouchEvent) => void;
+    onKeyDownCapture?: (e: React.KeyboardEvent) => void;
+    onScrollCapture?: (e: React.UIEvent) => void;
+    onContextMenuCapture?: (e: React.MouseEvent) => void;
 }

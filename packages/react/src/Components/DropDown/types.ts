@@ -18,6 +18,10 @@ import { CloseButtonProps } from '../CloseButton/CloseButton.tsx';
 import { ButtonProps } from '../Button/Button.tsx';
 import { TagsProps } from '../Tags/Tags.tsx';
 
+type WithSelector = {
+    selector?: string;
+};
+
 /**
  * Combo box MultiSelectionItem component
  */
@@ -90,9 +94,10 @@ export type DropDownNativeSelectComponent = React.ForwardRefExoticComponent<
  * Menu item component
  */
 export type DropDownMenuItemProps = MenuItemProps;
-export type DropDownMenuItemComponent = React.FC<DropDownMenuItemProps> & {
-    selector: string;
-};
+export type DropDownMenuItemComponent = (
+    (React.FC<DropDownMenuItemProps> & WithSelector)
+    | (React.MemoExoticComponent<React.FC<DropDownMenuItemProps>> & WithSelector)
+);
 
 /**
  * Menu group header component
@@ -102,17 +107,13 @@ export interface DropDownGroupHeaderProps {
     className?: string,
 }
 
-export type DropDownGroupHeaderComponent = React.FC<DropDownGroupHeaderProps> & {
-    selector: string;
-};
+export type DropDownGroupHeaderComponent = React.FC<DropDownGroupHeaderProps> & WithSelector;
 
 /**
  * Menu group item component
  */
 export type DropDownGroupItemProps = MenuGroupItemProps;
-export type DropDownGroupItemComponent = React.FC<DropDownGroupItemProps> & {
-    selector: string;
-};
+export type DropDownGroupItemComponent = React.FC<DropDownGroupItemProps> & WithSelector;
 
 /**
  * Menu header component
@@ -444,6 +445,7 @@ export interface DropDownProps {
 
 export interface DropDownState extends DropDownProps {
     active: boolean;
+    activeItem?: string | null;
     changed: boolean;
     visible: boolean;
     inputString: string | null;

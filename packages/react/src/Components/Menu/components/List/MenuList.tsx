@@ -1,4 +1,6 @@
 import classNames from 'classnames';
+import { useCallback, useMemo } from 'react';
+
 import { getClosestItemElement, getItemSelector } from '../../helpers.ts';
 import {
     MenuGroupHeaderProps,
@@ -6,6 +8,7 @@ import {
     MenuItemProps,
     MenuListProps,
 } from '../../types.ts';
+
 import './MenuList.scss';
 
 const defaultProps = {
@@ -33,7 +36,11 @@ export const MenuList = (p: MenuListProps) => {
         return closestElem?.dataset?.id ?? null;
     };
 
-    const onClick = (e: React.MouseEvent) => {
+    /**
+     * 'click' event handler
+     * @param {React.MouseEvent} e
+     */
+    const onClick = useCallback((e: React.MouseEvent) => {
         e?.stopPropagation();
 
         const itemId = getItemIdByElem(e?.target as HTMLElement);
@@ -42,19 +49,27 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         props.onItemClick?.(itemId, e);
-    };
+    }, []);
 
-    const onMouseEnter = (e: React.MouseEvent) => {
+    /**
+     * 'mouseenter' and 'mouseover' events handler
+     * @param {React.MouseEvent} e
+     */
+    const onMouseEnter = useCallback((e: React.MouseEvent) => {
         const itemId = getItemIdByElem(e?.target as HTMLElement);
         props.onMouseEnter?.(itemId, e);
-    };
+    }, []);
 
-    const onMouseLeave = (e: React.MouseEvent) => {
+    /**
+     * 'mouseleave' and 'mouseout' events handler
+     * @param {React.MouseEvent} e
+     */
+    const onMouseLeave = useCallback((e: React.MouseEvent) => {
         const itemId = getItemIdByElem(e?.relatedTarget as HTMLElement);
         props.onMouseLeave?.(itemId, e);
-    };
+    }, []);
 
-    const ItemComponent = (item: MenuItemProps) => {
+    const ItemComponent = useCallback((item: MenuItemProps) => {
         const {
             ListItem,
             Separator,
@@ -87,7 +102,7 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         return ListItem && <ListItem {...item} />;
-    };
+    }, []);
 
     const itemProps = (item: MenuItemProps, state: MenuListProps) => (
         state.getItemProps?.(item, state) ?? item
@@ -97,7 +112,7 @@ export const MenuList = (p: MenuListProps) => {
         state.getPlaceholderProps?.(state) ?? state.placeholder ?? {}
     );
 
-    const containerProps = {
+    const containerProps = useMemo(() => ({
         className: classNames(
             'menu-list',
             {
@@ -111,23 +126,28 @@ export const MenuList = (p: MenuListProps) => {
         onMouseLeave,
         onMouseOver: onMouseEnter,
         onMouseOut: onMouseLeave,
-    };
+    }), [props.beforeContent, props.afterContent, props.className]);
 
-    const placeholderProps = (props.items.length === 0)
-        ? getPlaceholderProps(props)
-        : {};
+    const placeholderProps = useMemo(() => (
+        (props.items.length === 0)
+            ? getPlaceholderProps(props)
+            : {}
+    ), [props.items, props.placeholder, props.getPlaceholderProps]);
+
+    const listContent = useMemo(() => (
+        (props.items.length > 0)
+            ? props.items.map((item) => (
+                <ItemComponent
+                    {...itemProps(item, props)}
+                    key={item.id}
+                />
+            ))
+            : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
+    ), [props.items, props.activeItem, placeholderProps]);
 
     return (
         <div {...containerProps}>
-            {(props.items.length > 0)
-                ? props.items.map((item) => (
-                    <ItemComponent
-                        {...itemProps(item, props)}
-                        key={item.id}
-                    />
-                ))
-                : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
-            }
+            {listContent}
         </div>
     );
 };
