@@ -87,9 +87,7 @@ export interface MenuItemProps {
     icon?: ComponentType;
     items?: MenuItemProps[];
 
-    components?: {
-        Check: ComponentType | null;
-    };
+    components?: MenuCommonComponents;
 }
 
 /**
@@ -174,9 +172,16 @@ export interface MenuPlaceholderProps {
 
 export type MenuPlaceholderComponent = React.FC<MenuPlaceholderProps>;
 
-export type MenuItemComponent = React.FC<MenuItemProps> & { selector: string; };
+type WithSelector = {
+    selector?: string;
+};
 
-export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & { selector: string; };
+export type MenuItemComponent = (
+    (React.FC<MenuItemProps> & WithSelector)
+    | (React.MemoExoticComponent<React.FC<MenuItemProps>> & WithSelector)
+);
+
+export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & WithSelector;
 
 /**
  * Menu group header component
@@ -186,7 +191,7 @@ export interface MenuGroupHeaderProps {
     className?: string;
 }
 
-export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & { selector: string; };
+export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & WithSelector;
 
 export interface MenuCommonComponents {
     List?: ComponentType<MenuListProps>;

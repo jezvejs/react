@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { getClosestItemElement, getItemSelector } from '../../helpers.ts';
 import {
@@ -40,7 +40,7 @@ export const MenuList = (p: MenuListProps) => {
      * 'click' event handler
      * @param {React.MouseEvent} e
      */
-    const onClick = (e: React.MouseEvent) => {
+    const onClick = useCallback((e: React.MouseEvent) => {
         e?.stopPropagation();
 
         const itemId = getItemIdByElem(e?.target as HTMLElement);
@@ -49,27 +49,27 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         props.onItemClick?.(itemId, e);
-    };
+    }, []);
 
     /**
      * 'mouseenter' and 'mouseover' events handler
      * @param {React.MouseEvent} e
      */
-    const onMouseEnter = (e: React.MouseEvent) => {
+    const onMouseEnter = useCallback((e: React.MouseEvent) => {
         const itemId = getItemIdByElem(e?.target as HTMLElement);
         props.onMouseEnter?.(itemId, e);
-    };
+    }, []);
 
     /**
      * 'mouseleave' and 'mouseout' events handler
      * @param {React.MouseEvent} e
      */
-    const onMouseLeave = (e: React.MouseEvent) => {
+    const onMouseLeave = useCallback((e: React.MouseEvent) => {
         const itemId = getItemIdByElem(e?.relatedTarget as HTMLElement);
         props.onMouseLeave?.(itemId, e);
-    };
+    }, []);
 
-    const ItemComponent = (item: MenuItemProps) => {
+    const ItemComponent = useCallback((item: MenuItemProps) => {
         const {
             ListItem,
             Separator,
@@ -102,7 +102,7 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         return ListItem && <ListItem {...item} />;
-    };
+    }, []);
 
     const itemProps = (item: MenuItemProps, state: MenuListProps) => (
         state.getItemProps?.(item, state) ?? item
@@ -143,7 +143,7 @@ export const MenuList = (p: MenuListProps) => {
                 />
             ))
             : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
-    ), [props.items]);
+    ), [props.items, props.activeItem, placeholderProps]);
 
     return (
         <div {...containerProps}>

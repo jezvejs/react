@@ -299,6 +299,7 @@ export const DropDownContainer = forwardRef<
     /** Hides menu if visible and send 'change' event */
     const closeMenu = () => {
         showMenu(false);
+        setActive(null);
         sendChangeEvent();
     };
 
@@ -824,7 +825,7 @@ export const DropDownContainer = forwardRef<
         if (item.type === 'group' && state.allowActiveGroupHeader) {
             const { GroupHeader } = state.components;
             const selector = GroupHeader?.selector ?? null;
-            const groupHeader = itemEl?.querySelector(selector) as HTMLElement;
+            const groupHeader = (selector) ? itemEl?.querySelector(selector) as HTMLElement : null;
             groupHeader?.focus(focusOptions);
         } else {
             itemEl.focus(focusOptions);
@@ -888,19 +889,17 @@ export const DropDownContainer = forwardRef<
         } else if (e.code === 'ArrowDown') {
             const availItems = getAvailableItems(state);
 
-            if (!state.visible && !activeItem) {
+            if (!state.visible) {
                 showMenu(true);
                 focusInput = true;
                 [newItem] = availItems;
-            } else if (state.visible) {
-                if (activeItem) {
-                    newItem = getNextAvailableItem(activeItem.id, state);
-                    if (props.loopNavigation && !newItem) {
-                        [newItem] = availItems;
-                    }
-                } else if (availItems.length > 0) {
+            } else if (activeItem) {
+                newItem = getNextAvailableItem(activeItem.id, state);
+                if (props.loopNavigation && !newItem) {
                     [newItem] = availItems;
                 }
+            } else if (availItems.length > 0) {
+                [newItem] = availItems;
             }
         } else if (e.code === 'ArrowUp') {
             const availItems = getAvailableItems(state);
@@ -1126,7 +1125,7 @@ export const DropDownContainer = forwardRef<
         return st.visible && (
             <Menu {...menuProps} ref={elementRef} />
         );
-    }, [state.items, state.visible, state.inputString]);
+    }, [state.items, state.activeItem, state.visible, state.inputString]);
 
     // Menu popup
     const container = props.container ?? document.body;

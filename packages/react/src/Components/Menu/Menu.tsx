@@ -64,7 +64,7 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
     const initialState = useMemo(() => (
         getInitialState(props, defaultProps)
-    ), []);
+    ), [props]);
 
     return (
         <StoreProvider

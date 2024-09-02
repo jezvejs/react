@@ -4,6 +4,7 @@ import {
     useImperativeHandle,
     useEffect,
     useMemo,
+    useCallback,
 } from 'react';
 import classNames from 'classnames';
 
@@ -87,16 +88,25 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setState((prev: MenuState) => ({ ...prev, ignoreTouch: false }))
     );
 
-    const setActive = (itemId: string | null) => (
+    const setActive = (itemId: string | null) => {
         setState((prev: MenuState) => (
             (prev.activeItem === itemId)
                 ? prev
                 : {
                     ...prev,
+                    items: mapItems(
+                        prev.items ?? [],
+                        (item) => (
+                            (item.active !== (item.id === itemId))
+                                ? { ...item, active: !item.active }
+                                : item
+                        ),
+                        { includeGroupItems: prev.allowActiveGroupHeader },
+                    ),
                     activeItem: itemId,
                 }
-        ))
-    );
+        ));
+    };
 
     /**
      * Captured 'focus' event handler
@@ -192,7 +202,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param {string | null} itemId
      * @param {React.MouseEvent} e
      */
-    const onMouseEnter = (itemId: string | null, e: React.MouseEvent) => {
+    const onMouseEnter = useCallback((itemId: string | null, e: React.MouseEvent) => {
         const st = getState() as MenuState;
         if (
             st.ignoreTouch
@@ -214,7 +224,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             const target = e?.target as HTMLElement;
 
             const { GroupHeader } = st.components ?? {};
-            if (GroupHeader && !target.closest(GroupHeader?.selector)) {
+            if (
+                GroupHeader
+                && GroupHeader?.selector
+                && !target.closest(GroupHeader?.selector)
+            ) {
                 return;
             }
         }
@@ -222,13 +236,13 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setActive(itemId);
 
         activateItem(itemId);
-    };
+    }, []);
 
     /**
      * 'mouseleave' and 'mouseout' events handler
      * @param relItemId
      */
-    const onMouseLeave = (relItemId?: string | null) => {
+    const onMouseLeave = useCallback((relItemId?: string | null) => {
         const st = getState() as MenuState;
         if (
             st.activeItem === null
@@ -247,7 +261,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         if (innerRef.current.contains(focused)) {
             innerRef.current.focus({ preventScroll: true });
         }
-    };
+    }, []);
 
     const cancelClick = () => {
         const st = getState() as MenuState;
@@ -290,7 +304,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param itemId
      * @param e
      */
-    const onItemClick = (
+    const onItemClick = useCallback((
         itemId: string | null,
         e: React.MouseEvent | React.KeyboardEvent<Element>,
     ) => {
@@ -345,7 +359,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         toggleItem(itemId);
 
         finishClick(() => props.onItemClick?.(clickedItem, e));
-    };
+    }, []);
 
     const onKeyDown = (e: React.KeyboardEvent) => {
         const st = getState() as MenuState;
@@ -478,6 +492,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         <Header {...(props.header ?? {})} />
     );
 
+    const state = getState() as MenuState;
     const menuList = useMemo(() => {
         const st = getState() as MenuState;
 
@@ -500,7 +515,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         return List && (
             <List {...listProps} />
         );
-    }, [props.items, props.activeItem]);
+    }, [state.items, state.activeItem]);
 
     const menuFooter = Footer && (
         <Footer {...(props.footer ?? {})} />

@@ -1,12 +1,16 @@
 import classNames from 'classnames';
+import { memo } from 'react';
+
 import { MenuItem } from '../../../../Menu/Menu.tsx';
+import { MenuItemComponent } from '../../../../Menu/types.ts';
 import { DropDownMenuItemProps } from '../../../types.ts';
 
 const defaultProps = {
     hidden: false,
 };
 
-export const DropDownListItem = (p: DropDownMenuItemProps) => {
+// eslint-disable-next-line react/display-name
+export const DropDownListItem: MenuItemComponent = memo((p: DropDownMenuItemProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -18,6 +22,6 @@ export const DropDownListItem = (p: DropDownMenuItemProps) => {
             className={classNames('dd__list-item', props.className)}
         />
     );
-};
+});
 
 DropDownListItem.selector = MenuItem.selector;

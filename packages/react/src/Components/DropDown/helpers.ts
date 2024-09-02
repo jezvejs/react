@@ -277,6 +277,8 @@ export const getNextAvailableItem = (itemId: string, state: DropDownState) => (
 export const getActiveItem = (state: DropDownState) => (
     MenuHelpers.findMenuItem<DropDownMenuItemProps>(
         state.items ?? [],
-        (item: DropDownMenuItemProps) => !!item?.active,
+        (item: DropDownMenuItemProps) => (
+            item?.id === state.activeItem
+        ),
     )
 );

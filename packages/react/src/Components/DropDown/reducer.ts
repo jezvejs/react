@@ -125,6 +125,7 @@ const slice = createSlice({
         visible: !state.visible,
         inputString: (!state.visible) ? state.inputString : null,
         active: (!state.visible) ? true : state.active,
+        activeItem: null,
         items: (
             (!state.visible)
                 ? state.items
@@ -140,6 +141,7 @@ const slice = createSlice({
                 visible,
                 inputString: (visible) ? state.inputString : null,
                 active: (visible) ? true : state.active,
+                activeItem: (visible) ? state.activeItem : null,
                 items: (
                     (visible)
                         ? state.items
@@ -158,6 +160,7 @@ const slice = createSlice({
         ...state,
         active: !state.active,
         actSelItemIndex: -1,
+        activeItem: null,
         filtered: false,
         inputString: null,
         items: deactivateAllItems(state.items ?? []),
