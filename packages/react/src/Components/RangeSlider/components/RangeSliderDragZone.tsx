@@ -1,4 +1,3 @@
-import { getOffset } from '@jezvejs/dom';
 import {
     forwardRef,
     useEffect,
@@ -10,6 +9,7 @@ import {
 import { minmax } from '../../../utils/common.ts';
 import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
+import { DragAvatarInitParam, DragZone, OnDragStartParams } from '../../../utils/DragnDrop/types.ts';
 import { StoreUpdater } from '../../../utils/Store/Store.ts';
 
 // Local components
@@ -25,7 +25,6 @@ import {
     RangeSliderValueSliderProps,
     RangeSliderValueSliderType,
 } from '../types.ts';
-import { DragAvatarInitParam, DragZone, OnDragStartParams } from '../../../utils/DragnDrop/types.ts';
 
 // eslint-disable-next-line react/display-name
 export const RangeSliderDragZone = forwardRef<
@@ -72,10 +71,7 @@ export const RangeSliderDragZone = forwardRef<
                         const sliderState = getState()[sliderId];
                         return {
                             id: props.id,
-                            mouseShift: {
-                                x: sliderState.shiftX,
-                                y: sliderState.shiftY,
-                            },
+                            mouseShift: { ...sliderState.shift },
                         };
                     },
 
@@ -89,21 +85,37 @@ export const RangeSliderDragZone = forwardRef<
                             return false;
                         }
 
-                        const offset = getOffset(innerRef.current);
+                        const original = {
+                            left: innerRef.current.offsetLeft,
+                            top: innerRef.current.offsetTop,
+                        };
 
                         const rect = innerRef.current.getBoundingClientRect();
-                        const offsetRect = innerRef.current?.offsetParent?.getBoundingClientRect();
+                        const shift = {
+                            x: downX - rect.left,
+                            y: downY - rect.top,
+                        };
+
+                        const { offsetParent } = innerRef.current;
+                        const border = {
+                            left: offsetParent?.clientLeft ?? 0,
+                            top: offsetParent?.clientTop ?? 0,
+                        };
+
+                        const offsetRect = offsetParent?.getBoundingClientRect();
+                        const offset = {
+                            top: offsetRect?.top ?? 0,
+                            left: offsetRect?.left ?? 0,
+                        };
 
                         setState((prev: RangeSliderState) => ({
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
-                                origLeft: innerRef.current?.offsetLeft ?? 0,
-                                origTop: innerRef.current?.offsetTop ?? 0,
-                                shiftX: downX - offset.left,
-                                shiftY: downY - offset.top,
-                                rect,
-                                offset: offsetRect,
+                                original,
+                                shift,
+                                offset,
+                                border,
                             },
                         }));
 
@@ -115,16 +127,14 @@ export const RangeSliderDragZone = forwardRef<
 
                         const state = getState();
                         const currentState = state[sliderId];
+                        const { offset, shift, border } = currentState;
 
                         const pos = (props.axis === 'x')
-                            ? (client.x - currentState.offset.left - currentState.shiftX)
-                            : (client.y - currentState.offset.top - currentState.shiftY);
+                            ? (client.x - offset.left - shift.x - border.left)
+                            : (client.y - offset.top - shift.y - border.top);
 
                         const { maxPos } = state;
                         const newPos = minmax(0, maxPos, pos);
-
-                        const rect = innerRef.current?.getBoundingClientRect();
-                        const offsetRect = innerRef.current?.offsetParent?.getBoundingClientRect();
 
                         setState((prev: RangeSliderState) => ({
                             ...prev,
@@ -132,8 +142,6 @@ export const RangeSliderDragZone = forwardRef<
                                 ...prev[sliderId],
                                 left: (props.axis === 'x') ? newPos : prev[sliderId].left,
                                 top: (props.axis === 'y') ? newPos : prev[sliderId].top,
-                                rect,
-                                offset: offsetRect,
                             },
                             dragging: true,
                             draggingId: props.id,
@@ -156,8 +164,7 @@ export const RangeSliderDragZone = forwardRef<
                             ...prev,
                             [sliderId]: {
                                 ...prev[sliderId],
-                                left: prev[sliderId].origLeft,
-                                top: prev[sliderId].origTop,
+                                ...prev[sliderId].original,
                             },
                             dragging: false,
                         }));

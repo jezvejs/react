@@ -355,10 +355,11 @@ export const RangeSliderContainer = forwardRef<
             onKeyDownCapture={onKey}
             ref={innerRef}
         >
-            <div className="range-slider__area" ref={sliderAreaRef}></div>
-            {sliderBeforeArea}
-            {sliderAfterArea}
-            {sliderSelectedArea}
+            <div className="range-slider__area" ref={sliderAreaRef}>
+                {sliderBeforeArea}
+                {sliderAfterArea}
+                {sliderSelectedArea}
+            </div>
             {slider}
             {endSlider}
         </RangeSliderDropTarget>
