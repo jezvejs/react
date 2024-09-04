@@ -2,7 +2,7 @@
 import '@jezvejs/react/style';
 import { Menu } from '@jezvejs/react';
 
-import { initItems } from '../../../utils/utils.js';
+import { initItems } from '../../../common/utils/utils.js';
 
 // Local components
 import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.jsx';

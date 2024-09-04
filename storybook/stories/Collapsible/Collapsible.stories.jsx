@@ -3,9 +3,9 @@ import '@jezvejs/react/style';
 import { useState } from 'react';
 import { Button, Collapsible } from '@jezvejs/react';
 
-import EditIcon from '../../assets/icons/edit.svg';
-import DeleteIcon from '../../assets/icons/del.svg';
-import ToggleIcon from '../../assets/icons/toggle.svg';
+import EditIcon from '../../common/assets/icons/edit.svg';
+import DeleteIcon from '../../common/assets/icons/del.svg';
+import ToggleIcon from '../../common/assets/icons/toggle.svg';
 
 import './Collapsible.stories.scss';
 

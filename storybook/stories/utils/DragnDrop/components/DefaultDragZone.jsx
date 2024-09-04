@@ -7,7 +7,7 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 
-import { usePortalElement } from '../../../../hooks/usePortalElement.jsx';
+import { usePortalElement } from '../../../../common/hooks/usePortalElement.jsx';
 
 import { Box } from './Box.jsx';
 import { OriginalDragAvatar } from './OriginalDragAvatar.jsx';

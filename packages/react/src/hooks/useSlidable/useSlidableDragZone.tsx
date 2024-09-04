@@ -105,7 +105,11 @@ export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
                         left: dragZoneEl.offsetLeft,
                         top: dragZoneEl.offsetTop,
                     };
-                    const position = getPositionForCoordinates(coord);
+                    const shift = {
+                        shiftX: coord.x - offset.left,
+                        shiftY: coord.y - offset.top,
+                    };
+                    const position = getPositionForCoordinates(coord, shift);
                     const lastTime = e.timeStamp;
 
                     setState((prev) => ({
@@ -113,8 +117,7 @@ export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
                         rect,
                         startPoint: { x: downX, y: downY },
                         moved: false,
-                        shiftX: coord.x - offset.left,
-                        shiftY: coord.y - offset.top,
+                        ...shift,
                         position,
                         origPosition: position,
                         totalDistance: 0,

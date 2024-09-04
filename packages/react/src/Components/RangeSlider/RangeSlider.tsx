@@ -41,18 +41,13 @@ export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, 
     const defaultOffset = {
         top: 0,
         left: 0,
-        width: 0,
-        height: 0,
     };
     const commonSliderProps = {
-        origTop: 0,
-        origLeft: 0,
-        top: 0,
-        left: 0,
-        shiftX: 0,
-        shiftY: 0,
+        ...defaultOffset,
+        original: { ...defaultOffset },
+        shift: { x: 0, y: 0 },
+        border: { ...defaultOffset },
         offset: { ...defaultOffset },
-        rect: { ...defaultOffset },
     };
 
     const initialState: RangeSliderState = {

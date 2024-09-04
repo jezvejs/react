@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { DropDown } from '@jezvejs/react';
+import { usePortalElement } from '../../../../../common/hooks/usePortalElement.jsx';
 import { BlueBox } from '../BlueBox/BlueBox.jsx';
-import { usePortalElement } from '../../../../../hooks/usePortalElement.jsx';
 
 export const AttachedToBlock = ({
     boxId = 'box',

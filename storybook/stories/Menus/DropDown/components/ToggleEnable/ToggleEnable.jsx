@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DropDown } from '@jezvejs/react';
-import { ActionButton } from '../../../../../Components/ActionButton/ActionButton.jsx';
-import { SectionControls } from '../../../../../Components/SectionControls/SectionControls.jsx';
+import { ActionButton } from '../../../../../common/Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../../../common/Components/SectionControls/SectionControls.jsx';
 
 export const ToggleEnable = (args) => {
     const [state, setState] = useState({

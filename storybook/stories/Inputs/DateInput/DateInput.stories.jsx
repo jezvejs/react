@@ -2,7 +2,7 @@
 import '@jezvejs/react/style';
 import { DateInput } from '@jezvejs/react';
 import { useState } from 'react';
-import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
+import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.jsx';
 
 const TempInputDecorator = (Story) => (
     <div>

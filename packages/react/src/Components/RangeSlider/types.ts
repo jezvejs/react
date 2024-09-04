@@ -4,24 +4,24 @@ export interface RangeSliderAreaProps {
     top: number;
     left: number;
 
-    origTop: number;
-    origLeft: number;
+    original: {
+        top: number;
+        left: number;
+    };
 
-    shiftX: number;
-    shiftY: number;
+    shift: {
+        x: number;
+        y: number;
+    };
+
+    border: {
+        top: number;
+        left: number;
+    };
 
     offset: {
         top: number;
         left: number;
-        width: number;
-        height: number;
-    };
-
-    rect: {
-        top: number;
-        left: number;
-        width: number;
-        height: number;
     };
 }
 

@@ -2,8 +2,8 @@ import { Slider } from '@jezvejs/react';
 import { useState } from 'react';
 
 // Common components
-import { ActionButton } from '../../../../Components/ActionButton/ActionButton.jsx';
-import { SectionControls } from '../../../../Components/SectionControls/SectionControls.jsx';
+import { ActionButton } from '../../../../common/Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../../common/Components/SectionControls/SectionControls.jsx';
 
 export const ControlledSlider = (args) => {
     const [state, setState] = useState({

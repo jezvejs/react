@@ -71,6 +71,8 @@
     border-radius: var(--rs-area-border-radius);
     background: var(--rs-background);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
   }
 
   .range-slider__selected-area {
@@ -122,10 +124,6 @@
       height: 100%;
     }
 
-    .range-slider__selected-area {
-      margin-left: calc(var(--rs-slider-length) / 2);
-    }
-
     .range-slider__before-area {
       left: 0;
       border-top-left-radius: var(--rs-area-border-radius);
@@ -163,10 +161,6 @@
     .range-slider__after-area {
       left: 0;
       width: 100%;
-    }
-
-    .range-slider__selected-area {
-      margin-top: calc(var(--rs-slider-length) / 2);
     }
 
     .range-slider__before-area {

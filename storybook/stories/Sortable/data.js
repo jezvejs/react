@@ -1,5 +1,5 @@
-import TileCardIcon from '../../assets/icons/tile-card.svg';
-import { initItems } from '../../utils/utils.js';
+import TileCardIcon from '../../common/assets/icons/tile-card.svg';
+import { initItems } from '../../common/utils/utils.js';
 
 export const getTableData = () => ([
     [1, 10000, 'some text'],

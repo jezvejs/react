@@ -1,6 +1,6 @@
 import packageJSON from '@jezvejs/react/package.json';
 import { create } from '@storybook/theming/create';
-import logo from '../assets/images/jezvejs-react.svg';
+import logo from '../common/assets/images/jezvejs-react.svg';
 
 export default create({
     base: 'dark',
