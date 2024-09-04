@@ -115,20 +115,12 @@ export const RangeSliderDragZone = forwardRef<
 
                         const state = getState();
                         const currentState = state[sliderId];
-                        const sliderState = (type !== 'endSlider')
-                            ? state.startSlider
-                            : currentState;
 
                         const pos = (props.axis === 'x')
                             ? (client.x - currentState.offset.left - currentState.shiftX)
                             : (client.y - currentState.offset.top - currentState.shiftY);
 
-                        const maxPos = Math.round(
-                            (props.axis === 'x')
-                                ? (currentState.offset.width - (sliderState.rect?.width ?? 0))
-                                : (currentState.offset.height - (sliderState.rect?.height ?? 0)),
-                        );
-
+                        const { maxPos } = state;
                         const newPos = minmax(0, maxPos, pos);
 
                         const rect = innerRef.current?.getBoundingClientRect();
