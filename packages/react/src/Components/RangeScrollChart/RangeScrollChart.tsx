@@ -183,8 +183,15 @@ export const RangeScrollChart = (props: RangeScrollChartProps) => {
         } else if (scrollLeft > maxScroll) {
             start = 1 - delta;
         } else {
-            start = getSliderStart(state);
-            end = getSliderEnd(state);
+            const sliderState = {
+                ...state,
+                scrollLeft,
+                scrollWidth,
+                scrollerWidth,
+            };
+
+            start = getSliderStart(sliderState);
+            end = getSliderEnd(sliderState);
         }
 
         setState((prev) => ({
@@ -377,6 +384,8 @@ export const RangeScrollChart = (props: RangeScrollChartProps) => {
         className: 'range-scroll-chart__range-slider',
         min: 0,
         max: 1,
+        start: state.start,
+        end: state.end,
         step: null,
         beforeArea: true,
         afterArea: true,

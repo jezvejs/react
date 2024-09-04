@@ -120,7 +120,19 @@ export const BaseChartXAxisLabels = forwardRef<
         return items?.filter((item: BaseChartXAxisLabelProps) => !item.hidden);
     };
 
-    const updateLabels = () => {
+    const cancelLabelsUpdate = () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = 0;
+        }
+    };
+
+    const requestLabelsUpdate = () => {
+        cancelLabelsUpdate();
+        animationFrameRef.current = requestAnimationFrame(() => updateLabels());
+    };
+
+    function updateLabels() {
         let lastOffset: number | null = null;
         const lblMarginLeft = 10;
         const labelsToRemove: string[] = [];
@@ -136,8 +148,12 @@ export const BaseChartXAxisLabels = forwardRef<
             return;
         }
         const filteredItems = getFilteredItems();
-        if (labels.length < filteredItems.length) {
-            animationFrameRef.current = requestAnimationFrame(() => updateLabels());
+
+        if (
+            (labels.length < filteredItems.length)
+            || (props.scrollerWidth === 0)
+        ) {
+            requestLabelsUpdate();
             return;
         }
 
@@ -204,14 +220,7 @@ export const BaseChartXAxisLabels = forwardRef<
             ...prev,
             scrollLeft: props.scrollLeft,
         }));
-    };
-
-    const cancelUpdate = () => {
-        if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = 0;
-        }
-    };
+    }
 
     useEffect(() => {
         if (disabled || !innerRef.current) {
@@ -219,11 +228,9 @@ export const BaseChartXAxisLabels = forwardRef<
         }
 
         initLabels();
+        requestLabelsUpdate();
 
-        cancelUpdate();
-        animationFrameRef.current = requestAnimationFrame(() => updateLabels());
-
-        return () => cancelUpdate();
+        return () => cancelLabelsUpdate();
     }, [
         innerRef.current,
         props.chartContentWidth,

@@ -9,7 +9,7 @@ import React, {
 import classNames from 'classnames';
 
 // Utils
-import { debounce, DebounceCancelFunction } from '../../utils/common.ts';
+import { debounce, DebounceCancelFunction, DebounceCancellableReturnResult } from '../../utils/common.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
 import { StoreAction, StoreUpdater } from '../../utils/Store/Store.ts';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
@@ -18,17 +18,16 @@ import { actions } from './reducer.ts';
 import { mapValues } from './helpers.ts';
 import { BaseChartPopupContainer } from './BaseChartPopupContainer.tsx';
 import {
+    BaseChartContainerRef,
     BaseChartDataSeriesComponent,
     BaseChartItemSearchResult,
     BaseChartMeasuredLayout,
+    BaseChartScaleFunction,
+    BaseChartScrollFunction,
+    BaseChartSizeFunction,
     BaseChartState,
     BaseChartXAxisLabelsRef,
 } from './types.ts';
-
-export type BaseChartContainerRef = HTMLDivElement | null;
-
-export type BaseChartScaleFunction = () => void;
-export type BaseChartScrollFunction = () => void;
 
 /**
  * BaseChartContainer component
@@ -62,12 +61,16 @@ export const BaseChartContainer = forwardRef<
     const popupRef = useRef<HTMLElement | null>(null);
     const pinnedPopupRef = useRef<HTMLElement | null>(null);
 
+    const sizeFunc = useRef<BaseChartSizeFunction | null>(null);
+    const cancelSizeFunc = useRef<DebounceCancelFunction | null>(null);
+
     const scaleFunc = useRef<BaseChartScaleFunction | null>(null);
     const cancelScaleFunc = useRef<DebounceCancelFunction | null>(null);
 
     const scrollFunc = useRef<BaseChartScrollFunction | null>(null);
     const cancelScrollFunc = useRef<DebounceCancelFunction | null>(null);
 
+    const resizeUpdateRef = useRef<number>(0);
     const animationFrameRef = useRef<number>(0);
     const removeTransitionHandlerRef = useRef(null);
 
@@ -148,6 +151,7 @@ export const BaseChartContainer = forwardRef<
         const state = getState();
         if (state.scrollRequested) {
             dispatch(actions.finishScroll());
+            return;
         }
 
         dispatch(actions.scroll(measureLayout()));
@@ -279,12 +283,32 @@ export const BaseChartContainer = forwardRef<
         }));
     };
 
+    const cancelResizeUpdate = () => {
+        if (resizeUpdateRef.current) {
+            cancelAnimationFrame(resizeUpdateRef.current);
+            resizeUpdateRef.current = 0;
+        }
+    };
+
+    const requestResizeUpdate = () => {
+        cancelResizeUpdate();
+        resizeUpdateRef.current = requestAnimationFrame(() => onResize());
+    };
+
     /** Chart scroller resize observer handler */
-    const onResize = (lastHLabelOffset = 0) => {
+    function onResize(lastHLabelOffset = 0) {
         dispatch(actions.resize({
             ...measureLayout(),
             lastHLabelOffset,
         }));
+
+        const state = getState();
+        if (state.scrollerWidth === 0) {
+            requestResizeUpdate();
+            return;
+        }
+
+        resizeUpdateRef.current = 0;
 
         if (scaleFunc.current) {
             scaleFunc.current();
@@ -293,7 +317,9 @@ export const BaseChartContainer = forwardRef<
         if (scrollFunc.current) {
             scrollFunc.current();
         }
-    };
+
+        props.onResize?.();
+    }
 
     // Process chart data on update
     useEffect(() => {
@@ -344,7 +370,7 @@ export const BaseChartContainer = forwardRef<
             () => onResize(),
             state.resizeTimeout,
             { cancellable: true },
-        );
+        ) as DebounceCancellableReturnResult;
         const handler = (typeof debouncedHandler === 'function')
             ? debouncedHandler
             : debouncedHandler.run;
@@ -352,10 +378,19 @@ export const BaseChartContainer = forwardRef<
         const observer = new ResizeObserver(handler);
         observer.observe(scrollerRef.current);
 
+        if (typeof debouncedHandler === 'object') {
+            sizeFunc.current = debouncedHandler.run ?? null;
+            cancelSizeFunc.current = debouncedHandler.cancel;
+        }
+
         return () => {
             observer.disconnect();
-            if (typeof debouncedHandler === 'object') {
-                debouncedHandler.cancel();
+            if (
+                typeof debouncedHandler === 'object'
+                && typeof cancelSizeFunc.current === 'function'
+            ) {
+                cancelSizeFunc.current();
+                cancelSizeFunc.current = null;
             }
         };
     }, [scrollerRef.current]);

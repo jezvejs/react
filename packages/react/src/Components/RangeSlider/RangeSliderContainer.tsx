@@ -1,4 +1,9 @@
-import { useRef, forwardRef, useImperativeHandle } from 'react';
+import {
+    useRef,
+    forwardRef,
+    useImperativeHandle,
+    useEffect,
+} from 'react';
 
 // Utils
 import { minmax } from '../../utils/common.ts';
@@ -308,6 +313,17 @@ export const RangeSliderContainer = forwardRef<
 
         props?.onKey?.(e);
     };
+
+    useEffect(() => {
+        const { start, end, value } = props;
+
+        setState((prev) => ({
+            ...prev,
+            start,
+            end,
+            value,
+        }));
+    }, [props.start, props.end, props.value]);
 
     const commonProps = {
         ...props,
