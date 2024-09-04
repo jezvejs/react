@@ -74,6 +74,14 @@ export const AfterArea = {
     },
 };
 
+export const BeforeAndAfterAreas = {
+    args: {
+        className: 'styled',
+        beforeArea: true,
+        afterArea: true,
+    },
+};
+
 /**
  * 'step' property is set to 0.02
  */
