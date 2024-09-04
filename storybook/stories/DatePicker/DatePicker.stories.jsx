@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { formatDate } from '@jezvejs/datetime';
 import { DatePicker, Input } from '@jezvejs/react';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
-import { SectionControls } from '../../Components/SectionControls/SectionControls.jsx';
+import { ActionButton } from '../../common/Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../common/Components/SectionControls/SectionControls.jsx';
 
 import { CustomDatePickerFooter } from './components/CustomFooter/CustomDatePickerFooter.jsx';
 import { DateInputGroup } from './components/DateInputGroup/DateInputGroup.jsx';

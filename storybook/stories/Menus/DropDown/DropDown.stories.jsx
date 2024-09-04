@@ -3,7 +3,7 @@ import '@jezvejs/react/style';
 import { DropDown, Tags } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { usePortalElement } from '../../../hooks/usePortalElement.jsx';
+import { usePortalElement } from '../../../common/hooks/usePortalElement.jsx';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.jsx';

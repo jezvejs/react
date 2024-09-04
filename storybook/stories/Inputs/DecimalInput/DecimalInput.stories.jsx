@@ -1,8 +1,8 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { DecimalInput } from '@jezvejs/react';
-import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
-import { useInputState } from '../../../hooks/useInputState.js';
+import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.jsx';
+import { useInputState } from '../../../common/hooks/useInputState.js';
 
 const TempInputDecorator = (Story) => (
     <div>

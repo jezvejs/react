@@ -9,7 +9,7 @@ import {
 } from '@jezvejs/react';
 import { forwardRef } from 'react';
 
-import MenuIcon from '../../../assets/icons/menu.svg';
+import MenuIcon from '../../../common/assets/icons/menu.svg';
 
 // Local components
 import { DefaultDragZone } from './components/DefaultDragZone.jsx';

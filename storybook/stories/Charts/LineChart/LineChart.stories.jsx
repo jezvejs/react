@@ -16,18 +16,18 @@ import {
     negPosData,
     posData,
     singleNegData,
-} from '../../../assets/data/index.js';
-import { largeData } from '../../../assets/data/largeData.js';
+} from '../../../common/assets/data/index.js';
+import { largeData } from '../../../common/assets/data/largeData.js';
 
 // Global components
-import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
-import { ChartCustomLegend } from '../../../Components/ChartCustomLegend/ChartCustomLegend.jsx';
-import { ChartMultiColumnPopup } from '../../../Components/ChartMultiColumnPopup/ChartMultiColumnPopup.jsx';
-import { RadioFieldset } from '../../../Components/RadioFieldset/RadioFieldset.jsx';
-import { RangeInputField } from '../../../Components/RangeInputField/RangeInputField.jsx';
+import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.jsx';
+import { ChartCustomLegend } from '../../../common/Components/ChartCustomLegend/ChartCustomLegend.jsx';
+import { ChartMultiColumnPopup } from '../../../common/Components/ChartMultiColumnPopup/ChartMultiColumnPopup.jsx';
+import { RadioFieldset } from '../../../common/Components/RadioFieldset/RadioFieldset.jsx';
+import { RangeInputField } from '../../../common/Components/RangeInputField/RangeInputField.jsx';
 
 // Common components
-import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
+import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.jsx';
 
 // Local components
 import { CustomLineChartActiveGroup } from './components/CustomActiveGroup/CustomLineChartActiveGroup.jsx';

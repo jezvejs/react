@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { InputGroup } from '@jezvejs/react';
-import { ActionButton } from '../../../../Components/ActionButton/ActionButton.jsx';
+import { ActionButton } from '../../../../common/Components/ActionButton/ActionButton.jsx';
 import './CustomDatePickerFooter.scss';
 
 export const CustomDatePickerFooter = (props) => (

@@ -3,8 +3,8 @@ import '@jezvejs/react/style';
 import { useState } from 'react';
 import { Offcanvas } from '@jezvejs/react';
 
-import { usePortalElement } from '../../hooks/usePortalElement.jsx';
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { usePortalElement } from '../../common/hooks/usePortalElement.jsx';
+import { ActionButton } from '../../common/Components/ActionButton/ActionButton.jsx';
 
 import './Offcanvas.stories.scss';
 

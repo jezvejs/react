@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import '@jezvejs/react/style';
 import { Input } from '@jezvejs/react';
-import { useInputState } from '../../../hooks/useInputState.js';
+import { useInputState } from '../../../common/hooks/useInputState.js';
 import './Input.stories.scss';
 
 const InputWithState = (props) => {

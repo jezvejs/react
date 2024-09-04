@@ -2,10 +2,10 @@ import { DropDown, Spinner } from '@jezvejs/react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
+import { MenuButton } from '../../../../../common/Components/MenuButton/MenuButton.jsx';
+
 import { CustomComboBoxControls } from './ComboBoxControls/CustomComboBoxControls.jsx';
 import { actions, reducer } from './reducer.js';
-import { MenuButton } from '../../../../../Components/MenuButton/MenuButton.jsx';
-
 import './CustomControlsSelect.scss';
 
 const { toggleLoading } = actions;

@@ -3,11 +3,11 @@ import '@jezvejs/react/style';
 import { ControlledInput } from '@jezvejs/react';
 
 // Hooks
-import { useInputState } from '../../../hooks/useInputState.js';
+import { useInputState } from '../../../common/hooks/useInputState.js';
 
 // Common components
-import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
-import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
+import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.jsx';
 
 const InputWithState = (props) => {
     const { inputProps } = useInputState(props);

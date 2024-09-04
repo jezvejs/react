@@ -5,7 +5,7 @@ import {
     useStore,
 } from '@jezvejs/react';
 import PropTypes from 'prop-types';
-import { MenuButton } from '../../../../../../Components/MenuButton/MenuButton.jsx';
+import { MenuButton } from '../../../../../../common/Components/MenuButton/MenuButton.jsx';
 
 const defaultProps = {
     loading: false,

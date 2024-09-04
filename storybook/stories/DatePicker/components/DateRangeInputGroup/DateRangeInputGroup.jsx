@@ -7,7 +7,7 @@ import {
     InputGroupText,
 } from '@jezvejs/react';
 
-import CalendarIcon from '../../../../assets/icons/calendar.svg';
+import CalendarIcon from '../../../../common/assets/icons/calendar.svg';
 
 export const DateRangeInputGroup = (props) => (
     <InputGroup

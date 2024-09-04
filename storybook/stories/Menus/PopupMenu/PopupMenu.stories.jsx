@@ -3,8 +3,8 @@ import '@jezvejs/react/style';
 import { PopupMenu } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { usePortalElement } from '../../../hooks/usePortalElement.jsx';
-import { MenuButton } from '../../../Components/MenuButton/MenuButton.jsx';
+import { usePortalElement } from '../../../common/hooks/usePortalElement.jsx';
+import { MenuButton } from '../../../common/Components/MenuButton/MenuButton.jsx';
 
 import { getDefaultItems } from './data.js';
 import './PopupMenu.stories.scss';

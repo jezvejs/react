@@ -1,5 +1,5 @@
-import SelectIcon from '../../../assets/icons/select.svg';
-import SearchIcon from '../../../assets/icons/search.svg';
+import SelectIcon from '../../../common/assets/icons/select.svg';
+import SearchIcon from '../../../common/assets/icons/search.svg';
 
 export const getDefaultItems = () => ([{
     id: 'selectBtnItem',

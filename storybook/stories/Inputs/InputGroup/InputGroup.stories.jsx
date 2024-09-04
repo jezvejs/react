@@ -10,15 +10,15 @@ import {
 } from '@jezvejs/react';
 
 // Icons
-import SmallCloseIcon from '../../../assets/icons/close-sm.svg';
-import SearchIcon from '../../../assets/icons/search.svg';
+import SmallCloseIcon from '../../../common/assets/icons/close-sm.svg';
+import SearchIcon from '../../../common/assets/icons/search.svg';
 
 // Hooks
-import { useInputState } from '../../../hooks/useInputState.js';
+import { useInputState } from '../../../common/hooks/useInputState.js';
 
 // Common components
-import { ActionButton } from '../../../Components/ActionButton/ActionButton.jsx';
-import { SectionControls } from '../../../Components/SectionControls/SectionControls.jsx';
+import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.jsx';
+import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.jsx';
 
 import './InputGroup.stories.scss';
 

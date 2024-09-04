@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { InputGroup, InputGroupButton, InputGroupInput } from '@jezvejs/react';
 
-import CalendarIcon from '../../../../assets/icons/calendar.svg';
+import CalendarIcon from '../../../../common/assets/icons/calendar.svg';
 
 import './DateInputGroup.scss';
 

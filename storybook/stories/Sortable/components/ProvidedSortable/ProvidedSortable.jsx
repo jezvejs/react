@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { createSlice, DragnDropProvider, Sortable } from '@jezvejs/react';
+import { usePortalElement } from '../../../../common/hooks/usePortalElement.jsx';
 import { useUniqueDragZoneId } from '../../hooks/useUniqueDragZoneId.jsx';
-import { usePortalElement } from '../../../../hooks/usePortalElement.jsx';
 
 export const ProvidedSortable = (props) => {
     const sortableProps = {

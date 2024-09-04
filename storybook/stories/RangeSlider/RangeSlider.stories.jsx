@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { isObject } from '@jezvejs/types';
 import { RangeSlider } from '@jezvejs/react';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
+import { ActionButton } from '../../common/Components/ActionButton/ActionButton.jsx';
 
 import './RangeSlider.stories.scss';
 

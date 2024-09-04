@@ -3,11 +3,11 @@ import '@jezvejs/react/style';
 import { Popup } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { usePortalElement } from '../../hooks/usePortalElement.jsx';
+import { usePortalElement } from '../../common/hooks/usePortalElement.jsx';
 
-import { ActionButton } from '../../Components/ActionButton/ActionButton.jsx';
-import { OkBtn } from '../../Components/ActionButton/OkBtn.jsx';
-import { CancelBtn } from '../../Components/ActionButton/CancelBtn.jsx';
+import { ActionButton } from '../../common/Components/ActionButton/ActionButton.jsx';
+import { OkBtn } from '../../common/Components/ActionButton/OkBtn.jsx';
+import { CancelBtn } from '../../common/Components/ActionButton/CancelBtn.jsx';
 
 import './Popup.stories.scss';
 
