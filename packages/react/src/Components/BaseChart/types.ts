@@ -174,6 +174,12 @@ export interface BaseChartSetDataParam {
     layout: BaseChartMeasuredLayout;
 }
 
+export type BaseChartContainerRef = HTMLDivElement | null;
+
+export type BaseChartSizeFunction = () => void;
+export type BaseChartScaleFunction = () => void;
+export type BaseChartScrollFunction = () => void;
+
 /**
  * BaseChart component props
  */
