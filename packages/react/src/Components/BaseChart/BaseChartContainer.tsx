@@ -68,6 +68,7 @@ export const BaseChartContainer = forwardRef<
     const scrollFunc = useRef<BaseChartScrollFunction | null>(null);
     const cancelScrollFunc = useRef<DebounceCancelFunction | null>(null);
 
+    const resizeUpdateRef = useRef<number>(0);
     const animationFrameRef = useRef<number>(0);
     const removeTransitionHandlerRef = useRef(null);
 
@@ -279,12 +280,30 @@ export const BaseChartContainer = forwardRef<
         }));
     };
 
+    const cancelResizeUpdate = () => {
+        if (resizeUpdateRef.current) {
+            cancelAnimationFrame(resizeUpdateRef.current);
+            resizeUpdateRef.current = 0;
+        }
+    };
+
+    const requestResizeUpdate = () => {
+        cancelResizeUpdate();
+        resizeUpdateRef.current = requestAnimationFrame(() => onResize());
+    };
+
     /** Chart scroller resize observer handler */
-    const onResize = (lastHLabelOffset = 0) => {
+    function onResize(lastHLabelOffset = 0) {
         dispatch(actions.resize({
             ...measureLayout(),
             lastHLabelOffset,
         }));
+
+        const state = getState();
+        if (state.scrollerWidth === 0) {
+            requestResizeUpdate();
+            return;
+        }
 
         if (scaleFunc.current) {
             scaleFunc.current();
@@ -293,7 +312,9 @@ export const BaseChartContainer = forwardRef<
         if (scrollFunc.current) {
             scrollFunc.current();
         }
-    };
+
+        props.onResize?.(lastHLabelOffset);
+    }
 
     // Process chart data on update
     useEffect(() => {
