@@ -32,7 +32,7 @@
     "dependencies": {
         "@jezvejs/datetime": "^1.1.0",
         "@jezvejs/dom": "^1.1.0",
-        "@jezvejs/react": "^1.3.0",
+        "@jezvejs/react": "^1.3.1",
         "@jezvejs/types": "^1.0.0",
         "@storybook/preview-api": "^8.2.9",
         "@vitejs/plugin-react": "^4.3.1",
