@@ -1,7 +1,7 @@
 import { BaseChartProps } from '../BaseChart/types.ts';
 import { RangeSliderProps } from '../RangeSlider/types.ts';
 
-export type RangeScrollChartData = BaseChartProps;
+export type RangeScrollChartData = Partial<BaseChartProps>;
 
 export type ChartType = 'histogram' | 'linechart';
 
@@ -13,13 +13,23 @@ export type RangeScrollChartChangeType =
     | 'scroll'
     | 'resize';
 
+// Main chart props
+export interface RangeScrollChartMainProps extends Partial<BaseChartProps> {
+    type: ChartType;
+}
+
+// Navigation chart props
+export interface RangeScrollChartNavigationProps extends BaseChartProps {
+    type: ChartType;
+}
+
 export interface RangeScrollChartProps {
-    className: string,
-    type: ChartType,
-    hideScrollBar: boolean,
-    mainChart: RangeScrollChartData,
-    navigationChart: RangeScrollChartData,
-    navigationSlider: RangeSliderProps,
+    className: string;
+    type: ChartType;
+    hideScrollBar: boolean;
+    mainChart: RangeScrollChartMainProps;
+    navigationChart: RangeScrollChartNavigationProps;
+    navigationSlider: RangeSliderProps;
 }
 
 export interface RangeScrollChartState extends RangeScrollChartProps {

@@ -1,0 +1,13 @@
+/* Navigation chart */
+.chart.range-scroll-chart__nav-chart {
+  .chart__container {
+    position: relative;
+  }
+
+  .chart__scroller {
+    width: auto;
+    max-width: 100%;
+    margin: var(--rschart-navigation-margin);
+    overflow-x: hidden;
+  }
+}
