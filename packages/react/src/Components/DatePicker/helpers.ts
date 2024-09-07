@@ -38,6 +38,7 @@ export const getInitialState = (props: DatePickerProps, defaultProps: DatePicker
         transition: null,
         secondViewTransition: false,
         waitingForAnimation: false,
+        slideIndex: 0,
         position: {
             ...(defaultProps?.position ?? {}),
             ...(props.position ?? {}),

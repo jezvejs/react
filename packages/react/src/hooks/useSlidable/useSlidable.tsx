@@ -22,7 +22,7 @@ export interface UseSlidableProps {
 
     // onDragEnd: () => void;
 
-    onWheel: (e: WheelEvent) => void;
+    onWheel: (e: Event) => void;
 
     onSlideEnd?: (position: number, totalDistance: number, velocity: number) => void,
 }

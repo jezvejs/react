@@ -21,6 +21,7 @@ import {
     DatePickerZoomInParams,
     DatePickerZoomOutParams,
 } from './types.ts';
+import { SlideProps } from '../Slider/types.ts';
 
 // Reducers
 const slice = createSlice({
@@ -187,6 +188,11 @@ const slice = createSlice({
             ? state
             : { ...state, disabledDateFilter }
     ),
+
+    setItems: (state: DatePickerState, items: SlideProps[]) => ({
+        ...state,
+        items: [...items],
+    }),
 });
 
 export const { actions, reducer } = slice;

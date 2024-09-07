@@ -259,6 +259,7 @@ export interface DatePickerState extends DatePickerProps {
     curRange: DatePickerRange;
     selRange: DatePickerRange;
     transition: string | null;
+    slideIndex: number;
     secondViewTransition: boolean;
     waitingForAnimation: boolean;
 }

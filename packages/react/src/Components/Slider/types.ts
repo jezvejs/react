@@ -2,34 +2,40 @@ import { ReactNode } from 'react';
 
 export interface SlideProps {
     id: string,
-    name: string,
-    width: number,
-    height: number,
+    className?: string;
+    name?: string,
+    width?: number,
+    height?: number,
     content: ReactNode,
 }
 
 export interface SliderContainerProps {
-    id: string;
-    slideIndex: number;
+    id?: string;
+    className?: string;
+    slideIndex?: number;
 
-    animate: boolean;
-    vertical: boolean;
-    allowMouse: boolean;
-    allowTouch: boolean;
-    allowWheel: boolean;
+    animate?: boolean;
+    vertical?: boolean;
+    allowMouse?: boolean;
+    allowTouch?: boolean;
+    allowWheel?: boolean;
 
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
 
-    items: SlideProps[];
+    items?: SlideProps[];
 
-    updatePosition: (position: number) => void;
+    content?: {
+        className?: string;
+    };
 
-    onChanged: (slideIndex: number) => void;
+    updatePosition?: (position: number) => void;
+
+    onChanged?: (slideIndex: number) => void;
 }
 
 export interface SliderProps extends SliderContainerProps {
-    className: string;
+    className?: string;
 }
 
 export interface SliderState extends SliderProps {

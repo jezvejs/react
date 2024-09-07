@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { SlideProps } from '../../types.ts';
 import './Slide.scss';
 
@@ -12,7 +13,7 @@ export const Slide = (props: SlideProps) => {
     const { content } = props;
 
     const slideProps: SlideAttrs = {
-        className: 'slide',
+        className: classNames('slide', props.className),
         style: {
             width: props.width,
             height: props.height,
