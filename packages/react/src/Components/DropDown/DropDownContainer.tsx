@@ -482,8 +482,8 @@ export const DropDownContainer = forwardRef<
             return;
         }
 
-        setEvents(window.visualViewport, viewportEvents);
-        setEvents(window, windowEvents);
+        setEvents(window.visualViewport, viewportEvents!);
+        setEvents(window, windowEvents!);
 
         dispatch(actions.startWindowListening());
     };
@@ -496,8 +496,8 @@ export const DropDownContainer = forwardRef<
 
         dispatch(actions.stopWindowListening());
 
-        removeEvents(window.visualViewport, viewportEvents);
-        removeEvents(window, windowEvents);
+        removeEvents(window.visualViewport, viewportEvents!);
+        removeEvents(window, windowEvents!);
     };
 
     const handlePlaceholderSelect = () => {

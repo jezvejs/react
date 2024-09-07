@@ -90,7 +90,8 @@ export function useSlidable(props: UseSlidableProps) {
     // Mouse wheel handler
     const wheelHandler = useMemo(() => ({
         wheel: {
-            listener: (e: WheelEvent) => {
+            listener: (ev: Event) => {
+                const e = ev as WheelEvent;
                 const elem = dragZoneRef?.current;
                 const target = e.target as HTMLElement;
                 if (!elem?.contains(target)) {
