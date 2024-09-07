@@ -6,24 +6,13 @@ import { minmax } from '../../utils/common.ts';
 import { StoreProviderContext } from '../../utils/Store/StoreProvider.tsx';
 
 // Global components
-import { BaseChartProps, BaseChartState } from '../BaseChart/types.ts';
-import { defaultProps as baseDefaultProps } from '../BaseChart/defaultProps.ts';
-
-// Histogram
-import { Histogram } from '../Histogram/Histogram.tsx';
-import { HistogramComponents, HistogramProps } from '../Histogram/types.ts';
-import { HistogramDataItem } from '../Histogram/components/DataItem/HistogramDataItem.tsx';
-import { HistogramDataSeries } from '../Histogram/components/DataSeries/HistogramDataSeries.tsx';
-
-// LineChart
-import { LineChartDataItem } from '../LineChart/components/DataItem/LineChartDataItem.tsx';
-import { LineChartDataPath } from '../LineChart/components/DataPath/LineChartDataPath.tsx';
-import { LineChartDataSeries } from '../LineChart/components/DataSeries/LineChartDataSeries.tsx';
-import { LineChart } from '../LineChart/LineChart.tsx';
-import { LineChartComponents, LineChartProps } from '../LineChart/types.ts';
-
-import { RangeSlider } from '../RangeSlider/RangeSlider.tsx';
+import { BaseChartState } from '../BaseChart/types.ts';
 import { RangeSliderBeforeChangeType, RangeSliderProps, RangeSliderValue } from '../RangeSlider/types.ts';
+
+// Local components
+import { RangeScrollChartMain } from './components/MainChart/RangeScrollChartMain.tsx';
+import { RangeScrollChartNavigation } from './components/NavigationChart/RangeScrollChartNavigation.tsx';
+import { RangeScrollChartSlider } from './components/NavigationSlider/RangeScrollChartSlider.tsx';
 
 import {
     getInitialState,
@@ -31,13 +20,14 @@ import {
     getSliderEnd,
     getSliderStart,
 } from './helpers.ts';
-import { RangeScrollChartChangeType, RangeScrollChartProps, RangeScrollChartState } from './types.ts';
+import {
+    RangeScrollChartChangeType,
+    RangeScrollChartMainProps,
+    RangeScrollChartNavigationProps,
+    RangeScrollChartProps,
+    RangeScrollChartState,
+} from './types.ts';
 import './RangeScrollChart.scss';
-
-const chartTypesMap = {
-    histogram: Histogram,
-    linechart: LineChart,
-};
 
 /**
  * RangeScrollChart component
@@ -307,88 +297,24 @@ export const RangeScrollChart = (props: RangeScrollChartProps) => {
         navStoreRef.current = store;
     };
 
-    if (!(type in chartTypesMap)) {
-        return null;
-    }
-
-    const ChartComponent = chartTypesMap[type];
-
     // Main chart
-    const mainDefaultProps = {
-        height: 300,
-        resizeTimeout: 0,
-    };
-
-    const mainChartProps: Partial<BaseChartProps> = {
-        ...mainDefaultProps,
+    const mainChartProps: RangeScrollChartMainProps = {
         ...mainChart,
-
+        type,
         allowLastXAxisLabelOverflow: false,
-
         columnWidth: state.columnWidth,
         groupsGap: state.groupsGap,
         scrollLeft: state.scrollLeft,
-
         onResize: onChartResize,
         onScroll: onChartScroll,
         onStoreReady: onMainStoreReady,
     };
 
-    let main = null;
-    if (type === 'linechart') {
-        const defaultProps = {
-            drawNodeCircles: false,
-            columnGap: 8,
-            nodeCircleRadius: 3,
-        };
-
-        const components: LineChartComponents = {
-            ...(baseDefaultProps.components ?? {}),
-            ...(mainChartProps.components ?? {}),
-            DataItem: LineChartDataItem,
-            DataPath: LineChartDataPath,
-            DataSeries: LineChartDataSeries,
-        };
-        const lineChartProps: LineChartProps = {
-            ...baseDefaultProps,
-            ...defaultProps,
-            ...mainChartProps,
-            components,
-        };
-
-        main = (
-            <LineChart {...lineChartProps} />
-        );
-    } else {
-        const components: HistogramComponents = {
-            ...(baseDefaultProps.components ?? {}),
-            ...(mainChartProps.components ?? {}),
-            DataItem: HistogramDataItem,
-            DataSeries: HistogramDataSeries,
-        };
-        const histogramProps: HistogramProps = {
-            ...baseDefaultProps,
-            ...mainChartProps,
-            components,
-        };
-
-        main = (
-            <Histogram {...histogramProps} />
-        );
-    }
-
     // Range slider
     const rangeSliderProps: RangeSliderProps = {
         ...navigationSlider,
-        range: true,
-        className: 'range-scroll-chart__range-slider',
-        min: 0,
-        max: 1,
         start: state.start,
         end: state.end,
-        step: null,
-        beforeArea: true,
-        afterArea: true,
         onBeforeChange: (
             value: RangeSliderValue,
             changeType: RangeSliderBeforeChangeType,
@@ -398,31 +324,22 @@ export const RangeScrollChart = (props: RangeScrollChartProps) => {
         onChange: (value) => onSliderChange(value),
         onScroll: (value) => onSliderScroll(value),
     };
-    const rangeSlider = <RangeSlider {...rangeSliderProps} />;
+    const rangeSlider = <RangeScrollChartSlider {...rangeSliderProps} />;
 
     // Navigation chart
-    const navDefaultProps = {
-        height: 100,
-        marginTop: 0,
-        resizeTimeout: 0,
-    };
-
-    const navChartProps: BaseChartProps = {
-        ...navDefaultProps,
+    const navChartProps: RangeScrollChartNavigationProps = {
         ...navigationChart,
-        className: 'range-scroll-chart__nav-chart',
-        fitToWidth: true,
-        data: navigationChart?.data ?? mainChart?.data,
+        type,
+        data: navigationChart?.data ?? mainChart?.data ?? [],
         onStoreReady: onNavStoreReady,
         beforeScroller: rangeSlider,
     };
-    const navigation = <ChartComponent {...navChartProps} />;
 
     return (
         <div className={classNames('range-scroll-chart', props.className)}>
             <div className="range-scroll-chart__slider-container">
-                {main}
-                {navigation}
+                <RangeScrollChartMain {...mainChartProps} />
+                <RangeScrollChartNavigation {...navChartProps} />
             </div>
         </div>
     );
