@@ -51,7 +51,7 @@ export interface RangeType {
 /**
  * Indexed CSS style object
  */
-export type StyleDeclaration = Partial<CSSStyleDeclaration> & { [propName: string]: string };
+export type StyleDeclaration = Partial<CSSStyleDeclaration> & { [propName: string]: string; };
 
 /**
  * Indexed SVG attributes object
@@ -59,3 +59,13 @@ export type StyleDeclaration = Partial<CSSStyleDeclaration> & { [propName: strin
 export type IndexedSVGAttributes<T> = Partial<SVGAttributes<T>> & {
     [propName: string]: string;
 };
+
+/**
+ * Animation stages
+ */
+export enum AnimationStages {
+    exited = 0,
+    entering,
+    entered,
+    exiting,
+}
