@@ -8,26 +8,7 @@ import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
 import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { Point } from '../../utils/types.ts';
 
-import { SlidableState } from './useSlidable.tsx';
-
-export interface PositionShift {
-    shiftX: number;
-    shiftY: number;
-}
-
-export interface UseSlidableDragZoneProps {
-    id: string,
-
-    vertical: boolean;
-    allowMouse: boolean;
-    allowTouch: boolean;
-
-    isReady: boolean | (() => boolean);
-
-    updatePosition: (position: number) => void;
-
-    onDragCancel: () => void;
-}
+import { PositionShift, SlidableState, UseSlidableDragZoneProps } from './types.ts';
 
 export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
     const avatarRef = useRef(null);

@@ -1,16 +1,8 @@
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 import { OnDragEndParams } from '../../utils/DragnDrop/types.ts';
-import { useDropTarget, UseDropTargetProps } from '../../utils/DragnDrop/useDropTarget.tsx';
+import { useDropTarget } from '../../utils/DragnDrop/useDropTarget.tsx';
 
-import { SlidableState } from './useSlidable.tsx';
-
-export interface UseSlidableDropTargetProps extends UseDropTargetProps {
-    id: string,
-
-    onWheel?: (e: WheelEvent) => void;
-
-    onSlideEnd?: (position: number, totalDistance: number, velocity: number) => void,
-}
+import { SlidableState, UseSlidableDropTargetProps } from './types.ts';
 
 export function useSlidableDropTarget(props: UseSlidableDropTargetProps) {
     const dragDrop = useDragnDrop();

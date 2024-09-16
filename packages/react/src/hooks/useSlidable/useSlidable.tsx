@@ -1,65 +1,31 @@
 import { removeEvents, setEvents } from '@jezvejs/dom';
 import { useEffect, useMemo } from 'react';
 
-import { Point } from '../../utils/types.ts';
-
 import { useSlidableDragZone } from './useSlidableDragZone.tsx';
 import { useSlidableDropTarget } from './useSlidableDropTarget.tsx';
+import { UseSlidableProps } from './types.ts';
 
-export interface UseSlidableProps {
-    id: string;
+const defaultProps = {
+    vertical: false,
+    allowMouse: false,
+    allowTouch: true,
+    allowWheel: true,
+    isReady: true,
+};
 
-    vertical: boolean;
-    allowMouse: boolean;
-    allowTouch: boolean;
-    allowWheel: boolean;
+export function useSlidable(p: UseSlidableProps) {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
 
-    isReady: boolean | (() => boolean);
-
-    updatePosition: (position: number) => void;
-
-    onDragCancel: () => void;
-
-    // onDragEnd: () => void;
-
-    onWheel: (e: Event) => void;
-
-    onSlideEnd?: (position: number, totalDistance: number, velocity: number) => void,
-}
-
-export interface SlidableState {
-    id: string;
-
-    vertical: boolean;
-    allowMouse: boolean;
-    allowTouch: boolean;
-    allowWheel: boolean;
-
-    moved: boolean;
-
-    startPoint?: Point;
-
-    lastTime: number;
-    position: number;
-    origPosition: number;
-
-    distance: number;
-    totalDistance: number;
-
-    velocity: number;
-
-    shiftX: number;
-    shiftY: number;
-}
-
-export function useSlidable(props: UseSlidableProps) {
     const {
         id,
         vertical,
         allowMouse,
         allowTouch,
         allowWheel,
-        isReady = true,
+        isReady,
         updatePosition,
         onWheel,
         onSlideEnd,
