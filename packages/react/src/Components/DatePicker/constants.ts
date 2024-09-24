@@ -13,3 +13,6 @@ export const viewTypesMap = {
     month: YEAR_VIEW,
     year: YEARRANGE_VIEW,
 };
+
+export const slideTransitions = ['slideToPrevious', 'slideToNext'];
+export const zoomTransitions = ['zoomIn', 'zoomOut'];

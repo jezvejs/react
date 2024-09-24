@@ -41,6 +41,16 @@ export interface Point {
 }
 
 /**
+ * Rectangle
+ */
+export interface Rect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+/**
  * Range type
  */
 export interface RangeType {

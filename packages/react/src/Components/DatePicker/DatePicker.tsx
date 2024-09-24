@@ -20,6 +20,7 @@ import { reducer } from './reducer.ts';
 import * as DatePickerHelpers from './helpers.ts';
 import { DatePickerProps } from './types.ts';
 import './DatePicker.scss';
+import { DragnDropProvider } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 
 export {
     // Child components
@@ -46,16 +47,18 @@ export const DatePicker = forwardRef<
             : reducer;
     }, [props.reducers]);
 
-    const initialState = (
+    const initialState = useMemo(() => (
         DatePickerHelpers.getInitialState(props, defaultProps)
-    );
+    ), [props]);
 
     return (
         <StoreProvider
             reducer={reducers}
             initialState={initialState}
         >
-            <DatePickerContainer ref={ref} {...initialState} />
+            <DragnDropProvider reducer={reducers} initialState={initialState}>
+                <DatePickerContainer ref={ref} {...initialState} />
+            </DragnDropProvider>
         </StoreProvider>
     );
 });

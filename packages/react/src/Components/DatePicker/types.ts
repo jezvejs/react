@@ -92,16 +92,13 @@ export interface DatePickerMonthViewItemProps {
  * Month view props
  */
 export interface DatePickerMonthViewProps {
+    className?: string;
     date: Date;
     actDate: Date | Date[] | null;
     multiple: boolean;
     range: boolean;
     curRange: DatePickerRange;
     rangePart: DatePickerRangePart | null;
-    /*
-    title: string;
-    nav: object;
-    */
     locales: string | string[];
     firstDay: number | null;
     doubleView: boolean;
@@ -175,6 +172,12 @@ export interface DatePickerSearchResults {
     index: number,
     itemView?: null,
     secondViewTransition: boolean,
+}
+
+export interface DatePickerViewTransform {
+    height?: number;
+    transform?: string;
+    targetTransform?: string;
 }
 
 /**
@@ -251,6 +254,14 @@ export interface DatePickerProps {
 }
 
 /**
+ * DatePicker next state. Used for transition animations
+ */
+export interface DatePickerNextState {
+    viewType: DatePickerViewType;
+    date: Date;
+}
+
+/**
  * DatePicker state
  */
 export interface DatePickerState extends DatePickerProps {
@@ -260,8 +271,14 @@ export interface DatePickerState extends DatePickerProps {
     selRange: DatePickerRange;
     transition: string | null;
     slideIndex: number;
+    sliderPosition: number;
     secondViewTransition: boolean;
     waitingForAnimation: boolean;
+
+    width: number;
+    height: number;
+
+    next: DatePickerNextState | null;
 }
 
 /**

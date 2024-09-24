@@ -201,6 +201,7 @@
 /* Animation */
 .dp__animated {
   touch-action: none;
+  pointer-events: none;
 }
 
 .dp__animated-view,
