@@ -29,6 +29,8 @@ export function useAnimationStage<
 
     const setAnimationStage = (stage: AnimationStages) => {
         setAnimation((prev) => ({ ...prev, stage }));
+
+        props.onStateChanged?.(stage);
     };
 
     const setAnimationTransform = (transform: Transform | null) => {
@@ -77,6 +79,7 @@ export function useAnimationStage<
             && !transformApplied
         ) {
             setAnimationStage(AnimationStages.exited);
+            props.onExited?.();
             return;
         }
 
@@ -86,6 +89,7 @@ export function useAnimationStage<
             && transformApplied
         ) {
             setAnimationStage(AnimationStages.entering);
+            props.onEntering?.();
             return;
         }
 
@@ -97,6 +101,7 @@ export function useAnimationStage<
             animationFrameRef.current = requestAnimationFrame(() => {
                 animationFrameRef.current = 0;
                 setAnimationStage(AnimationStages.entered);
+                props.onEntered?.();
             });
 
             return;
@@ -109,6 +114,7 @@ export function useAnimationStage<
         ) {
             if (!ref.current.parentNode) {
                 setAnimationStage(AnimationStages.exiting);
+                props.onExiting?.();
                 return;
             }
 
@@ -123,6 +129,7 @@ export function useAnimationStage<
                     clearTransitionRef.current = null;
 
                     setAnimationStage(AnimationStages.exiting);
+                    props.onExiting?.();
                 },
             );
         }
