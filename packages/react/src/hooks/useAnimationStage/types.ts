@@ -1,10 +1,15 @@
 import { AnimationStages } from '../../utils/types.ts';
 
+type RefStatic<T> = React.RefObject<T | null>;
+type RefCallback<T> = () => RefStatic<T>;
+type Ref<T> = RefStatic<T> | RefCallback<T>;
+
 export interface UseAnimationStageProps<
     RefType extends Node | null,
     Transform,
 > {
-    ref: React.RefObject<RefType | null>,
+    ref: RefStatic<RefType>,
+    targetRef?: Ref<RefType>,
 
     id?: string;
     transform?: Transform | null;

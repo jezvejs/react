@@ -118,10 +118,15 @@ export function useAnimationStage<
                 return;
             }
 
+            const target = props.targetRef ?? ref;
+            const targetRef = (typeof target === 'function')
+                ? target()
+                : target;
+
             clearTransitionRef.current = afterTransition(
                 ref.current.parentNode as Element,
                 {
-                    elem: ref.current,
+                    target: targetRef?.current,
                     duration: props.transitionTimeout,
                     property: 'transform',
                 },
