@@ -7,6 +7,8 @@ import {
     YEAR_VIEW,
     YEARRANGE_VIEW,
     YEAR_RANGE_LENGTH,
+    slideTransitions,
+    zoomTransitions,
 } from './constants.ts';
 import {
     DatePickerHeaderTitleParam,
@@ -15,6 +17,7 @@ import {
     DatePickerState,
     DatePickerViewType,
 } from './types.ts';
+import { Rect } from '../../utils/types.ts';
 
 export const toCSSValue = (val: number): number => (+val.toFixed(4));
 
@@ -38,6 +41,11 @@ export const getInitialState = (props: DatePickerProps, defaultProps: DatePicker
         transition: null,
         secondViewTransition: false,
         waitingForAnimation: false,
+        slideIndex: 0,
+        sliderPosition: 0,
+        width: 0,
+        height: 0,
+        next: null,
         position: {
             ...(defaultProps?.position ?? {}),
             ...(props.position ?? {}),
@@ -125,9 +133,22 @@ export const getHeaderTitle = (state: DatePickerHeaderTitleParam): string => {
     throw new Error('Invalid view type');
 };
 
-/** Returns offsetHeight for specified component */
-export const getComponentHeight = (component: HTMLElement): number => (
-    component?.offsetHeight ?? 0
+/**
+ * Returns offsetWidth for specified element
+ * @param {HTMLElement|null} elem
+ * @returns {number}
+ */
+export const getWidth = (elem: HTMLElement | null): number => (
+    elem?.offsetWidth ?? 0
+);
+
+/**
+ * Returns offsetHeight for specified element
+ * @param {HTMLElement|null} elem
+ * @returns {number}
+ */
+export const getHeight = (elem: HTMLElement | null): number => (
+    elem?.offsetHeight ?? 0
 );
 
 /**
@@ -149,4 +170,147 @@ export const inRange = (date: Date, range: DatePickerRange): boolean => {
     const rangeEnd = range.end?.getTime() ?? 0;
 
     return (time - rangeStart >= 0 && time - rangeEnd <= 0);
+};
+
+/**
+ * Returns true if view type of next state is the same as current
+ * @param {DatePickerState} state
+ * @returns {boolean}
+ */
+export const isSameNextViewType = (state: DatePickerState): boolean => (
+    !!state.next
+    && state.next.viewType === state.viewType
+);
+
+/**
+ * Returns true if date of next state is the same as current
+ * @param {DatePickerState} state
+ * @returns {boolean}
+ */
+export const isSameNextDate = (state: DatePickerState): boolean => (
+    !!state.next
+    && isSameDate(state.next.date, state.date)
+);
+
+/**
+ * Returns true if current transition is 'slideToPrevious' or 'slideToNext'
+ * @param {DatePickerState} state
+ * @returns {boolean}
+ */
+export const isSlideTransition = (state: DatePickerState): boolean => (
+    isSameNextViewType(state)
+    && !!state.transition
+    && slideTransitions.includes(state.transition)
+);
+
+/**
+ * Returns true if current transition is 'zoomIn' or 'zoomOut'
+ * @param {DatePickerState} state
+ * @returns {boolean}
+ */
+export const isZoomTransition = (state: DatePickerState): boolean => (
+    /* isSameNextDate(state)
+    && */
+    !!state.transition
+    && zoomTransitions.includes(state.transition)
+);
+
+export interface DatePickerViewDates {
+    previous: Date;
+    current: Date;
+    second: Date;
+    next: Date;
+}
+
+export const getViewDates = (state: DatePickerState): DatePickerViewDates => {
+    let prevDate = getPrevViewDate(state.date, state.viewType);
+    if (state.doubleView && state.secondViewTransition) {
+        prevDate = getPrevViewDate(prevDate, state.viewType);
+    }
+
+    const currentDate = (state.doubleView && state.secondViewTransition)
+        ? getPrevViewDate(state.date, state.viewType)
+        : state.date;
+
+    const secondDate = (state.secondViewTransition)
+        ? state.date
+        : getNextViewDate(state.date, state.viewType);
+
+    let nextDate = getNextViewDate(state.date, state.viewType);
+    if (state.doubleView && !state.secondViewTransition) {
+        nextDate = getNextViewDate(nextDate, state.viewType);
+    }
+
+    return {
+        previous: prevDate,
+        current: currentDate,
+        second: secondDate,
+        next: nextDate,
+    };
+};
+
+/**
+ * Returns matrix transform string for specified array
+ * @param {Array} transform
+ * @returns {string}
+ */
+export const formatMatrixTransform = (
+    transform: number | number[] | string | string[],
+): string => (
+    `matrix(${asArray(transform).map(toCSSValue).join(', ')})`
+);
+
+/**
+ * Returns all child item elements for specified view
+ * @param {HTMLElement|null} elem
+ * @returns {HTMLElement[]}
+ */
+export const getViewItems = (elem: HTMLElement | null): HTMLElement[] => (
+    Array.from(elem?.querySelectorAll?.('.dp__cell') ?? [])
+);
+
+/**
+ * Returns Date object for specified view item element or null in case of invalid item
+ * @param {HTMLElement|null} elem
+ * @returns {Date|null}
+ */
+export const getViewItemDate = (elem: HTMLElement | null): Date | null => {
+    const time = parseInt(elem?.dataset?.date ?? '', 10);
+    return (time) ? (new Date(time)) : null;
+};
+
+/**
+ * Returns dimensions object for specified view item element
+ * @param {HTMLElement|null} elem
+ * @param {DatePickerState} state
+ * @returns {Rect|null}
+ */
+export const getViewItemBox = (elem: HTMLElement | null, state: DatePickerState): Rect | null => {
+    if (!elem) {
+        return null;
+    }
+
+    const { vertical, secondViewTransition } = state;
+
+    const x = (secondViewTransition && !vertical)
+        ? (elem.offsetLeft - elem.offsetWidth)
+        : elem.offsetLeft;
+
+    const y = (secondViewTransition && vertical)
+        ? (elem.offsetTop - elem.offsetHeight)
+        : elem.offsetTop;
+
+    const width = (secondViewTransition && !vertical)
+        ? (elem.offsetWidth * 2)
+        : elem.offsetWidth;
+    const height = (secondViewTransition && vertical)
+        ? (elem.offsetHeight * 2)
+        : elem.offsetHeight;
+
+    return {
+        x,
+        y,
+        width,
+        height,
+    };
 };

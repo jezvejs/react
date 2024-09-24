@@ -1,4 +1,3 @@
-import { afterTransition } from '@jezvejs/dom';
 import classNames from 'classnames';
 import {
     forwardRef,
@@ -6,174 +5,98 @@ import {
     useImperativeHandle,
     useMemo,
     useRef,
-    useState,
 } from 'react';
 
+// Utils
 import { px } from '../../../../utils/common.ts';
 import { useDragnDrop } from '../../../../utils/DragnDrop/DragnDropProvider.tsx';
-import { isPlaceholder } from '../../helpers.ts';
+import { AnimationStages } from '../../../../utils/types.ts';
 
+// Hooks
+import { useAnimationStage } from '../../../../hooks/useAnimationStage/useAnimationStage.tsx';
+
+import { isPlaceholder } from '../../helpers.ts';
 import {
-    SortableAnimationTransform,
     SortableItemWrapperProps,
     SortableItemWrapperRef,
     SortableState,
 } from '../../types.ts';
 
-enum AnimationStages {
-    exited = 0,
-    entering,
-    entered,
-    exiting,
+export interface SortableItemTransform {
+    initial?: string | null;
+    offset?: string | null;
 }
 
-interface Callable {
-    (): void,
-}
+const defaultProps = {
+    transitionTimeout: 500,
+};
 
 // eslint-disable-next-line react/display-name
 export const SortableItemWrapper = forwardRef<
     SortableItemWrapperRef,
     SortableItemWrapperProps
->((props, ref) => {
+>((p, ref) => {
+    const props = {
+        ...defaultProps,
+        ...p,
+    };
+
     const {
         placeholderClass,
         animatedClass,
+        transitionTimeout,
     } = props;
 
-    const [animation, setAnimation] = useState({
-        stage: AnimationStages.exited,
-        initialTransform: props.initialTransform,
-        offsetTransform: props.offsetTransform,
-    });
-
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as SortableState ?? null;
-
-    const innerRef = useRef<HTMLElement>(null);
+    const innerRef = useRef<HTMLElement | null>(null);
     useImperativeHandle<SortableItemWrapperRef, SortableItemWrapperRef>(ref, () => (
         innerRef?.current
     ));
 
-    const animationFrameRef = useRef(0);
-    const clearTransitionRef = useRef<Callable | null>(null);
+    const animation = useAnimationStage<SortableItemWrapperRef, SortableItemTransform>({
+        ref: innerRef,
+        id: props.id,
+        transform: null,
+        transitionTimeout,
+        isTransformApplied: (transform: SortableItemTransform | null) => (
+            !!transform?.offset
+        ),
+    });
 
-    const setAnimationStage = (stage: AnimationStages) => {
-        setAnimation((prev) => ({ ...prev, stage }));
-    };
+    const {
+        cancel,
+        clearTransition,
+        setStage,
+        setTransform,
+    } = animation;
 
-    const setAnimationTransform = (params: SortableAnimationTransform) => {
-        setAnimation((prev) => ({ ...prev, ...params }));
-    };
-
-    const cancelAnimation = () => {
-        if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = 0;
-        }
-    };
-
-    const clearTransition = () => {
-        if (typeof clearTransitionRef.current === 'function') {
-            clearTransitionRef.current?.();
-            clearTransitionRef.current = null;
-        }
-    };
+    const dragDrop = useDragnDrop();
+    const getState = () => dragDrop?.getState() as SortableState ?? null;
 
     useEffect(() => {
         if (
-            animation.initialTransform === props.initialTransform
-            && animation.offsetTransform === props.offsetTransform
+            animation.transform?.initial === props.initialTransform
+            && animation.transform?.offset === props.offsetTransform
         ) {
-            return;
+            return undefined;
         }
 
         clearTransition();
-        setAnimationStage(AnimationStages.exited);
+        setStage(AnimationStages.exited);
 
         if (props.offsetTransform) {
-            setAnimationTransform({
-                initialTransform: animation.offsetTransform,
-                offsetTransform: props.offsetTransform,
+            setTransform({
+                initial: animation.transform?.offset ?? props.initialTransform,
+                offset: props.offsetTransform,
             });
         } else {
-            setAnimationTransform({
-                initialTransform: props.initialTransform,
-                offsetTransform: props.offsetTransform,
+            setTransform({
+                initial: props.initialTransform,
+                offset: props.offsetTransform,
             });
         }
+
+        return () => cancel();
     }, [props.initialTransform, props.offsetTransform]);
-
-    const handleAnimationState = () => {
-        if (!innerRef.current) {
-            return;
-        }
-
-        // Exiting -> Exited
-        if (
-            animation.stage === AnimationStages.exiting
-            && !animation.offsetTransform
-        ) {
-            setAnimationStage(AnimationStages.exited);
-            return;
-        }
-
-        // Exited -> Entering
-        if (
-            animation.stage === AnimationStages.exited
-            && animation.offsetTransform
-        ) {
-            setAnimationStage(AnimationStages.entering);
-            return;
-        }
-
-        // Entering -> Entered
-        if (
-            animation.stage === AnimationStages.entering
-            && animationFrameRef.current === 0
-        ) {
-            animationFrameRef.current = requestAnimationFrame(() => {
-                animationFrameRef.current = 0;
-                setAnimationStage(AnimationStages.entered);
-            });
-
-            return;
-        }
-
-        // Entered -> Exiting
-        if (
-            !clearTransitionRef.current
-            && animation.stage === AnimationStages.entered
-        ) {
-            if (!props.animated || !innerRef.current.parentNode) {
-                setAnimationStage(AnimationStages.exiting);
-                return;
-            }
-
-            clearTransitionRef.current = afterTransition(
-                innerRef.current.parentNode as Element,
-                {
-                    elem: innerRef.current,
-                    duration: props.transitionTimeout,
-                    property: 'transform',
-                },
-                () => {
-                    clearTransitionRef.current = null;
-
-                    setAnimationStage(AnimationStages.exiting);
-                },
-            );
-        }
-    };
-
-    useEffect(() => {
-        handleAnimationState();
-
-        return () => {
-            cancelAnimation();
-            clearTransition();
-        };
-    }, [animation.stage, animation.initialTransform, animation.offsetTransform]);
 
     const state = getState();
 
@@ -213,9 +136,9 @@ export const SortableItemWrapper = forwardRef<
                 res.style!.transitionProperty = 'transform, width';
             }
 
-            const transform = (animation.offsetTransform && (isEntered || isExiting))
-                ? animation.offsetTransform
-                : animation.initialTransform;
+            const transform = (animation.transform?.offset && (isEntered || isExiting))
+                ? animation.transform?.offset
+                : animation.transform?.initial;
 
             if (transform) {
                 res.style!.transform = transform;
@@ -250,8 +173,7 @@ export const SortableItemWrapper = forwardRef<
         props.offsetTransform,
         props.childContainer,
         state.dragging,
-        animation.initialTransform,
-        animation.offsetTransform,
+        animation.transform,
         animation.stage,
     ]);
 

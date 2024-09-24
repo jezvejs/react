@@ -264,7 +264,10 @@ export const DatePickerMonthView = forwardRef<
 
     return (
         <div
-            className='dp__view-container dp__month-view'
+            className={classNames(
+                'dp__view-container dp__month-view',
+                props.className,
+            )}
             ref={ref}
         >
             {header}

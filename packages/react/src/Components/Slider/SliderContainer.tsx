@@ -22,6 +22,9 @@ interface Callable {
     (): void,
 }
 
+type DragZoneRef = Element | null;
+type DropTargetRef = Element | null;
+
 export const SliderContainer = (props: SliderContainerProps) => {
     const {
         id,
@@ -45,17 +48,17 @@ export const SliderContainer = (props: SliderContainerProps) => {
 
     const clientSize = () => {
         const state = getState();
-        return state.vertical ? state.height : state.width;
+        return ((state.vertical) ? state.height : state.width) ?? 0;
     };
 
     const notifyChanged = () => {
-        onChanged?.(getState().slideIndex);
+        onChanged?.(getState().slideIndex!);
     };
 
     const calculatePosition = (num: number): number | false => {
         const state = getState();
 
-        if (num < 0 || num > state.items.length - 1) {
+        if (num < 0 || num > (state.items ?? []).length - 1) {
             return false;
         }
 
@@ -148,25 +151,26 @@ export const SliderContainer = (props: SliderContainerProps) => {
     };
 
     const slideToPrev = () => {
-        slideTo(getState().slideIndex - 1);
+        slideTo(getState().slideIndex! - 1);
     };
 
     const slideToNext = () => {
-        slideTo(getState().slideIndex + 1);
+        slideTo(getState().slideIndex! + 1);
     };
 
     const { dragZoneRef, dropTargetRef } = useSlidable({
-        id,
+        id: id!,
         vertical,
         allowMouse,
         allowTouch,
         allowWheel,
 
-        updatePosition,
+        updatePosition: updatePosition!,
 
         isReady: () => !getState().waitingForAnimation,
 
-        onWheel(e: WheelEvent) {
+        onWheel: (ev: Event) => {
+            const e = ev as WheelEvent;
             if (!allowWheel || getState().waitingForAnimation) {
                 return;
             }
@@ -188,21 +192,25 @@ export const SliderContainer = (props: SliderContainerProps) => {
                 slideNum = Math.round(slideNum);
             }
 
-            const num = minmax(0, getState().items.length - 1, slideNum);
+            const num = minmax(0, (getState().items ?? []).length - 1, slideNum);
             slideTo(num);
         },
 
         onDragCancel() {
             const state = getState();
-            slideTo(state.slideIndex);
+            slideTo(state.slideIndex ?? 0);
         },
     });
 
-    type DragZoneRef = Element | null;
     useImperativeHandle<DragZoneRef, DragZoneRef>(dragZoneRef, () => contentRef.current);
-
-    type DropTargetRef = Element | null;
     useImperativeHandle<DropTargetRef, DropTargetRef>(dropTargetRef, () => elemRef.current);
+
+    useEffect(() => {
+        setState((prev: SliderState) => ({
+            ...prev,
+            items: [...(props.items ?? [])],
+        }));
+    }, [props.items]);
 
     useEffect(() => {
         const state = getState();
@@ -214,7 +222,7 @@ export const SliderContainer = (props: SliderContainerProps) => {
             return;
         }
 
-        const num = minmax(0, state.items.length - 1, props.slideIndex);
+        const num = minmax(0, (state.items ?? []).length - 1, props.slideIndex ?? 0);
         if (props.animate) {
             slideTo(num);
         } else {
@@ -231,20 +239,23 @@ export const SliderContainer = (props: SliderContainerProps) => {
             {
                 slider_vertical: state.vertical,
             },
+            state.className,
         ),
         style: {
-            width: px(state.width),
-            height: px(state.height),
+            width: px(state.width ?? 0),
+            height: px(state.height ?? 0),
         },
     };
 
     // Sliding content props
     const contentProps: HTMLAttributes<HTMLDivElement> = {
+        ...(state.content ?? {}),
         className: classNames(
             'slider__content',
             {
                 animate: state.animate,
             },
+            state.content?.className,
         ),
         style: {},
     };
@@ -257,14 +268,14 @@ export const SliderContainer = (props: SliderContainerProps) => {
 
     // Slide props
     const commonSlideProps = {
-        width: state.width,
-        height: state.height,
+        width: state.width ?? 0,
+        height: state.height ?? 0,
     };
 
     return (
         <div {...sliderProps} ref={elemRef}>
             <div {...contentProps} ref={contentRef}>
-                {state.items.map((item) => (
+                {(state.items ?? []).map((item) => (
                     <Slide
                         key={item.id}
                         {...item}

@@ -3,6 +3,8 @@ import { asArray, isDate } from '@jezvejs/types';
 
 import { createSlice } from '../../utils/createSlice.ts';
 
+import { SlideProps } from '../Slider/types.ts';
+
 import {
     MONTH_VIEW,
     YEAR_VIEW,
@@ -58,13 +60,23 @@ const slice = createSlice({
         secondViewTransition: false,
     }),
 
+    setSliderPosition: (state: DatePickerState, sliderPosition: number): DatePickerState => ({
+        ...state,
+        sliderPosition,
+    }),
+
     zoomIn: (state: DatePickerState, params: DatePickerZoomInParams): DatePickerState => (
         ([YEAR_VIEW, YEARRANGE_VIEW].includes(state.viewType))
             ? {
                 ...state,
+                next: {
+                    date: params.date,
+                    viewType: (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW,
+                },
                 transition: 'zoomIn',
-                viewType: (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW,
                 ...params,
+                date: state.date,
+                viewType: state.viewType,
             }
             : state
     ),
@@ -73,23 +85,42 @@ const slice = createSlice({
         ([MONTH_VIEW, YEAR_VIEW].includes(state.viewType))
             ? {
                 ...state,
+                next: {
+                    date: state.date,
+                    viewType: (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW,
+                },
                 transition: 'zoomOut',
-                viewType: (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW,
                 ...params,
+                date: state.date,
+                viewType: state.viewType,
             }
             : state
     ),
 
     navigateToPrev: (state: DatePickerState): DatePickerState => ({
         ...state,
-        date: getPrevViewDate(state.date, state.viewType),
+        next: {
+            date: getPrevViewDate(state.date, state.viewType),
+            viewType: state.viewType,
+        },
         transition: 'slideToPrevious',
     }),
 
     navigateToNext: (state: DatePickerState): DatePickerState => ({
         ...state,
-        date: getNextViewDate(state.date, state.viewType),
+        next: {
+            date: getNextViewDate(state.date, state.viewType),
+            viewType: state.viewType,
+        },
         transition: 'slideToNext',
+    }),
+
+    finishNavigate: (state: DatePickerState): DatePickerState => ({
+        ...state,
+        date: state.next?.date ?? state.date,
+        viewType: state.next?.viewType ?? state.viewType,
+        next: null,
+        transition: null,
     }),
 
     showMonth: (state: DatePickerState, date: Date): DatePickerState => ({
@@ -187,6 +218,11 @@ const slice = createSlice({
             ? state
             : { ...state, disabledDateFilter }
     ),
+
+    setItems: (state: DatePickerState, items: SlideProps[]) => ({
+        ...state,
+        items: [...items],
+    }),
 });
 
 export const { actions, reducer } = slice;
