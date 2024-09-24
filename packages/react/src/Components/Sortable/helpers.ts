@@ -14,6 +14,7 @@ import {
 } from './types.ts';
 import { DragZone } from '../../utils/DragnDrop/types.ts';
 import { Point } from '../../utils/types.ts';
+import { px } from '../../utils/common.ts';
 
 /**
  * Returns new array with only distinct(unique) values from specified array
@@ -571,7 +572,7 @@ export const formatMatrixTransform = (
  * @returns
  */
 export const formatOffsetMatrix = ({ x, y }: Point) => (
-    formatMatrixTransform([1, 0, 0, 1, x, y])
+    `translate3d(${px(x)}, ${px(y)}, 0)`
 );
 
 /**
