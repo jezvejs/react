@@ -1,32 +1,16 @@
 import {
     createContext,
-    ReactNode,
     useContext,
     useMemo,
     useState,
 } from 'react';
-import {
-    createStore,
-    Store,
+import { createStore } from './Store.ts';
+import type {
     StoreAction,
-    StoreReducer,
-    StoreState,
+    StoreProviderContext,
+    StoreProviderProps,
     StoreUpdater,
-} from './Store.ts';
-
-export interface StoreProviderProps {
-    reducer: StoreReducer,
-    initialState: StoreState,
-    children: ReactNode,
-}
-
-export interface StoreProviderContext {
-    store: Store,
-    state: StoreState,
-    getState: () => StoreState,
-    setState: (state: StoreUpdater) => void,
-    dispatch: (action: StoreAction) => void,
-}
+} from './types.ts';
 
 const StoreContext = createContext<StoreProviderContext | null>(null);
 

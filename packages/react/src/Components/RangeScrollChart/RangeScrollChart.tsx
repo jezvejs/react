@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 
 // Utils
 import { minmax } from '../../utils/common.ts';
-import { StoreProviderContext } from '../../utils/Store/StoreProvider.tsx';
+import { StoreProviderContext } from '../../utils/Store/Store.ts';
 
 // Global components
 import { BaseChartState } from '../BaseChart/types.ts';
