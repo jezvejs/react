@@ -68,11 +68,16 @@ export const CustomComboBoxControls = (p) => {
     );
 };
 
+const ComponentPropType = PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.object,
+]);
+
 CustomComboBoxControls.propTypes = {
     ...DropDownComboBoxControls.propTypes,
     loading: PropTypes.bool,
     components: PropTypes.shape({
-        Loading: DropDownHelpers.componentPropType,
-        ComboMenuButton: DropDownHelpers.componentPropType,
+        Loading: ComponentPropType,
+        ComboMenuButton: ComponentPropType,
     }),
 };
