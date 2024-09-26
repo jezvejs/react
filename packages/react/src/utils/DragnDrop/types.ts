@@ -22,6 +22,12 @@ export interface OnDragStartParams {
     downY: number;
 }
 
+/** Drag move parameters */
+export interface OnDragMoveParams {
+    e: TouchEvent | MouseEvent;
+    avatar?: DragAvatar;
+}
+
 /** Drag end parameters */
 export interface OnDragEndParams {
     e: TouchEvent | MouseEvent | Event;
@@ -36,6 +42,20 @@ export interface OnDragEndParams {
 export interface OnDragCancelParams {
     e: TouchEvent | MouseEvent | Event;
     avatar?: DragAvatar;
+}
+
+/** Drag leave params */
+export interface OnDragLeaveParams {
+    e: TouchEvent | MouseEvent | Event;
+    avatar?: DragAvatar;
+    newTarget?: DropTarget | null;
+}
+
+/** Drag enter params */
+export interface OnDragEnterParams {
+    e: TouchEvent | MouseEvent | Event;
+    avatar?: DragAvatar;
+    prevTarget?: DropTarget | null;
 }
 
 /**
@@ -81,11 +101,11 @@ export interface DragAvatar {
     getTargetElem: () => Element | null,
     getDragInfo: (e?: TouchEvent | MouseEvent | Event) => DragAvatarInfo,
 
-    onDragMove: (e: TouchEvent | MouseEvent) => void,
+    onDragMove: (params: OnDragMoveParams) => void,
 
     onDragEnd?: () => void,
 
-    onDragCancel?: (params: { e: TouchEvent | MouseEvent | Event; }) => void,
+    onDragCancel?: (params: OnDragCancelParams) => void,
 }
 
 /**
@@ -95,18 +115,11 @@ export interface DropTarget {
     id: string,
     elem?: Element | null,
 
-    onDragEnter?: (
-        prevTarget: DropTarget | null,
-        avatar: DragAvatar, e: TouchEvent | MouseEvent,
-    ) => void,
+    onDragEnter?: (params: OnDragEnterParams) => void,
 
-    onDragLeave?: (
-        newTarget: DropTarget | null,
-        avatar: DragAvatar,
-        e: TouchEvent | MouseEvent,
-    ) => void,
+    onDragLeave?: (params: OnDragLeaveParams) => void,
 
-    onDragMove?: (avatar: DragAvatar, e: TouchEvent | MouseEvent) => void,
+    onDragMove?: (params: OnDragMoveParams) => void,
 
     onDragEnd?: (params: OnDragEndParams) => void,
 

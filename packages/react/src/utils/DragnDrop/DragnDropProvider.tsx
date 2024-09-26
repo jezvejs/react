@@ -26,9 +26,17 @@ export interface DragnDropProviderProps {
     children: ReactNode,
 }
 
-const DragnDropContext = createContext<DragnDropContextStore | null>(null);
+const initialContext = {
+    store: {},
+    state: {},
+    getState: () => ({}),
+    setState: (_: StoreUpdater) => {},
+    dispatch: (_: StoreAction) => {},
+};
 
-export const useDragnDrop = (): DragnDropContextStore | null => useContext(DragnDropContext);
+const DragnDropContext = createContext<DragnDropContextStore>(initialContext);
+
+export const useDragnDrop = (): DragnDropContextStore => useContext(DragnDropContext);
 
 export function DragnDropProvider(props: DragnDropProviderProps) {
     const {

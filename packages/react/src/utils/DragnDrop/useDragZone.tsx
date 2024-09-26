@@ -12,6 +12,7 @@ import {
     DragAvatarInitParam,
     DragnDropState,
     DragZone,
+    OnDragMoveParams,
     OnDragStartParams,
 } from './types.ts';
 
@@ -121,7 +122,8 @@ export function useDragZone(props: UseDragZoneProps) {
                         }
                     },
 
-                    onDragMove(e: TouchEvent | MouseEvent) {
+                    onDragMove(params: OnDragMoveParams) {
+                        const { e } = params;
                         this.cancelAnimation();
 
                         const page = DragMaster.getEventPageCoordinates(e);

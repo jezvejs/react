@@ -3,7 +3,7 @@ import { useRef } from 'react';
 // Utils
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
-import { DragAvatarInitParam, OnDragStartParams } from '../../utils/DragnDrop/types.ts';
+import { DragAvatarInitParam, OnDragMoveParams, OnDragStartParams } from '../../utils/DragnDrop/types.ts';
 import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
 import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { Point } from '../../utils/types.ts';
@@ -110,7 +110,8 @@ export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
                     return true;
                 },
 
-                onDragMove(e: TouchEvent | MouseEvent) {
+                onDragMove(params: OnDragMoveParams) {
+                    const { e } = params;
                     const state = getState();
                     if (!state.startPoint) {
                         return;

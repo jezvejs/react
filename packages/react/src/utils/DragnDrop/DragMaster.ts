@@ -473,21 +473,32 @@ export class DragMaster {
             return;
         }
 
-        this.avatar.onDragMove(e);
+        this.avatar.onDragMove({ e });
 
         const newDropTarget = this.findDropTarget();
         if (this.dropTarget !== newDropTarget) {
             if (this.dropTarget) {
-                this.dropTarget.onDragLeave?.(newDropTarget, this.avatar, e);
+                this.dropTarget.onDragLeave?.({
+                    e,
+                    avatar: this.avatar,
+                    newTarget: newDropTarget,
+                });
             }
             if (newDropTarget) {
-                newDropTarget.onDragEnter?.(this.dropTarget, this.avatar, e);
+                newDropTarget.onDragEnter?.({
+                    e,
+                    avatar: this.avatar,
+                    prevTarget: this.dropTarget,
+                });
             }
         }
 
         this.dropTarget = newDropTarget;
         if (this.dropTarget) {
-            this.dropTarget.onDragMove?.(this.avatar, e);
+            this.dropTarget.onDragMove?.({
+                e,
+                avatar: this.avatar,
+            });
         }
     }
 
