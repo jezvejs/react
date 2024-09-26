@@ -600,7 +600,7 @@ export const BaseChartContainer = forwardRef<
 
     // x axis labels
     const xAxisLabels = XAxisLabels && (
-        <XAxisLabels {...state} ref={xAxisLabelsRef} />
+        <XAxisLabels {...state} onResize={onResize} ref={xAxisLabelsRef} />
     );
 
     // y axis labels
