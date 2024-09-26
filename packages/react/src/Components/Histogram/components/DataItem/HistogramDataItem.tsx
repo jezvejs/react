@@ -41,11 +41,8 @@ export const HistogramDataItem: HistogramDataItemComponent = forwardRef<
         height,
     };
 
-    const store = useStore();
-    if (!store) {
-        return null;
-    }
-    const state = store.getState() as HistogramState;
+    const { getState } = useStore<HistogramState>();
+    const state = getState();
 
     const isValid = Object.values(attrs).every((value) => value >= 0);
     if (!isValid) {

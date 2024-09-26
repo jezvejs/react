@@ -42,12 +42,10 @@ export const DropDownMenuHeader: DropDownMenuHeaderComponent = (p: DropDownMenuH
     } = props;
     const { Input } = props.components ?? {};
 
-    const store = useStore()!;
+    const { getState } = useStore<DropDownState>();
     if (!Input) {
         return null;
     }
-
-    const { getState } = store;
 
     const inputPlaceholder = props.inputPlaceholder ?? '';
     let placeholder = inputPlaceholder;

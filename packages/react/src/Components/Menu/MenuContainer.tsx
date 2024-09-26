@@ -74,8 +74,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         },
     };
 
-    const store = useStore()!;
-    const { getState, setState } = store;
+    const { getState, setState } = useStore<MenuState>();
 
     const innerRef = useRef<HTMLDivElement | null>(null);
     useImperativeHandle<MenuRef, MenuRef>(ref, () => innerRef?.current);
@@ -118,7 +117,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        const st = getState() as MenuState;
+        const st = getState();
         const selector = getItemSelector(st);
         const closestElem = getClosestItemElement(target, selector);
         const itemId = closestElem?.dataset?.id ?? null;
@@ -156,7 +155,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        const st = getState() as MenuState;
+        const st = getState();
         const item = getItemById(itemId, st.items ?? []);
         if (!item) {
             return;
@@ -203,7 +202,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param {React.MouseEvent} e
      */
     const onMouseEnter = useCallback((itemId: string | null, e: React.MouseEvent) => {
-        const st = getState() as MenuState;
+        const st = getState();
         if (
             st.ignoreTouch
             || !st.focusItemOnHover
@@ -243,7 +242,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param relItemId
      */
     const onMouseLeave = useCallback((relItemId?: string | null) => {
-        const st = getState() as MenuState;
+        const st = getState();
         if (
             st.activeItem === null
             || (st.activeItem === relItemId)
@@ -264,7 +263,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     }, []);
 
     const cancelClick = () => {
-        const st = getState() as MenuState;
+        const st = getState();
         if (st.ignoreTouch) {
             setTimeout(() => {
                 onMouseLeave();
@@ -279,7 +278,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     };
 
     const finishClick = (callback: () => void) => {
-        const st = getState() as MenuState;
+        const st = getState();
         if (st.ignoreTouch) {
             setTimeout(() => {
                 onMouseLeave();
@@ -310,7 +309,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     ) => {
         e?.stopPropagation();
 
-        const st = getState() as MenuState;
+        const st = getState();
         const clickedItem = getItemById(itemId, st.items ?? []);
         if (!clickedItem) {
             return;
@@ -362,7 +361,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     }, []);
 
     const onKeyDown = (e: React.KeyboardEvent) => {
-        const st = getState() as MenuState;
+        const st = getState();
 
         const availCallback = (item: MenuItemProps): boolean => (
             props.isAvailableItem?.(item, st) ?? true
@@ -444,7 +443,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
     // Prepare alignment before and after item content
     const columns = useMemo(() => {
-        const st = getState() as MenuState;
+        const st = getState();
         const res = {
             beforeContent: false,
             afterContent: false,
@@ -486,15 +485,15 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         return res;
     }, [props.items]);
 
-    const { Header, Footer, List } = (getState() as MenuState).components ?? {};
+    const { Header, Footer, List } = (getState()).components ?? {};
 
     const menuHeader = Header && (
         <Header {...(props.header ?? {})} />
     );
 
-    const state = getState() as MenuState;
+    const state = getState();
     const menuList = useMemo(() => {
-        const st = getState() as MenuState;
+        const st = getState();
 
         const { ...rest } = st;
         delete rest.className;
@@ -522,7 +521,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     );
 
     const menuProps = useMemo(() => {
-        const st = getState() as MenuState;
+        const st = getState();
         const { disabled } = props;
         let tabIndex: number | null = (props.tabThrough) ? -1 : (props.tabIndex ?? null);
         if (disabled) {

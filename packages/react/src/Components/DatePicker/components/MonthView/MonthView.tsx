@@ -131,12 +131,8 @@ export const DatePickerMonthView = forwardRef<
     const rMonth = date.getMonth();
     const rYear = date.getFullYear();
 
-    const store = useStore();
-    if (!store) {
-        return null;
-    }
-
-    const state = store.getState() as DatePickerState;
+    const { getState } = useStore<DatePickerState>();
+    const state = getState();
 
     // month header
     const title = getHeaderTitle({

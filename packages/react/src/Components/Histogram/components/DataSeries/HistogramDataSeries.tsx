@@ -18,7 +18,7 @@ export const HistogramDataSeries: HistogramDataSeriesComponent = (
     p: HistogramDataSeriesProps,
 ) => {
     const props = p as HistogramState;
-    const store = useStore();
+    const { setState, getState } = useStore<HistogramState>();
 
     const { dataSets, activeTarget, grid } = props;
 
@@ -97,7 +97,7 @@ export const HistogramDataSeries: HistogramDataSeriesComponent = (
             items.push(group);
         }
 
-        store?.setState((prev: HistogramState) => ({
+        setState((prev: HistogramState) => ({
             ...prev,
             dataSeries: {
                 ...prev.dataSeries,
@@ -125,11 +125,11 @@ export const HistogramDataSeries: HistogramDataSeriesComponent = (
         props.pinnedTarget,
     ]);
 
-    if (!store || dataSets.length === 0 || !grid) {
+    if (dataSets.length === 0 || !grid) {
         return null;
     }
 
-    const state = store.getState() as HistogramState;
+    const state = getState();
 
     const components = state.components as HistogramComponents;
     const DataItem = components?.DataItem;

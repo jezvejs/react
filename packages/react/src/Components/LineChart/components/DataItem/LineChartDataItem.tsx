@@ -45,11 +45,8 @@ export const LineChartDataItem: LineChartDataItemComponent = forwardRef<
         r,
     };
 
-    const store = useStore();
-    if (!store) {
-        return null;
-    }
-    const state = store.getState() as LineChartState;
+    const { getState } = useStore<LineChartState>();
+    const state = getState();
 
     const isValid = Object.values(attrs).every((value) => value >= 0);
     if (!isValid) {

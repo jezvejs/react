@@ -7,7 +7,6 @@ import {
 } from 'react';
 
 import { px } from '../../../../utils/common.ts';
-import { StoreUpdater } from '../../../../utils/Store/Store.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
 import { BaseChartState, BaseChartXAxisLabelProps } from '../../types.ts';
@@ -31,10 +30,7 @@ export const BaseChartXAxisLabels = forwardRef<
     } = props;
     const disabled = xAxis === 'none';
 
-    const store = useStore();
-
-    const getState = (): BaseChartState | null => (store?.getState() as BaseChartState) ?? null;
-    const setState = (update: StoreUpdater) => store?.setState(update);
+    const { getState, setState } = useStore<BaseChartState>();
 
     const [prevState, setPrevState] = useState({
         scrollLeft: 0,

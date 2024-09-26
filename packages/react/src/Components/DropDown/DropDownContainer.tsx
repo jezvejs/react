@@ -58,9 +58,12 @@ export const DropDownContainer = forwardRef<
     DropDownRef,
     DropDownProps
 >((props, ref) => {
-    const store = useStore()!;
-    const { getState, dispatch, setState } = store;
-    const state = store.state as DropDownState;
+    const {
+        state,
+        getState,
+        dispatch,
+        setState,
+    } = useStore<DropDownState>();
 
     const innerRef = useRef<HTMLDivElement>(null);
     useImperativeHandle<DropDownRef, DropDownRef>(ref, () => (
