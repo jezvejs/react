@@ -30,8 +30,10 @@ const initialContext = {
     store: {},
     state: {},
     getState: () => ({}),
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     setState: (_: StoreUpdater) => {},
     dispatch: (_: StoreAction) => {},
+    /* eslint-enable @typescript-eslint/no-unused-vars */
 };
 
 const DragnDropContext = createContext<DragnDropContextStore>(initialContext);

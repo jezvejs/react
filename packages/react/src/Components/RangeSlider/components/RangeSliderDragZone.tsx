@@ -9,7 +9,12 @@ import {
 import { minmax } from '../../../utils/common.ts';
 import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
-import { DragAvatarInitParam, DragZone, OnDragMoveParams, OnDragStartParams } from '../../../utils/DragnDrop/types.ts';
+import {
+    DragAvatarInitParam,
+    DragZone,
+    OnDragMoveParams,
+    OnDragStartParams,
+} from '../../../utils/DragnDrop/types.ts';
 import { StoreUpdater } from '../../../utils/Store/Store.ts';
 
 // Local components
@@ -62,7 +67,7 @@ export const RangeSliderDragZone = forwardRef<
             mouseMoveThreshold: 0,
             touchMoveTimeout: 0,
 
-            onDragStart: (params: OnDragStartParams)=> {
+            onDragStart: (params: OnDragStartParams) => {
                 const avatar = {
                     id: props.id,
                     elem: avatarRef.current,
@@ -122,8 +127,8 @@ export const RangeSliderDragZone = forwardRef<
                         return true;
                     },
 
-                    onDragMove(params: OnDragMoveParams) {
-                        const { e } = params;
+                    onDragMove(p: OnDragMoveParams) {
+                        const { e } = p;
                         const client = DragMaster.getEventClientCoordinates(e);
 
                         const state = getState();

@@ -187,7 +187,7 @@ export const DatePickerContainer = forwardRef<
             second: secondTargetViewRef.current,
         });
 
-        const isSlideNext = (!!state.next && state.date < state.next?.date);
+        const isSlideNext = (!!st.next && st.date < st.next?.date);
         const heights = viewHeightsRef.current;
         const current = (isSlideNext) ? heights.next : heights.prev;
 
