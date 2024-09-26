@@ -23,9 +23,9 @@ export const LineChartDataSeries: LineChartDataSeriesComponent = (
     p: LineChartDataSeriesProps,
 ) => {
     const props = p as LineChartState;
-    const store = useStore();
+    const { getState, setState } = useStore<LineChartState>();
 
-    const storeState = store?.getState() as LineChartState;
+    const storeState = getState();
     const { dataSets, activeTarget, grid } = storeState;
 
     useEffect(() => {
@@ -115,7 +115,7 @@ export const LineChartDataSeries: LineChartDataSeriesComponent = (
             paths.push(path);
         }
 
-        store?.setState((prev: LineChartState) => ({
+        setState((prev: LineChartState) => ({
             ...prev,
             dataSeries: {
                 ...prev.dataSeries,
@@ -144,11 +144,11 @@ export const LineChartDataSeries: LineChartDataSeriesComponent = (
         storeState.pinnedTarget,
     ]);
 
-    if (!store || dataSets.length === 0 || !grid) {
+    if (dataSets.length === 0 || !grid) {
         return null;
     }
 
-    const state = store.getState() as LineChartState;
+    const state = getState();
 
     const { DataItem, DataPath } = state.components;
     if (!DataItem || !DataPath) {

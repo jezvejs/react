@@ -5,7 +5,7 @@ import {
     ReactNode,
 } from 'react';
 import { ChartGrid } from '../ChartGrid/ChartGrid.ts';
-import { StoreProviderContext } from '../../utils/Store/StoreProvider.tsx';
+import { StoreProviderContext } from '../../utils/Store/Store.ts';
 
 export type BaseChartDataSerie = string | number;
 export type BaseChartDataCategory = string | number | null;

@@ -1,53 +1,29 @@
-export type StoreActionPayload = object | string | number | boolean | bigint | symbol | null;
+import type {
+    StoreReducer,
+    StoreState,
+    StoreListener,
+    StoreActionAPI,
+    StoreOptions,
+    StoreAction,
+    StoreActionFunction,
+    StoreUpdater,
+} from './types.ts';
 
-export interface StoreActionObject {
-    type: string,
-    payload?: StoreActionPayload,
-}
-
-export type StoreActionPayloadFunction = (payload?: StoreActionPayload) => StoreActionObject;
-export type StoreActionFunction = (api: StoreActionAPI | null) => void;
-
-export type StoreAction = StoreActionObject | StoreActionFunction;
-
-export type StoreState = object;
-
-export type StoreReducer = (state: StoreState, action: StoreActionObject) => StoreState;
-export type StoreReducersList = StoreReducer | StoreReducer[];
-
-export type StoreActionReducer = (state: StoreState, payload?: StoreActionPayload) => StoreState;
-
-export interface StoreOptions {
-    initialState?: StoreState,
-    sendInitialState?: true,
-}
-
-export type StoreListener = (state: StoreState, prevState: StoreState) => void;
-
-export type StoreDispatchFunction = (action: StoreAction) => void;
-export type StoreGetStateFunction = () => StoreState;
-
-export interface StoreActionAPI {
-    dispatch: StoreDispatchFunction,
-    getState: StoreGetStateFunction,
-}
-
-export type StoreUpdaterFunction = (prev: StoreState) => StoreState;
-export type StoreUpdater = StoreState | StoreUpdaterFunction;
+export * from './types.ts';
 
 /** State store class */
-export class Store {
-    reducer: StoreReducer | null = null;
+export class Store<State extends StoreState = StoreState> {
+    reducer: StoreReducer<State> | null = null;
 
-    state: StoreState = {};
+    state: State | object = {};
 
-    listeners: StoreListener[] = [];
+    listeners: StoreListener<State>[] = [];
 
     sendInitialState: boolean = true;
 
-    storeAPI: StoreActionAPI | null = null;
+    storeAPI: StoreActionAPI<State> | null = null;
 
-    constructor(reducer: StoreReducer, options: StoreOptions = {}) {
+    constructor(reducer: StoreReducer<State>, options: StoreOptions<State> = {}) {
         if (typeof reducer !== 'function') {
             throw new Error('Expected reducer to be a function');
         }
@@ -68,8 +44,8 @@ export class Store {
         };
     }
 
-    getState() {
-        return this.state;
+    getState(): State {
+        return this.state as State;
     }
 
     dispatch(action: StoreAction | StoreActionFunction) {
@@ -82,26 +58,26 @@ export class Store {
             return;
         }
 
-        const newState = this.reducer(this.state, action);
-        const prevState = this.state;
+        const newState = this.reducer(this.getState(), action);
+        const prevState = this.getState();
         this.state = newState;
-        this.listeners.forEach((listener: StoreListener) => listener(newState, prevState));
+        this.listeners.forEach((listener: StoreListener<State>) => listener(newState, prevState));
     }
 
-    setState(state: StoreUpdater) {
+    setState(state: StoreUpdater<State>) {
         const newState = (typeof state === 'function')
-            ? state(this.state)
+            ? state(this.getState())
             : state;
         if (this.state === newState) {
             return;
         }
 
-        const prevState = this.state;
+        const prevState = this.getState();
         this.state = newState;
         this.listeners.forEach((listener) => listener(newState, prevState));
     }
 
-    subscribe(listener: StoreListener) {
+    subscribe(listener: StoreListener<State>) {
         if (typeof listener !== 'function') {
             throw new Error('Expected listener to be a function');
         }
@@ -115,14 +91,14 @@ export class Store {
 
         // Send initial state to new listener
         if (this.sendInitialState) {
-            listener(this.state, {});
+            listener(this.getState(), {} as State);
         }
     }
 }
 
-export const createStore = (
-    reducer: StoreReducer,
-    options: StoreOptions = {},
-) => (
-    new Store(reducer, options)
-);
+export function createStore<State extends StoreState = StoreState>(
+    reducer: StoreReducer<State>,
+    options: StoreOptions<State> = {},
+) {
+    return new Store<State>(reducer, options);
+}

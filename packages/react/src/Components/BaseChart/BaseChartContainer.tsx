@@ -11,7 +11,6 @@ import classNames from 'classnames';
 // Utils
 import { debounce, DebounceCancelFunction, DebounceCancellableReturnResult } from '../../utils/common.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
-import { StoreAction, StoreUpdater } from '../../utils/Store/Store.ts';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
 
 import { actions } from './reducer.ts';
@@ -37,11 +36,8 @@ export const BaseChartContainer = forwardRef<
     BaseChartContainerRef,
     BaseChartState
 >((props, ref) => {
-    const store = useStore();
-
-    const getState = () => store?.getState() as BaseChartState ?? null;
-    const setState = (update: StoreUpdater) => store?.setState(update);
-    const dispatch = (action: StoreAction) => store?.dispatch(action);
+    const store = useStore<BaseChartState>();
+    const { getState, setState, dispatch } = store;
 
     useEffect(() => {
         if (store) {

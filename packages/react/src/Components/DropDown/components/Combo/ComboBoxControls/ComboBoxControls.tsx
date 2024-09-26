@@ -34,7 +34,7 @@ export const DropDownComboBoxControls: DropDownComboBoxControlsComponent = (
     } = props;
     const { ClearButton, ToggleButton } = props.components;
 
-    const { state } = useStore()!;
+    const { state } = useStore<DropDownState>();
     const selectedItems = getSelectedItems(state as DropDownState);
 
     const showClear = (

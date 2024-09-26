@@ -10,7 +10,7 @@ import {
 import { createPortal } from 'react-dom';
 
 // Utils
-import { StoreAction, StoreActionObject } from '../../../../utils/Store/Store.ts';
+import { StoreActionObject } from '../../../../utils/Store/Store.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 import { AnimationStages } from '../../../../utils/types.ts';
 import { minmax, px } from '../../../../utils/common.ts';
@@ -105,11 +105,7 @@ export const DatePickerContainer = forwardRef<
     DatePickerContainerRef,
     DatePickerContainerProps
 >((props, ref) => {
-    const store = useStore();
-
-    const getState = () => store?.getState() as DatePickerState ?? null;
-    const dispatch = (action: StoreAction) => store?.dispatch(action);
-
+    const { getState, dispatch } = useStore<DatePickerState>();
     const state = getState() ?? (props as DatePickerState);
 
     const {

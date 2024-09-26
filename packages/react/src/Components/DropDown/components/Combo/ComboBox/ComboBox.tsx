@@ -85,7 +85,7 @@ export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
         props?.onDeleteSelectedItem?.({ itemId, e });
     };
 
-    const { state } = useStore()!;
+    const { state } = useStore<DropDownState>();
     const selectedItems = getSelectedItems(state as DropDownState);
     const [selectedItem] = selectedItems;
     const str = selectedItem?.title ?? '';
