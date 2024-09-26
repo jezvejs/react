@@ -227,10 +227,7 @@ export const DatePickerContainer = forwardRef<
                 if (height > 0) {
                     dispatch(actions.resize({ height }));
                 }
-            }
-        },
-        onEntered: () => {
-            if (isZoomTransition(getState())) {
+            } else if (isZoomTransition(st)) {
                 viewHeightsRef.current = getViewsHeights({
                     current: targetViewRef.current,
                     second: secondTargetViewRef.current,
@@ -251,6 +248,7 @@ export const DatePickerContainer = forwardRef<
     const isEntered = animation.stage === AnimationStages.entered;
     const isEntering = animation.stage === AnimationStages.entering;
     const isExiting = animation.stage === AnimationStages.exiting;
+    const isExited = animation.stage === AnimationStages.exited;
 
     const sendShowEvents = (value = true) => {
         const eventName = (value) ? 'onShow' : 'onHide';
@@ -1156,19 +1154,19 @@ export const DatePickerContainer = forwardRef<
             ),
             style: {
                 transform: (
-                    (isEntering) ? targetTransform : ''
+                    (isExited || isEntering) ? targetTransform : ''
                 ),
-                opacity: (isEntered || isExiting) ? 1 : 0,
+                opacity: (isExiting || isEntered) ? 1 : 0,
             },
         };
 
         viewContent = (
             <>
-                <div {...sourceProps} ref={zoomSourceRef}>
-                    {views}
-                </div>
                 <div {...targetProps} ref={zoomTargetRef}>
                     {nextViews}
+                </div>
+                <div {...sourceProps} ref={zoomSourceRef}>
+                    {views}
                 </div>
             </>
         );
