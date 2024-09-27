@@ -15,7 +15,6 @@ import {
     OnDragMoveParams,
     OnDragStartParams,
 } from '../../../utils/DragnDrop/types.ts';
-import { StoreUpdater } from '../../../utils/Store/Store.ts';
 
 // Local components
 import { RangeSliderSelectedArea } from './RangeSliderSelectedArea.tsx';
@@ -52,9 +51,7 @@ export const RangeSliderDragZone = forwardRef<
     const avatarRef = useRef<HTMLElement | null>(null);
     const currentTargetElemRef = useRef<HTMLElement | null>(null);
 
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as RangeSliderState ?? null;
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { getState, setState } = useDragnDrop();
 
     useEffect(() => {
         if (!innerRef?.current) {
