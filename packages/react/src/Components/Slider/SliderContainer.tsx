@@ -12,7 +12,6 @@ import { useSlidable } from '../../hooks/useSlidable/useSlidable.tsx';
 
 import { Slide } from './components/Slide/Slide.tsx';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { SliderContainerProps, SliderState } from './types.ts';
 
 const TRANSITION_END_TIMEOUT = 500;
@@ -36,9 +35,7 @@ export const SliderContainer = (props: SliderContainerProps) => {
         onChanged = null,
     } = props;
 
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as SliderState ?? null;
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<SliderState>();
 
     const elemRef = useRef(null);
     const contentRef = useRef(null);
@@ -110,7 +107,7 @@ export const SliderContainer = (props: SliderContainerProps) => {
                 return;
             }
 
-            setState((prev) => ({
+            setState((prev: SliderState) => ({
                 ...prev,
                 animate: true,
                 waitingForAnimation: true,

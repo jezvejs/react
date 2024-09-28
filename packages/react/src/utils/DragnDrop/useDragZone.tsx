@@ -2,7 +2,6 @@ import { getOffset } from '@jezvejs/dom';
 import { useEffect, useRef } from 'react';
 
 // Utils
-import { StoreUpdater } from '../Store/Store.ts';
 import { Point } from '../types.ts';
 
 import { DragMaster } from './DragMaster.ts';
@@ -12,6 +11,7 @@ import {
     DragAvatarInitParam,
     DragnDropState,
     DragZone,
+    OnDragMoveParams,
     OnDragStartParams,
 } from './types.ts';
 
@@ -40,10 +40,7 @@ export function useDragZone(props: UseDragZoneProps) {
     const animationFrameRef = useRef<number>(0);
     const currentTargetElemRef = useRef<Element | null>(null);
 
-    const dragDrop = useDragnDrop();
-
-    const getState = () => ((dragDrop?.getState() as DragnDropState) ?? null);
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<DragnDropState>();
 
     const state = getState();
     const showOriginal = !!state && (!state.dragging || !dragOriginal);
@@ -121,7 +118,8 @@ export function useDragZone(props: UseDragZoneProps) {
                         }
                     },
 
-                    onDragMove(e: TouchEvent | MouseEvent) {
+                    onDragMove(params: OnDragMoveParams) {
+                        const { e } = params;
                         this.cancelAnimation();
 
                         const page = DragMaster.getEventPageCoordinates(e);
@@ -183,10 +181,10 @@ export function useDragZone(props: UseDragZoneProps) {
     useEffect(() => {
         setState((prev) => ({
             ...prev,
-            left: (props.absolutePos) ? props.left : 0,
-            origLeft: (props.absolutePos) ? props.left : 0,
-            top: (props.absolutePos) ? props.top : 0,
-            origTop: (props.absolutePos) ? props.top : 0,
+            left: (props.absolutePos && props.left) ? props.left : 0,
+            origLeft: (props.absolutePos && props.left) ? props.left : 0,
+            top: (props.absolutePos && props.top) ? props.top : 0,
+            origTop: (props.absolutePos && props.top) ? props.top : 0,
             dragging: false,
         }));
     }, [props.left, props.top, props.absolutePos]);

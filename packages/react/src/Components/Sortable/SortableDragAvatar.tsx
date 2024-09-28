@@ -15,12 +15,8 @@ export interface SortableDragAvatarProps {
 }
 
 export const SortableDragAvatar = (props: SortableDragAvatarProps) => {
-    const dragnDrop = useDragnDrop();
-    if (!dragnDrop) {
-        return null;
-    }
-
-    const state = dragnDrop.getState() as SortableState;
+    const { getState } = useDragnDrop<SortableState>();
+    const state = getState();
 
     const style: CSSProperties = {
         left: px(state.left),

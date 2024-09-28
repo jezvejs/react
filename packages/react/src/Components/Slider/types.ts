@@ -39,6 +39,6 @@ export interface SliderProps extends SliderContainerProps {
 }
 
 export interface SliderState extends SliderProps {
-    position: 0,
-    waitingForAnimation: false,
+    position: number,
+    waitingForAnimation: boolean,
 }

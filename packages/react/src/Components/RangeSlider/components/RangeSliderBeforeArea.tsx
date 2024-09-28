@@ -17,13 +17,12 @@ export const RangeSliderBeforeArea = forwardRef<
         (props.range) ? state.start : state.value
     );
 
-    const dragnDrop = useDragnDrop();
-    if (!dragnDrop || !props.beforeArea) {
+    const { getState } = useDragnDrop<RangeSliderState>();
+    if (!props.beforeArea) {
         return null;
     }
 
-    const { getState } = dragnDrop;
-    const state = getState() as RangeSliderState;
+    const state = getState();
     const value = getStartValue(state);
     const size = valueToPosition(value, state.min, state.max, state.maxPos);
 

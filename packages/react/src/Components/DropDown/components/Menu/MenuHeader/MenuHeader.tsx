@@ -49,7 +49,7 @@ export const DropDownMenuHeader: DropDownMenuHeaderComponent = (p: DropDownMenuH
 
     const inputPlaceholder = props.inputPlaceholder ?? '';
     let placeholder = inputPlaceholder;
-    const [item] = getSelectedItems(getState() as DropDownState);
+    const [item] = getSelectedItems(getState());
     const str = item?.title ?? '';
     if (!multiple) {
         const usePlaceholder = (

@@ -149,7 +149,7 @@ export const DropDownContainer = forwardRef<
             return -1;
         }
 
-        const selectedItems = getSelectedItems(getState() as DropDownState);
+        const selectedItems = getSelectedItems(getState());
         if (!Array.isArray(selectedItems)) {
             return -1;
         }
@@ -242,7 +242,7 @@ export const DropDownContainer = forwardRef<
 
     /** Returns selected items data for 'itemselect' and 'change' events */
     const getSelectionData = (): DropDownSelectedItem[] | DropDownSelectedItem | null => {
-        const selectedItems = getSelectedItems(getState() as DropDownState)
+        const selectedItems = getSelectedItems(getState())
             .map((item) => ({ id: item.id, value: item.title }));
 
         if (state.multiple) {
@@ -254,7 +254,7 @@ export const DropDownContainer = forwardRef<
 
     /** Returns value for NativeSelect component */
     const getNativeSelectValue = (): string | string[] | undefined => {
-        const selectedItems = getSelectedItems(getState() as DropDownState)
+        const selectedItems = getSelectedItems(getState())
             .map((item) => item.id);
 
         if (state.multiple) {
@@ -277,7 +277,7 @@ export const DropDownContainer = forwardRef<
      * 'change' event occurs after user finnished selection of item(s) and menu was hidden
      */
     const sendChangeEvent = () => {
-        const { changed } = getState() as DropDownState;
+        const { changed } = getState();
         if (!changed) {
             return;
         }
@@ -343,7 +343,7 @@ export const DropDownContainer = forwardRef<
     };
 
     const getItem = (itemId: string | null) => (
-        MenuHelpers.getItemById(itemId, (getState() as DropDownState).items ?? [])
+        MenuHelpers.getItemById(itemId, getState().items ?? [])
     );
 
     /** Deselect specified item */
@@ -367,7 +367,7 @@ export const DropDownContainer = forwardRef<
 
     /** Show only items containing specified string */
     const filter = (inputString: string) => {
-        const st = getState() as DropDownState;
+        const st = getState();
         if (st.inputString === inputString) {
             return;
         }
@@ -387,7 +387,7 @@ export const DropDownContainer = forwardRef<
     /** Set active state for specified list item */
     const setActive = (itemId: string | null) => {
         const itemToActivate = getItem(itemId);
-        const activeItem = getActiveItem(getState() as DropDownState);
+        const activeItem = getActiveItem(getState());
         if (
             (activeItem && itemToActivate && activeItem.id === itemToActivate.id)
             || (!activeItem && !itemToActivate)
@@ -439,7 +439,7 @@ export const DropDownContainer = forwardRef<
 
     /** Activate specified selected item */
     const activateSelectedItem = (index: number) => {
-        const current = getState() as DropDownState;
+        const current = getState();
         if (
             props.disabled
             || !state.multiple
@@ -471,7 +471,7 @@ export const DropDownContainer = forwardRef<
 
     /** Activate last(right) selected item */
     const activateLastSelectedItem = () => {
-        const selectedItems = getSelectedItems(getState() as DropDownState);
+        const selectedItems = getSelectedItems(getState());
         if (!selectedItems.length) {
             return;
         }
@@ -724,7 +724,7 @@ export const DropDownContainer = forwardRef<
 
     /** Click by delete button of selected item event handler */
     const onDeleteSelectedItem = ({ e }: { e: React.MouseEvent | React.KeyboardEvent; }) => {
-        const current = getState() as DropDownState;
+        const current = getState();
         if (!state.multiple || !e) {
             return;
         }
@@ -780,7 +780,7 @@ export const DropDownContainer = forwardRef<
 
     /** Handler for left or right arrow keys */
     const onSelectionNavigate = (e: React.KeyboardEvent) => {
-        const current = getState() as DropDownState;
+        const current = getState();
         if (!state.multiple) {
             return;
         }
@@ -1033,7 +1033,7 @@ export const DropDownContainer = forwardRef<
 
     // Update disabled state
     useEffect(() => {
-        const st = getState() as DropDownState;
+        const st = getState();
         if (props.disabled !== st.disabled) {
             dispatch(actions.toggleEnable());
         }
@@ -1080,7 +1080,7 @@ export const DropDownContainer = forwardRef<
 
     // Menu
     const menu = useMemo(() => {
-        const st = getState() as DropDownState;
+        const st = getState();
         const activeItem = getActiveItem(st);
 
         const menuProps: DropDownMenuProps = {
@@ -1189,8 +1189,8 @@ export const DropDownContainer = forwardRef<
                 dd__container_multiple: !!state.multiple,
                 dd__container_active: !!state.active,
                 dd__open: !state.fixedMenu && !!state.visible,
-                dd__editable: isEditable(getState() as DropDownState),
-                dd__list_active: isEditable(getState() as DropDownState),
+                dd__editable: isEditable(getState()),
+                dd__list_active: isEditable(getState()),
                 dd__fullscreen: !!state.fullScreen,
                 dd__container_native: !!state.useNativeSelect,
                 dd__container_disabled: !!props.disabled,

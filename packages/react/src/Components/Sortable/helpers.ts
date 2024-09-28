@@ -444,9 +444,9 @@ export const moveTreeItem = (state: SortableState, options: MoveTreeItemParam): 
     const targetId = target?.id ?? null;
 
     if (
-        (sourceId === null)
-        || (source.zoneId === null)
-        || (target.zoneId === null)
+        !sourceId
+        || !source.zoneId
+        || !target.zoneId
         || (sourceId === targetId)
     ) {
         return state;
@@ -796,7 +796,7 @@ export const getSourcePosition = (state: SortableState): SortableItemPosition | 
             continue;
         }
 
-        const sourceZone = getDragZoneItems(position?.zoneId, state);
+        const sourceZone = getDragZoneItems(position?.zoneId ?? null, state);
         const item = getTreeItemById(state?.itemId, sourceZone);
         if (item) {
             return { ...position };

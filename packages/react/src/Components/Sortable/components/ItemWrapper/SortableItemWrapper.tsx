@@ -69,8 +69,7 @@ export const SortableItemWrapper = forwardRef<
         setTransform,
     } = animation;
 
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as SortableState ?? null;
+    const { getState } = useDragnDrop<SortableState>();
 
     useEffect(() => {
         if (

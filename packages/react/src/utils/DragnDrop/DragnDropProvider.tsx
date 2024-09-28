@@ -5,58 +5,78 @@ import {
     useMemo,
     useState,
 } from 'react';
+
 import {
     createStore,
+    Store,
     StoreAction,
+    StoreProviderContext,
     StoreReducer,
+    StoreState,
     StoreUpdater,
 } from '../Store/Store.ts';
 
-export interface DragnDropContextStore {
-    store: object,
-    state: object,
-    getState: () => object,
-    setState: (update: StoreUpdater) => void,
+export interface DragnDropContextStore<State extends StoreState = StoreState> {
+    store: Store | object,
+    state: State,
+    getState: () => State,
+    setState: (update: StoreUpdater<State>) => void,
     dispatch: (action: StoreAction) => void,
 }
 
-export interface DragnDropProviderProps {
-    reducer: StoreReducer,
-    initialState: object,
+export interface DragnDropProviderProps<State extends StoreState = StoreState> {
+    reducer?: StoreReducer<State>,
+    initialState: State,
     children: ReactNode,
 }
 
-const DragnDropContext = createContext<DragnDropContextStore | null>(null);
+export const initialContext: StoreProviderContext = {
+    store: {},
+    state: {},
+    getState: () => ({}),
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    setState: (_: StoreUpdater) => { },
+    dispatch: (_: StoreAction) => { },
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+};
 
-export const useDragnDrop = (): DragnDropContextStore | null => useContext(DragnDropContext);
+const DragnDropContext = createContext<DragnDropContextStore>(initialContext);
 
-export function DragnDropProvider(props: DragnDropProviderProps) {
+export function useDragnDrop<
+    State extends StoreState = StoreState,
+>(): DragnDropContextStore<State> {
+    return useContext(DragnDropContext) as StoreProviderContext<State>;
+}
+
+export function DragnDropProvider<State extends StoreState = StoreState>(
+    props: DragnDropProviderProps<State>,
+) {
     const {
-        reducer = (state) => state,
+        reducer = (state: State): State => state,
         children,
         ...options
     } = props;
 
-    const [state, setState] = useState(options.initialState ?? {});
+    const [state, setState] = useState<State>(options.initialState ?? {});
 
-    const listener = (newState: object) => setState(newState);
+    const listener = (newState: State) => setState(newState);
 
     const store = useMemo(() => {
-        const res = createStore(reducer, options);
+        const res = createStore<State>(reducer, options);
         res.subscribe(listener);
         return res;
     }, []);
 
-    const contextValue: DragnDropContextStore = useMemo(() => ({
+    const contextValue = useMemo(() => ({
         store,
         state,
         getState: () => store.getState(),
-        setState: (update: StoreUpdater) => store.setState(update),
+        setState: (update: StoreUpdater<State>) => store.setState(update),
         dispatch: (action: StoreAction) => store.dispatch(action),
     }), [state]);
 
     return (
-        <DragnDropContext.Provider value={contextValue}>
+        <DragnDropContext.Provider value={contextValue as StoreProviderContext}>
             {children}
         </DragnDropContext.Provider>
     );

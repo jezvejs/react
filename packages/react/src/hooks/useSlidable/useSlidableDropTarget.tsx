@@ -5,8 +5,7 @@ import { useDropTarget } from '../../utils/DragnDrop/useDropTarget.tsx';
 import { SlidableState, UseSlidableDropTargetProps } from './types.ts';
 
 export function useSlidableDropTarget(props: UseSlidableDropTargetProps) {
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as SlidableState ?? null;
+    const { getState } = useDragnDrop<SlidableState>();
 
     const dropTargetProps: UseSlidableDropTargetProps = {
         ...props,

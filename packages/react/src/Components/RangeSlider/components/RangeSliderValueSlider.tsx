@@ -35,13 +35,8 @@ export const RangeSliderValueSlider = forwardRef<
         RangeSliderValueSliderRef
     >(ref, () => innerRef?.current);
 
-    const dragDrop = useDragnDrop();
-    if (!dragDrop) {
-        return null;
-    }
-
-    const { getState } = dragDrop;
-    const state = getState() as RangeSliderState;
+    const { getState } = useDragnDrop<RangeSliderState>();
+    const state = getState();
 
     const maxPos = getMaxPos(innerRef?.current, axis);
     const rangeValue = (type === 'endSlider') ? state.end : state.start;

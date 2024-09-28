@@ -6,8 +6,12 @@ import { Point } from '../../utils/types.ts';
 import {
     DragAvatar,
     DragnDropState,
+    DragZone,
     DropTarget,
+    OnDragStartParams,
 } from '../../utils/DragnDrop/types.ts';
+import { UseDropTargetProps } from '../../utils/DragnDrop/useDropTarget.tsx';
+import { UseDragZoneProps } from '../../utils/DragnDrop/useDragZone.tsx';
 
 export interface ItemOffset extends Point {
     id: string;
@@ -58,9 +62,9 @@ export interface TreeFilterCallback<
  */
 export interface SortableItemPosition {
     id?: string | null;
-    parentId: string | null;
+    parentId?: string | null;
     index: number;
-    zoneId: string | null;
+    zoneId?: string | null;
 }
 
 /**
@@ -371,4 +375,121 @@ export interface SortableState extends DragnDropState, SortableProps {
     width: number;
 
     avatarState?: SortableAvatarState | null;
+}
+
+/**
+ * useSortableDropTarget() hook props
+ */
+export interface UseSortableDragZoneProps extends UseDragZoneProps {
+    group?: string | GetGroupFunction;
+
+    selector?: string;
+    placeholderClass?: string;
+    animatedClass?: string;
+    dragClass?: string | boolean;
+    containerSelector?: string;
+
+    allowSingleItemSort?: boolean;
+    onlyRootHandle?: boolean;
+    dragOriginal?: boolean;
+    absolutePos?: boolean;
+    copyWidth?: boolean;
+
+    table?: boolean;
+    tree?: boolean;
+
+    sourceNode?: HTMLElement | null;
+    sourceNodeRestored?: boolean;
+    nodeObserver?: MutationObserver | null;
+
+    onDragStart: (params: OnDragStartParams) => DragAvatar | null;
+
+    onSortStart?: (params: OnSortStartParam) => void;
+
+    getClosestItemElement?: (elem: Element | null) => Element | null;
+    itemIdFromElem?: (elem: Element | null) => string | null;
+    getDragItemElement?: () => Element | null;
+    findDragZoneItem?: (target: Element | null) => Element | null;
+    findAllDragZoneItems?: () => Element[];
+    isValidDragHandle?: (target: Element) => boolean;
+
+    getPlaceholder?: () => string | null;
+    getAnimatedClass?: () => string | null;
+    getItemSelector?: () => string | null;
+    getContainerSelector?: () => string | null;
+    getDragClass?: () => string | null;
+
+    restoreSourceNode?: () => void;
+    observeNode?: (node: Element | null) => void;
+    disconnectNodeObserver?: () => void;
+    removeSourceNode?: () => void;
+    finishDrag?: () => void;
+
+    makeSortableTableAvatar?: () => SortableDragAvatar | null;
+    makeSortableAvatar?: () => SortableDragAvatar | null;
+    makeAvatar?: () => SortableDragAvatar | null;
+
+    getGroup?: GetGroupFunction;
+
+    components?: {
+        Avatar?: React.ComponentType;
+    };
+}
+
+/**
+ * useSortableDropTarget() hook props
+ */
+export interface UseSortableDropTargetProps extends UseDropTargetProps {
+    group?: string | GetGroupFunction;
+
+    selector?: string;
+    placeholderClass?: string;
+    hoverClass?: string;
+    containerSelector?: string;
+    tree?: boolean;
+
+    getGroup?: () => string | null;
+
+    isAceptableAvatar?: (avatar: DragAvatar | null) => boolean;
+
+    onSortMove?: (params: OnSortMoveParam) => void;
+    onSortEnd?: (params: OnSortEndParam) => void;
+    onSortCancel?: (params: OnSortCancelParam) => void;
+
+    getItemElementById?: (id: string, elem: Element) => Element | null;
+
+    getItemsPositions?: (dragZone: DragZone | null) => SortableItemsPositions | null;
+
+    updatePositions?: (options: {
+        name: SortablePositionType;
+        zoneIds: string | string[];
+    }) => void;
+
+    checkPositionsCache?: (zoneIds: string | string[]) => void;
+
+    getTargetPositions?: (zoneIds: string[]) => void;
+
+    getAnimatedItem?: (
+        id: string | null,
+        index: number,
+        zoneIds: string[],
+        parentId: string | null,
+    ) => SortableItemAnimation | null;
+
+    getItemRects?: (
+        itemId: string,
+        zoneIds: string[],
+        state: SortableState,
+    ) => SortableItemRects | null,
+
+    getMovingItems?: (options: SortableMoveInfo) => SortableItemAnimation[] | null;
+
+    finishDrag?: () => void,
+
+    applySort?: (oarams: OnSortEndParam) => void;
+    cancelSort?: (params: OnSortCancelParam) => void;
+
+    components?: {
+        ListItem?: SortableListItemComponent;
+    },
 }

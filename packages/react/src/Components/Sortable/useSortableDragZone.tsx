@@ -1,5 +1,5 @@
 import { getOffset } from '@jezvejs/dom';
-import { ComponentType, useRef } from 'react';
+import { useRef } from 'react';
 
 import { px } from '../../utils/common.ts';
 import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
@@ -11,73 +11,16 @@ import {
     OnDragCancelParams,
     OnDragStartParams,
 } from '../../utils/DragnDrop/types.ts';
-import { useDragZone, UseDragZoneProps } from '../../utils/DragnDrop/useDragZone.tsx';
+import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
 import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { StyleDeclaration } from '../../utils/types.ts';
 
 import {
-    GetGroupFunction,
-    OnSortStartParam,
     SortableAvatarState,
     SortableDragAvatar,
     SortableState,
+    UseSortableDragZoneProps,
 } from './types.ts';
-
-export interface UseSortableDragZoneProps extends UseDragZoneProps {
-    group?: string | GetGroupFunction;
-
-    selector?: string;
-    placeholderClass?: string;
-    animatedClass?: string;
-    dragClass?: string | boolean;
-    containerSelector?: string;
-
-    allowSingleItemSort?: boolean;
-    onlyRootHandle?: boolean;
-    dragOriginal?: boolean;
-    absolutePos?: boolean;
-    copyWidth?: boolean;
-
-    table?: boolean;
-    tree?: boolean;
-
-    sourceNode?: HTMLElement | null;
-    sourceNodeRestored?: boolean;
-    nodeObserver?: MutationObserver | null;
-
-    onDragStart: (params: OnDragStartParams) => DragAvatar | null;
-
-    onSortStart?: (params: OnSortStartParam) => void;
-
-    getClosestItemElement?: (elem: Element | null) => Element | null;
-    itemIdFromElem?: (elem: Element | null) => string | null;
-    getDragItemElement?: () => Element | null;
-    findDragZoneItem?: (target: Element | null) => Element | null;
-    findAllDragZoneItems?: () => Element[];
-    isValidDragHandle?: (target: Element) => boolean;
-
-    getPlaceholder?: () => string | null;
-    getAnimatedClass?: () => string | null;
-    getItemSelector?: () => string | null;
-    getContainerSelector?: () => string | null;
-    getDragClass?: () => string | null;
-
-    restoreSourceNode?: () => void;
-    observeNode?: (node: Element | null) => void;
-    disconnectNodeObserver?: () => void;
-    removeSourceNode?: () => void;
-    finishDrag?: () => void;
-
-    makeSortableTableAvatar?: () => SortableDragAvatar | null;
-    makeSortableAvatar?: () => SortableDragAvatar | null;
-    makeAvatar?: () => SortableDragAvatar | null;
-
-    getGroup?: GetGroupFunction;
-
-    components?: {
-        Avatar?: ComponentType;
-    };
-}
 
 export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
     const dragDrop = useDragnDrop();

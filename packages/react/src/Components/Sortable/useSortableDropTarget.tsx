@@ -6,15 +6,14 @@ import {
     DragMaster,
     useDragnDrop,
     useDropTarget,
-    UseDropTargetProps,
 } from '../../utils/DragnDrop/index.ts';
 import {
     DragAvatar,
     DragZone,
     OnDragCancelParams,
     OnDragEndParams,
+    OnDragMoveParams,
 } from '../../utils/DragnDrop/types.ts';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 
 import {
     distinctValues,
@@ -38,78 +37,21 @@ import {
 } from './helpers.ts';
 import {
     AnimationBox,
-    GetGroupFunction,
     ItemOffset,
     OnSortCancelParam,
     OnSortEndParam,
-    OnSortMoveParam,
     SortableDragAvatar,
     SortableItemAnimation,
     SortableItemRects,
     SortableItemsPositions,
-    SortableListItemComponent,
     SortableMoveInfo,
     SortablePositionType,
     SortableState,
     SortableTreeItem,
     SortableZonePositionsMap,
+    UseSortableDragZoneProps,
+    UseSortableDropTargetProps,
 } from './types.ts';
-import { UseSortableDragZoneProps } from './useSortableDragZone.tsx';
-
-export interface UseSortableDropTargetProps extends UseDropTargetProps {
-    group?: string | GetGroupFunction;
-
-    selector?: string;
-    placeholderClass?: string;
-    hoverClass?: string;
-    containerSelector?: string;
-    tree?: boolean;
-
-    getGroup?: () => string | null;
-
-    isAceptableAvatar?: (avatar: DragAvatar | null) => boolean;
-
-    onSortMove?: (params: OnSortMoveParam) => void;
-    onSortEnd?: (params: OnSortEndParam) => void;
-    onSortCancel?: (params: OnSortCancelParam) => void;
-
-    getItemElementById?: (id: string, elem: Element) => Element | null;
-
-    getItemsPositions?: (dragZone: DragZone | null) => SortableItemsPositions | null;
-
-    updatePositions?: (options: {
-        name: SortablePositionType;
-        zoneIds: string | string[];
-    }) => void;
-
-    checkPositionsCache?: (zoneIds: string | string[]) => void;
-
-    getTargetPositions?: (zoneIds: string[]) => void;
-
-    getAnimatedItem?: (
-        id: string | null,
-        index: number,
-        zoneIds: string[],
-        parentId: string | null,
-    ) => SortableItemAnimation | null;
-
-    getItemRects?: (
-        itemId: string,
-        zoneIds: string[],
-        state: SortableState,
-    ) => SortableItemRects | null,
-
-    getMovingItems?: (options: SortableMoveInfo) => SortableItemAnimation[] | null;
-
-    finishDrag?: () => void,
-
-    applySort?: (oarams: OnSortEndParam) => void;
-    cancelSort?: (params: OnSortCancelParam) => void;
-
-    components?: {
-        ListItem?: SortableListItemComponent;
-    },
-}
 
 export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>) {
     const defaultProps = {
@@ -123,10 +65,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
 
     const targetElem = useRef<HTMLElement | null>(null);
 
-    const dragnDrop = useDragnDrop();
-
-    const getState = () => dragnDrop?.getState() as SortableState ?? null;
-    const setState = (update: StoreUpdater) => dragnDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<SortableState>();
 
     const dropTargetProps: UseSortableDropTargetProps = {
         ...defaultProps,
@@ -177,9 +116,10 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
             this.showHoverIndication?.(avatar);
         },
 
-        onDragMove(avatar: DragAvatar, e: TouchEvent | MouseEvent) {
+        onDragMove(params: OnDragMoveParams) {
+            const { avatar, e } = params;
             const dragMaster = DragMaster.getInstance();
-            if (!dragMaster) {
+            if (!dragMaster || !avatar) {
                 return;
             }
 
@@ -669,7 +609,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 return null;
             }
 
-            const state = getState() as SortableState;
+            const state = getState();
             const itemRects = this.getItemRects?.(id, zoneIds, state);
             if (!itemRects) {
                 return null;
