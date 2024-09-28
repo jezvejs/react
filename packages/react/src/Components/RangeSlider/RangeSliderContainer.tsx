@@ -9,7 +9,6 @@ import {
 import { minmax } from '../../utils/common.ts';
 import { RangeType } from '../../utils/types.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 
 // Local components
 import { RangeSliderDragZone } from './components/RangeSliderDragZone.tsx';
@@ -38,9 +37,7 @@ export const RangeSliderContainer = forwardRef<
         innerRef?.current
     ));
 
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as RangeSliderState ?? null;
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<RangeSliderState>();
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const endSliderRef = useRef<HTMLDivElement>(null);
@@ -167,12 +164,12 @@ export const RangeSliderContainer = forwardRef<
         const state = getState();
 
         const newValue = posToValue(pos, state);
-        const value = beforeChange(newValue);
+        const value = beforeChange(newValue) as number;
         if (state.value === value) {
             return;
         }
 
-        setState((prev) => ({
+        setState((prev: RangeSliderState) => ({
             ...prev,
             value,
         }));

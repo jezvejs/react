@@ -11,13 +11,12 @@ export const RangeSliderSelectedArea = forwardRef<
     RangeSliderSelectedAreaRef,
     RangeSliderSelectedAreaProps
 >((props, ref) => {
-    const dragDrop = useDragnDrop();
-    if (!dragDrop || !props.range) {
+    const { getState } = useDragnDrop<RangeSliderState>();
+    if (!props.range) {
         return null;
     }
 
-    const { getState } = dragDrop;
-    const state = getState() as RangeSliderState;
+    const state = getState();
 
     const startPos = valueToPosition(state.start, state.min, state.max, state.maxPos);
     const endPos = valueToPosition(state.end, state.min, state.max, state.maxPos);

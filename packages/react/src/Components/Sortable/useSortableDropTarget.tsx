@@ -14,7 +14,6 @@ import {
     OnDragEndParams,
     OnDragMoveParams,
 } from '../../utils/DragnDrop/types.ts';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 
 import {
     distinctValues,
@@ -66,10 +65,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
 
     const targetElem = useRef<HTMLElement | null>(null);
 
-    const dragnDrop = useDragnDrop();
-
-    const getState = () => dragnDrop?.getState() as SortableState ?? null;
-    const setState = (update: StoreUpdater) => dragnDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<SortableState>();
 
     const dropTargetProps: UseSortableDropTargetProps = {
         ...defaultProps,
@@ -613,7 +609,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 return null;
             }
 
-            const state = getState() as SortableState;
+            const state = getState();
             const itemRects = this.getItemRects?.(id, zoneIds, state);
             if (!itemRects) {
                 return null;

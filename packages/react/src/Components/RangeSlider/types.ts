@@ -60,6 +60,8 @@ export interface RangeSliderSelectedAreaProps {
 
 export type RangeSliderValueSliderType = 'startSlider' | 'endSlider';
 
+export type RangeSliderType = RangeSliderValueSliderType | 'selectedArea';
+
 /**
  * Value slider component props
  */
@@ -77,7 +79,7 @@ export interface RangeSliderValueSliderProps {
 export interface RangeSliderDragZoneProps {
     id: string;
     axis: RangeSliderAxisType;
-    type?: 'startSlider' | 'endSlider' | 'selectedArea';
+    type?: RangeSliderType;
     range: boolean;
     onPosChange: (position: number) => void;
 }

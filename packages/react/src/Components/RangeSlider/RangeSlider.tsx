@@ -86,4 +86,12 @@ export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, 
             <RangeSliderContainer {...commonProps} ref={ref} />
         </DragnDropProvider >
     );
+
+    /*
+    return (
+        <DragnDropProvider<RangeSliderState> initialState={initialState}>
+            <RangeSliderContainer {...commonProps} ref={ref} />
+        </DragnDropProvider >
+    );
+    */
 });

@@ -8,14 +8,14 @@ import {
     StoreState,
 } from './Store/Store.ts';
 
-export interface ReducerSlice {
+export interface ReducerSlice<State extends StoreState = StoreState> {
     actions: {
         [type: string]: StoreActionPayloadFunction,
     },
     reducers: {
-        [type: string]: StoreActionReducer,
+        [type: string]: StoreActionReducer<State>,
     },
-    reducer: StoreReducer,
+    reducer: StoreReducer<State>,
 }
 
 /**
@@ -24,15 +24,17 @@ export interface ReducerSlice {
  * @param {object} reducers
  * @returns {object}
  */
-export const createSlice = (reducers: object): ReducerSlice => {
+export function createSlice<State extends StoreState = StoreState>(
+    reducers: object,
+): ReducerSlice<State> {
     if (!isObject(reducers)) {
         throw new Error('Invalid actions object');
     }
 
-    const slice: ReducerSlice = {
+    const slice: ReducerSlice<State> = {
         actions: {},
         reducers: {},
-        reducer(state: StoreState, action: StoreActionObject): StoreState {
+        reducer(state: State, action: StoreActionObject): State {
             if (!(action.type in slice.reducers)) {
                 return state;
             }
@@ -48,4 +50,4 @@ export const createSlice = (reducers: object): ReducerSlice => {
     });
 
     return slice;
-};
+}

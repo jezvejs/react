@@ -7,7 +7,6 @@ import {
 } from 'react';
 
 import { useDragnDrop } from '../../utils/DragnDrop/index.ts';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 
 import { SortableContainer } from './components/Container/SortableContainer.tsx';
 import { SortableTableContainer } from './components/Container/SortableTableContainer.tsx';
@@ -74,9 +73,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
 
     const Avatar = components?.Avatar ?? components?.ListItem;
 
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as SortableState ?? null;
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<SortableState>();
 
     const getItems = (dragZoneId: string | null) => {
         const state = getState();
@@ -162,17 +159,17 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 },
                 target: {
                     id: move.sortPosition.id,
-                    index: move.sortPosition.index,
-                    parentId: move.sortPosition.parentId,
-                    zoneId: move.sortPosition.zoneId,
+                    index: move.sortPosition.index ?? -1,
+                    parentId: move.sortPosition.parentId ?? null,
+                    zoneId: move.sortPosition.zoneId ?? null,
                 },
                 swapWithPlaceholder: move.swapWithPlaceholder,
             });
 
-            const res = {
+            const res: SortableState = {
                 ...prev,
                 prevPosition: {
-                    ...prev.sortPosition,
+                    ...prev.sortPosition!,
                 },
                 sortPosition: {
                     ...move.sortPosition,
@@ -207,7 +204,7 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
 
             const sourceZoneId = source.zoneId;
             const targetZoneId = prev.sortPosition?.zoneId ?? null;
-            if (sourceZoneId === null || targetZoneId === null) {
+            if (!sourceZoneId || !targetZoneId) {
                 return prev;
             }
 
@@ -429,11 +426,11 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
                 return;
             }
 
-            const sourceZoneId = source.zoneId;
-            const sourceParentId = source.parentId;
+            const sourceZoneId = source.zoneId ?? null;
+            const sourceParentId = source.parentId ?? null;
 
-            const targetZoneId = state.sortPosition.zoneId;
-            const targetParentId = state.sortPosition.parentId;
+            const targetZoneId = state.sortPosition.zoneId ?? null;
+            const targetParentId = state.sortPosition.parentId ?? null;
 
             const sortParams = {
                 id: state.origSortPos.id,

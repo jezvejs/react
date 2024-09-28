@@ -62,9 +62,9 @@ export interface TreeFilterCallback<
  */
 export interface SortableItemPosition {
     id?: string | null;
-    parentId: string | null;
+    parentId?: string | null;
     index: number;
-    zoneId: string | null;
+    zoneId?: string | null;
 }
 
 /**

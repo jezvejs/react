@@ -40,14 +40,14 @@ export const RangeScrollChart = (props: RangeScrollChartProps) => {
         navigationSlider,
     } = props;
 
-    const mainStoreRef = useRef<StoreProviderContext | null>(null);
-    const navStoreRef = useRef<StoreProviderContext | null>(null);
+    const mainStoreRef = useRef<StoreProviderContext<BaseChartState> | null>(null);
+    const navStoreRef = useRef<StoreProviderContext<BaseChartState> | null>(null);
 
     const initialState = getInitialState(props);
     const [state, setState] = useState<RangeScrollChartState>(initialState);
 
-    const getMainState = (): BaseChartState => (
-        (mainStoreRef.current?.getState() as BaseChartState) ?? null
+    const getMainState = (): BaseChartState | null => (
+        (mainStoreRef.current?.getState()) ?? null
     );
 
     const onBeforeSliderChange = (
@@ -289,11 +289,11 @@ export const RangeScrollChart = (props: RangeScrollChartProps) => {
         }));
     };
 
-    const onMainStoreReady = (store: StoreProviderContext) => {
+    const onMainStoreReady = (store: StoreProviderContext<BaseChartState>) => {
         mainStoreRef.current = store;
     };
 
-    const onNavStoreReady = (store: StoreProviderContext) => {
+    const onNavStoreReady = (store: StoreProviderContext<BaseChartState>) => {
         navStoreRef.current = store;
     };
 

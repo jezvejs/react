@@ -5,7 +5,6 @@ import { DragMaster } from '../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 import { DragAvatarInitParam, OnDragMoveParams, OnDragStartParams } from '../../utils/DragnDrop/types.ts';
 import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { Point } from '../../utils/types.ts';
 
 import { PositionShift, SlidableState, UseSlidableDragZoneProps } from './types.ts';
@@ -14,9 +13,7 @@ export function useSlidableDragZone(props: UseSlidableDragZoneProps) {
     const avatarRef = useRef(null);
     const currentTargetElemRef = useRef<HTMLElement | null>(null);
 
-    const dragDrop = useDragnDrop();
-    const getState = () => dragDrop?.getState() as SlidableState ?? null;
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { getState, setState } = useDragnDrop<SlidableState>();
 
     const getPositionForCoordinates = (coords: Point, state?: PositionShift): number => (
         (props.vertical)

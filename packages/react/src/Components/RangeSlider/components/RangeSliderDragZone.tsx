@@ -26,6 +26,7 @@ import {
     RangeSliderDragZoneRef,
     RangeSliderSelectedAreaProps,
     RangeSliderState,
+    RangeSliderType,
     RangeSliderValueSliderProps,
     RangeSliderValueSliderType,
 } from '../types.ts';
@@ -36,9 +37,9 @@ export const RangeSliderDragZone = forwardRef<
     RangeSliderDragZoneProps
 >((props, ref) => {
     const {
-        type = 'startSlider',
+        type = 'startSlider' as RangeSliderType,
     } = props;
-    const sliderId = type;
+    const sliderId = type as RangeSliderType;
 
     const innerRef = useRef<RangeSliderDragZoneRef>(null);
     useImperativeHandle<
@@ -51,7 +52,7 @@ export const RangeSliderDragZone = forwardRef<
     const avatarRef = useRef<HTMLElement | null>(null);
     const currentTargetElemRef = useRef<HTMLElement | null>(null);
 
-    const { getState, setState } = useDragnDrop();
+    const { getState, setState } = useDragnDrop<RangeSliderState>();
 
     useEffect(() => {
         if (!innerRef?.current) {
@@ -136,7 +137,7 @@ export const RangeSliderDragZone = forwardRef<
                             ? (client.x - offset.left - shift.x - border.left)
                             : (client.y - offset.top - shift.y - border.top);
 
-                        const { maxPos } = state;
+                        const maxPos = state?.maxPos ?? 0;
                         const newPos = minmax(0, maxPos, pos);
 
                         setState((prev: RangeSliderState) => ({

@@ -377,7 +377,7 @@ export const DatePickerContainer = forwardRef<
         } else {
             setSelection(start, date, false);
 
-            const newState = getState() as DatePickerState;
+            const newState = getState();
             const { curRange } = newState;
             props.onRangeSelect?.(curRange, newState);
         }
@@ -391,7 +391,7 @@ export const DatePickerContainer = forwardRef<
 
         dispatch(actions.selectDay(date));
 
-        const newState = getState() as DatePickerState;
+        const newState = getState();
         const activeDates = asArray(newState.actDate);
         if (activeDates.length > 0) {
             const [actDate] = activeDates;

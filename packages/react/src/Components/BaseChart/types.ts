@@ -251,7 +251,7 @@ export interface BaseChartProps {
     popupPosition: 'right';
 
     // Callbacks
-    onStoreReady?: (store: StoreProviderContext) => void;
+    onStoreReady?: (store: StoreProviderContext<BaseChartState>) => void;
     onItemClick: ((options: { e: React.MouseEvent; }) => void) | null;
     onItemOver: ((options: { e: React.MouseEvent; }) => void) | null;
     onItemOut: ((options: { e: React.MouseEvent; }) => void) | null;
