@@ -159,6 +159,9 @@ export const DatePickerContainer = forwardRef<
             return;
         }
 
+        dispatch(actions.finishNavigate());
+        setDefaultContentPosition();
+
         /*
         if (state.focusIndex !== -1) {
             const view = (state.focusSecond) ? this.secondView : this.currView;
@@ -235,9 +238,8 @@ export const DatePickerContainer = forwardRef<
         },
         onExiting: () => {
             animation.setTransform(null);
-            dispatch(actions.finishNavigate());
             waitingForAnimationRef.current = false;
-            setDefaultContentPosition();
+            onStateReady();
         },
     });
 
@@ -857,7 +859,6 @@ export const DatePickerContainer = forwardRef<
             doubleView,
             width,
             height,
-            date: state.date,
         }));
     };
 
