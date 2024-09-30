@@ -154,12 +154,8 @@ export const DatePickerContainer = forwardRef<
         open: (state?.visible ?? false),
     });
 
-    const waitingForAnimation = useMemo(() => (
-        waitingForAnimationRef.current
-    ), [waitingForAnimationRef.current]);
-
     const onStateReady = () => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -272,7 +268,7 @@ export const DatePickerContainer = forwardRef<
     const hide = () => show(false);
 
     const navigateTo = (action: StoreActionObject) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -329,7 +325,7 @@ export const DatePickerContainer = forwardRef<
         endDate: Date | null,
         navigateToFirst: boolean = true,
     ) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -342,7 +338,7 @@ export const DatePickerContainer = forwardRef<
 
     /** Clears selected items range */
     const clearSelection = () => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -350,7 +346,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setDisabledDateFilter = (disabledDateFilter: DatePickerDisabledDateFilter | null) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -358,7 +354,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setRangePart = (rangePart: DatePickerRangePart | null) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -367,7 +363,7 @@ export const DatePickerContainer = forwardRef<
 
     /** Range select inner callback */
     const onRangeSelect = (date: Date) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -385,7 +381,7 @@ export const DatePickerContainer = forwardRef<
 
     /** Day cell click inner callback */
     const onDayClick = (date: Date) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -464,7 +460,7 @@ export const DatePickerContainer = forwardRef<
     const onViewClick = (e: React.MouseEvent) => {
         e.stopPropagation();
 
-        if (!currViewRef.current || waitingForAnimation) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             return;
         }
 
@@ -476,7 +472,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setContentPosition = (position: number) => {
-        if (!currViewRef.current || waitingForAnimation) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             return;
         }
 
@@ -542,7 +538,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setDefaultContentPosition = () => {
-        if (!currViewRef.current || waitingForAnimation) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             return;
         }
 
@@ -833,7 +829,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const onResize = () => {
-        if (!currViewRef || waitingForAnimation) {
+        if (!currViewRef || waitingForAnimationRef.current) {
             resizeRequestedRef.current = true;
             return;
         }
@@ -894,7 +890,7 @@ export const DatePickerContainer = forwardRef<
      */
     const onWheel = (ev: Event) => {
         const e = ev as WheelEvent;
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -911,7 +907,7 @@ export const DatePickerContainer = forwardRef<
 
         updatePosition: setContentPosition,
 
-        isReady: () => !waitingForAnimation,
+        isReady: () => !waitingForAnimationRef.current,
 
         onWheel,
         onSlideEnd,
@@ -934,7 +930,7 @@ export const DatePickerContainer = forwardRef<
         if (
             !st.next
             || animation.stage !== AnimationStages.exited
-            || waitingForAnimation
+            || waitingForAnimationRef.current
         ) {
             return;
         }
@@ -954,7 +950,7 @@ export const DatePickerContainer = forwardRef<
         state.viewType,
         state.next,
         animation.stage,
-        waitingForAnimation,
+        waitingForAnimationRef.current,
     ]);
 
     const isZoom = isZoomTransition(getState());
