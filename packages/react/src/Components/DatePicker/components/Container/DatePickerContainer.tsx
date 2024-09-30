@@ -392,8 +392,10 @@ export const DatePickerContainer = forwardRef<
         const newState = getState();
         const activeDates = asArray(newState.actDate);
         if (activeDates.length > 0) {
-            const [actDate] = activeDates;
-            props.onDateSelect?.(actDate, newState);
+            const value = (newState.multiple)
+                ? activeDates
+                : activeDates[0];
+            props.onDateSelect?.(value, newState);
         }
 
         if (props.range) {
