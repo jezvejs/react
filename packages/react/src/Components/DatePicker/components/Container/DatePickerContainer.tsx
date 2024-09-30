@@ -1244,9 +1244,13 @@ export const DatePickerContainer = forwardRef<
 
     const container = props.container ?? document.body;
 
+    const refWrapperProps = {
+        className: 'dp__ref-wrapper',
+    };
+
     return (
         <>
-            <div ref={referenceRef}>
+            <div {...refWrapperProps} ref={referenceRef}>
                 {props.children}
             </div>
             {state.visible && !state.fixed && datePicker}

@@ -3,6 +3,10 @@
   align-items: center;
   justify-content: center;
   padding: 350px 1rem;
+
+  & > div {
+    flex-grow: 1;
+  }
 }
 
 .btn.input-group__btn {
