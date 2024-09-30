@@ -28,6 +28,18 @@ export const DatePickerInputGroup = (props) => {
     const datePickerProps = {
         ...rest,
         visible: state.open,
+        onShow: () => {
+            setState((prev) => ({
+                ...prev,
+                open: true,
+            }));
+        },
+        onHide: () => {
+            setState((prev) => ({
+                ...prev,
+                open: false,
+            }));
+        },
         onDateSelect: (dates) => {
             setState((prev) => ({
                 ...prev,
