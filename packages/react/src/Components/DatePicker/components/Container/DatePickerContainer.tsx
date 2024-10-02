@@ -980,7 +980,7 @@ export const DatePickerContainer = forwardRef<
     if (doubleView) {
         headerProps.secondTitle = getHeaderTitle({
             viewType: state.viewType,
-            date: viewDates.next,
+            date: viewDates.second,
             locales: state.locales,
         });
     }
