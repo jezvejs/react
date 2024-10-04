@@ -15,6 +15,7 @@ import {
     DatePickerProps,
     DatePickerRange,
     DatePickerState,
+    DatePickerViewDates,
     DatePickerViewType,
 } from './types.ts';
 import { Rect } from '../../utils/types.ts';
@@ -45,7 +46,7 @@ export const getInitialState = (props: DatePickerProps, defaultProps: DatePicker
         sliderPosition: 0,
         width: 0,
         height: 0,
-        next: null,
+        nextState: null,
         position: {
             ...(defaultProps?.position ?? {}),
             ...(props.position ?? {}),
@@ -178,8 +179,8 @@ export const inRange = (date: Date, range: DatePickerRange): boolean => {
  * @returns {boolean}
  */
 export const isSameNextViewType = (state: DatePickerState): boolean => (
-    !!state.next
-    && state.next.viewType === state.viewType
+    !!state.nextState
+    && state.nextState.viewType === state.viewType
 );
 
 /**
@@ -188,8 +189,8 @@ export const isSameNextViewType = (state: DatePickerState): boolean => (
  * @returns {boolean}
  */
 export const isSameNextDate = (state: DatePickerState): boolean => (
-    !!state.next
-    && isSameDate(state.next.date, state.date)
+    !!state.nextState
+    && isSameDate(state.nextState.date, state.date)
 );
 
 /**
@@ -214,13 +215,6 @@ export const isZoomTransition = (state: DatePickerState): boolean => (
     !!state.transition
     && zoomTransitions.includes(state.transition)
 );
-
-export interface DatePickerViewDates {
-    previous: Date;
-    current: Date;
-    second: Date;
-    next: Date;
-}
 
 export const getViewDates = (state: DatePickerState): DatePickerViewDates => {
     let prevDate = getPrevViewDate(state.date, state.viewType);

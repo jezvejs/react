@@ -37,18 +37,23 @@ export interface DatePickerHeaderTitleParam {
 export type DatePickerHeaderComponent = React.FC<DatePickerHeaderProps>;
 
 /**
+ * Header callbacks
+ */
+export interface DatePickerHeaderCallbacks {
+    onClickTitle?: (params: DatePickerTitleClickParams) => void;
+    onClickPrev?: (params: object) => void;
+    onClickNext?: (params: object) => void;
+}
+
+/**
  * Header props
  */
-export interface DatePickerHeaderProps {
+export interface DatePickerHeaderProps extends DatePickerHeaderCallbacks {
     title?: string | null;
     secondTitle?: string | null;
     doubleView?: boolean;
     focusable?: boolean;
     secondViewTransition?: boolean;
-
-    onClickTitle?: (params: DatePickerTitleClickParams) => void;
-    onClickPrev?: (params: object) => void;
-    onClickNext?: (params: object) => void;
 }
 
 /**
@@ -278,7 +283,7 @@ export interface DatePickerState extends DatePickerProps {
     width: number;
     height: number;
 
-    next: DatePickerNextState | null;
+    nextState: DatePickerNextState | null;
 }
 
 /**
@@ -319,3 +324,69 @@ export interface DatePickerTitleClickParams {
     e: React.MouseEvent;
     secondViewTransition: boolean;
 }
+
+export type DatePickerContainerProps = DatePickerProps;
+export type DatePickerContainerRef = HTMLDivElement | null;
+export type DatePickerSliderRef = HTMLDivElement | null;
+export type DatePickerCellsContainerRef = HTMLDivElement | null;
+
+export type DragZoneRef = Element | null;
+export type DropTargetRef = Element | null;
+
+export interface GetViewHeightsParam {
+    prev?: HTMLDivElement | null;
+    current: HTMLDivElement | null;
+    second?: HTMLDivElement | null;
+    next?: HTMLDivElement | null;
+}
+
+export interface ViewHeights {
+    prev?: number;
+    current?: number;
+    second?: number;
+    next?: number;
+    header?: number;
+}
+
+export interface DatePickerViewsRefs {
+    previous?: React.MutableRefObject<HTMLDivElement | null>;
+    current?: React.MutableRefObject<HTMLDivElement | null>;
+    second?: React.MutableRefObject<HTMLDivElement | null>;
+    next?: React.MutableRefObject<HTMLDivElement | null>;
+}
+
+export interface DatePickerRenderViewsParams {
+    renderOutside: boolean;
+    refs: DatePickerViewsRefs;
+}
+
+/**
+ * Result of getViewDates() function and part of DatePickerViewsGroupProps
+ */
+export interface DatePickerViewDates {
+    previous: Date;
+    current: Date;
+    second: Date;
+    next: Date;
+}
+
+/**
+ * DatePickerViewsGroup component props
+ */
+export type DatePickerViewsGroupProps =
+    DatePickerViewState
+    & DatePickerRenderViewsParams
+    & DatePickerViewDates
+    & DatePickerHeaderCallbacks
+    & {
+        zoomOut: (params: DatePickerZoomOutParams) => void;
+        refs: DatePickerViewsRefs;
+    };
+
+/**
+ * DatePickerDateView component props
+ */
+export interface DatePickerDateViewProps extends DatePickerViewState, DatePickerHeaderCallbacks {
+    zoomOut: (params: DatePickerZoomOutParams) => void;
+    dateViewRef: React.MutableRefObject<HTMLDivElement | null> | null | undefined;
+};

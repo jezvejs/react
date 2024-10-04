@@ -24,9 +24,7 @@ import { useSlidable } from '../../../../hooks/useSlidable/useSlidable.tsx';
 import { formatOffsetMatrix } from '../../../Sortable/helpers.ts';
 
 // Local components
-import { DatePickerMonthView } from '../MonthView/MonthView.tsx';
-import { DatePickerYearRangeView } from '../YearRangeView/YearRangeView.tsx';
-import { DatePickerYearView } from '../YearView/YearView.tsx';
+import { DatePickerViewsGroup } from '../ViewsGroup/ViewsGroup.tsx';
 
 import {
     MIN_DOUBLE_VIEW_SCREEN_WIDTH,
@@ -50,55 +48,26 @@ import {
 } from '../../helpers.ts';
 import { actions } from '../../reducer.ts';
 import {
+    DatePickerCellsContainerRef,
+    DatePickerContainerProps,
+    DatePickerContainerRef,
     DatePickerDisabledDateFilter,
     DatePickerHeaderProps,
     DatePickerItem,
-    DatePickerProps,
     DatePickerRangePart,
     DatePickerSearchResults,
+    DatePickerSliderRef,
     DatePickerState,
-    DatePickerTitleClickParams,
-    DatePickerViewState,
+    DatePickerViewsGroupProps,
     DatePickerViewTransform,
     DatePickerZoomInParams,
     DatePickerZoomOutParams,
+    DragZoneRef,
+    DropTargetRef,
+    GetViewHeightsParam,
+    ViewHeights,
 } from '../../types.ts';
 import './DatePickerContainer.scss';
-
-type DatePickerContainerProps = DatePickerProps;
-type DatePickerContainerRef = HTMLDivElement | null;
-type DatePickerSliderRef = HTMLDivElement | null;
-type DatePickerCellsContainerRef = HTMLDivElement | null;
-
-type DragZoneRef = Element | null;
-type DropTargetRef = Element | null;
-
-interface GetViewHeightsParam {
-    prev?: HTMLDivElement | null;
-    current: HTMLDivElement | null;
-    second?: HTMLDivElement | null;
-    next?: HTMLDivElement | null;
-}
-
-interface ViewHeights {
-    prev?: number;
-    current?: number;
-    second?: number;
-    next?: number;
-    header?: number;
-}
-
-interface DatePickerViewsRefs {
-    previous?: React.MutableRefObject<HTMLDivElement | null>;
-    current?: React.MutableRefObject<HTMLDivElement | null>;
-    second?: React.MutableRefObject<HTMLDivElement | null>;
-    next?: React.MutableRefObject<HTMLDivElement | null>;
-}
-
-interface DatePickerRenderViewsParams {
-    renderOutside: boolean;
-    refs: DatePickerViewsRefs;
-}
 
 // eslint-disable-next-line react/display-name
 export const DatePickerContainer = forwardRef<
@@ -186,7 +155,7 @@ export const DatePickerContainer = forwardRef<
             second: secondTargetViewRef.current,
         });
 
-        const isSlideNext = (!!st.next && st.date < st.next?.date);
+        const isSlideNext = (!!st.nextState && st.date < st.nextState?.date);
         const heights = viewHeightsRef.current;
         const current = (isSlideNext) ? heights.next : heights.prev;
 
@@ -574,7 +543,7 @@ export const DatePickerContainer = forwardRef<
 
     const zoom = () => {
         const st = getState();
-        if (!st.next) {
+        if (!st.nextState) {
             return;
         }
 
@@ -591,12 +560,12 @@ export const DatePickerContainer = forwardRef<
         let relViewDate;
         if (secondViewTransition) {
             relView = ((zoomingOut) ? secondViewRef : secondTargetViewRef).current;
-            relViewType = (zoomingOut) ? st.next?.viewType : st.viewType;
-            relViewDate = (zoomingOut) ? st.next?.date : st.date;
+            relViewType = (zoomingOut) ? st.nextState?.viewType : st.viewType;
+            relViewDate = (zoomingOut) ? st.nextState?.date : st.date;
         } else {
             relView = ((zoomingOut) ? currViewRef : targetViewRef).current;
-            relViewType = (zoomingOut) ? st.viewType : st.next?.viewType;
-            relViewDate = (zoomingOut) ? st.date : st.next?.date;
+            relViewType = (zoomingOut) ? st.viewType : st.nextState?.viewType;
+            relViewDate = (zoomingOut) ? st.date : st.nextState?.date;
         }
         if (!relView) {
             return;
@@ -690,72 +659,6 @@ export const DatePickerContainer = forwardRef<
         onClickTitle: zoomOut,
         onClickPrev: navigateToPrev,
         onClickNext: navigateToNext,
-    };
-
-    const renderDateView = (
-        date: Date,
-        viewState: DatePickerViewState,
-        dateViewRef: React.MutableRefObject<HTMLDivElement | null> | null | undefined,
-    ) => {
-        const {
-            viewType,
-            locales,
-            focusable,
-            components,
-        } = viewState;
-
-        const refProps = (dateViewRef)
-            ? { ref: dateViewRef }
-            : {};
-
-        const commonProps = {
-            date,
-            locales,
-            doubleView,
-            focusable,
-            renderHeader: doubleView && vertical,
-            header: {
-                ...headerEvents,
-                focusable,
-                onClickTitle: (options: DatePickerTitleClickParams) => zoomOut({
-                    ...options,
-                    secondViewTransition: true,
-                }),
-            },
-            components: {
-                Header: components.Header,
-                WeekDaysHeader: components.WeekDaysHeader,
-            },
-            ...refProps,
-        };
-
-        if (viewType === MONTH_VIEW) {
-            return (
-                <DatePickerMonthView
-                    {...commonProps}
-                    firstDay={viewState.firstDay}
-                    actDate={viewState.actDate}
-                    multiple={viewState.multiple}
-                    range={viewState.range}
-                    curRange={viewState.curRange}
-                    disabledDateFilter={viewState.disabledDateFilter}
-                    rangePart={viewState.rangePart}
-                    renderWeekdays={!viewState.vertical}
-                    showOtherMonthDays={viewState.showOtherMonthDays}
-                    fixedHeight={viewState.fixedHeight}
-                />
-            );
-        }
-
-        if (viewType === YEAR_VIEW) {
-            return <DatePickerYearView {...commonProps} />;
-        }
-
-        if (viewType === YEARRANGE_VIEW) {
-            return <DatePickerYearRangeView {...commonProps} />;
-        }
-
-        throw new Error('Invalid view type');
     };
 
     // Update visibility of component
@@ -931,7 +834,7 @@ export const DatePickerContainer = forwardRef<
         const st = getState();
 
         if (
-            !st.next
+            !st.nextState
             || animation.stage !== AnimationStages.exited
             || waitingForAnimationRef.current
         ) {
@@ -939,7 +842,7 @@ export const DatePickerContainer = forwardRef<
         }
 
         if (isSlideTransition(st)) {
-            const isNext = st.next.date > state.date;
+            const isNext = st.nextState.date > state.date;
             slideTo(isNext ? 1 : -1);
             return;
         }
@@ -951,7 +854,7 @@ export const DatePickerContainer = forwardRef<
         state.transition,
         state.date,
         state.viewType,
-        state.next,
+        state.nextState,
         animation.stage,
         waitingForAnimationRef.current,
     ]);
@@ -1001,59 +904,25 @@ export const DatePickerContainer = forwardRef<
         );
     }
 
-    const RenderViews = (st: DatePickerViewState, options: DatePickerRenderViewsParams) => {
-        const {
-            renderOutside = true,
-            refs,
-        } = options;
-
-        const res = useMemo(() => {
-            const prevView = renderOutside && (
-                renderDateView(viewDates.previous, st, refs?.previous)
-            );
-            const currentView = renderDateView(viewDates.current, st, refs?.current);
-
-            const secondView = state.doubleView && (
-                renderDateView(viewDates.second, st, refs?.second)
-            );
-
-            const nextView = renderOutside && renderDateView(viewDates.next, st, refs?.next);
-
-            return (
-                <>
-                    {prevView}
-                    {currentView}
-                    {doubleView && secondView}
-                    {nextView}
-                </>
-            );
-        }, [
-            st.date,
-            st.doubleView,
-            st.viewType,
-            st.locales,
-            st.slideIndex,
-            renderOutside,
-        ]);
-
-        return res;
-    };
-
     // Content
-    const viewState: DatePickerViewState = {
+    const viewGroupProps: DatePickerViewsGroupProps = {
         ...state,
         focusable: keyboardNavigation,
-    };
-
-    const views = RenderViews(viewState, {
         renderOutside: !isZoom,
+        ...viewDates,
+        zoomOut,
+        onClickTitle: zoomOut,
+        onClickPrev: navigateToPrev,
+        onClickNext: navigateToNext,
         refs: {
             previous: prevViewRef,
             current: currViewRef,
             second: secondViewRef,
             next: nextViewRef,
         },
-    });
+    };
+
+    const views = <DatePickerViewsGroup {...viewGroupProps} />;
 
     const cellsContainerProps: React.HTMLAttributes<HTMLDivElement> = {
         className: classNames(
@@ -1112,22 +981,6 @@ export const DatePickerContainer = forwardRef<
 
     let viewContent;
 
-    const nextViewState: DatePickerViewState = {
-        ...state,
-        viewType: state.next?.viewType ?? state.viewType,
-        focusable: keyboardNavigation,
-    };
-
-    // TODO : don't render next views every time (currently requeired due to useMemo()
-    // hook inside RenderViews() function)
-    const nextViews = RenderViews(nextViewState, {
-        renderOutside: false,
-        refs: {
-            current: targetViewRef,
-            second: secondTargetViewRef,
-        },
-    });
-
     const transform = animation.transform?.transform ?? '';
     if (isZoom) {
         const zoomingOut = state.transition === 'zoomOut';
@@ -1159,10 +1012,27 @@ export const DatePickerContainer = forwardRef<
             },
         };
 
+        const nextViewsProps = {
+            ...state,
+            date: state.nextState?.date ?? state.date,
+            viewType: state.nextState?.viewType ?? state.viewType,
+            focusable: keyboardNavigation,
+            renderOutside: false,
+            ...viewDates,
+            zoomOut,
+            onClickTitle: zoomOut,
+            onClickPrev: navigateToPrev,
+            onClickNext: navigateToNext,
+            refs: {
+                current: targetViewRef,
+                second: secondTargetViewRef,
+            },
+        };
+
         viewContent = (
             <>
                 <div {...targetProps} ref={zoomTargetRef}>
-                    {nextViews}
+                    <DatePickerViewsGroup {...nextViewsProps} />
                 </div>
                 <div {...sourceProps} ref={zoomSourceRef}>
                     {views}

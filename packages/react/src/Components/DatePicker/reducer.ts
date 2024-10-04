@@ -69,7 +69,7 @@ const slice = createSlice({
         ([YEAR_VIEW, YEARRANGE_VIEW].includes(state.viewType))
             ? {
                 ...state,
-                next: {
+                nextState: {
                     date: params.date,
                     viewType: (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW,
                 },
@@ -85,7 +85,7 @@ const slice = createSlice({
         ([MONTH_VIEW, YEAR_VIEW].includes(state.viewType))
             ? {
                 ...state,
-                next: {
+                nextState: {
                     date: state.date,
                     viewType: (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW,
                 },
@@ -99,7 +99,7 @@ const slice = createSlice({
 
     navigateToPrev: (state: DatePickerState): DatePickerState => ({
         ...state,
-        next: {
+        nextState: {
             date: getPrevViewDate(state.date, state.viewType),
             viewType: state.viewType,
         },
@@ -108,7 +108,7 @@ const slice = createSlice({
 
     navigateToNext: (state: DatePickerState): DatePickerState => ({
         ...state,
-        next: {
+        nextState: {
             date: getNextViewDate(state.date, state.viewType),
             viewType: state.viewType,
         },
@@ -117,9 +117,9 @@ const slice = createSlice({
 
     finishNavigate: (state: DatePickerState): DatePickerState => ({
         ...state,
-        date: state.next?.date ?? state.date,
-        viewType: state.next?.viewType ?? state.viewType,
-        next: null,
+        date: state.nextState?.date ?? state.date,
+        viewType: state.nextState?.viewType ?? state.viewType,
+        nextState: null,
         transition: null,
     }),
 
