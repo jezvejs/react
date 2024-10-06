@@ -389,4 +389,4 @@ export type DatePickerViewsGroupProps =
 export interface DatePickerDateViewProps extends DatePickerViewState, DatePickerHeaderCallbacks {
     zoomOut: (params: DatePickerZoomOutParams) => void;
     dateViewRef: React.MutableRefObject<HTMLDivElement | null> | null | undefined;
-};
+}

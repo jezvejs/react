@@ -19,7 +19,7 @@ export const DatePickerViewsGroup = (props: DatePickerViewsGroupProps) => {
                 }}
             />
         );
-        const currentView =  (
+        const currentView = (
             <DatePickerDateView
                 {...{
                     ...props,
@@ -28,7 +28,6 @@ export const DatePickerViewsGroup = (props: DatePickerViewsGroupProps) => {
                 }}
             />
         );
-
 
         const secondView = props.doubleView && (
             <DatePickerDateView
