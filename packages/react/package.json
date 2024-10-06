@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "type": "module",
     "files": [
         "src",
@@ -28,7 +28,7 @@
         "@jezvejs/dom": "^1.2.1",
         "@jezvejs/number": "^1.1.0",
         "@jezvejs/types": "^1.1.0",
-        "@vitejs/plugin-react": "^4.3.1",
+        "@vitejs/plugin-react": "^4.3.2",
         "classnames": "^2.5.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
