@@ -68,8 +68,8 @@ export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
 
     const typeMap = {
         [MONTH_VIEW]: (d: Date) => (new Date(d.getFullYear(), d.getMonth() - 1, 1)),
-        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() - 1, 1, 1)),
-        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() - YEAR_RANGE_LENGTH, 1, 1)),
+        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() - 1, d.getMonth(), 1)),
+        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() - YEAR_RANGE_LENGTH, 0, 1)),
     };
 
     if (!isFunction(typeMap[viewType])) {
@@ -87,8 +87,8 @@ export const getNextViewDate = (date: Date, viewType: DatePickerViewType) => {
 
     const typeMap = {
         [MONTH_VIEW]: (d: Date) => (new Date(d.getFullYear(), d.getMonth() + 1, 1)),
-        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() + 1, 1, 1)),
-        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() + YEAR_RANGE_LENGTH, 1, 1)),
+        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() + 1, d.getMonth(), 1)),
+        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() + YEAR_RANGE_LENGTH, 0, 1)),
     };
 
     if (!isFunction(typeMap[viewType])) {
@@ -284,7 +284,7 @@ export const getViewItemBox = (elem: HTMLElement | null, state: DatePickerState)
         return null;
     }
 
-    const { vertical, secondViewTransition } = state;
+    const { vertical, secondViewTransition, doubleView } = state;
 
     const x = (secondViewTransition && !vertical)
         ? (elem.offsetLeft - elem.offsetWidth)
@@ -294,10 +294,10 @@ export const getViewItemBox = (elem: HTMLElement | null, state: DatePickerState)
         ? (elem.offsetTop - elem.offsetHeight)
         : elem.offsetTop;
 
-    const width = (secondViewTransition && !vertical)
+    const width = (doubleView && !vertical)
         ? (elem.offsetWidth * 2)
         : elem.offsetWidth;
-    const height = (secondViewTransition && vertical)
+    const height = (doubleView && vertical)
         ? (elem.offsetHeight * 2)
         : elem.offsetHeight;
 

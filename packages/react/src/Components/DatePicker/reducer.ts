@@ -48,7 +48,6 @@ const slice = createSlice({
         ...state,
         ...update,
         transition: null,
-        secondViewTransition: false,
     }),
 
     resize: (
@@ -57,7 +56,6 @@ const slice = createSlice({
     ): DatePickerState => ({
         ...state,
         ...update,
-        secondViewTransition: false,
     }),
 
     setSliderPosition: (state: DatePickerState, sliderPosition: number): DatePickerState => ({
@@ -65,37 +63,61 @@ const slice = createSlice({
         sliderPosition,
     }),
 
-    zoomIn: (state: DatePickerState, params: DatePickerZoomInParams): DatePickerState => (
-        ([YEAR_VIEW, YEARRANGE_VIEW].includes(state.viewType))
-            ? {
-                ...state,
-                nextState: {
-                    date: params.date,
-                    viewType: (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW,
-                },
-                transition: 'zoomIn',
-                ...params,
-                date: state.date,
-                viewType: state.viewType,
-            }
-            : state
-    ),
+    zoomIn: (state: DatePickerState, params: DatePickerZoomInParams): DatePickerState => {
+        if (![YEAR_VIEW, YEARRANGE_VIEW].includes(state.viewType)) {
+            return state;
+        }
 
-    zoomOut: (state: DatePickerState, params: DatePickerZoomOutParams): DatePickerState => (
-        ([MONTH_VIEW, YEAR_VIEW].includes(state.viewType))
-            ? {
-                ...state,
-                nextState: {
-                    date: state.date,
-                    viewType: (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW,
-                },
-                transition: 'zoomOut',
-                ...params,
-                date: state.date,
-                viewType: state.viewType,
-            }
-            : state
-    ),
+        const currentDate = (state.secondViewTransition)
+            ? getPrevViewDate(state.date, state.viewType)
+            : state.date;
+
+        const nextViewType = (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW;
+        return {
+            ...state,
+            nextState: {
+                date: params.date,
+                viewType: nextViewType,
+            },
+            transition: 'zoomIn',
+            secondViewTransition: params.secondViewTransition,
+            date: (
+                (params.secondViewTransition)
+                    ? getNextViewDate(currentDate, state.viewType)
+                    : currentDate
+            ),
+        };
+    },
+
+    zoomOut: (state: DatePickerState, params: DatePickerZoomOutParams): DatePickerState => {
+        if (![MONTH_VIEW, YEAR_VIEW].includes(state.viewType)) {
+            return state;
+        }
+
+        const currentDate = (state.secondViewTransition)
+            ? getPrevViewDate(state.date, state.viewType)
+            : state.date;
+
+        const nextViewType = (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW;
+        return {
+            ...state,
+            nextState: {
+                date: (
+                    (params.secondViewTransition)
+                        ? getNextViewDate(currentDate, state.viewType)
+                        : currentDate
+                ),
+                viewType: nextViewType,
+            },
+            transition: 'zoomOut',
+            secondViewTransition: params.secondViewTransition,
+            date: (
+                (params.secondViewTransition)
+                    ? getNextViewDate(currentDate, state.viewType)
+                    : currentDate
+            ),
+        };
+    },
 
     navigateToPrev: (state: DatePickerState): DatePickerState => ({
         ...state,

@@ -118,7 +118,7 @@ export const DatePickerContainer = forwardRef<
     ));
 
     // Popup position
-    const { referenceRef, elementRef } = usePopupPosition({
+    const { reference, referenceRef, elementRef } = usePopupPosition({
         ...(state?.position ?? {}),
         open: (state?.visible ?? false),
     });
@@ -209,6 +209,10 @@ export const DatePickerContainer = forwardRef<
             animation.setTransform(null);
             waitingForAnimationRef.current = false;
             onStateReady();
+
+            if (resizeRequestedRef.current) {
+                onResize();
+            }
         },
     });
 
@@ -418,9 +422,7 @@ export const DatePickerContainer = forwardRef<
 
         let secondViewTransition = false;
         if (doubleView) {
-            const view = elem?.closest('.dp__view-container');
-            const previous = view?.previousElementSibling;
-            secondViewTransition = previous?.classList?.contains('dp__view-container') ?? false;
+            secondViewTransition = secondViewRef.current?.contains(elem) ?? false;
         }
 
         return {
@@ -555,17 +557,13 @@ export const DatePickerContainer = forwardRef<
             return;
         }
 
+        const relViewType = (zoomingOut) ? st.viewType : st.nextState.viewType;
+        const relViewDate = (zoomingOut) ? st.date : st.nextState.date;
         let relView;
-        let relViewType;
-        let relViewDate;
         if (secondViewTransition) {
             relView = ((zoomingOut) ? secondViewRef : secondTargetViewRef).current;
-            relViewType = (zoomingOut) ? st.nextState?.viewType : st.viewType;
-            relViewDate = (zoomingOut) ? st.nextState?.date : st.date;
         } else {
             relView = ((zoomingOut) ? currViewRef : targetViewRef).current;
-            relViewType = (zoomingOut) ? st.viewType : st.nextState?.viewType;
-            relViewDate = (zoomingOut) ? st.date : st.nextState?.date;
         }
         if (!relView) {
             return;
@@ -605,8 +603,21 @@ export const DatePickerContainer = forwardRef<
             return;
         }
 
-        const scaleX = cell.width / st.width;
-        const scaleY = cell.height / st.height;
+        const view = {
+            width: st.width,
+            height: st.height,
+        };
+
+        if (secondViewTransition && zoomingOut) {
+            if (vertical) {
+                cell.y += (st.height / 2);
+            } else {
+                cell.x += (st.width / 2);
+            }
+        }
+
+        const scaleX = cell.width / view.width;
+        const scaleY = cell.height / view.height;
         const cellTrans = [scaleX, 0, 0, scaleY, cell.x, cell.y];
         const viewTrans = [
             1 / scaleX,
@@ -721,7 +732,7 @@ export const DatePickerContainer = forwardRef<
 
         // For horizontal layout return maximal height
         if (!vertical) {
-            return Math.max(...childHeights);
+            return Math.max(...childHeights, 0);
         }
 
         // For vertical layout return sum of all views and gaps between
@@ -735,7 +746,7 @@ export const DatePickerContainer = forwardRef<
         return res;
     };
 
-    const onResize = () => {
+    function onResize() {
         if (!currViewRef || waitingForAnimationRef.current) {
             resizeRequestedRef.current = true;
             return;
@@ -754,10 +765,6 @@ export const DatePickerContainer = forwardRef<
         const width = getWidth(cellsContainer);
         const height = containerHeight;
 
-        if (cellsContainer) {
-            cellsContainer.style.height = px(containerHeight);
-        }
-
         setDefaultContentPosition();
 
         dispatch(actions.resize({
@@ -765,25 +772,31 @@ export const DatePickerContainer = forwardRef<
             width,
             height,
         }));
-    };
+    }
 
     useEffect(() => {
-        const container = innerRef?.current as HTMLElement;
-        if (!container?.offsetParent) {
+        const containerEl = innerRef.current as HTMLElement;
+        const refEl = reference.current as HTMLElement;
+        if (!containerEl && !refEl) {
             return undefined;
         }
 
         const observer = new ResizeObserver(onResize);
-        observer.observe(container.offsetParent);
+        if (containerEl) {
+            observer.observe(containerEl);
+        }
+        if (refEl) {
+            observer.observe(refEl);
+        }
 
         return () => {
             observer.disconnect();
         };
-    }, [innerRef]);
+    }, [innerRef.current, reference.current]);
 
     // Measure dimensions of views
     useEffect(() => {
-        viewHeightsRef.current = getViewsHeights(/* views */);
+        viewHeightsRef.current = getViewsHeights();
         const width = getWidth(cellsContainerRef.current);
         const height = getContainerHeight(viewHeightsRef.current);
 
@@ -862,7 +875,7 @@ export const DatePickerContainer = forwardRef<
     const isZoom = isZoomTransition(getState());
 
     // Render views
-    const viewDates = getViewDates(state);
+    const viewDates = getViewDates(getState());
 
     // Header
     const { Header } = state.components;
@@ -971,7 +984,9 @@ export const DatePickerContainer = forwardRef<
     if (state.width > 0) {
         cellsContainerProps.style!.width = px(state.width);
     }
-    cellsContainerProps.style!.height = px(state.height);
+    if (state.height > 0) {
+        cellsContainerProps.style!.height = px(state.height);
+    }
 
     if (vertical) {
         sliderProps.style!.top = px(state.sliderPosition);
