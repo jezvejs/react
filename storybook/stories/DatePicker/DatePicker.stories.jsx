@@ -41,6 +41,9 @@ export const Default = {
         inline: true,
         animated: true,
     },
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const [state, setState] = useState({
             value: '',
@@ -89,10 +92,10 @@ export const FullWidth = {
         inline: true,
         className: 'dp_full-width',
     },
+    decorators: [widthDecorator],
     parameters: {
         layout: 'fullscreen',
     },
-    decorators: [widthDecorator],
 };
 
 export const Popup = {
@@ -103,6 +106,9 @@ export const Popup = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
@@ -115,10 +121,10 @@ export const PopupPosition = {
             screenPadding: 5,
         },
     },
+    decorators: [heightDecorator],
     parameters: {
         layout: 'fullscreen',
     },
-    decorators: [heightDecorator],
     render: function Render(args) {
         const [state, setState] = useState({
             open: false,
@@ -155,6 +161,9 @@ export const HideOnSelect = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
@@ -172,6 +181,9 @@ export const CustomFooter = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const {
             inputId = null,
@@ -225,6 +237,9 @@ export const Multiple = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
@@ -239,6 +254,9 @@ export const RangeSelect = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const {
             inputId = null,
@@ -288,6 +306,9 @@ export const DoubleView = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
@@ -307,6 +328,9 @@ export const Vertical = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
@@ -324,6 +348,9 @@ export const VerticalDoubleView = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: (args) => (
         <DatePickerInputGroup {...args} />
     ),
@@ -338,6 +365,9 @@ export const Callbacks = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const {
             inputId = null,
@@ -399,6 +429,9 @@ export const SetSelection = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const {
             inputId = null,
@@ -479,6 +512,9 @@ export const DisabledDateFilter = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const {
             inputId = null,
@@ -557,6 +593,9 @@ export const RangePart = {
         },
     },
     decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
         const [state, setState] = useState({
             value: '',

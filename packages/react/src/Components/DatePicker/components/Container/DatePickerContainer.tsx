@@ -24,9 +24,7 @@ import { useSlidable } from '../../../../hooks/useSlidable/useSlidable.tsx';
 import { formatOffsetMatrix } from '../../../Sortable/helpers.ts';
 
 // Local components
-import { DatePickerMonthView } from '../MonthView/MonthView.tsx';
-import { DatePickerYearRangeView } from '../YearRangeView/YearRangeView.tsx';
-import { DatePickerYearView } from '../YearView/YearView.tsx';
+import { DatePickerViewsGroup } from '../ViewsGroup/ViewsGroup.tsx';
 
 import {
     MIN_DOUBLE_VIEW_SCREEN_WIDTH,
@@ -50,55 +48,26 @@ import {
 } from '../../helpers.ts';
 import { actions } from '../../reducer.ts';
 import {
+    DatePickerCellsContainerRef,
+    DatePickerContainerProps,
+    DatePickerContainerRef,
     DatePickerDisabledDateFilter,
     DatePickerHeaderProps,
     DatePickerItem,
-    DatePickerProps,
     DatePickerRangePart,
     DatePickerSearchResults,
+    DatePickerSliderRef,
     DatePickerState,
-    DatePickerTitleClickParams,
-    DatePickerViewState,
+    DatePickerViewsGroupProps,
     DatePickerViewTransform,
     DatePickerZoomInParams,
     DatePickerZoomOutParams,
+    DragZoneRef,
+    DropTargetRef,
+    GetViewHeightsParam,
+    ViewHeights,
 } from '../../types.ts';
 import './DatePickerContainer.scss';
-
-type DatePickerContainerProps = DatePickerProps;
-type DatePickerContainerRef = HTMLDivElement | null;
-type DatePickerSliderRef = HTMLDivElement | null;
-type DatePickerCellsContainerRef = HTMLDivElement | null;
-
-type DragZoneRef = Element | null;
-type DropTargetRef = Element | null;
-
-interface GetViewHeightsParam {
-    prev?: HTMLDivElement | null;
-    current: HTMLDivElement | null;
-    second?: HTMLDivElement | null;
-    next?: HTMLDivElement | null;
-}
-
-interface ViewHeights {
-    prev?: number;
-    current?: number;
-    second?: number;
-    next?: number;
-    header?: number;
-}
-
-interface DatePickerViewsRefs {
-    previous?: React.MutableRefObject<HTMLDivElement | null>;
-    current?: React.MutableRefObject<HTMLDivElement | null>;
-    second?: React.MutableRefObject<HTMLDivElement | null>;
-    next?: React.MutableRefObject<HTMLDivElement | null>;
-}
-
-interface DatePickerRenderViewsParams {
-    renderOutside: boolean;
-    refs: DatePickerViewsRefs;
-}
 
 // eslint-disable-next-line react/display-name
 export const DatePickerContainer = forwardRef<
@@ -149,19 +118,18 @@ export const DatePickerContainer = forwardRef<
     ));
 
     // Popup position
-    const { referenceRef, elementRef } = usePopupPosition({
+    const { reference, referenceRef, elementRef } = usePopupPosition({
         ...(state?.position ?? {}),
         open: (state?.visible ?? false),
     });
 
-    const waitingForAnimation = useMemo(() => (
-        waitingForAnimationRef.current
-    ), [waitingForAnimationRef.current]);
-
     const onStateReady = () => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
+
+        dispatch(actions.finishNavigate());
+        setDefaultContentPosition();
 
         /*
         if (state.focusIndex !== -1) {
@@ -187,7 +155,7 @@ export const DatePickerContainer = forwardRef<
             second: secondTargetViewRef.current,
         });
 
-        const isSlideNext = (!!st.next && st.date < st.next?.date);
+        const isSlideNext = (!!st.nextState && st.date < st.nextState?.date);
         const heights = viewHeightsRef.current;
         const current = (isSlideNext) ? heights.next : heights.prev;
 
@@ -239,9 +207,12 @@ export const DatePickerContainer = forwardRef<
         },
         onExiting: () => {
             animation.setTransform(null);
-            dispatch(actions.finishNavigate());
             waitingForAnimationRef.current = false;
-            setDefaultContentPosition();
+            onStateReady();
+
+            if (resizeRequestedRef.current) {
+                onResize();
+            }
         },
     });
 
@@ -272,7 +243,7 @@ export const DatePickerContainer = forwardRef<
     const hide = () => show(false);
 
     const navigateTo = (action: StoreActionObject) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -329,7 +300,7 @@ export const DatePickerContainer = forwardRef<
         endDate: Date | null,
         navigateToFirst: boolean = true,
     ) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -342,7 +313,7 @@ export const DatePickerContainer = forwardRef<
 
     /** Clears selected items range */
     const clearSelection = () => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -350,7 +321,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setDisabledDateFilter = (disabledDateFilter: DatePickerDisabledDateFilter | null) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -358,7 +329,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setRangePart = (rangePart: DatePickerRangePart | null) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -367,7 +338,7 @@ export const DatePickerContainer = forwardRef<
 
     /** Range select inner callback */
     const onRangeSelect = (date: Date) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -385,7 +356,7 @@ export const DatePickerContainer = forwardRef<
 
     /** Day cell click inner callback */
     const onDayClick = (date: Date) => {
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -394,8 +365,10 @@ export const DatePickerContainer = forwardRef<
         const newState = getState();
         const activeDates = asArray(newState.actDate);
         if (activeDates.length > 0) {
-            const [actDate] = activeDates;
-            props.onDateSelect?.(actDate, newState);
+            const value = (newState.multiple)
+                ? activeDates
+                : activeDates[0];
+            props.onDateSelect?.(value, newState);
         }
 
         if (props.range) {
@@ -449,9 +422,7 @@ export const DatePickerContainer = forwardRef<
 
         let secondViewTransition = false;
         if (doubleView) {
-            const view = elem?.closest('.dp__view-container');
-            const previous = view?.previousElementSibling;
-            secondViewTransition = previous?.classList?.contains('dp__view-container') ?? false;
+            secondViewTransition = secondViewRef.current?.contains(elem) ?? false;
         }
 
         return {
@@ -464,7 +435,7 @@ export const DatePickerContainer = forwardRef<
     const onViewClick = (e: React.MouseEvent) => {
         e.stopPropagation();
 
-        if (!currViewRef.current || waitingForAnimation) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             return;
         }
 
@@ -476,7 +447,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setContentPosition = (position: number) => {
-        if (!currViewRef.current || waitingForAnimation) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             return;
         }
 
@@ -542,7 +513,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const setDefaultContentPosition = () => {
-        if (!currViewRef.current || waitingForAnimation) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             return;
         }
 
@@ -574,7 +545,7 @@ export const DatePickerContainer = forwardRef<
 
     const zoom = () => {
         const st = getState();
-        if (!st.next) {
+        if (!st.nextState) {
             return;
         }
 
@@ -586,17 +557,13 @@ export const DatePickerContainer = forwardRef<
             return;
         }
 
+        const relViewType = (zoomingOut) ? st.viewType : st.nextState.viewType;
+        const relViewDate = (zoomingOut) ? st.date : st.nextState.date;
         let relView;
-        let relViewType;
-        let relViewDate;
         if (secondViewTransition) {
             relView = ((zoomingOut) ? secondViewRef : secondTargetViewRef).current;
-            relViewType = (zoomingOut) ? st.next?.viewType : st.viewType;
-            relViewDate = (zoomingOut) ? st.next?.date : st.date;
         } else {
             relView = ((zoomingOut) ? currViewRef : targetViewRef).current;
-            relViewType = (zoomingOut) ? st.viewType : st.next?.viewType;
-            relViewDate = (zoomingOut) ? st.date : st.next?.date;
         }
         if (!relView) {
             return;
@@ -636,8 +603,21 @@ export const DatePickerContainer = forwardRef<
             return;
         }
 
-        const scaleX = cell.width / st.width;
-        const scaleY = cell.height / st.height;
+        const view = {
+            width: st.width,
+            height: st.height,
+        };
+
+        if (secondViewTransition && zoomingOut) {
+            if (vertical) {
+                cell.y += (st.height / 2);
+            } else {
+                cell.x += (st.width / 2);
+            }
+        }
+
+        const scaleX = cell.width / view.width;
+        const scaleY = cell.height / view.height;
         const cellTrans = [scaleX, 0, 0, scaleY, cell.x, cell.y];
         const viewTrans = [
             1 / scaleX,
@@ -690,72 +670,6 @@ export const DatePickerContainer = forwardRef<
         onClickTitle: zoomOut,
         onClickPrev: navigateToPrev,
         onClickNext: navigateToNext,
-    };
-
-    const renderDateView = (
-        date: Date,
-        viewState: DatePickerViewState,
-        dateViewRef: React.MutableRefObject<HTMLDivElement | null> | null | undefined,
-    ) => {
-        const {
-            viewType,
-            locales,
-            focusable,
-            components,
-        } = viewState;
-
-        const refProps = (dateViewRef)
-            ? { ref: dateViewRef }
-            : {};
-
-        const commonProps = {
-            date,
-            locales,
-            doubleView,
-            focusable,
-            renderHeader: doubleView && vertical,
-            header: {
-                ...headerEvents,
-                focusable,
-                onClickTitle: (options: DatePickerTitleClickParams) => zoomOut({
-                    ...options,
-                    secondViewTransition: true,
-                }),
-            },
-            components: {
-                Header: components.Header,
-                WeekDaysHeader: components.WeekDaysHeader,
-            },
-            ...refProps,
-        };
-
-        if (viewType === MONTH_VIEW) {
-            return (
-                <DatePickerMonthView
-                    {...commonProps}
-                    firstDay={viewState.firstDay}
-                    actDate={viewState.actDate}
-                    multiple={viewState.multiple}
-                    range={viewState.range}
-                    curRange={viewState.curRange}
-                    disabledDateFilter={viewState.disabledDateFilter}
-                    rangePart={viewState.rangePart}
-                    renderWeekdays={!viewState.vertical}
-                    showOtherMonthDays={viewState.showOtherMonthDays}
-                    fixedHeight={viewState.fixedHeight}
-                />
-            );
-        }
-
-        if (viewType === YEAR_VIEW) {
-            return <DatePickerYearView {...commonProps} />;
-        }
-
-        if (viewType === YEARRANGE_VIEW) {
-            return <DatePickerYearRangeView {...commonProps} />;
-        }
-
-        throw new Error('Invalid view type');
     };
 
     // Update visibility of component
@@ -818,7 +732,7 @@ export const DatePickerContainer = forwardRef<
 
         // For horizontal layout return maximal height
         if (!vertical) {
-            return Math.max(...childHeights);
+            return Math.max(...childHeights, 0);
         }
 
         // For vertical layout return sum of all views and gaps between
@@ -832,8 +746,8 @@ export const DatePickerContainer = forwardRef<
         return res;
     };
 
-    const onResize = () => {
-        if (!currViewRef || waitingForAnimation) {
+    function onResize() {
+        if (!currViewRef || waitingForAnimationRef.current) {
             resizeRequestedRef.current = true;
             return;
         }
@@ -851,37 +765,38 @@ export const DatePickerContainer = forwardRef<
         const width = getWidth(cellsContainer);
         const height = containerHeight;
 
-        if (cellsContainer) {
-            cellsContainer.style.height = px(containerHeight);
-        }
-
         setDefaultContentPosition();
 
         dispatch(actions.resize({
             doubleView,
             width,
             height,
-            date: state.date,
         }));
-    };
+    }
 
     useEffect(() => {
-        const container = innerRef?.current as HTMLElement;
-        if (!container?.offsetParent) {
+        const containerEl = innerRef.current as HTMLElement;
+        const refEl = reference.current as HTMLElement;
+        if (!containerEl && !refEl) {
             return undefined;
         }
 
         const observer = new ResizeObserver(onResize);
-        observer.observe(container.offsetParent);
+        if (containerEl) {
+            observer.observe(containerEl);
+        }
+        if (refEl) {
+            observer.observe(refEl);
+        }
 
         return () => {
             observer.disconnect();
         };
-    }, [innerRef]);
+    }, [innerRef.current, reference.current]);
 
     // Measure dimensions of views
     useEffect(() => {
-        viewHeightsRef.current = getViewsHeights(/* views */);
+        viewHeightsRef.current = getViewsHeights();
         const width = getWidth(cellsContainerRef.current);
         const height = getContainerHeight(viewHeightsRef.current);
 
@@ -894,7 +809,7 @@ export const DatePickerContainer = forwardRef<
      */
     const onWheel = (ev: Event) => {
         const e = ev as WheelEvent;
-        if (waitingForAnimation) {
+        if (waitingForAnimationRef.current) {
             return;
         }
 
@@ -911,7 +826,7 @@ export const DatePickerContainer = forwardRef<
 
         updatePosition: setContentPosition,
 
-        isReady: () => !waitingForAnimation,
+        isReady: () => !waitingForAnimationRef.current,
 
         onWheel,
         onSlideEnd,
@@ -932,15 +847,15 @@ export const DatePickerContainer = forwardRef<
         const st = getState();
 
         if (
-            !st.next
+            !st.nextState
             || animation.stage !== AnimationStages.exited
-            || waitingForAnimation
+            || waitingForAnimationRef.current
         ) {
             return;
         }
 
         if (isSlideTransition(st)) {
-            const isNext = st.next.date > state.date;
+            const isNext = st.nextState.date > state.date;
             slideTo(isNext ? 1 : -1);
             return;
         }
@@ -952,15 +867,15 @@ export const DatePickerContainer = forwardRef<
         state.transition,
         state.date,
         state.viewType,
-        state.next,
+        state.nextState,
         animation.stage,
-        waitingForAnimation,
+        waitingForAnimationRef.current,
     ]);
 
     const isZoom = isZoomTransition(getState());
 
     // Render views
-    const viewDates = getViewDates(state);
+    const viewDates = getViewDates(getState());
 
     // Header
     const { Header } = state.components;
@@ -981,7 +896,7 @@ export const DatePickerContainer = forwardRef<
     if (doubleView) {
         headerProps.secondTitle = getHeaderTitle({
             viewType: state.viewType,
-            date: viewDates.next,
+            date: viewDates.second,
             locales: state.locales,
         });
     }
@@ -1002,59 +917,25 @@ export const DatePickerContainer = forwardRef<
         );
     }
 
-    const RenderViews = (st: DatePickerViewState, options: DatePickerRenderViewsParams) => {
-        const {
-            renderOutside = true,
-            refs,
-        } = options;
-
-        const res = useMemo(() => {
-            const prevView = renderOutside && (
-                renderDateView(viewDates.previous, st, refs?.previous)
-            );
-            const currentView = renderDateView(viewDates.current, st, refs?.current);
-
-            const secondView = state.doubleView && (
-                renderDateView(viewDates.second, st, refs?.second)
-            );
-
-            const nextView = renderOutside && renderDateView(viewDates.next, st, refs?.next);
-
-            return (
-                <>
-                    {prevView}
-                    {currentView}
-                    {doubleView && secondView}
-                    {nextView}
-                </>
-            );
-        }, [
-            st.date,
-            st.doubleView,
-            st.viewType,
-            st.locales,
-            st.slideIndex,
-            renderOutside,
-        ]);
-
-        return res;
-    };
-
     // Content
-    const viewState: DatePickerViewState = {
+    const viewGroupProps: DatePickerViewsGroupProps = {
         ...state,
         focusable: keyboardNavigation,
-    };
-
-    const views = RenderViews(viewState, {
         renderOutside: !isZoom,
+        ...viewDates,
+        zoomOut,
+        onClickTitle: zoomOut,
+        onClickPrev: navigateToPrev,
+        onClickNext: navigateToNext,
         refs: {
             previous: prevViewRef,
             current: currViewRef,
             second: secondViewRef,
             next: nextViewRef,
         },
-    });
+    };
+
+    const views = <DatePickerViewsGroup {...viewGroupProps} />;
 
     const cellsContainerProps: React.HTMLAttributes<HTMLDivElement> = {
         className: classNames(
@@ -1103,7 +984,9 @@ export const DatePickerContainer = forwardRef<
     if (state.width > 0) {
         cellsContainerProps.style!.width = px(state.width);
     }
-    cellsContainerProps.style!.height = px(state.height);
+    if (state.height > 0) {
+        cellsContainerProps.style!.height = px(state.height);
+    }
 
     if (vertical) {
         sliderProps.style!.top = px(state.sliderPosition);
@@ -1112,22 +995,6 @@ export const DatePickerContainer = forwardRef<
     }
 
     let viewContent;
-
-    const nextViewState: DatePickerViewState = {
-        ...state,
-        viewType: state.next?.viewType ?? state.viewType,
-        focusable: keyboardNavigation,
-    };
-
-    // TODO : don't render next views every time (currently requeired due to useMemo()
-    // hook inside RenderViews() function)
-    const nextViews = RenderViews(nextViewState, {
-        renderOutside: false,
-        refs: {
-            current: targetViewRef,
-            second: secondTargetViewRef,
-        },
-    });
 
     const transform = animation.transform?.transform ?? '';
     if (isZoom) {
@@ -1160,10 +1027,27 @@ export const DatePickerContainer = forwardRef<
             },
         };
 
+        const nextViewsProps = {
+            ...state,
+            date: state.nextState?.date ?? state.date,
+            viewType: state.nextState?.viewType ?? state.viewType,
+            focusable: keyboardNavigation,
+            renderOutside: false,
+            ...viewDates,
+            zoomOut,
+            onClickTitle: zoomOut,
+            onClickPrev: navigateToPrev,
+            onClickNext: navigateToNext,
+            refs: {
+                current: targetViewRef,
+                second: secondTargetViewRef,
+            },
+        };
+
         viewContent = (
             <>
                 <div {...targetProps} ref={zoomTargetRef}>
-                    {nextViews}
+                    <DatePickerViewsGroup {...nextViewsProps} />
                 </div>
                 <div {...sourceProps} ref={zoomSourceRef}>
                     {views}
@@ -1245,9 +1129,13 @@ export const DatePickerContainer = forwardRef<
 
     const container = props.container ?? document.body;
 
+    const refWrapperProps = {
+        className: 'dp__ref-wrapper',
+    };
+
     return (
         <>
-            <div ref={referenceRef}>
+            <div {...refWrapperProps} ref={referenceRef}>
                 {props.children}
             </div>
             {state.visible && !state.fixed && datePicker}

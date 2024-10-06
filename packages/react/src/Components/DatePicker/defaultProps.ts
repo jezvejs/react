@@ -39,6 +39,12 @@ export const defaultProps = {
     position: {
         margin: 5,
         screenPadding: 5,
+        scrollOnOverflow: true,
+        allowResize: false,
+        allowFlip: false,
+        updateProps: () => ({
+            scrollOnOverflow: false,
+        }),
     },
     components: {
         Footer: null,

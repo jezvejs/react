@@ -15,6 +15,7 @@ import {
     DatePickerProps,
     DatePickerRange,
     DatePickerState,
+    DatePickerViewDates,
     DatePickerViewType,
 } from './types.ts';
 import { Rect } from '../../utils/types.ts';
@@ -45,7 +46,7 @@ export const getInitialState = (props: DatePickerProps, defaultProps: DatePicker
         sliderPosition: 0,
         width: 0,
         height: 0,
-        next: null,
+        nextState: null,
         position: {
             ...(defaultProps?.position ?? {}),
             ...(props.position ?? {}),
@@ -67,8 +68,8 @@ export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
 
     const typeMap = {
         [MONTH_VIEW]: (d: Date) => (new Date(d.getFullYear(), d.getMonth() - 1, 1)),
-        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() - 1, 1, 1)),
-        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() - YEAR_RANGE_LENGTH, 1, 1)),
+        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() - 1, d.getMonth(), 1)),
+        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() - YEAR_RANGE_LENGTH, 0, 1)),
     };
 
     if (!isFunction(typeMap[viewType])) {
@@ -86,8 +87,8 @@ export const getNextViewDate = (date: Date, viewType: DatePickerViewType) => {
 
     const typeMap = {
         [MONTH_VIEW]: (d: Date) => (new Date(d.getFullYear(), d.getMonth() + 1, 1)),
-        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() + 1, 1, 1)),
-        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() + YEAR_RANGE_LENGTH, 1, 1)),
+        [YEAR_VIEW]: (d: Date) => (new Date(d.getFullYear() + 1, d.getMonth(), 1)),
+        [YEARRANGE_VIEW]: (d: Date) => (new Date(d.getFullYear() + YEAR_RANGE_LENGTH, 0, 1)),
     };
 
     if (!isFunction(typeMap[viewType])) {
@@ -178,8 +179,8 @@ export const inRange = (date: Date, range: DatePickerRange): boolean => {
  * @returns {boolean}
  */
 export const isSameNextViewType = (state: DatePickerState): boolean => (
-    !!state.next
-    && state.next.viewType === state.viewType
+    !!state.nextState
+    && state.nextState.viewType === state.viewType
 );
 
 /**
@@ -188,8 +189,8 @@ export const isSameNextViewType = (state: DatePickerState): boolean => (
  * @returns {boolean}
  */
 export const isSameNextDate = (state: DatePickerState): boolean => (
-    !!state.next
-    && isSameDate(state.next.date, state.date)
+    !!state.nextState
+    && isSameDate(state.nextState.date, state.date)
 );
 
 /**
@@ -214,13 +215,6 @@ export const isZoomTransition = (state: DatePickerState): boolean => (
     !!state.transition
     && zoomTransitions.includes(state.transition)
 );
-
-export interface DatePickerViewDates {
-    previous: Date;
-    current: Date;
-    second: Date;
-    next: Date;
-}
 
 export const getViewDates = (state: DatePickerState): DatePickerViewDates => {
     let prevDate = getPrevViewDate(state.date, state.viewType);
@@ -256,9 +250,14 @@ export const getViewDates = (state: DatePickerState): DatePickerViewDates => {
  */
 export const formatMatrixTransform = (
     transform: number | number[] | string | string[],
-): string => (
-    `matrix(${asArray(transform).map(toCSSValue).join(', ')})`
-);
+): string => {
+    const [a, b, c, d, tx, ty] = asArray(transform);
+    const values = [a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1];
+
+    return (
+        `matrix3d(${values.map(toCSSValue).join(', ')})`
+    );
+};
 
 /**
  * Returns all child item elements for specified view
@@ -290,7 +289,7 @@ export const getViewItemBox = (elem: HTMLElement | null, state: DatePickerState)
         return null;
     }
 
-    const { vertical, secondViewTransition } = state;
+    const { vertical, secondViewTransition, doubleView } = state;
 
     const x = (secondViewTransition && !vertical)
         ? (elem.offsetLeft - elem.offsetWidth)
@@ -300,10 +299,10 @@ export const getViewItemBox = (elem: HTMLElement | null, state: DatePickerState)
         ? (elem.offsetTop - elem.offsetHeight)
         : elem.offsetTop;
 
-    const width = (secondViewTransition && !vertical)
+    const width = (doubleView && !vertical)
         ? (elem.offsetWidth * 2)
         : elem.offsetWidth;
-    const height = (secondViewTransition && vertical)
+    const height = (doubleView && vertical)
         ? (elem.offsetHeight * 2)
         : elem.offsetHeight;
 

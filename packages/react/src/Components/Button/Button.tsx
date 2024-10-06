@@ -41,7 +41,6 @@ const defaultProps = {
     iconAlign: 'left',
     disabled: false,
     url: '',
-    title: '',
     tooltip: '',
     icon: null,
 };
