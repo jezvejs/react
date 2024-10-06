@@ -250,9 +250,14 @@ export const getViewDates = (state: DatePickerState): DatePickerViewDates => {
  */
 export const formatMatrixTransform = (
     transform: number | number[] | string | string[],
-): string => (
-    `matrix(${asArray(transform).map(toCSSValue).join(', ')})`
-);
+): string => {
+    const [a, b, c, d, tx, ty] = asArray(transform);
+    const values = [a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1];
+
+    return (
+        `matrix3d(${values.map(toCSSValue).join(', ')})`
+    );
+};
 
 /**
  * Returns all child item elements for specified view
