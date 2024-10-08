@@ -71,6 +71,13 @@ export type IndexedSVGAttributes<T> = Partial<SVGAttributes<T>> & {
 };
 
 /**
+ * React.HTMLAttributes with style
+ */
+export type StyledHTMLAttributes<T extends HTMLElement = HTMLDivElement> =
+    React.HTMLAttributes<T>
+    & { style: React.CSSProperties };
+
+/**
  * Animation stages
  */
 export enum AnimationStages {

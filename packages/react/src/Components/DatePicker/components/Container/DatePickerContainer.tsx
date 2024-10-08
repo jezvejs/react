@@ -12,7 +12,7 @@ import { createPortal } from 'react-dom';
 // Utils
 import { StoreActionObject } from '../../../../utils/Store/Store.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
-import { AnimationStages } from '../../../../utils/types.ts';
+import { AnimationStages, StyledHTMLAttributes } from '../../../../utils/types.ts';
 import { minmax, px } from '../../../../utils/common.ts';
 
 // Hooks
@@ -937,7 +937,7 @@ export const DatePickerContainer = forwardRef<
 
     const views = <DatePickerViewsGroup {...viewGroupProps} />;
 
-    const cellsContainerProps: React.HTMLAttributes<HTMLDivElement> = {
+    const cellsContainerProps: StyledHTMLAttributes = {
         className: classNames(
             'dp__view',
             {
@@ -947,7 +947,7 @@ export const DatePickerContainer = forwardRef<
         style: {},
     };
 
-    const sliderProps: React.HTMLAttributes<HTMLDivElement> = {
+    const sliderProps: StyledHTMLAttributes = {
         className: 'dp__slider',
         style: {},
     };
@@ -975,23 +975,23 @@ export const DatePickerContainer = forwardRef<
         || rebuildContentRef.current
         || !props.animated
     ) {
-        sliderProps.style!.transform = '';
-        cellsContainerProps.style!.width = '';
+        sliderProps.style.transform = '';
+        cellsContainerProps.style.width = '';
 
         rebuildContentRef.current = false;
     }
 
     if (state.width > 0) {
-        cellsContainerProps.style!.width = px(state.width);
+        cellsContainerProps.style.width = px(state.width);
     }
     if (state.height > 0) {
-        cellsContainerProps.style!.height = px(state.height);
+        cellsContainerProps.style.height = px(state.height);
     }
 
     if (vertical) {
-        sliderProps.style!.top = px(state.sliderPosition);
+        sliderProps.style.top = px(state.sliderPosition);
     } else {
-        sliderProps.style!.left = px(state.sliderPosition);
+        sliderProps.style.left = px(state.sliderPosition);
     }
 
     let viewContent;
@@ -1000,7 +1000,7 @@ export const DatePickerContainer = forwardRef<
     if (isZoom) {
         const zoomingOut = state.transition === 'zoomOut';
 
-        const sourceProps: React.HTMLAttributes<HTMLDivElement> = {
+        const sourceProps: StyledHTMLAttributes = {
             className: classNames(
                 'dp__layered-view',
                 (zoomingOut) ? 'bottom_to' : 'top_to',
@@ -1014,7 +1014,7 @@ export const DatePickerContainer = forwardRef<
         };
 
         const targetTransform = animation.transform?.targetTransform ?? '';
-        const targetProps: React.HTMLAttributes<HTMLDivElement> = {
+        const targetProps: StyledHTMLAttributes = {
             className: classNames(
                 'dp__layered-view',
                 (zoomingOut) ? 'top_from' : 'bottom_from',
@@ -1055,7 +1055,7 @@ export const DatePickerContainer = forwardRef<
             </>
         );
     } else {
-        sliderProps.style!.transform = (isEntered || isExiting) ? transform : '';
+        sliderProps.style.transform = (isEntered || isExiting) ? transform : '';
 
         viewContent = (
             <div {...sliderProps} ref={sliderRef} >
