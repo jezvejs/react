@@ -439,17 +439,27 @@ export const SetSelection = {
         } = args;
 
         const [state, setState] = useState({
-            value: '',
             open: false,
             startDate: rest.startDate,
             endDate: rest.endDate,
+            value: formatDateRange({
+                start: rest.startDate,
+                end: rest.endDate,
+            }),
+        });
+
+        const getRangeToSelect = () => ({
+            start: new Date(Date.UTC(2020, 11, 8)),
+            end: new Date(Date.UTC(2020, 11, 14)),
         });
 
         const onSelect = () => {
+            const rangeToSelect = getRangeToSelect();
             setState((prev) => ({
                 ...prev,
-                startDate: new Date(Date.UTC(2020, 11, 8)),
-                endDate: new Date(Date.UTC(2020, 11, 14)),
+                startDate: rangeToSelect.start,
+                endDate: rangeToSelect.end,
+                value: formatDateRange(rangeToSelect),
             }));
         };
 
@@ -458,6 +468,7 @@ export const SetSelection = {
                 ...prev,
                 startDate: null,
                 endDate: null,
+                value: '',
             }));
         };
 
