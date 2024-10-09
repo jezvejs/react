@@ -103,8 +103,6 @@ export const DatePickerContainer = forwardRef<
     const secondTargetViewRef = useRef<HTMLDivElement | null>(null);
     const nextTargetViewRef = useRef<HTMLDivElement | null>(null);
 
-    const headerRef = useRef<HTMLDivElement | null>(null);
-
     const sliderRef = useRef<DatePickerSliderRef>(null);
     const cellsContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -762,7 +760,8 @@ export const DatePickerContainer = forwardRef<
             res.second = getHeight(second);
         }
         if (doubleView && vertical) {
-            res.header = getHeight(headerRef.current);
+            const headerEl = current?.querySelector('.dp__header') as HTMLElement;
+            res.header = getHeight(headerEl);
         }
 
         return res;
