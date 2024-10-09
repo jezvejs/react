@@ -1,6 +1,8 @@
 import { getLongMonthName, isSameDate } from '@jezvejs/datetime';
 import { asArray, isDate, isFunction } from '@jezvejs/types';
 
+import { Rect } from '../../utils/types.ts';
+
 import {
     viewTypesMap,
     MONTH_VIEW,
@@ -18,7 +20,6 @@ import {
     DatePickerViewDates,
     DatePickerViewType,
 } from './types.ts';
-import { Rect } from '../../utils/types.ts';
 
 export const toCSSValue = (val: number): number => (+val.toFixed(4));
 
@@ -61,7 +62,7 @@ export const getInitialState = (props: DatePickerProps, defaultProps: DatePicker
 };
 
 /** Returns previous date for specified view type */
-export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
+export const getPreviousDate = (date: Date, viewType: DatePickerViewType) => {
     if (!isDate(date)) {
         throw new Error('Invalid date');
     }
@@ -80,7 +81,7 @@ export const getPrevViewDate = (date: Date, viewType: DatePickerViewType) => {
 };
 
 /** Returns next date for specified view type */
-export const getNextViewDate = (date: Date, viewType: DatePickerViewType) => {
+export const getNextDate = (date: Date, viewType: DatePickerViewType) => {
     if (!isDate(date)) {
         throw new Error('Invalid date');
     }
@@ -216,32 +217,67 @@ export const isZoomTransition = (state: DatePickerState): boolean => (
     && zoomTransitions.includes(state.transition)
 );
 
-export const getViewDates = (state: DatePickerState): DatePickerViewDates => {
-    let prevDate = getPrevViewDate(state.date, state.viewType);
+/**
+ * Returns date of previous view for specified state
+ * @param {DatePickerState} state
+ * @returns {Date}
+ */
+export const getPreviousViewDate = (state: DatePickerState): Date => {
+    let res = getPreviousDate(state.date, state.viewType);
     if (state.doubleView && state.secondViewTransition) {
-        prevDate = getPrevViewDate(prevDate, state.viewType);
+        res = getPreviousDate(res, state.viewType);
     }
 
-    const currentDate = (state.doubleView && state.secondViewTransition)
-        ? getPrevViewDate(state.date, state.viewType)
-        : state.date;
-
-    const secondDate = (state.secondViewTransition)
-        ? state.date
-        : getNextViewDate(state.date, state.viewType);
-
-    let nextDate = getNextViewDate(state.date, state.viewType);
-    if (state.doubleView && !state.secondViewTransition) {
-        nextDate = getNextViewDate(nextDate, state.viewType);
-    }
-
-    return {
-        previous: prevDate,
-        current: currentDate,
-        second: secondDate,
-        next: nextDate,
-    };
+    return res;
 };
+
+/**
+ * Returns date of current view for specified state
+ * @param {DatePickerState} state
+ * @returns {Date}
+ */
+export const getCurrentViewDate = (state: DatePickerState): Date => (
+    (state.doubleView && state.secondViewTransition)
+        ? getPreviousDate(state.date, state.viewType)
+        : state.date
+);
+
+/**
+ * Returns date of second view(in 'doubleView' mode) for specified state
+ * @param {DatePickerState} state
+ * @returns {Date}
+ */
+export const getSecondViewDate = (state: DatePickerState): Date => (
+    (state.secondViewTransition)
+        ? state.date
+        : getNextDate(state.date, state.viewType)
+);
+
+/**
+ * Returns date of next view for specified state
+ * @param {DatePickerState} state
+ * @returns {Date}
+ */
+export const getNextViewDate = (state: DatePickerState): Date => {
+    let res = getNextDate(state.date, state.viewType);
+    if (state.doubleView && !state.secondViewTransition) {
+        res = getNextDate(res, state.viewType);
+    }
+
+    return res;
+};
+
+/**
+ * Returns view dates object for specified state
+ * @param {DatePickerState} state
+ * @returns {DatePickerViewDates}
+ */
+export const getViewDates = (state: DatePickerState): DatePickerViewDates => ({
+    previous: getPreviousViewDate(state),
+    current: getCurrentViewDate(state),
+    second: getSecondViewDate(state),
+    next: getNextViewDate(state),
+});
 
 /**
  * Returns matrix transform string for specified array

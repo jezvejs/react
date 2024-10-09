@@ -24,6 +24,7 @@ import { useSlidable } from '../../../../hooks/useSlidable/useSlidable.tsx';
 import { formatOffsetMatrix } from '../../../Sortable/helpers.ts';
 
 // Local components
+import { DatePickerDateView } from '../DateView/DateView.tsx';
 import { DatePickerViewsGroup } from '../ViewsGroup/ViewsGroup.tsx';
 
 import {
@@ -45,6 +46,8 @@ import {
     isZoomTransition,
     getViewItemBox,
     formatMatrixTransform,
+    getPreviousViewDate,
+    getNextViewDate,
 } from '../../helpers.ts';
 import { actions } from '../../reducer.ts';
 import {
@@ -95,8 +98,10 @@ export const DatePickerContainer = forwardRef<
     const secondViewRef = useRef<HTMLDivElement | null>(null);
     const nextViewRef = useRef<HTMLDivElement | null>(null);
 
+    const prevTargetViewRef = useRef<HTMLDivElement | null>(null);
     const targetViewRef = useRef<HTMLDivElement | null>(null);
     const secondTargetViewRef = useRef<HTMLDivElement | null>(null);
+    const nextTargetViewRef = useRef<HTMLDivElement | null>(null);
 
     const headerRef = useRef<HTMLDivElement | null>(null);
 
@@ -129,7 +134,6 @@ export const DatePickerContainer = forwardRef<
         }
 
         dispatch(actions.finishNavigate());
-        setDefaultContentPosition();
 
         /*
         if (state.focusIndex !== -1) {
@@ -191,6 +195,10 @@ export const DatePickerContainer = forwardRef<
         onEntering: () => {
             const st = getState();
             if (isSlideTransition(st)) {
+                if (vertical) {
+                    return;
+                }
+
                 const height = getNextSlideHeight(st);
                 if (height > 0) {
                     dispatch(actions.resize({ height }));
@@ -205,9 +213,50 @@ export const DatePickerContainer = forwardRef<
                 dispatch(actions.resize({ height }));
             }
         },
+        onEntered: () => {
+            const st = getState();
+            const isVerticalSlide = isSlideTransition(st) && st.vertical;
+            if (!isVerticalSlide) {
+                return;
+            }
+
+            const navigateToPrev = (st.transition === 'slideToPrevious');
+            if (navigateToPrev && !prevTargetViewRef.current) {
+                return;
+            }
+
+            const prevRef = (navigateToPrev) ? prevTargetViewRef : currViewRef;
+
+            let currRef = prevViewRef;
+            if (!navigateToPrev) {
+                currRef = (doubleView) ? secondViewRef : nextViewRef;
+            }
+
+            let secondRef = null;
+            if (doubleView) {
+                secondRef = (navigateToPrev) ? nextViewRef : currViewRef;
+            }
+
+            let nextRef = nextTargetViewRef;
+            if (navigateToPrev) {
+                nextRef = (doubleView) ? secondViewRef : currViewRef;
+            }
+
+            viewHeightsRef.current = getViewsHeights({
+                prev: prevRef.current,
+                current: currRef.current,
+                second: secondRef?.current ?? null,
+                next: nextRef?.current ?? null,
+            });
+            const height = getContainerHeight(viewHeightsRef.current);
+
+            dispatch(actions.resize({ height }));
+        },
         onExiting: () => {
-            animation.setTransform(null);
             waitingForAnimationRef.current = false;
+            setDefaultContentPosition();
+
+            animation.setTransform(null);
             onStateReady();
 
             if (resizeRequestedRef.current) {
@@ -747,7 +796,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     function onResize() {
-        if (!currViewRef || waitingForAnimationRef.current) {
+        if (!currViewRef.current || waitingForAnimationRef.current) {
             resizeRequestedRef.current = true;
             return;
         }
@@ -801,6 +850,8 @@ export const DatePickerContainer = forwardRef<
         const height = getContainerHeight(viewHeightsRef.current);
 
         dispatch(actions.resize({ width, height }));
+
+        setDefaultContentPosition();
     }, [state.date, state.viewType]);
 
     /**
@@ -959,14 +1010,14 @@ export const DatePickerContainer = forwardRef<
             || rebuildContentRef.current
             || !props.animated
         ) {
-            if (state.width > 0) {
-                setDefaultContentPosition();
-            }
-
             viewHeightsRef.current = getViewsHeights();
             const height = getContainerHeight(viewHeightsRef.current);
 
             dispatch(actions.resize({ height }));
+
+            if (state.width > 0) {
+                setDefaultContentPosition();
+            }
         }
     }, [currViewRef.current, rebuildContentRef.current, props.animated]);
 
@@ -1057,9 +1108,38 @@ export const DatePickerContainer = forwardRef<
     } else {
         sliderProps.style.transform = (isEntered || isExiting) ? transform : '';
 
+        let measureView = null;
+        const toPrev = (state.transition === 'slideToPrevious');
+        const toNext = (state.transition === 'slideToNext');
+
+        if (toPrev || toNext) {
+            const nextState = {
+                ...state,
+                ...state.nextState,
+            };
+
+            const dateToMeasure = (toPrev)
+                ? getPreviousViewDate(nextState)
+                : getNextViewDate(nextState);
+
+            measureView = (
+                <DatePickerDateView
+                    {...{
+                        ...viewGroupProps,
+                        date: dateToMeasure,
+                        dateViewRef: (toPrev) ? prevTargetViewRef : nextTargetViewRef,
+                    }}
+                />
+            );
+        } else {
+            prevTargetViewRef.current = null;
+            nextTargetViewRef.current = null;
+        }
+
         viewContent = (
             <div {...sliderProps} ref={sliderRef} >
                 {views}
+                {measureView}
             </div>
         );
     }
