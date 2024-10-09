@@ -1,0 +1,11 @@
+.date-range-input-group {
+  display: grid;
+  grid-template-columns: 1fr auto auto 1fr auto;
+  max-width: 450px;
+
+  .input-group__input {
+    min-width: 120px;
+    flex-shrink: 1;
+    flex-grow: 0;
+  }
+}

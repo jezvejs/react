@@ -9,9 +9,11 @@ import {
 
 import CalendarIcon from '../../../../common/assets/icons/calendar.svg';
 
+import './DateRangeInputGroup.scss';
+
 export const DateRangeInputGroup = (props) => (
     <InputGroup
-        className={classNames('date-input-group', props.className)}
+        className={classNames('date-range-input-group', props.className)}
     >
         <InputGroupInput
             id={props.startInputId}
