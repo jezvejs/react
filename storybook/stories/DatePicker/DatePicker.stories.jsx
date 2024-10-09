@@ -613,26 +613,17 @@ export const RangePart = {
             open: false,
             startDate: args.startDate,
             endDate: args.endDate,
+            rangePart: 'start',
         });
 
-        const show = () => {
-            setState((prev) => ({ ...prev, open: true }));
+        const show = (open = true) => {
+            setState((prev) => ({ ...prev, open }));
         };
 
-        const hide = () => {
-            setState((prev) => ({ ...prev, open: false }));
-        };
+        const hide = () => show(false);
 
         const setRangePart = (rangePart) => {
             setState((prev) => ({ ...prev, rangePart }));
-        };
-
-        const setStartDate = (startDate) => {
-            setState((prev) => ({ ...prev, startDate }));
-        };
-
-        const setEndDate = (endDate) => {
-            setState((prev) => ({ ...prev, endDate }));
         };
 
         const inputProps = {
@@ -675,11 +666,11 @@ export const RangePart = {
                 return (rangePart === 'start') ? (limitDate - date < 0) : (limitDate - date > 0);
             },
             onDateSelect: (date) => {
-                if (state.rangePart === 'start') {
-                    setStartDate(date);
-                } else if (state.rangePart === 'end') {
-                    setEndDate(date);
-                }
+                setState((prev) => ({
+                    ...prev,
+                    startDate: (prev.rangePart === 'start') ? date : prev.startDate,
+                    endDate: (prev.rangePart === 'end') ? date : prev.endDate,
+                }));
 
                 hide();
             },
