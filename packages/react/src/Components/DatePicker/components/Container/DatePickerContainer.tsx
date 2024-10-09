@@ -724,6 +724,14 @@ export const DatePickerContainer = forwardRef<
         show(props.visible);
     }, [props.visible]);
 
+    // Handle size and position of DatePicker popup on open
+    useEffect(() => {
+        const st = getState();
+        if (st.visible && (st.width === 0 || st.height === 0)) {
+            onResize();
+        }
+    }, [state.visible, state.width, state.height]);
+
     // Update selection
     useEffect(() => {
         if (!props.startDate && !props.endDate) {
