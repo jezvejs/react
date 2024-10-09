@@ -258,14 +258,16 @@ export const DatePickerMonthView = forwardRef<
         weeks += 1;
     } while (week);
 
+    const viewProps = {
+        className: classNames(
+            'dp__view-container dp__month-view',
+            props.className,
+        ),
+        'data-date': `${rYear}${(rMonth + 1).toString().padStart(2, '0')}`,
+    };
+
     return (
-        <div
-            className={classNames(
-                'dp__view-container dp__month-view',
-                props.className,
-            )}
-            ref={ref}
-        >
+        <div {...viewProps} ref={ref}>
             {header}
             {weekdays}
             {items.map((item) => (

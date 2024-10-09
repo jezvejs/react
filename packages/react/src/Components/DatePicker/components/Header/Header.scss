@@ -18,8 +18,8 @@
 }
 
 .dp__header_title {
-  height: 2rem;
-  line-height: 2rem;
+  height: var(--dp-header-size);
+  line-height: var(--dp-header-size);
   font-size: var(--dp-header-font-size);
   font-weight: var(--dp-header-font-weight);
   text-transform: capitalize;
@@ -29,8 +29,8 @@
   border-radius: 100vh;
 
   .dp__header_nav-icon {
-    height: 32px;
-    width: 32px;
+    height: var(--dp-header-size);
+    width: var(--dp-header-size);
     padding: 0.5rem;
     fill: var(--dp-nav-fill);
   }

@@ -113,11 +113,13 @@ export const DatePickerYearRangeView = forwardRef<
         items.push(item);
     }
 
+    const viewProps = {
+        className: 'dp__view-container dp__year-range-view',
+        'data-date': `${startYear}-${startYear + YEAR_RANGE_LENGTH}`,
+    };
+
     return (
-        <div
-            className='dp__view-container dp__year-range-view'
-            ref={ref}
-        >
+        <div {...viewProps} ref={ref}>
             {header}
             {items.map((item) => (
                 <DatePickerYearRangeItem key={`dp_yr_${item.date}`} {...item} />

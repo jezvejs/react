@@ -1,17 +1,17 @@
 import { afterTransition } from '@jezvejs/dom';
+import classNames from 'classnames';
 import {
-    HTMLAttributes,
     useEffect,
     useImperativeHandle,
     useRef,
 } from 'react';
-import classNames from 'classnames';
 
-import { minmax, px } from '../../utils/common.ts';
 import { useSlidable } from '../../hooks/useSlidable/useSlidable.tsx';
+import { minmax, px } from '../../utils/common.ts';
+import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
+import { StyledHTMLAttributes } from '../../utils/types.ts';
 
 import { Slide } from './components/Slide/Slide.tsx';
-import { useDragnDrop } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 import { SliderContainerProps, SliderState } from './types.ts';
 
 const TRANSITION_END_TIMEOUT = 500;
@@ -245,7 +245,7 @@ export const SliderContainer = (props: SliderContainerProps) => {
     };
 
     // Sliding content props
-    const contentProps: HTMLAttributes<HTMLDivElement> = {
+    const contentProps: StyledHTMLAttributes = {
         ...(state.content ?? {}),
         className: classNames(
             'slider__content',
@@ -258,9 +258,9 @@ export const SliderContainer = (props: SliderContainerProps) => {
     };
 
     if (state.vertical) {
-        contentProps.style!.top = px(state.position);
+        contentProps.style.top = px(state.position);
     } else {
-        contentProps.style!.left = px(state.position);
+        contentProps.style.left = px(state.position);
     }
 
     // Slide props

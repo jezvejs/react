@@ -11,8 +11,8 @@ import {
     YEARRANGE_VIEW,
 } from './constants.ts';
 import {
-    getNextViewDate,
-    getPrevViewDate,
+    getNextDate,
+    getPreviousDate,
     includesDate,
 } from './helpers.ts';
 import {
@@ -69,7 +69,7 @@ const slice = createSlice({
         }
 
         const currentDate = (state.secondViewTransition)
-            ? getPrevViewDate(state.date, state.viewType)
+            ? getPreviousDate(state.date, state.viewType)
             : state.date;
 
         const nextViewType = (state.viewType === YEAR_VIEW) ? MONTH_VIEW : YEAR_VIEW;
@@ -83,7 +83,7 @@ const slice = createSlice({
             secondViewTransition: params.secondViewTransition,
             date: (
                 (params.secondViewTransition)
-                    ? getNextViewDate(currentDate, state.viewType)
+                    ? getNextDate(currentDate, state.viewType)
                     : currentDate
             ),
         };
@@ -95,7 +95,7 @@ const slice = createSlice({
         }
 
         const currentDate = (state.secondViewTransition)
-            ? getPrevViewDate(state.date, state.viewType)
+            ? getPreviousDate(state.date, state.viewType)
             : state.date;
 
         const nextViewType = (state.viewType === MONTH_VIEW) ? YEAR_VIEW : YEARRANGE_VIEW;
@@ -104,7 +104,7 @@ const slice = createSlice({
             nextState: {
                 date: (
                     (params.secondViewTransition)
-                        ? getNextViewDate(currentDate, state.viewType)
+                        ? getNextDate(currentDate, state.viewType)
                         : currentDate
                 ),
                 viewType: nextViewType,
@@ -113,7 +113,7 @@ const slice = createSlice({
             secondViewTransition: params.secondViewTransition,
             date: (
                 (params.secondViewTransition)
-                    ? getNextViewDate(currentDate, state.viewType)
+                    ? getNextDate(currentDate, state.viewType)
                     : currentDate
             ),
         };
@@ -122,7 +122,7 @@ const slice = createSlice({
     navigateToPrev: (state: DatePickerState): DatePickerState => ({
         ...state,
         nextState: {
-            date: getPrevViewDate(state.date, state.viewType),
+            date: getPreviousDate(state.date, state.viewType),
             viewType: state.viewType,
         },
         transition: 'slideToPrevious',
@@ -131,7 +131,7 @@ const slice = createSlice({
     navigateToNext: (state: DatePickerState): DatePickerState => ({
         ...state,
         nextState: {
-            date: getNextViewDate(state.date, state.viewType),
+            date: getNextDate(state.date, state.viewType),
             viewType: state.viewType,
         },
         transition: 'slideToNext',
