@@ -1,7 +1,9 @@
 import { asArray } from '@jezvejs/types';
+import { removeEvents, setEvents } from '@jezvejs/dom';
 import classNames from 'classnames';
 import {
     forwardRef,
+    useCallback,
     useEffect,
     useImperativeHandle,
     useMemo,
@@ -28,7 +30,6 @@ import { DatePickerDateView } from '../DateView/DateView.tsx';
 import { DatePickerViewsGroup } from '../ViewsGroup/ViewsGroup.tsx';
 
 import {
-    MIN_DOUBLE_VIEW_SCREEN_WIDTH,
     MONTH_VIEW,
     SWIPE_THRESHOLD,
     YEARRANGE_VIEW,
@@ -37,7 +38,6 @@ import {
 import {
     getHeaderTitle,
     getHeight,
-    getScreenWidth,
     getViewItems,
     getViewDates,
     getViewItemDate,
@@ -48,6 +48,7 @@ import {
     formatMatrixTransform,
     getPreviousViewDate,
     getNextViewDate,
+    isDoubleView,
 } from '../../helpers.ts';
 import { actions } from '../../reducer.ts';
 import {
@@ -84,14 +85,6 @@ export const DatePickerContainer = forwardRef<
         keyboardNavigation = true,
         vertical = false,
     } = props;
-
-    const doubleView = useMemo(() => (
-        !!props.doubleView
-        && (
-            !!props.vertical
-            || (getScreenWidth() >= MIN_DOUBLE_VIEW_SCREEN_WIDTH)
-        )
-    ), [props.doubleView, props.vertical]);
 
     const prevViewRef = useRef<HTMLDivElement | null>(null);
     const currViewRef = useRef<HTMLDivElement | null>(null);
@@ -162,7 +155,7 @@ export const DatePickerContainer = forwardRef<
         const current = (isSlideNext) ? heights.next : heights.prev;
 
         let second;
-        if (doubleView) {
+        if (st.doubleView) {
             second = (isSlideNext) ? heights.second : heights.current;
         }
 
@@ -227,17 +220,17 @@ export const DatePickerContainer = forwardRef<
 
             let currRef = prevViewRef;
             if (!navigateToPrev) {
-                currRef = (doubleView) ? secondViewRef : nextViewRef;
+                currRef = (st.doubleView) ? secondViewRef : nextViewRef;
             }
 
             let secondRef = null;
-            if (doubleView) {
+            if (st.doubleView) {
                 secondRef = (navigateToPrev) ? nextViewRef : currViewRef;
             }
 
             let nextRef = nextTargetViewRef;
             if (navigateToPrev) {
-                nextRef = (doubleView) ? secondViewRef : currViewRef;
+                nextRef = (st.doubleView) ? secondViewRef : currViewRef;
             }
 
             viewHeightsRef.current = getViewsHeights({
@@ -463,12 +456,13 @@ export const DatePickerContainer = forwardRef<
             date: new Date(parseInt(time, 10)),
         };
 
+        const st = getState();
         const elems = cell.parentNode?.querySelectorAll?.('.dp__cell') ?? [];
         const siblings = Array.from(elems);
         const index = siblings.indexOf(cell);
 
         let secondViewTransition = false;
-        if (doubleView) {
+        if (st.doubleView) {
             secondViewTransition = secondViewRef.current?.contains(elem) ?? false;
         }
 
@@ -505,11 +499,14 @@ export const DatePickerContainer = forwardRef<
         dispatch(actions.setSliderPosition(sliderPosition));
     };
 
-    const getSlideWidth = () => (
-        (doubleView)
-            ? ((getState().width - (props.columnGap ?? 0)) / 2)
-            : getState().width
-    );
+    const getSlideWidth = () => {
+        const st = getState();
+        return (
+            (st.doubleView)
+                ? ((st.width - (props.columnGap ?? 0)) / 2)
+                : st.width
+        );
+    };
 
     const getSlideHeight = (index: number, heights?: ViewHeights | null) => {
         const viewHeights = heights ?? viewHeightsRef.current;
@@ -524,7 +521,8 @@ export const DatePickerContainer = forwardRef<
             next,
         } = viewHeights;
 
-        const resHeights = (doubleView)
+        const st = getState();
+        const resHeights = (st.doubleView)
             ? [prev, current, second, next]
             : [prev, current, next];
 
@@ -536,7 +534,8 @@ export const DatePickerContainer = forwardRef<
     );
 
     const getSlidesGap = () => {
-        if (!doubleView) {
+        const st = getState();
+        if (!st.doubleView) {
             return 0;
         }
 
@@ -544,6 +543,7 @@ export const DatePickerContainer = forwardRef<
     };
 
     const getSlidePosition = (index: number, heights?: ViewHeights | null) => {
+        const st = getState();
         const viewHeights = heights ?? viewHeightsRef.current;
         const gap = getSlidesGap();
 
@@ -552,7 +552,7 @@ export const DatePickerContainer = forwardRef<
             res -= getSlideSize(slide, viewHeights) + gap;
         }
 
-        if (doubleView && props.vertical) {
+        if (st.doubleView && props.vertical) {
             res -= viewHeights?.header ?? 0;
         }
 
@@ -600,7 +600,7 @@ export const DatePickerContainer = forwardRef<
         const zoomingOut = st.transition === 'zoomOut';
         const cellView = ((zoomingOut) ? targetViewRef : currViewRef).current;
         const secondCellView = ((zoomingOut) ? secondTargetViewRef : secondViewRef).current;
-        if (!cellView || (doubleView && !secondCellView)) {
+        if (!cellView || (st.doubleView && !secondCellView)) {
             return;
         }
 
@@ -640,7 +640,7 @@ export const DatePickerContainer = forwardRef<
         };
 
         let cellElem = getViewItems(cellView).find(isRelativeItem);
-        if (!cellElem && doubleView) {
+        if (!cellElem && st.doubleView) {
             cellElem = getViewItems(secondCellView).find(isRelativeItem);
         }
 
@@ -753,6 +753,8 @@ export const DatePickerContainer = forwardRef<
 
     /** Returns array of heights of all views */
     const getViewsHeights = (views?: GetViewHeightsParam) => {
+        const st = getState();
+
         const prev = views?.prev ?? prevViewRef.current;
         const current = views?.current ?? currViewRef.current;
         const next = views?.next ?? nextViewRef.current;
@@ -763,11 +765,11 @@ export const DatePickerContainer = forwardRef<
             next: getHeight(next),
         };
 
-        if (doubleView) {
+        if (st.doubleView) {
             const second = views?.second ?? secondViewRef.current;
             res.second = getHeight(second);
         }
-        if (doubleView && vertical) {
+        if (st.doubleView && vertical) {
             const headerEl = current?.querySelector('.dp__header') as HTMLElement;
             res.header = getHeight(headerEl);
         }
@@ -777,12 +779,13 @@ export const DatePickerContainer = forwardRef<
 
     /** Returns height of container required to fit all views */
     const getContainerHeight = (heights: ViewHeights) => {
+        const st = getState();
         const childHeights = [];
         if (heights.current) {
             childHeights.push(heights.current);
         }
 
-        if (doubleView && heights.second) {
+        if (st.doubleView && heights.second) {
             childHeights.push(heights.second);
         }
 
@@ -795,7 +798,7 @@ export const DatePickerContainer = forwardRef<
         const gapsHeight = (props.rowGap ?? 0) * (childHeights.length - 1);
         let res = childHeights.reduce((sum, item) => (sum + item), 0) + gapsHeight;
 
-        if (doubleView && vertical) {
+        if (st.doubleView && vertical) {
             res -= heights.header ?? 0;
         }
 
@@ -821,15 +824,20 @@ export const DatePickerContainer = forwardRef<
         const width = getWidth(cellsContainer);
         const height = containerHeight;
 
-        setDefaultContentPosition();
-
         dispatch(actions.resize({
-            doubleView,
+            doubleView: isDoubleView(props),
             width,
             height,
         }));
+
+        setDefaultContentPosition();
     }
 
+    const resizeHandler = useCallback(() => (
+        requestAnimationFrame(() => onResize())
+    ), []);
+
+    // ResizeObserver
     useEffect(() => {
         const containerEl = innerRef.current as HTMLElement;
         const refEl = reference.current as HTMLElement;
@@ -837,7 +845,7 @@ export const DatePickerContainer = forwardRef<
             return undefined;
         }
 
-        const observer = new ResizeObserver(onResize);
+        const observer = new ResizeObserver(resizeHandler);
         if (containerEl) {
             observer.observe(containerEl);
         }
@@ -849,6 +857,32 @@ export const DatePickerContainer = forwardRef<
             observer.disconnect();
         };
     }, [innerRef.current, reference.current]);
+
+    // Orientation 'change' event listener
+    useEffect(() => {
+        const listeners = {
+            change: resizeHandler,
+        };
+
+        setEvents(window.screen.orientation, listeners);
+
+        return () => {
+            removeEvents(window.screen.orientation, listeners);
+        };
+    }, []);
+
+    // Viewport 'resize' event listener
+    useEffect(() => {
+        const listeners = {
+            resize: resizeHandler,
+        };
+
+        setEvents(window.visualViewport, listeners);
+
+        return () => {
+            removeEvents(window.visualViewport, listeners);
+        };
+    }, []);
 
     // Measure dimensions of views
     useEffect(() => {
@@ -946,12 +980,12 @@ export const DatePickerContainer = forwardRef<
 
     const headerProps: DatePickerHeaderProps = {
         ...headerEvents,
-        doubleView: doubleView && !vertical,
+        doubleView: state.doubleView && !vertical,
         focusable: keyboardNavigation,
         title,
     };
 
-    if (doubleView) {
+    if (state.doubleView) {
         headerProps.secondTitle = getHeaderTitle({
             viewType: state.viewType,
             date: viewDates.second,
@@ -1039,7 +1073,7 @@ export const DatePickerContainer = forwardRef<
         rebuildContentRef.current = false;
     }
 
-    if (state.width > 0) {
+    if (state.width > 0 && !isExited) {
         cellsContainerProps.style.width = px(state.width);
     }
     if (state.height > 0) {
@@ -1168,11 +1202,11 @@ export const DatePickerContainer = forwardRef<
             {
                 dp__horizontal: !props.vertical,
                 dp__vertical: !!props.vertical,
-                'dp__double-view': !!props.doubleView,
+                'dp__double-view': !!state.doubleView,
             },
             props.className,
         ),
-    }), [props.vertical, props.doubleView, props.className]);
+    }), [props.vertical, state.doubleView, props.className]);
 
     // Wrapper props
     const wrapperProps = useMemo(() => ({
@@ -1180,7 +1214,7 @@ export const DatePickerContainer = forwardRef<
             'dp__wrapper',
             {
                 'dp__inline-wrapper': props.inline,
-                'dp__double-view': props.doubleView,
+                'dp__double-view': state.doubleView,
                 dp__animated: props.animated && (isEntering || isEntered),
             },
         ),
@@ -1188,7 +1222,7 @@ export const DatePickerContainer = forwardRef<
     }), [
         props.inline,
         props.vertical,
-        props.doubleView,
+        state.doubleView,
         props.className,
         props.animated,
         animation.stage,
@@ -1221,14 +1255,12 @@ export const DatePickerContainer = forwardRef<
     };
 
     return (
-        <>
-            <div {...refWrapperProps} ref={referenceRef}>
-                {props.children}
-            </div>
+        <div {...refWrapperProps} ref={referenceRef}>
+            {props.children}
             {state.visible && !state.fixed && datePicker}
             {state.visible && state.fixed && (
                 createPortal(datePicker, container)
             )}
-        </>
+        </div>
     );
 });

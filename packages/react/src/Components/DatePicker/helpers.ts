@@ -11,6 +11,7 @@ import {
     YEAR_RANGE_LENGTH,
     slideTransitions,
     zoomTransitions,
+    MIN_DOUBLE_VIEW_SCREEN_WIDTH,
 } from './constants.ts';
 import {
     DatePickerHeaderTitleParam,
@@ -112,6 +113,19 @@ export const getScreenWidth = (): number => {
         ? Math.max(width, height)
         : Math.min(width, height);
 };
+
+/**
+ * Returns true if 'doubleView' mode is enabled and screen is big enought
+ * @param {DatePickerProps} props
+ * @returns {boolean}
+ */
+export const isDoubleView = (props: DatePickerProps): boolean => (
+    !!props.doubleView
+    && (
+        !!props.vertical
+        || (getScreenWidth() >= MIN_DOUBLE_VIEW_SCREEN_WIDTH)
+    )
+);
 
 /** Returns header title string for specified view state */
 export const getHeaderTitle = (state: DatePickerHeaderTitleParam): string => {
