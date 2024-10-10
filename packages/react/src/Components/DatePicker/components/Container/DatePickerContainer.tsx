@@ -903,7 +903,7 @@ export const DatePickerContainer = forwardRef<
             return;
         }
 
-        if (e.deltaY > 0) {
+        if (e.deltaY < 0) {
             navigateToPrev();
         } else {
             navigateToNext();
