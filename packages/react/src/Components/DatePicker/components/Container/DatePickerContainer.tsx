@@ -3,7 +3,6 @@ import { removeEvents, setEvents } from '@jezvejs/dom';
 import classNames from 'classnames';
 import {
     forwardRef,
-    useCallback,
     useEffect,
     useImperativeHandle,
     useMemo,
@@ -15,10 +14,11 @@ import { createPortal } from 'react-dom';
 import { StoreActionObject } from '../../../../utils/Store/Store.ts';
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 import { AnimationStages, StyledHTMLAttributes } from '../../../../utils/types.ts';
-import { minmax, px } from '../../../../utils/common.ts';
+import { DebounceRunFunction, minmax, px } from '../../../../utils/common.ts';
 
 // Hooks
 import { useAnimationStage } from '../../../../hooks/useAnimationStage/useAnimationStage.tsx';
+import { useDebounce } from '../../../../hooks/useDebounce/useDebounce.ts';
 import { usePopupPosition } from '../../../../hooks/usePopupPosition/usePopupPosition.ts';
 import { useSlidable } from '../../../../hooks/useSlidable/useSlidable.tsx';
 
@@ -170,6 +170,8 @@ export const DatePickerContainer = forwardRef<
         return height;
     };
 
+    const resizeHandler = useDebounce(onResize, 100) as DebounceRunFunction;
+
     // Component animation
     const animation = useAnimationStage<DatePickerContainerRef, DatePickerViewTransform>({
         ref: innerRef,
@@ -251,7 +253,7 @@ export const DatePickerContainer = forwardRef<
             onStateReady();
 
             if (resizeRequestedRef.current) {
-                onResize();
+                resizeHandler();
             }
         },
     });
@@ -833,10 +835,6 @@ export const DatePickerContainer = forwardRef<
         setDefaultContentPosition();
     }
 
-    const resizeHandler = useCallback(() => (
-        requestAnimationFrame(() => onResize())
-    ), []);
-
     // ResizeObserver
     useEffect(() => {
         const containerEl = innerRef.current as HTMLElement;
@@ -1073,9 +1071,13 @@ export const DatePickerContainer = forwardRef<
         rebuildContentRef.current = false;
     }
 
-    if (state.width > 0 && !isExited) {
-        cellsContainerProps.style.width = px(state.width);
-    }
+    const keepWidth = (
+        state.width > 0
+        && !isExited
+        && !isExiting
+    );
+
+    cellsContainerProps.style.width = (keepWidth) ? px(state.width) : '';
     if (state.height > 0) {
         cellsContainerProps.style.height = px(state.height);
     }
