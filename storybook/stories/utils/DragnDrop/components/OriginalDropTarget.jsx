@@ -10,26 +10,26 @@ export const OriginalDropTarget = (props) => {
             const { id } = avatarInfo;
 
             const page = DragMaster.getEventPageCoordinates(params.e);
+            const left = page.x - avatarInfo.mouseShift.x - offset.left - border.left;
+            const top = page.y - avatarInfo.mouseShift.y - offset.top - border.top;
+
             setState((prev) => ({
                 ...prev,
                 [id]: {
                     ...(prev[id] ?? {}),
-                    left: page.x - avatarInfo.mouseShift.x - offset.left - border.left,
-                    top: page.y - avatarInfo.mouseShift.y - offset.top - border.top,
-                },
-            }));
-
-            requestAnimationFrame(() => {
-                setState((prev) => ({
-                    ...prev,
-                    [id]: {
-                        ...(prev[id] ?? {}),
-                        dragging: false,
-                    },
+                    left,
+                    top,
+                    origLeft: left,
+                    origTop: top,
                     dragging: false,
-                    draggingId: null,
-                }));
-            });
+                },
+                left,
+                top,
+                origLeft: left,
+                origTop: top,
+                dragging: false,
+                draggingId: null,
+            }));
         },
     });
 
