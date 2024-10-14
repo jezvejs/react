@@ -175,8 +175,10 @@ export function useDragZone(props: UseDragZoneProps) {
             elem: dragZoneRef.current,
         };
 
-        DragMaster.makeDraggable(dragZone as DragZone);
-    }, []);
+        if (dragZone.elem) {
+            DragMaster.makeDraggable(dragZone as DragZone);
+        }
+    }, [dragZoneRef.current]);
 
     useEffect(() => {
         setState((prev) => ({
