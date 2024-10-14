@@ -147,10 +147,6 @@ export function useDragZone(props: UseDragZoneProps) {
                     },
 
                     onDragCancel() {
-                        this.onDragEnd();
-                    },
-
-                    onDragEnd() {
                         this.cancelAnimation();
 
                         setState((prev: DragnDropState) => ({
@@ -159,6 +155,10 @@ export function useDragZone(props: UseDragZoneProps) {
                             top: prev.origTop,
                             dragging: false,
                         }));
+                    },
+
+                    onDragEnd() {
+                        this.cancelAnimation();
                     },
                 };
             },
@@ -175,8 +175,10 @@ export function useDragZone(props: UseDragZoneProps) {
             elem: dragZoneRef.current,
         };
 
-        DragMaster.makeDraggable(dragZone as DragZone);
-    }, []);
+        if (dragZone.elem) {
+            DragMaster.makeDraggable(dragZone as DragZone);
+        }
+    }, [dragZoneRef.current]);
 
     useEffect(() => {
         setState((prev) => ({

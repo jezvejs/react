@@ -64,7 +64,7 @@ export const XAxisDragZone = forwardRef((props, ref) => {
 
                         return true;
                     },
-                    onDragMove(e) {
+                    onDragMove({ e }) {
                         const client = DragMaster.getEventClientCoordinates(e);
 
                         const state = getState();

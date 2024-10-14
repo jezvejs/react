@@ -20,12 +20,12 @@ export function useDropTarget(props: UseDropTargetProps) {
         const dropTarget: DropTarget = {
             ...props,
 
-            elem: dropTargetRef?.current,
+            elem: dropTargetRef.current,
 
             onDragEnd(params: OnDragEndParams) {
                 const { avatar, e } = params;
 
-                const elem = dropTargetRef?.current;
+                const elem = dropTargetRef.current;
                 const offset = getOffset(elem);
                 const border = {
                     top: elem?.clientTop ?? 0,
@@ -48,7 +48,7 @@ export function useDropTarget(props: UseDropTargetProps) {
         DragMaster.registerDropTarget(dropTarget);
 
         return () => DragMaster.unregisterDropTarget(dropTarget);
-    }, []);
+    }, [dropTargetRef.current]);
 
     return {
         dropTargetRef,

@@ -106,6 +106,8 @@ export class DragMaster {
 
     isTouch: boolean = false;
 
+    dragStarted: boolean = false;
+
     touchTimeout: number = 0;
 
     touchMoveReady: boolean = false;
@@ -145,6 +147,7 @@ export class DragMaster {
         this.avatar = null;
         this.dropTarget = null;
         this.isTouch = false;
+        this.dragStarted = false;
         this.touchTimeout = 0;
         this.touchMoveReady = false;
         this.touchHandlerSet = false;
@@ -473,6 +476,8 @@ export class DragMaster {
             return;
         }
 
+        this.dragStarted = true;
+
         this.avatar.onDragMove({ e });
 
         const newDropTarget = this.findDropTarget();
@@ -508,18 +513,21 @@ export class DragMaster {
             return;
         }
 
-        if (this.isTouch) {
-            if (!this.touchMoveReady) {
-                this.resetMoveTimeout();
-                return;
-            }
-
-            if (e.cancelable) {
-                e.preventDefault();
-            }
+        if (this.isTouch && !this.touchMoveReady) {
+            this.resetMoveTimeout();
+            return;
         }
 
         this.handleMove(e);
+
+        const preventTouchScroll = (
+            this.isTouch
+            && this.dragStarted
+            && e.cancelable
+        );
+        if (preventTouchScroll) {
+            e.preventDefault();
+        }
     }
 
     /** Document mouse up event handler */
@@ -533,6 +541,8 @@ export class DragMaster {
     }
 
     finishDrag(e: TouchEvent | MouseEvent | Event, cancel: boolean = false) {
+        this.dragStarted = false;
+
         if (this.avatar) {
             if (!cancel && this.dropTarget) {
                 this.dropTarget.onDragEnd?.({ avatar: this.avatar, e });

@@ -1,7 +1,6 @@
 import { useDragZone, useDragnDrop } from '@jezvejs/react';
 import {
     forwardRef,
-    useEffect,
     useImperativeHandle,
     useRef,
 } from 'react';
@@ -23,7 +22,7 @@ export const DefaultDragZone = forwardRef((props, ref) => {
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
 
-    const { state, setState } = useDragnDrop();
+    const { getState } = useDragnDrop();
 
     const portalElement = usePortalElement();
 
@@ -37,23 +36,12 @@ export const DefaultDragZone = forwardRef((props, ref) => {
         dragOriginal,
     });
 
-    useEffect(() => {
-        setState((prev) => ({
-            ...prev,
-            left: (props.absolutePos) ? props.left : 0,
-            origLeft: (props.absolutePos) ? props.left : 0,
-            top: (props.absolutePos) ? props.top : 0,
-            origTop: (props.absolutePos) ? props.top : 0,
-            dragging: false,
-        }));
-    }, [props.left, props.top, props.absolutePos]);
+    const state = getState();
 
     const origProps = {
         ...state,
         id: props.id,
         title: props.title,
-        left: state.origLeft,
-        top: state.origTop,
         absolutePos: props.absolutePos,
         dragging: false,
         hidden: !showOriginal,
