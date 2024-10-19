@@ -36,7 +36,7 @@ export const CustomControlsSelect = (p) => {
         }
     };
 
-    const onInput = (_, dispatch) => {
+    const onInput = ({ dispatch }) => {
         dispatch(toggleLoading());
         setTimeout(() => dispatch(toggleLoading()), 500);
     };

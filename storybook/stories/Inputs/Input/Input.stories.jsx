@@ -33,6 +33,13 @@ export const Placeholder = {
     },
 };
 
+export const Password = {
+    args: {
+        placeholder: 'Input password',
+        type: 'password',
+    },
+};
+
 export const FullWidth = {
     args: {
         className: 'full-width',

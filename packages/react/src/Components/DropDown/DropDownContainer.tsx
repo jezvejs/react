@@ -43,6 +43,7 @@ import {
     DropDownMenuItemProps,
     DropDownMenuProps,
     DropDownNativeSelectProps,
+    DropDownOnInputParam,
     DropDownProps,
     DropDownSelectedItem,
     DropDownState,
@@ -948,13 +949,13 @@ export const DropDownContainer = forwardRef<
     };
 
     /** Handler for 'input' event of text field  */
-    const onInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onInput = useCallback((params: DropDownOnInputParam<DropDownState> | null) => {
         if (props.enableFilter) {
-            const target = e?.target as HTMLInputElement;
+            const target = params?.e?.target as HTMLInputElement;
             filter(target?.value);
         }
 
-        props.onInput?.(e);
+        props.onInput?.(params);
     }, [props.enableFilter, props.onInput]);
 
     /** Handler for 'clear selection' button click */

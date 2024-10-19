@@ -28,7 +28,7 @@ export default {
 
     staticDirs: ['./public'],
 
-    typescript: {
-        reactDocgen: 'react-docgen-typescript'
-    }
+    core: {
+        disableTelemetry: true,
+    },
 };

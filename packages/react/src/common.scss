@@ -130,6 +130,27 @@ select[disabled="disabled"] {
   opacity: 1;
 }
 
+/* Remove IE/Edge clear and eye icons */
+input::-ms-clear,
+input::-ms-reveal {
+  display: none;
+}
+
+/* Remove Safari contacts icon */
+input::-webkit-contacts-auto-fill-button {
+  display: none;
+}
+
+/* Remove Safari password and caps lock icons */
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-caps-lock-indicator {
+  display: none;
+}
+
+input::-webkit-caps-lock-indicator {
+  content: none;
+}
+
 /* Firefox fix */
 button::-moz-focus-inner {
   padding: 0;
