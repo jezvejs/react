@@ -130,7 +130,7 @@ export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
     const input = useMemo(() => {
         const inputProps: DropDownInputProps = {
             placeholder,
-            onInput: (onInput ?? undefined),
+            onInput,
             disabled,
         };
         if (editable) {

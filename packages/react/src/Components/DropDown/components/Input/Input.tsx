@@ -1,8 +1,10 @@
 import { forwardRef } from 'react';
+import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 import {
     DropDownInputComponent,
     DropDownInputProps,
     DropDownInputRef,
+    DropDownState,
     DropDownValidInputTypes,
 } from '../../types.ts';
 import './Input.scss';
@@ -42,8 +44,25 @@ export const DropDownInput: DropDownInputComponent = forwardRef<
         hidden,
     } = props;
 
+    const {
+        state,
+        getState,
+        dispatch,
+        setState,
+    } = useStore<DropDownState>();
+
     const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        props?.onInput?.(e);
+        if (e.type !== 'change') {
+            return;
+        }
+
+        props?.onInput?.({
+            e,
+            state,
+            getState,
+            setState,
+            dispatch,
+        });
     };
 
     const inputProps: DropDownInputProps = {
@@ -55,8 +74,6 @@ export const DropDownInput: DropDownInputComponent = forwardRef<
         placeholder,
         disabled,
         hidden,
-        onInput,
-        onChange: onInput,
     };
 
     if (!disabled) {
@@ -67,6 +84,8 @@ export const DropDownInput: DropDownInputComponent = forwardRef<
         <input
             ref={ref}
             {...inputProps}
+            onInput={onInput}
+            onChange={onInput}
         />
     );
 });

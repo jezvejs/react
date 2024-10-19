@@ -1,6 +1,11 @@
-import { ComponentType, ReactNode } from 'react';
+import {
+    ComponentType,
+    Dispatch,
+    ReactNode,
+    SetStateAction,
+} from 'react';
 
-import { StoreReducersList } from '../../utils/Store/Store.ts';
+import { StoreDispatchFunction, StoreReducersList } from '../../utils/Store/Store.ts';
 import { PopupPositionProps } from '../../hooks/usePopupPosition/types.ts';
 
 import {
@@ -21,6 +26,18 @@ import { TagsProps } from '../Tags/Tags.tsx';
 type WithSelector = {
     selector?: string;
 };
+
+/**
+ * .onInput() event handler params
+ */
+export interface DropDownOnInputParam<T = MenuState> {
+    e: React.ChangeEvent<HTMLInputElement>;
+
+    state: T;
+    getState: () => T;
+    setState: Dispatch<SetStateAction<T>>;
+    dispatch?: StoreDispatchFunction;
+}
 
 /**
  * Combo box MultiSelectionItem component
@@ -52,10 +69,12 @@ export type DropDownValidInputTypes =
     | 'text'
     | 'url';
 
-export interface DropDownInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    type?: DropDownValidInputTypes,
-    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void,
-}
+export type DropDownInputProps =
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onInput'>
+    & {
+        type?: DropDownValidInputTypes;
+        onInput?: ((params: DropDownOnInputParam<DropDownState> | null) => void) | null;
+    };
 
 export type DropDownInputRef = HTMLInputElement | null;
 
@@ -126,7 +145,7 @@ export interface DropDownMenuHeaderProps {
     useSingleSelectionAsPlaceholder?: boolean;
     disabled?: boolean;
     multiple?: boolean;
-    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onInput?: (params: DropDownOnInputParam<DropDownState> | null) => void;
     components?: {
         Input: DropDownInputComponent | null;
     };
@@ -177,7 +196,7 @@ export interface DropDownMenuProps extends MenuProps<DropDownMenuHeaderProps> {
         ) => void
     ) | null;
 
-    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onInput?: (params: DropDownOnInputParam<DropDownState> | null) => void;
     onDeleteSelectedItem?: (params: OnDeleteSelectedItemParam) => void;
     onClearSelection?: () => void;
     onToggle?: () => void;
@@ -298,7 +317,7 @@ export interface DropDownComboBoxProps {
     showToggleButton?: boolean;
     actSelItemIndex?: number;
 
-    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onInput?: (params: DropDownOnInputParam<DropDownState> | null) => void;
     onDeleteSelectedItem: (params: OnDeleteSelectedItemParam) => void;
     onClearSelection: () => void;
     onToggle: () => void;
@@ -427,8 +446,8 @@ export interface DropDownProps {
     onItemSelect: ((params: DropDownSelectionParam | null) => void) | null;
     /* selection changed event handler */
     onChange: ((params: DropDownSelectionParam | null) => void) | null;
-    /* filer input event handler */
-    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    /* filter input event handler */
+    onInput?: (params: DropDownOnInputParam<DropDownState> | null) => void;
 
     isAvailableItem?: ((item: MenuItemProps, state: MenuState) => boolean) | null;
 
