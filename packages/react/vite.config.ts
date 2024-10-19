@@ -9,7 +9,7 @@ export default defineConfig({
         lib: {
             entry: resolve('src/index.ts'),
             name: '@jezvejs/react',
-            formats: ['es', 'umd'],
+            formats: ['es'],
             fileName: (format) => `jezvejs-react.${format}.js`,
         },
         rollupOptions: {
