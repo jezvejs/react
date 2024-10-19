@@ -27,8 +27,4 @@ export default {
     docs: {},
 
     staticDirs: ['./public'],
-
-    typescript: {
-        reactDocgen: 'react-docgen-typescript'
-    }
 };
