@@ -10,6 +10,8 @@
         "lint-src": "npx eslint --ext js,jsx,ts,tsx --quiet ./packages/ ./storybook/",
         "lint-style": "npx stylelint packages/**/*.scss storybook/**/*.scss",
         "lint": "npm-run-all --parallel lint-src lint-style",
+        "lint-ts": "npx tsc -b ./packages/react/ --noEmit",
+        "lint-all": "npm-run-all lint lint-ts",
         "prestart": "npm install",
         "test": "npx playwright test",
         "start": "npm run dev -w jezvejs-react-storybook",
