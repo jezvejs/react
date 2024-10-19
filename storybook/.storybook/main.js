@@ -27,4 +27,8 @@ export default {
     docs: {},
 
     staticDirs: ['./public'],
+
+    core: {
+        disableTelemetry: true,
+    },
 };
