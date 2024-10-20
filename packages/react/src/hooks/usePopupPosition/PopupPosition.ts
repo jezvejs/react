@@ -817,7 +817,8 @@ export class PopupPosition {
 
     /* Reset previously applied style properties of element */
     reset() {
-        const { style } = this.props.elem as HTMLElement;
+        const elem = this.props.elem as HTMLElement;
+        const { style } = elem;
 
         style.top = '';
         style.bottom = '';
@@ -825,6 +826,8 @@ export class PopupPosition {
         style.minWidth = '';
         style.width = '';
         style.maxHeight = '';
+
+        transform(elem, '');
 
         setTimeout(() => this.stopWindowEvents());
     }
