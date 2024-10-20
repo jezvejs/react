@@ -5,6 +5,7 @@ import './MenuGroupHeader.scss';
 export const MenuGroupHeader: MenuGroupHeaderComponent = (props: MenuGroupHeaderProps) => (
     <div
         className={classNames('menu-group__header', props.className)}
+        data-id={props.id}
     >
         {props.title}
     </div>

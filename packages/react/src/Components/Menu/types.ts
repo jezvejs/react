@@ -186,10 +186,7 @@ export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & WithSelector
 /**
  * Menu group header component
  */
-export interface MenuGroupHeaderProps {
-    title: string;
-    className?: string;
-}
+export type MenuGroupHeaderProps = MenuItemProps;
 
 export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & WithSelector;
 

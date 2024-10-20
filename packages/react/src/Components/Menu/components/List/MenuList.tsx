@@ -86,7 +86,7 @@ export const MenuList = (p: MenuListProps) => {
                 items: (item.items ?? []),
             };
             const header: MenuGroupHeaderProps = {
-                title: item.title,
+                ...item,
             };
 
             const groupProps: MenuGroupItemProps = {
