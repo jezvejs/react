@@ -377,6 +377,11 @@ const slice = createSlice({
         ...state,
         fullScreenHeight,
     }),
+
+    setMobileViewport: (state: DropDownState, mobileViewport: boolean) => ({
+        ...state,
+        mobileViewport,
+    }),
 });
 
 export const { actions, reducer } = slice;

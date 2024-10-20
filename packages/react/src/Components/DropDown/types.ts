@@ -474,6 +474,7 @@ export interface DropDownState extends DropDownProps {
     isTouch: boolean,
     listeningWindow: boolean,
     waitForScroll: boolean,
+    mobileViewport: boolean,
     fullScreenHeight: number | null,
     renderTime: number,
 

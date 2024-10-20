@@ -36,6 +36,7 @@ import {
     getActiveItem,
     getSelectedItems,
     getVisibleItems,
+    isMobileViewport,
 } from './helpers.ts';
 import { actions } from './reducer.ts';
 import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.ts';
@@ -84,8 +85,7 @@ export const DropDownContainer = forwardRef<
     /** Returns true if fullscreen mode is enabled and active */
     const isFullScreen = () => (
         props.fullScreen
-        && innerRef?.current
-        && !innerRef.current.offsetParent
+        && isMobileViewport()
     );
 
     const setFullScreenContainerHeight = () => {
@@ -95,19 +95,26 @@ export const DropDownContainer = forwardRef<
 
     /** Handles window 'scroll' and viewport 'resize' events */
     const onUpdatePosition = () => {
-        if (state.waitForScroll) {
+        const st = getState();
+        if (st.waitForScroll) {
             showListHandler?.();
             return false;
         }
 
         if (
-            !state.visible
+            !st.visible
             // || isVisible(selectElem, true)
         ) {
             return false;
         }
 
-        if (isFullScreen()) {
+        const isMobile = isMobileViewport();
+        if (st.mobileViewport !== isMobile) {
+            dispatch(actions.setMobileViewport(isMobile));
+        }
+
+        const fullscreen = isFullScreen();
+        if (fullscreen) {
             setFullScreenContainerHeight();
             return false;
         }
@@ -135,7 +142,7 @@ export const DropDownContainer = forwardRef<
             allowResize: false,
         }),
 
-        open: state.visible && !state.fullScreen,
+        open: state.visible && !isFullScreen(),
         onScrollDone: () => dispatch(actions.startWindowListening()),
         onWindowScroll: () => onUpdatePosition(),
         onViewportResize: () => onUpdatePosition(),
@@ -1176,7 +1183,12 @@ export const DropDownContainer = forwardRef<
     );
 
     const style: CSSProperties = {};
-    if (state.visible && state.fullScreenHeight) {
+    if (
+        isFullScreen()
+        && state.mobileViewport
+        && state.visible
+        && state.fullScreenHeight
+    ) {
         style.height = px(state.fullScreenHeight);
     }
 

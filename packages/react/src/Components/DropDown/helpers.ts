@@ -1,5 +1,9 @@
 import { asArray } from '@jezvejs/types';
 
+// Gloabal hooks
+import { getScreenWidth } from '../../hooks/usePopupPosition/helpers.ts';
+
+// Local components
 import { MenuHelpers } from '../Menu/Menu.tsx';
 import { MenuItemType, MenuState } from '../Menu/types.ts';
 
@@ -10,6 +14,12 @@ import {
     DropDownProps,
     DropDownState,
 } from './types.ts';
+import { MAX_MOBILE_SCREEN_WIDTH } from './constants.ts';
+
+/** Returns true if current width of screen is lower than mobile breakpoint */
+export const isMobileViewport = () => (
+    getScreenWidth() < MAX_MOBILE_SCREEN_WIDTH
+);
 
 /** Returns array of selected items */
 export const getSelectedItems = (state: DropDownState) => (
@@ -208,6 +218,7 @@ export const getInitialState = (
         isTouch: false,
         listeningWindow: false,
         waitForScroll: false,
+        mobileViewport: isMobileViewport(),
         fullScreenHeight: null,
         renderTime: Date.now(),
         position: {
