@@ -265,6 +265,22 @@ export const FilterGroups = {
 };
 
 /**
+ * With 'openOnFocus' option enabled
+ */
+export const FilterGroupsMultiple = {
+    args: {
+        className: 'dd_stretch',
+        enableFilter: true,
+        openOnFocus: true,
+        multiple: true,
+        placeholder: 'Type to filter',
+        items: initGroupItems(),
+    },
+    decorators: [textDecorator],
+    render: ToggleEnable,
+};
+
+/**
  * By default focus is removed from input after select item from menu.
  * Set 'blurInputOnSingleSelect' to false to keep input focused after select item.
  */
