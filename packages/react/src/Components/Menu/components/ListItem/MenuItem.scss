@@ -72,11 +72,8 @@
   .menu-item__icon {
     fill: var(--menu-item-selected-icon-color);
   }
-}
 
-.menu .menu-item.menu-item_selected,
-.menu .menu-item.menu-item_selected:focus {
-  & > .menu-item__side-content > .menu-checkbox {
+  > .menu-item__side-content > .menu-checkbox {
     background: var(--menu-item-selected-checkbox-background);
 
     .menu-checkbox__icon {
