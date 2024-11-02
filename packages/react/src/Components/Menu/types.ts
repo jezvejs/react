@@ -102,17 +102,11 @@ export interface MenuSeparatorProps {
 /**
  * Menu group item props
  */
-export interface MenuGroupItemProps {
-    id: string;
-    title: string;
+export interface MenuGroupItemProps extends MenuItemProps {
     items: MenuItemProps[];
 
-    className?: string;
     header: MenuGroupHeaderProps;
     list: MenuListProps;
-
-    beforeContent?: boolean;
-    afterContent?: boolean;
 
     getItemProps?: (
         (item: MenuItemProps, state: MenuListProps) => MenuItemProps
@@ -186,10 +180,7 @@ export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & WithSelector
 /**
  * Menu group header component
  */
-export interface MenuGroupHeaderProps {
-    title: string;
-    className?: string;
-}
+export type MenuGroupHeaderProps = MenuItemProps;
 
 export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & WithSelector;
 

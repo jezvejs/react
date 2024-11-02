@@ -48,6 +48,10 @@ export const MenuGroupItem: MenuGroupItemComponent = (p: MenuGroupItemProps) => 
     const listProps: MenuListProps = {
         ...props.list,
         id,
+        items: props.items.map((item) => ({
+            ...item,
+            disabled: props.disabled || item.disabled,
+        })),
     };
 
     return (

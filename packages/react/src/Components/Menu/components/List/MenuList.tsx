@@ -1,12 +1,15 @@
 import classNames from 'classnames';
 import { useCallback, useMemo } from 'react';
 
+import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
+
 import { getClosestItemElement, getItemSelector } from '../../helpers.ts';
 import {
     MenuGroupHeaderProps,
     MenuGroupItemProps,
     MenuItemProps,
     MenuListProps,
+    MenuState,
 } from '../../types.ts';
 
 import './MenuList.scss';
@@ -29,6 +32,7 @@ export const MenuList = (p: MenuListProps) => {
 
     const { components } = props;
     const { ListPlaceholder } = components;
+    const { getState } = useStore<MenuState>();
 
     const getItemIdByElem = (elem: HTMLElement | null): string | null => {
         const selector = getItemSelector(props);
@@ -81,12 +85,15 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         if (item.type === 'group') {
+            const st = getState();
+
             const list: MenuListProps = {
                 ...props,
                 items: (item.items ?? []),
+                activeItem: st.activeItem,
             };
             const header: MenuGroupHeaderProps = {
-                title: item.title,
+                ...item,
             };
 
             const groupProps: MenuGroupItemProps = {

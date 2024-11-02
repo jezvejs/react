@@ -30,7 +30,6 @@ export const defaultProps: MenuProps = {
     multiple: false,
     disabled: false,
     tabThrough: true,
-    tabIndex: 0,
     loopNavigation: true,
     preventNavigation: false,
     focusItemOnHover: true,

@@ -10,6 +10,7 @@ import { PopupPositionProps } from '../../hooks/usePopupPosition/types.ts';
 
 import {
     MenuComponents,
+    MenuGroupHeaderProps,
     MenuGroupItemProps,
     MenuItemProps,
     MenuListProps,
@@ -121,10 +122,7 @@ export type DropDownMenuItemComponent = (
 /**
  * Menu group header component
  */
-export interface DropDownGroupHeaderProps {
-    title: string,
-    className?: string,
-}
+export type DropDownGroupHeaderProps = MenuGroupHeaderProps;
 
 export type DropDownGroupHeaderComponent = React.FC<DropDownGroupHeaderProps> & WithSelector;
 
@@ -474,6 +472,7 @@ export interface DropDownState extends DropDownProps {
     isTouch: boolean,
     listeningWindow: boolean,
     waitForScroll: boolean,
+    mobileViewport: boolean,
     fullScreenHeight: number | null,
     renderTime: number,
 
