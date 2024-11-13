@@ -1,5 +1,6 @@
 import { asArray, isFunction } from '@jezvejs/types';
 import {
+    IncludeGroupItemsParam,
     MenuItemCallback,
     MenuItemProps,
     MenuListProps,
@@ -22,6 +23,41 @@ export const isCheckbox = (item: MenuItemProps | null): boolean => (
 );
 
 /**
+ * Returns true if specified item support child items
+ *
+ * @param {<T = MenuItemProps>} item
+ * @returns {boolean}
+ */
+export function isChildItemsAvailable<T extends MenuItemProps = MenuItemProps>(
+    item: T,
+): boolean {
+    return (
+        item.type === 'group'
+        // || item.type === 'parent'
+    );
+};
+
+/**
+ * Returns true if specified item itself should be included to the tree data processing
+ *
+ * @param {<T = MenuItemProps>} item
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function shouldIncludeParentItem<
+    T extends MenuItemProps = MenuItemProps,
+    OPT extends IncludeGroupItemsParam = IncludeGroupItemsParam,
+>(
+    item: T,
+    options?: OPT | null,
+): boolean {
+    return !!(
+        (item.type === 'group' && options?.includeGroupItems)
+        || (item.type === 'parent' && options?.includeChildItems)
+    );
+}
+
+/**
  * Converts multilevel menu list to flat array of items and returns result
  *
  * @param {<T = MenuItemProps>[]} items
@@ -38,8 +74,8 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
         const item = items[index];
         const disabled = options?.disabled || item.disabled;
 
-        if (item.type === 'group') {
-            if (options?.includeGroupItems) {
+        if (isChildItemsAvailable(item)) {
+            if (shouldIncludeParentItem(item, options)) {
                 res.push({ ...item, disabled });
             }
 
@@ -83,7 +119,7 @@ export function findMenuItem<T extends MenuItemProps = MenuItemProps>(
             return item;
         }
 
-        if (item.type === 'group' && Array.isArray(item.items)) {
+        if (isChildItemsAvailable(item) && Array.isArray(item.items)) {
             item = findMenuItem<T>((item.items ?? []) as T[], callback);
             if (item) {
                 return item;
@@ -208,8 +244,8 @@ export function forItems<T extends MenuItemProps = MenuItemProps>(
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
-        if (item.type === 'group') {
-            if (options?.includeGroupItems) {
+        if (isChildItemsAvailable(item)) {
+            if (shouldIncludeParentItem(item, options)) {
                 callback(item, index, items);
             }
 
@@ -246,8 +282,8 @@ export function mapItems<T extends MenuItemProps = MenuItemProps>(
             group: options?.group?.id,
         };
 
-        if (item.type === 'group') {
-            const group = (options?.includeGroupItems)
+        if (isChildItemsAvailable(item)) {
+            const group = shouldIncludeParentItem(item, options)
                 ? callback(item, index, items)
                 : item;
 
@@ -291,9 +327,10 @@ export function filterItems<T extends MenuItemProps = MenuItemProps>(
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
-        if (item.type === 'group') {
+        if (isChildItemsAvailable(item)) {
+            const includeParentItem = shouldIncludeParentItem(item, options);
             if (
-                !options?.includeGroupItems
+                !includeParentItem
                 || callback(item, index, items)
             ) {
                 const children = filterItems<T>((item.items ?? []) as T[], callback, options);

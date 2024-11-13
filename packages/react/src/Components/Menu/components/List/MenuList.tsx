@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useCallback, useMemo } from 'react';
+import { ReactNode, useCallback, useMemo } from 'react';
 
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
@@ -73,20 +73,28 @@ export const MenuList = (p: MenuListProps) => {
         props.onMouseLeave?.(itemId, e);
     }, []);
 
-    const ItemComponent = useCallback((item: MenuItemProps) => {
+    const itemProps = (item: MenuItemProps, state: MenuListProps) => (
+        state.getItemProps?.(item, state) ?? item
+    );
+
+    const ItemComponent = useCallback((item: MenuItemProps): ReactNode => {
         const {
             ListItem,
             Separator,
             GroupItem,
         } = props.components;
+        const st = getState();
+
+        const CustomItem = st.getItemComponent?.(item, props);
+        if (CustomItem) {
+            return CustomItem && <CustomItem {...item} />;
+        }
 
         if (item.type === 'separator') {
             return Separator && <Separator {...item} />;
         }
 
         if (item.type === 'group') {
-            const st = getState();
-
             const list: MenuListProps = {
                 ...props,
                 items: (item.items ?? []),
@@ -111,9 +119,6 @@ export const MenuList = (p: MenuListProps) => {
         return ListItem && <ListItem {...item} />;
     }, []);
 
-    const itemProps = (item: MenuItemProps, state: MenuListProps) => (
-        state.getItemProps?.(item, state) ?? item
-    );
 
     const getPlaceholderProps = (state: MenuListProps) => (
         state.getPlaceholderProps?.(state) ?? state.placeholder ?? {}

@@ -361,6 +361,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     }, []);
 
     const onKeyDown = (e: React.KeyboardEvent) => {
+        const customRes = props.onKeyDown?.(e) ?? false;
+        if (customRes) {
+            return;
+        }
+
         const st = getState();
 
         const availCallback = (item: MenuItemProps): boolean => (
@@ -388,8 +393,8 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
                 scrollToItem();
 
                 e.preventDefault();
+                e.stopPropagation();
             }
-
             return;
         }
 
@@ -408,8 +413,8 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
                 scrollToItem();
 
                 e.preventDefault();
+                e.stopPropagation();
             }
-
             return;
         }
 
@@ -503,10 +508,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             ...columns,
             id: st.id!,
             items: st.items ?? [],
-            getItemProps: MenuHelpers.getItemProps,
+            getItemProps: st.getItemProps ?? MenuHelpers.getItemProps,
             onItemClick,
             onMouseEnter,
             onMouseLeave,
+            components: rest.components!,
         };
 
         listProps.itemSelector = listProps.components?.ListItem?.selector ?? null;
