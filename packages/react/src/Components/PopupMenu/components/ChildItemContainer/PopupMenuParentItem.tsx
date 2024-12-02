@@ -31,7 +31,8 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
     const containerProps = {
         id: `${id}_submenu`,
         className: classNames('menu-item menu-group', className),
-        'data-id': id,
+        'data-parent': id,
+        parentId: id,
         items: items.map((item: MenuItemProps) => ({
             ...item,
             parentId: id,
@@ -44,9 +45,9 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         fixed: true,
         handleHideOnSelect: () => props.handleHideOnSelect?.(),
 
-        isAvailableItem: (item: MenuItemProps, state: MenuState) => {
-            return MenuHelpers.isAvailableItem(item, state);
-        },
+        isAvailableItem: (item: MenuItemProps, state: MenuState) => (
+            MenuHelpers.isAvailableItem(item, state)
+        ),
     };
 
     const { ListItem } = props.components;

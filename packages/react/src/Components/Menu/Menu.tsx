@@ -30,6 +30,8 @@ export {
     MenuDefProps,
 };
 
+export * from './types.ts';
+
 type MenuRef = HTMLDivElement | null;
 
 const {

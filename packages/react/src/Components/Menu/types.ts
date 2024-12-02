@@ -134,6 +134,7 @@ export interface MenuListProps {
     items: MenuItemProps[];
 
     className?: string | null;
+    menuSelector?: string | null;
     itemSelector?: string | null;
 
     activeItem?: string | null;
@@ -235,6 +236,8 @@ export interface MenuProps<
     items: MenuItemProps[];
     /* Additional CSS class names */
     className?: string | null;
+    /* CSS selector for menu element */
+    menuSelector?: string | null;
     /* CSS selector for menu item element */
     itemSelector?: string | null;
     /* Default type of menu item */
@@ -313,6 +316,7 @@ export interface MenuState extends MenuProps {
  */
 export interface MenuAttrs extends React.HTMLAttributes<HTMLDivElement> {
     disabled?: boolean;
+    'data-id'?: string;
     'data-parent'?: string;
 
     onFocusCapture?: (e: React.FocusEvent) => void;

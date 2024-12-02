@@ -3,7 +3,7 @@ import { ReactNode, useCallback, useMemo } from 'react';
 
 import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
 
-import { getClosestItemElement, getItemSelector } from '../../helpers.ts';
+import { getItemIdByElem } from '../../helpers.ts';
 import {
     MenuGroupHeaderProps,
     MenuGroupItemProps,
@@ -34,12 +34,6 @@ export const MenuList = (p: MenuListProps) => {
     const { ListPlaceholder } = components;
     const { getState } = useStore<MenuState>();
 
-    const getItemIdByElem = (elem: HTMLElement | null): string | null => {
-        const selector = getItemSelector(props);
-        const closestElem = getClosestItemElement(elem, selector) as HTMLElement;
-        return closestElem?.dataset?.id ?? null;
-    };
-
     /**
      * 'click' event handler
      * @param {React.MouseEvent} e
@@ -47,7 +41,7 @@ export const MenuList = (p: MenuListProps) => {
     const onClick = useCallback((e: React.MouseEvent) => {
         e?.stopPropagation();
 
-        const itemId = getItemIdByElem(e?.target as HTMLElement);
+        const itemId = getItemIdByElem(e?.target as HTMLElement, props);
         if (itemId === null) {
             return;
         }
@@ -60,7 +54,7 @@ export const MenuList = (p: MenuListProps) => {
      * @param {React.MouseEvent} e
      */
     const onMouseEnter = useCallback((e: React.MouseEvent) => {
-        const itemId = getItemIdByElem(e?.target as HTMLElement);
+        const itemId = getItemIdByElem(e?.target as HTMLElement, props);
         props.onMouseEnter?.(itemId, e);
     }, []);
 
@@ -69,7 +63,7 @@ export const MenuList = (p: MenuListProps) => {
      * @param {React.MouseEvent} e
      */
     const onMouseLeave = useCallback((e: React.MouseEvent) => {
-        const itemId = getItemIdByElem(e?.relatedTarget as HTMLElement);
+        const itemId = getItemIdByElem(e?.relatedTarget as HTMLElement, props);
         props.onMouseLeave?.(itemId, e);
     }, []);
 
@@ -118,7 +112,6 @@ export const MenuList = (p: MenuListProps) => {
 
         return ListItem && <ListItem {...item} />;
     }, []);
-
 
     const getPlaceholderProps = (state: MenuListProps) => (
         state.getPlaceholderProps?.(state) ?? state.placeholder ?? {}

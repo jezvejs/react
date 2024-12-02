@@ -192,12 +192,10 @@ export const PopupMenu = (p: PopupMenuProps) => {
             return null;
         },
 
-        getItemProps: (item: MenuItemProps, st: MenuListProps) => {
-            return {
-                ...MenuHelpers.getItemProps(item, st),
-                handleHideOnSelect: () => handleHideOnSelect(),
-            };
-        },
+        getItemProps: (item: MenuItemProps, st: MenuListProps) => ({
+            ...MenuHelpers.getItemProps(item, st),
+            handleHideOnSelect: () => handleHideOnSelect(),
+        }),
 
         onKeyDown: (e: React.KeyboardEvent) => {
             if (e.code === 'Escape') {
