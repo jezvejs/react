@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react",
-    "version": "1.6.6",
+    "version": "1.6.7",
     "type": "module",
     "files": [
         "src",
@@ -25,14 +25,14 @@
     },
     "dependencies": {
         "@jezvejs/datetime": "^1.2.1",
-        "@jezvejs/dom": "^1.2.1",
+        "@jezvejs/dom": "^1.2.2",
         "@jezvejs/number": "^1.1.0",
         "@jezvejs/types": "^1.1.0",
-        "@vitejs/plugin-react": "^4.3.3",
+        "@vitejs/plugin-react": "^4.3.4",
         "classnames": "^2.5.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "vite": "^5.4.10",
+        "vite": "^5.4.11",
         "vite-plugin-svgr": "^4.3.0"
     },
     "peerDependencies": {
