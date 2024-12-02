@@ -92,7 +92,7 @@ export const defaultIsAvailableItem = (
     && !item.disabled
     && ((state.filtered) ? item.matchFilter : true)
     && (
-        item.type !== 'group'
+        (item.type !== 'group')
         || state.allowActiveGroupHeader
     )
 );

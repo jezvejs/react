@@ -1,5 +1,6 @@
 import { asArray, isFunction } from '@jezvejs/types';
 import {
+    IncludeGroupItemsParam,
     MenuItemCallback,
     MenuItemProps,
     MenuListProps,
@@ -22,6 +23,58 @@ export const isCheckbox = (item: MenuItemProps | null): boolean => (
 );
 
 /**
+ * Returns true if specified item support child items
+ *
+ * @param {<T = MenuItemProps>} item
+ * @returns {boolean}
+ */
+export function isChildItemsAvailable<T extends MenuItemProps = MenuItemProps>(
+    item: T,
+): boolean {
+    return (
+        item.type === 'group'
+        || item.type === 'parent'
+    );
+}
+
+/**
+ * Returns true if specified item itself should be included to the tree data processing
+ *
+ * @param {<T = MenuItemProps>} item
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function shouldIncludeParentItem<
+    T extends MenuItemProps = MenuItemProps,
+    OPT extends IncludeGroupItemsParam = IncludeGroupItemsParam,
+>(
+    item: T,
+    options?: OPT | null,
+): boolean {
+    return !!(
+        (item.type === 'group' && options?.includeGroupItems)
+        || (item.type === 'parent' && options?.includeChildItems)
+    );
+}
+
+/**
+ * Returns true if children of specified item should be included to the tree data processing
+ *
+ * @param {<T = MenuItemProps>} item
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function shouldIncludeChildItems<
+    T extends MenuItemProps = MenuItemProps,
+    OPT extends IncludeGroupItemsParam = IncludeGroupItemsParam,
+>(
+    item: T,
+    options?: OPT | null,
+): boolean {
+    return (item.type === 'parent' && !!options?.includeChildItems);
+}
+
+/**
  * Converts multilevel menu list to flat array of items and returns result
  *
  * @param {<T = MenuItemProps>[]} items
@@ -38,20 +91,23 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
         const item = items[index];
         const disabled = options?.disabled || item.disabled;
 
-        if (item.type === 'group') {
-            if (options?.includeGroupItems) {
+        if (isChildItemsAvailable(item)) {
+            if (shouldIncludeParentItem(item, options)) {
                 res.push({ ...item, disabled });
             }
 
-            res.push(
-                ...toFlatList<T>(
-                    asArray(item.items),
-                    {
-                        disabled,
-                        includeGroupItems: options?.includeGroupItems,
-                    },
-                ),
-            );
+            if (shouldIncludeChildItems(item, options)) {
+                res.push(
+                    ...toFlatList<T>(
+                        asArray(item.items),
+                        {
+                            ...options,
+                            disabled,
+                            includeGroupItems: options?.includeGroupItems,
+                        },
+                    ),
+                );
+            }
         } else {
             res.push({ ...item, disabled });
         }
@@ -65,10 +121,12 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
  *
  * @param {<T = MenuItemProps>[]} items array of items to search in
  * @param {MenuItemCallback<T>} callback
+ * @param {ToFlatListParam} options
  */
 export function findMenuItem<T extends MenuItemProps = MenuItemProps>(
     items: T[],
     callback: MenuItemCallback<T>,
+    options?: ToFlatListParam,
 ): T | null {
     if (!Array.isArray(items)) {
         throw new Error('Invalid items parameter');
@@ -83,8 +141,8 @@ export function findMenuItem<T extends MenuItemProps = MenuItemProps>(
             return item;
         }
 
-        if (item.type === 'group' && Array.isArray(item.items)) {
-            item = findMenuItem<T>((item.items ?? []) as T[], callback);
+        if (isChildItemsAvailable(item) && Array.isArray(item.items)) {
+            item = findMenuItem<T>((item.items ?? []) as T[], callback, options);
             if (item) {
                 return item;
             }
@@ -208,8 +266,8 @@ export function forItems<T extends MenuItemProps = MenuItemProps>(
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
-        if (item.type === 'group') {
-            if (options?.includeGroupItems) {
+        if (isChildItemsAvailable(item)) {
+            if (shouldIncludeParentItem(item, options)) {
                 callback(item, index, items);
             }
 
@@ -246,8 +304,8 @@ export function mapItems<T extends MenuItemProps = MenuItemProps>(
             group: options?.group?.id,
         };
 
-        if (item.type === 'group') {
-            const group = (options?.includeGroupItems)
+        if (isChildItemsAvailable(item)) {
+            const group = shouldIncludeParentItem(item, options)
                 ? callback(item, index, items)
                 : item;
 
@@ -291,9 +349,10 @@ export function filterItems<T extends MenuItemProps = MenuItemProps>(
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
 
-        if (item.type === 'group') {
+        if (isChildItemsAvailable(item)) {
+            const includeParentItem = shouldIncludeParentItem(item, options);
             if (
-                !options?.includeGroupItems
+                !includeParentItem
                 || callback(item, index, items)
             ) {
                 const children = filterItems<T>((item.items ?? []) as T[], callback, options);
@@ -392,10 +451,31 @@ export function getNextItem<T extends MenuItemProps = MenuItemProps>(
     return null;
 }
 
+/**
+ * Returns menu container CSS selector string for specified props
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getMenuSelector = (props: MenuState | MenuListProps): string | null => (
+    props?.menuSelector ?? null
+);
+
+/**
+ * Returns menu item CSS selector string for specified props
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
 export const getItemSelector = (props: MenuState | MenuListProps): string | null => (
     props?.itemSelector ?? props?.components?.ListItem?.selector ?? null
 );
 
+/**
+ * Returns element closest to the specified element and matching selector
+ *
+ * @param {HTMLElement | null} elem
+ * @param {string | null} selector
+ * @returns {HTMLElement | null}
+ */
 export const getClosestItemElement = (
     elem: HTMLElement | null,
     selector: string | null,
@@ -403,13 +483,77 @@ export const getClosestItemElement = (
     (selector && elem?.closest?.(selector)) as HTMLElement ?? null
 );
 
+/**
+ * Finds the item element closest to the specified element and
+ * returns item id if found element or null otherwise
+ *
+ * @param {HTMLElement | null} elem
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getItemIdByElem = (
+    elem: HTMLElement | null,
+    props: MenuState | MenuListProps,
+): string | null => {
+    const selector = getItemSelector(props);
+    const closestElem = getClosestItemElement(elem, selector) as HTMLElement;
+    return closestElem?.dataset?.id ?? null;
+};
+
+/**
+ * Returns menu element closest to the specified element
+ *
+ * @param {HTMLElement | null} elem
+ * @param {MenuState | MenuListProps} props
+ * @returns {HTMLElement | null}
+ */
+export const getClosestMenuByElem = (
+    elem: HTMLElement | null,
+    props: MenuState | MenuListProps,
+): HTMLElement | null => {
+    const selector = getMenuSelector(props);
+    return getClosestItemElement(elem, selector) as HTMLElement;
+};
+
+/**
+ * Finds the menu element closest to the specified element and
+ * returns menu id if found element or null otherwise
+ *
+ * @param {HTMLElement | null} elem
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getMenuIdByElem = (
+    elem: HTMLElement | null,
+    props: MenuState | MenuListProps,
+): string | null => {
+    const closestElem = getClosestMenuByElem(elem, props);
+    return closestElem?.dataset?.id ?? null;
+};
+
+/**
+ * Finds the menu element closest to the specified element and
+ * returns menu id if found element or null otherwise
+ *
+ * @param {HTMLElement | null} elem
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getMenuParentIdByElem = (
+    elem: HTMLElement | null,
+    props: MenuState | MenuListProps,
+): string | null => {
+    const closestElem = getClosestMenuByElem(elem, props);
+    return closestElem?.dataset?.parent ?? null;
+};
+
 export const isAvailableItem = (item: MenuItemProps, state: MenuState): boolean => !!(
     item
     && !item.hidden
     && !item.disabled
     && item.type !== 'separator'
     && (
-        item.type !== 'group'
+        (item.type !== 'group')
         || state.allowActiveGroupHeader
     )
 );

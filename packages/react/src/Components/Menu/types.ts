@@ -19,25 +19,34 @@ export type MenuItemButtonType =
 export type MenuItemType =
     MenuItemButtonType
     | 'separator'
-    | 'group';
+    | 'group'
+    | 'parent';
 
 export interface MenuItemCallback<T extends MenuItemProps = MenuItemProps, R = boolean> {
     (item: T, index?: number, arr?: T[]): R;
 }
 
 /**
+ * shouldIncludeParentItem() function params
+ */
+export interface IncludeGroupItemsParam {
+    includeGroupItems?: boolean;
+    includeChildItems?: boolean;
+}
+
+/**
  * toFlatList() function params
  */
-export interface ToFlatListParam {
+export interface ToFlatListParam extends IncludeGroupItemsParam {
     disabled?: boolean;
-    includeGroupItems?: boolean;
 }
 
 /**
  * forItems() function params
  */
-export interface MenuLoopParam<T extends MenuItemProps = MenuItemProps> {
-    includeGroupItems?: boolean;
+export interface MenuLoopParam<
+    T extends MenuItemProps = MenuItemProps,
+> extends IncludeGroupItemsParam {
     group?: T | null;
 }
 
@@ -60,6 +69,7 @@ export interface MenuItemProps {
     id: string;
     type: MenuItemType;
     group?: string | null;
+    parentId?: string;
 
     className?: string;
     title: string;
@@ -124,6 +134,7 @@ export interface MenuListProps {
     items: MenuItemProps[];
 
     className?: string | null;
+    menuSelector?: string | null;
     itemSelector?: string | null;
 
     activeItem?: string | null;
@@ -145,6 +156,10 @@ export interface MenuListProps {
 
     getItemProps?: (
         (item: MenuItemProps, state: MenuListProps) => MenuItemProps
+    ) | null;
+
+    getItemComponent?: (
+        (item: MenuItemProps, state: MenuListProps) => (MenuItemComponent | null)
     ) | null;
 
     getItemDefaultProps?: (() => Partial<MenuItemProps>) | null;
@@ -221,6 +236,8 @@ export interface MenuProps<
     items: MenuItemProps[];
     /* Additional CSS class names */
     className?: string | null;
+    /* CSS selector for menu element */
+    menuSelector?: string | null;
     /* CSS selector for menu item element */
     itemSelector?: string | null;
     /* Default type of menu item */
@@ -246,9 +263,9 @@ export interface MenuProps<
     /* Enables render checkbox component even if menu item is not selected */
     renderNotSelected?: boolean;
     /* Enables activation of menu group header */
-    allowActiveGroupHeader: boolean;
+    allowActiveGroupHeader?: boolean;
     /* Identified or active menu item */
-    activeItem: string | null;
+    activeItem?: string | null;
 
     /* Additional reducers */
     reducers?: StoreReducersList | null;
@@ -260,7 +277,9 @@ export interface MenuProps<
     /* Props to pass to ListPlaceholder component */
     placeholder?: MenuPlaceholderProps | null;
 
-    onItemClick: (
+    onKeyDown?: ((e: React.KeyboardEvent) => boolean) | null;
+
+    onItemClick?: (
         (
             item: MenuItemProps,
             e: React.MouseEvent | React.KeyboardEvent<Element>,
@@ -273,6 +292,10 @@ export interface MenuProps<
         (item: MenuItemProps, state: MenuListProps) => MenuItemProps
     ) | null;
 
+    getItemComponent?: (
+        (item: MenuItemProps, state: MenuListProps) => (MenuItemComponent | null)
+    ) | null;
+
     getItemDefaultProps?: (() => Partial<MenuItemProps>) | null;
 
     getPlaceholderProps?: ((state: MenuListProps) => (MenuPlaceholderProps | null)) | null;
@@ -281,7 +304,7 @@ export interface MenuProps<
 
     onItemActivate?: ((itemId: string | null) => void) | null;
 
-    components: MenuComponents<HeaderProps, FooterProps>;
+    components?: MenuComponents<HeaderProps, FooterProps>;
 }
 
 export interface MenuState extends MenuProps {
@@ -293,6 +316,7 @@ export interface MenuState extends MenuProps {
  */
 export interface MenuAttrs extends React.HTMLAttributes<HTMLDivElement> {
     disabled?: boolean;
+    'data-id'?: string;
     'data-parent'?: string;
 
     onFocusCapture?: (e: React.FocusEvent) => void;

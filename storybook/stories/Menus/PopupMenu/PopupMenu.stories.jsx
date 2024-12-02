@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { usePortalElement } from '../../../common/hooks/usePortalElement.jsx';
 import { MenuButton } from '../../../common/Components/MenuButton/MenuButton.jsx';
 
-import { getDefaultItems } from './data.js';
+import { getDefaultItems, getNestedMenuItems } from './data.js';
 import './PopupMenu.stories.scss';
 
 export default {
@@ -78,4 +78,35 @@ export const HideOnSelect = {
     },
     decorators: [heightDecorator],
     render: PopupMenuDemo,
+};
+
+export const NestedMenus = {
+    args: {
+        id: 'nestedParentMenu',
+        items: getNestedMenuItems(),
+        multiple: true,
+        hideOnScroll: false,
+        position: {
+            position: 'right-start',
+        },
+    },
+    decorators: [heightDecorator],
+    render: function Render(args) {
+        const portalElement = usePortalElement();
+
+        const [state, setState] = useState({
+            ...args,
+            open: false,
+        });
+
+        const toggleMenu = () => (
+            setState((prev) => ({ ...prev, open: !prev.open }))
+        );
+
+        return (
+            <PopupMenu {...state} container={portalElement}>
+                <MenuButton onClick={toggleMenu} />
+            </PopupMenu>
+        );
+    },
 };

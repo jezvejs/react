@@ -23,6 +23,7 @@ export const getItemDefaultProps = () => itemDefaultProps;
 
 export const defaultProps: MenuProps = {
     id: '',
+    menuSelector: '.menu',
     itemSelector: null,
     defaultItemType: 'button',
     iconAlign: 'left',
