@@ -39,7 +39,10 @@ import {
     isMobileViewport,
 } from './helpers.ts';
 import { actions } from './reducer.ts';
-import { SHOW_LIST_SCROLL_TIMEOUT } from './constants.ts';
+import {
+    RESIZE_DEBOUNCE_TIMEOUT,
+    SHOW_LIST_SCROLL_TIMEOUT,
+} from './constants.ts';
 import {
     DropDownMenuItemProps,
     DropDownMenuProps,
@@ -66,6 +69,9 @@ export const DropDownContainer = forwardRef<
         dispatch,
         setState,
     } = useStore<DropDownState>();
+
+    const onResize = useCallback(updateListPosition, []);
+    const resizeHandler = useDebounce(onResize, RESIZE_DEBOUNCE_TIMEOUT) as DebounceRunFunction;
 
     const innerRef = useRef<HTMLDivElement>(null);
     useImperativeHandle<DropDownRef, DropDownRef>(ref, () => (
@@ -314,12 +320,14 @@ export const DropDownContainer = forwardRef<
         sendChangeEvent();
     };
 
-    const updateListPosition = () => {
-        const updateRequired = onUpdatePosition();
-        if (updateRequired) {
-            updatePosition();
-        }
-    };
+    function updateListPosition() {
+        requestAnimationFrame(() => {
+            const updateRequired = onUpdatePosition();
+            if (updateRequired) {
+                updatePosition();
+            }
+        });
+    }
 
     const startScrollWaiting = () => dispatch(actions.startScrollWaiting());
 
@@ -990,7 +998,7 @@ export const DropDownContainer = forwardRef<
     };
 
     const onViewportResize = () => {
-        updateListPosition();
+        resizeHandler();
     };
 
     const onWindowScroll = (e: Event) => {
@@ -1003,7 +1011,7 @@ export const DropDownContainer = forwardRef<
             return;
         }
 
-        updateListPosition();
+        resizeHandler();
     };
 
     viewportEvents = { resize: onViewportResize };
@@ -1035,7 +1043,7 @@ export const DropDownContainer = forwardRef<
     // Update position of menu popup
     useEffect(() => {
         if (state.visible) {
-            setTimeout(() => updateListPosition());
+            resizeHandler();
         }
     }, [state.visible, state.items, state.inputString]);
 
@@ -1056,6 +1064,31 @@ export const DropDownContainer = forwardRef<
         [elem, reference],
         state.visible,
     );
+
+    // ResizeObserver
+    useEffect(() => {
+        const containerEl = innerRef.current as HTMLElement;
+        const refEl = reference.current as HTMLElement;
+        const menuEl = elem.current as HTMLElement;
+        if (!containerEl && !refEl && !menuEl) {
+            return undefined;
+        }
+
+        const observer = new ResizeObserver(resizeHandler);
+        if (menuEl) {
+            observer.observe(menuEl);
+        }
+        if (containerEl) {
+            observer.observe(containerEl);
+        }
+        if (refEl) {
+            observer.observe(refEl);
+        }
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [innerRef.current, reference.current, elem.current, resizeHandler]);
 
     const { Menu, ComboBox } = state.components;
 

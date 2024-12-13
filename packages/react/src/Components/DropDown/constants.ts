@@ -1,3 +1,5 @@
 export const SHOW_LIST_SCROLL_TIMEOUT = 100;
 
+export const RESIZE_DEBOUNCE_TIMEOUT = 100;
+
 export const MAX_MOBILE_SCREEN_WIDTH = 767;
