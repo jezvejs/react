@@ -3,6 +3,7 @@ import '@jezvejs/react/style';
 import { DateInput } from '@jezvejs/react';
 import { useState } from 'react';
 import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.jsx';
+import { LocaleSelect } from '../../../common/Components/LocaleSelect/LocaleSelect.jsx';
 
 const TempInputDecorator = (Story) => (
     <div>
@@ -68,34 +69,33 @@ export const Placeholder = {
     },
 };
 
-export const EnglishLocale = {
+export const Locales = {
     args: {
-        id: 'usLocaleInput',
+        id: 'localeInput',
         locales: ['en-US'],
     },
     decorators: [TempInputDecorator],
-};
+    render: function Render(args) {
+        const [state, setState] = useState({
+            locales: args.locales,
+        });
 
-export const KoreanLocale = {
-    args: {
-        id: 'koLocaleInput',
-        locales: ['ko-KR'],
-    },
-    decorators: [TempInputDecorator],
-};
+        const onChangeLocale = (e) => {
+            setState((prev) => ({
+                ...prev,
+                locales: [e.target.value],
+            }));
+        };
 
-export const RussianLocale = {
-    args: {
-        id: 'ruLocaleInput',
-        locales: ['ru-RU'],
+        return (
+            <div>
+                <div>
+                    <DateInput {...args} locales={state.locales} />
+                </div>
+                <SectionControls>
+                    <LocaleSelect id="localeSelect" onChange={onChangeLocale} />
+                </SectionControls>
+            </div>
+        );
     },
-    decorators: [TempInputDecorator],
-};
-
-export const EsLocale = {
-    args: {
-        id: 'esLocaleInput',
-        locales: ['es'],
-    },
-    decorators: [TempInputDecorator],
 };

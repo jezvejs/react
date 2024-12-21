@@ -5,6 +5,7 @@ import { formatDate } from '@jezvejs/datetime';
 import { DatePicker, Input } from '@jezvejs/react';
 
 import { ActionButton } from '../../common/Components/ActionButton/ActionButton.jsx';
+import { LocaleSelect } from '../../common/Components/LocaleSelect/LocaleSelect.jsx';
 import { SectionControls } from '../../common/Components/SectionControls/SectionControls.jsx';
 
 import { CustomDatePickerFooter } from './components/CustomFooter/CustomDatePickerFooter.jsx';
@@ -699,6 +700,61 @@ export const FirstDaySunday = {
         inline: true,
         locales: ['en-US'],
         firstDay: 7,
+    },
+};
+
+/**
+ * 'locales' property
+ */
+export const Locales = {
+    args: {
+        inline: true,
+        locales: ['en-US'],
+    },
+    decorators: [heightDecorator],
+    parameters: {
+        layout: 'fullscreen',
+    },
+    render: function Render(args) {
+        const [state, setState] = useState({
+            value: '',
+            open: false,
+            locales: args.locales,
+        });
+
+        const inputProps = {
+            id: 'localesDateInp',
+            value: state.value,
+        };
+
+        const props = {
+            ...args,
+            onDateSelect: (date) => {
+                setState((prev) => ({
+                    ...prev,
+                    value: formatDate(date),
+                }));
+            },
+        };
+
+        const onChangeLocale = (e) => {
+            setState((prev) => ({
+                ...prev,
+                locales: [e.target.value],
+            }));
+        };
+
+        return (
+            <div>
+                <div>
+                    <Input {...inputProps} />
+                    <DatePicker {...props} locales={state.locales} />
+                </div>
+                <SectionControls>
+                    <LocaleSelect id="localeSelect" onChange={onChangeLocale} />
+                </SectionControls>
+            </div>
+        );
     },
 };
 

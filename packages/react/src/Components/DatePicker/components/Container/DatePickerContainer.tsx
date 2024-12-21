@@ -753,6 +753,13 @@ export const DatePickerContainer = forwardRef<
         setRangePart(props.rangePart);
     }, [props.rangePart]);
 
+    // Update locales
+    useEffect(() => {
+        dispatch(actions.resize({
+            locales: props.locales,
+        }));
+    }, [props.locales]);
+
     /** Returns array of heights of all views */
     const getViewsHeights = (views?: GetViewHeightsParam) => {
         const st = getState();
@@ -1058,7 +1065,7 @@ export const DatePickerContainer = forwardRef<
                 setDefaultContentPosition();
             }
         }
-    }, [currViewRef.current, rebuildContentRef.current, props.animated]);
+    }, [currViewRef.current, rebuildContentRef.current, props.animated, state.locales]);
 
     if (
         !currViewRef.current

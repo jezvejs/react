@@ -1,5 +1,5 @@
 import { getCursorPos } from '@jezvejs/dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 
 import { ControlledInput, ControlledInputHelpers } from '../ControlledInput/ControlledInput.tsx';
@@ -33,6 +33,14 @@ export const DateInput = (p: DateInputProps) => {
         ...p,
     };
     const [state, setState] = useState(getInitialState(props));
+
+    // Update locales
+    useEffect(() => {
+        setState((prev) => ({
+            ...prev,
+            ...getInitialState(props),
+        }));
+    }, [props.locales]);
 
     const deleteSelection = () => {
         const range = {
@@ -369,6 +377,7 @@ export const DateInput = (p: DateInputProps) => {
         onValidateInput,
         onValue,
         onSelectCapture,
+        handleValueProperty: false,
         renderValue: () => renderValue(state),
         placeholder: props.placeholder ?? state.formatMask ?? '',
         onInput: props.onInput,

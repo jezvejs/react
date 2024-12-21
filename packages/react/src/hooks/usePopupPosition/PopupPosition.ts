@@ -128,7 +128,7 @@ export class PopupPosition {
             },
         };
 
-        const handler = () => this.updatePosition();
+        const handler = () => requestAnimationFrame(() => this.updatePosition());
         this.updateHandler = debounce(handler, UPDATE_TIMEOUT);
 
         this.state = {
