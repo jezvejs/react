@@ -84,6 +84,8 @@ export class PopupPosition {
         'right-end',
     ];
 
+    static scrollRequested = false;
+
     props: PopupPositionProps;
 
     viewportEvents: {
@@ -135,7 +137,6 @@ export class PopupPosition {
             current: {},
             isInitial: true,
             listeningWindow: false,
-            scrollRequested: false,
         };
 
         this.update(this.props);
@@ -181,7 +182,7 @@ export class PopupPosition {
             : true;
 
         if (updateRequired) {
-            if (this.state.scrollRequested && typeof this.updateHandler === 'function') {
+            if (PopupPosition.scrollRequested && typeof this.updateHandler === 'function') {
                 this.updateHandler();
             } else {
                 this.updatePosition();
@@ -196,7 +197,7 @@ export class PopupPosition {
             : true;
 
         if (updateRequired) {
-            if (this.state.scrollRequested && typeof this.updateHandler === 'function') {
+            if (PopupPosition.scrollRequested && typeof this.updateHandler === 'function') {
                 this.updateHandler();
             } else {
                 this.updatePosition();
@@ -210,7 +211,7 @@ export class PopupPosition {
             : this.state.updateProps;
         const props = isObject(updateProps) ? updateProps : {};
 
-        this.state.scrollRequested = false;
+        PopupPosition.scrollRequested = false;
 
         this.update(props);
     }
@@ -701,7 +702,7 @@ export class PopupPosition {
             }
             const newWindowScrollY = window.scrollY + windowScrollDistance;
 
-            this.state.scrollRequested = true;
+            PopupPosition.scrollRequested = true;
             scrollParent.scrollTop = newScrollTop;
             if (Math.abs(windowScrollDistance) > 0) {
                 window.scrollTo(window.scrollX, newWindowScrollY);
@@ -796,7 +797,7 @@ export class PopupPosition {
             }
             const newWindowScrollX = window.scrollX + windowHScrollDistance;
 
-            this.state.scrollRequested = true;
+            PopupPosition.scrollRequested = true;
             scrollParent.scrollLeft = newScrollLeft;
             if (Math.abs(windowHScrollDistance) > 0) {
                 window.scrollTo(newWindowScrollX, window.scrollY);
