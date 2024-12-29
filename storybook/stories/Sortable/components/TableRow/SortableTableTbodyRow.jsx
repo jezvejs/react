@@ -2,7 +2,6 @@ import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-// eslint-disable-next-line react/display-name
 export const SortableTableTbodyRow = forwardRef((props, ref) => {
     const itemProps = {
         className: classNames('tbl_list_item', props.className),
@@ -29,6 +28,7 @@ export const SortableTableTbodyRow = forwardRef((props, ref) => {
     );
 });
 
+SortableTableTbodyRow.displayName = 'SortableTableTbodyRow';
 SortableTableTbodyRow.selector = '.tbl_list_item';
 
 SortableTableTbodyRow.propTypes = {

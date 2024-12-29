@@ -11,7 +11,6 @@ import { usePortalElement } from '../../../../common/hooks/usePortalElement.jsx'
 import { Box } from './Box.jsx';
 import { OriginalDragAvatar } from './OriginalDragAvatar.jsx';
 
-// eslint-disable-next-line react/display-name
 export const DefaultDragZone = forwardRef((props, ref) => {
     const {
         dragOriginal = false,
@@ -69,6 +68,7 @@ export const DefaultDragZone = forwardRef((props, ref) => {
     );
 });
 
+DefaultDragZone.displayName = 'DefaultDragZone';
 DefaultDragZone.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,

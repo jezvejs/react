@@ -31,7 +31,6 @@ import {
 /**
  * BaseChartContainer component
  */
-// eslint-disable-next-line react/display-name
 export const BaseChartContainer = forwardRef<
     BaseChartContainerRef,
     BaseChartState
@@ -658,3 +657,5 @@ export const BaseChartContainer = forwardRef<
         </div>
     );
 });
+
+BaseChartContainer.displayName = 'BaseChartContainer';

@@ -3,7 +3,6 @@ import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-// eslint-disable-next-line react/display-name
 export const Box = forwardRef((props, ref) => {
     const style = {
         left: px(props.left),
@@ -37,6 +36,7 @@ export const Box = forwardRef((props, ref) => {
     );
 });
 
+Box.displayName = 'Box';
 Box.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,

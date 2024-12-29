@@ -6,7 +6,6 @@ import { RangeSliderSelectedAreaProps, RangeSliderState } from '../types.ts';
 
 type RangeSliderSelectedAreaRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const RangeSliderSelectedArea = forwardRef<
     RangeSliderSelectedAreaRef,
     RangeSliderSelectedAreaProps
@@ -41,3 +40,5 @@ export const RangeSliderSelectedArea = forwardRef<
         />
     );
 });
+
+RangeSliderSelectedArea.displayName = 'RangeSliderSelectedArea';

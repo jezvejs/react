@@ -30,7 +30,6 @@ const defaultProps = {
 /**
  * MenuItem component
  */
-// eslint-disable-next-line react/display-name
 export const MenuItem: MenuItemComponent = memo<MenuItemProps>((p: MenuItemProps) => {
     const props = {
         ...defaultProps,
@@ -141,4 +140,5 @@ export const MenuItem: MenuItemComponent = memo<MenuItemProps>((p: MenuItemProps
     );
 });
 
+MenuItem.displayName = 'MenuItem';
 MenuItem.selector = '.menu-item';

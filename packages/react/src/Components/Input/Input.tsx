@@ -45,7 +45,6 @@ export type InputRef = HTMLInputElement;
 /**
  * Input component
  */
-// eslint-disable-next-line react/display-name
 export const Input = forwardRef<InputRef, InputProps>((p, ref) => {
     const props = {
         ...defaultProps,
@@ -85,3 +84,5 @@ export const Input = forwardRef<InputRef, InputProps>((p, ref) => {
         <input {...inputProps} ref={ref} />
     );
 });
+
+Input.displayName = 'Input';

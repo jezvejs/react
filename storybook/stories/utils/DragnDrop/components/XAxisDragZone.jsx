@@ -13,7 +13,6 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 
-// eslint-disable-next-line react/display-name
 export const XAxisDragZone = forwardRef((props, ref) => {
     const innerRef = useRef(null);
     useImperativeHandle(ref, () => innerRef.current);
@@ -124,6 +123,7 @@ export const XAxisDragZone = forwardRef((props, ref) => {
     );
 });
 
+XAxisDragZone.displayName = 'XAxisDragZone';
 XAxisDragZone.propTypes = {
     id: PropTypes.string,
     left: PropTypes.number,

@@ -8,7 +8,6 @@ import { RangeSliderAfterAreaProps, RangeSliderState } from '../types.ts';
 
 type RangeSliderAfterAreaRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const RangeSliderAfterArea = forwardRef<
     RangeSliderAfterAreaRef,
     RangeSliderAfterAreaProps
@@ -41,3 +40,5 @@ export const RangeSliderAfterArea = forwardRef<
         <div className="range-slider__after-area" style={style} ref={ref} />
     );
 });
+
+RangeSliderAfterArea.displayName = 'RangeSliderAfterArea';

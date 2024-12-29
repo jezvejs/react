@@ -46,7 +46,6 @@ const defaultProps = {
 
 type DatePickerYearViewRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const DatePickerYearView = forwardRef<
     DatePickerYearViewRef,
     DatePickerYearViewProps
@@ -110,3 +109,5 @@ export const DatePickerYearView = forwardRef<
         </div>
     );
 });
+
+DatePickerYearView.displayName = 'DatePickerYearView';

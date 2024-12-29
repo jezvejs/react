@@ -5,7 +5,6 @@ import { px } from '@jezvejs/react';
 
 import './SortableTreeItem.scss';
 
-// eslint-disable-next-line react/display-name
 export const SortableTreeItem = forwardRef((props, ref) => {
     const commonProps = {
         group: props.group,
@@ -76,6 +75,7 @@ export const SortableTreeItem = forwardRef((props, ref) => {
     );
 });
 
+SortableTreeItem.displayName = 'SortableTreeItem';
 SortableTreeItem.selector = '.tree-item';
 
 const isComponent = PropTypes.oneOfType([

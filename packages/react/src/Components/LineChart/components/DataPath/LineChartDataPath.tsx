@@ -6,7 +6,6 @@ import './LineChartDataPath.scss';
 /**
  * LineChartDataPath component
  */
-// eslint-disable-next-line react/display-name
 export const LineChartDataPath: LineChartDataPathComponent = forwardRef<
     LineChartDataPathRef,
     LineChartDataPathProps
@@ -39,3 +38,5 @@ export const LineChartDataPath: LineChartDataPathComponent = forwardRef<
         <path {...itemProps} ref={ref} />
     );
 });
+
+LineChartDataPath.displayName = 'LineChartDataPath';

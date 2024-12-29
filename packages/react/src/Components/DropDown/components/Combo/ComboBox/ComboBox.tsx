@@ -52,7 +52,6 @@ const defaultProps = {
     },
 };
 
-// eslint-disable-next-line react/display-name
 export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
     DropDownComboBoxRef,
     DropDownComboBoxProps
@@ -164,3 +163,5 @@ export const DropDownComboBox: DropDownComboBoxComponent = forwardRef<
         </div>
     );
 });
+
+DropDownComboBox.displayName = 'DropDownComboBox';

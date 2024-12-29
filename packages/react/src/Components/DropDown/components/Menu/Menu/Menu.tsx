@@ -43,7 +43,6 @@ const defaultProps = {
 /**
  * DropDown Menu container component
  */
-// eslint-disable-next-line react/display-name
 export const DropDownMenu: DropDownMenuComponent = forwardRef<
     DropDownMenuRef,
     DropDownMenuProps
@@ -92,3 +91,5 @@ export const DropDownMenu: DropDownMenuComponent = forwardRef<
         <Menu {...menuProps} ref={ref} />
     );
 });
+
+DropDownMenu.displayName = 'DropDownMenu';

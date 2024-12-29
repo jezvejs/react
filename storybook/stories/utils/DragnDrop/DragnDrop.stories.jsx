@@ -182,7 +182,6 @@ export const XAxisAvatar = {
     },
 };
 
-// eslint-disable-next-line react/display-name
 const SimpleDragItem = forwardRef((_, ref) => {
     const { state } = useDragnDrop();
 
@@ -212,7 +211,8 @@ const SimpleDragItem = forwardRef((_, ref) => {
     );
 });
 
-// eslint-disable-next-line react/display-name
+SimpleDragItem.displayName = 'SimpleDragItem';
+
 const HandleDragItem = forwardRef((_, ref) => {
     const { state } = useDragnDrop();
 
@@ -243,7 +243,8 @@ const HandleDragItem = forwardRef((_, ref) => {
     );
 });
 
-// eslint-disable-next-line react/display-name
+HandleDragItem.displayName = 'HandleDragItem';
+
 const DoubleHandleDragItem = forwardRef((_, ref) => {
     const { state } = useDragnDrop();
 
@@ -274,6 +275,8 @@ const DoubleHandleDragItem = forwardRef((_, ref) => {
         </div>
     );
 });
+
+DoubleHandleDragItem.displayName = 'DoubleHandleDragItem';
 
 export const Handles = {
     render: function HandlesDemo() {

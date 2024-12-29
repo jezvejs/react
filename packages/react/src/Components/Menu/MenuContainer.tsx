@@ -63,7 +63,6 @@ const defaultProps = MenuDefProps.getDefaultProps();
 /**
  * Menu container component
  */
-// eslint-disable-next-line react/display-name
 export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     const props = {
         ...defaultProps,
@@ -613,3 +612,5 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         </div>
     );
 });
+
+MenuContainer.displayName = 'MenuContainer';

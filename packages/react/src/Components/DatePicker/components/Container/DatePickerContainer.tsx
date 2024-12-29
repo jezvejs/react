@@ -73,7 +73,6 @@ import {
 } from '../../types.ts';
 import './DatePickerContainer.scss';
 
-// eslint-disable-next-line react/display-name
 export const DatePickerContainer = forwardRef<
     DatePickerContainerRef,
     DatePickerContainerProps
@@ -1273,3 +1272,5 @@ export const DatePickerContainer = forwardRef<
         </div>
     );
 });
+
+DatePickerContainer.displayName = 'DatePickerContainer';

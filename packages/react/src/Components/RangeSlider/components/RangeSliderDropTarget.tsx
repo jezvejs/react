@@ -10,7 +10,6 @@ import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
 import { RangeSliderDropTargetProps, RangeSliderDropTargetRef } from '../types.ts';
 import { OnDragEndParams } from '../../../utils/DragnDrop/types.ts';
 
-// eslint-disable-next-line react/display-name
 export const RangeSliderDropTarget = forwardRef<
     RangeSliderDropTargetRef,
     RangeSliderDropTargetProps
@@ -67,3 +66,5 @@ export const RangeSliderDropTarget = forwardRef<
         </div>
     );
 });
+
+RangeSliderDropTarget.displayName = 'RangeSliderDropTarget';

@@ -28,7 +28,6 @@ export interface LineChartDataItemAttrs {
 /**
  * LineChartDataItem component
  */
-// eslint-disable-next-line react/display-name
 export const LineChartDataItem: LineChartDataItemComponent = forwardRef<
     LineChartDataItemRef,
     LineChartDataItemProps
@@ -95,3 +94,5 @@ export const LineChartDataItem: LineChartDataItemComponent = forwardRef<
         <circle {...itemProps} ref={ref} />
     );
 });
+
+LineChartDataItem.displayName = 'LineChartDataItem';

@@ -48,7 +48,6 @@ const defaultProps = MenuDefProps.getDefaultProps();
 /**
  * Menu component
  */
-// eslint-disable-next-line react/display-name
 export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
     const defaultId = useRef(MenuHelpers.generateMenuId('menu'));
 
@@ -126,3 +125,5 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         </StoreProvider>
     );
 });
+
+Menu.displayName = 'Menu';

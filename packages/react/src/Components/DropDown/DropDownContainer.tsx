@@ -58,7 +58,6 @@ type DropDownRef = HTMLDivElement | null;
 /**
  * DropDown component
  */
-// eslint-disable-next-line react/display-name
 export const DropDownContainer = forwardRef<
     DropDownRef,
     DropDownProps
@@ -1266,3 +1265,5 @@ export const DropDownContainer = forwardRef<
         </div>
     );
 });
+
+DropDownContainer.displayName = 'DropDownContainer';

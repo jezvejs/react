@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './SortableListItem.scss';
 
-// eslint-disable-next-line react/display-name
 export const SortableListItem = forwardRef((props, ref) => {
     const itemProps = {
         className: classNames('sortable-list-item', props.className),
@@ -22,6 +21,7 @@ export const SortableListItem = forwardRef((props, ref) => {
     );
 });
 
+SortableListItem.displayName = 'SortableListItem';
 SortableListItem.selector = '.sortable-list-item';
 
 SortableListItem.propTypes = {

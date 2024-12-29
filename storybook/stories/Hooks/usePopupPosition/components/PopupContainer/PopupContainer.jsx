@@ -1,7 +1,6 @@
 import { forwardRef } from 'react';
 import './PopupContainer.scss';
 
-// eslint-disable-next-line react/display-name
 export const PopupContainer = forwardRef((_, ref) => (
     <div ref={ref} className='popup-container'>
         <div className='popup-header'>Popup content</div>
@@ -12,3 +11,5 @@ export const PopupContainer = forwardRef((_, ref) => (
         <div className='popup-list-item'>Item 5</div>
     </div>
 ));
+
+PopupContainer.displayName = 'PopupContainer';

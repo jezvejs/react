@@ -11,7 +11,6 @@ import {
 /**
  * BaseChartPopupContainer component
  */
-// eslint-disable-next-line react/display-name
 export const BaseChartPopupContainer: BaseChartPopupContainerComponent = forwardRef<
     BaseChartPopupContainerRef,
     BaseChartPopupContainerProps
@@ -71,3 +70,5 @@ export const BaseChartPopupContainer: BaseChartPopupContainerComponent = forward
         </div>
     );
 });
+
+BaseChartPopupContainer.displayName = 'BaseChartPopupContainer';

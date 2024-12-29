@@ -27,7 +27,6 @@ import {
 type RangeSliderContainerProps = RangeSliderProps;
 type RangeSliderContainerRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const RangeSliderContainer = forwardRef<
     RangeSliderContainerRef,
     RangeSliderContainerProps
@@ -378,3 +377,5 @@ export const RangeSliderContainer = forwardRef<
         </RangeSliderDropTarget>
     );
 });
+
+RangeSliderContainer.displayName = 'RangeSliderContainer';
