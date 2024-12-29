@@ -1,5 +1,5 @@
 import { asArray } from '@jezvejs/types';
-import classNames from 'classnames';
+import { useMemo } from 'react';
 
 import { MenuItemProps, MenuState } from '../../../Menu/types.ts';
 import { PopupMenu } from '../../PopupMenu.tsx';
@@ -24,40 +24,46 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         },
     };
 
-    const { id, className } = props;
+    const { id, container, position } = props;
 
-    const items = asArray(props.items);
+    const items = useMemo(() => asArray(props.items), [props.items]);
 
-    const containerProps = {
+    const containerProps = useMemo(() => ({
         id: `${id}_submenu`,
-        className: classNames('menu-item menu-group', className),
         'data-parent': id,
         parentId: id,
         items: items.map((item: MenuItemProps) => ({
             ...item,
             parentId: id,
+            container,
+            position,
             handleHideOnSelect: () => props.handleHideOnSelect?.(item),
             disabled: props.disabled || item.disabled,
         })),
+        container,
         position: {
             position: 'right-start' as PopupPositions,
+            ...position,
+            scrollOnOverflow: false,
         },
         fixed: true,
+        useParentContext: true,
+        hideOnScroll: false,
         handleHideOnSelect: () => props.handleHideOnSelect?.(),
 
         isAvailableItem: (item: MenuItemProps, state: MenuState) => (
             MenuHelpers.isAvailableItem(item, state)
         ),
-    };
+    }), [id, items]);
+
+    const itemProps = useMemo(() => ({
+        ...props,
+    }), [props]);
 
     const { ListItem } = props.components;
     if (!ListItem) {
         return null;
     }
-
-    const itemProps = {
-        ...props,
-    };
 
     return (
         <PopupMenu {...containerProps}>

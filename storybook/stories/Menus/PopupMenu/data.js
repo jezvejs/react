@@ -42,6 +42,16 @@ export const nestedItems2 = (prefix = '') => ([{
 }, {
     id: `${prefix}item4`,
     title: 'Child item 4',
+    ...(
+        (prefix === 'item4_')
+            ? {
+                icon: GlyphIcon,
+                iconAlign: 'right',
+                type: 'parent',
+                items: nestedItems2('item4_4_'),
+            }
+            : {}
+    ),
 }]);
 
 export const nestedItems1 = () => ([{

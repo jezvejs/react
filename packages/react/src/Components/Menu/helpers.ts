@@ -53,7 +53,7 @@ export function shouldIncludeParentItem<
 ): boolean {
     return !!(
         (item.type === 'group' && options?.includeGroupItems)
-        || (item.type === 'parent' && options?.includeChildItems)
+        || (item.type === 'parent')
     );
 }
 
@@ -71,7 +71,10 @@ export function shouldIncludeChildItems<
     item: T,
     options?: OPT | null,
 ): boolean {
-    return (item.type === 'parent' && !!options?.includeChildItems);
+    return !!(
+        (item.type === 'group')
+        || (item.type === 'parent' && !!options?.includeChildItems)
+    );
 }
 
 /**

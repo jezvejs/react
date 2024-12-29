@@ -116,17 +116,35 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param {React.FocusEvent} e
      */
     const onFocus = (e: React.FocusEvent) => {
+        const st = getState();
+
         const target = e?.target as HTMLElement;
         if (innerRef?.current === target) {
+            // Activate first item
+            if (props.parentId) {
+                const options = {
+                    includeGroupItems: true,
+                    includeChildItems: false,
+                };
+                const menuItems = st.items ?? [];
+
+                const nextItem = findMenuItem(menuItems, availCallback, options);
+
+                if (nextItem) {
+                    setActive(nextItem.id);
+                }
+            }
+
             return;
         }
 
-        const st = getState();
         const selector = getItemSelector(st);
         const closestElem = getClosestItemElement(target, selector);
         const itemId = closestElem?.dataset?.id ?? null;
 
-        setActive(itemId);
+        if (itemId) {
+            setActive(itemId);
+        }
     };
 
     /**
@@ -168,7 +186,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const focusOptions = { preventScroll: true };
 
         const itemSelector = getItemSelector(st);
-        const itemEl = document.querySelector(`${itemSelector}[data-id="${itemId}"]`) as HTMLElement;
+        const itemEl = innerRef.current.querySelector(`${itemSelector}[data-id="${itemId}"]`) as HTMLElement;
         if (!itemEl) {
             return;
         }
@@ -562,7 +580,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const res: MenuAttrs = {
             id: props.id,
             'data-id': props.id,
-            className: classNames('menu', st.className),
+            className: classNames('menu', st.className, props.className),
             disabled,
             onFocusCapture: onFocus,
             onBlurCapture: onBlur,
@@ -578,7 +596,14 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
 
         return res;
-    }, [props.tabThrough, props.tabIndex, props.id, props.disabled, props.parentId]);
+    }, [
+        props.tabThrough,
+        props.tabIndex,
+        props.id,
+        props.disabled,
+        props.parentId,
+        props.className,
+    ]);
 
     return (
         <div {...menuProps} ref={innerRef} >
