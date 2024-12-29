@@ -66,11 +66,7 @@ export const MenuList = (p: MenuListProps) => {
         props.onMouseLeave?.(itemId, e);
     }, []);
 
-    const itemProps = (item: MenuItemProps, state: MenuListProps) => (
-        state.getItemProps?.(item, state) ?? item
-    );
-
-    const ItemComponent = useCallback((item: MenuItemProps): ReactNode => {
+    const renderItem = useCallback((itemData: MenuItemProps): ReactNode => {
         const {
             ListItem,
             Separator,
@@ -78,13 +74,15 @@ export const MenuList = (p: MenuListProps) => {
         } = props.components;
         const st = getState();
 
+        const item = props.getItemProps?.(itemData, props) ?? itemData;
+
         const CustomItem = st.getItemComponent?.(item, props);
         if (CustomItem) {
-            return CustomItem && <CustomItem {...item} />;
+            return CustomItem && <CustomItem {...item} key={item.id} />;
         }
 
         if (item.type === 'separator') {
-            return Separator && <Separator {...item} />;
+            return Separator && <Separator {...item} key={item.id} />;
         }
 
         if (item.type === 'group') {
@@ -106,10 +104,10 @@ export const MenuList = (p: MenuListProps) => {
                 components: props.components,
             };
 
-            return GroupItem && <GroupItem {...groupProps} />;
+            return GroupItem && <GroupItem {...groupProps} key={item.id} />;
         }
 
-        return ListItem && <ListItem {...item} />;
+        return ListItem && <ListItem {...item} key={item.id} />;
     }, []);
 
     const getPlaceholderProps = (state: MenuListProps) => (
@@ -140,12 +138,7 @@ export const MenuList = (p: MenuListProps) => {
 
     const listContent = useMemo(() => (
         (props.items.length > 0)
-            ? props.items.map((item) => (
-                <ItemComponent
-                    {...itemProps(item, props)}
-                    key={item.id}
-                />
-            ))
+            ? props.items.map((item) => renderItem(item))
             : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
     ), [props.items, props.activeItem, placeholderProps]);
 
