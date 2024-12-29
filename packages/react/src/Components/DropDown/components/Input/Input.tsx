@@ -25,7 +25,6 @@ const defaultProps = {
     onInput: null,
 };
 
-// eslint-disable-next-line react/display-name
 export const DropDownInput: DropDownInputComponent = forwardRef<
     DropDownInputRef,
     DropDownInputProps
@@ -89,3 +88,5 @@ export const DropDownInput: DropDownInputComponent = forwardRef<
         />
     );
 });
+
+DropDownInput.displayName = 'DropDownInput';

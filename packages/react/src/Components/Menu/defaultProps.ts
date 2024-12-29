@@ -22,7 +22,7 @@ export const itemDefaultProps = {
 export const getItemDefaultProps = () => itemDefaultProps;
 
 export const defaultProps: MenuProps = {
-    id: '',
+    useParentContext: false,
     menuSelector: '.menu',
     itemSelector: null,
     defaultItemType: 'button',
@@ -31,6 +31,7 @@ export const defaultProps: MenuProps = {
     multiple: false,
     disabled: false,
     tabThrough: true,
+    tabIndex: 0,
     loopNavigation: true,
     preventNavigation: false,
     focusItemOnHover: true,

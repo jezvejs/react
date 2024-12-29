@@ -19,7 +19,6 @@ interface SliderProps {
 
 type RangeSliderValueSliderRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const RangeSliderValueSlider = forwardRef<
     RangeSliderValueSliderRef,
     RangeSliderValueSliderProps
@@ -67,3 +66,5 @@ export const RangeSliderValueSlider = forwardRef<
         />
     );
 });
+
+RangeSliderValueSlider.displayName = 'RangeSliderValueSlider';

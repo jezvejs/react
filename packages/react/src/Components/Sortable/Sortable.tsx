@@ -44,7 +44,6 @@ export {
 
 export type SortableRef = HTMLElement | null;
 
-// eslint-disable-next-line react/display-name
 export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
     const defaultProps = {
         animatedClass: 'animated',
@@ -606,3 +605,5 @@ export const Sortable = forwardRef<SortableRef, SortableProps>((p, ref) => {
         </Container>
     );
 });
+
+Sortable.displayName = 'Sortable';

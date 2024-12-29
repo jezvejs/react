@@ -8,7 +8,6 @@ export interface SortableTableContainerProps {
 
 export type SortableTableContainerRef = HTMLTableElement | null;
 
-// eslint-disable-next-line react/display-name
 export const SortableTableContainer = forwardRef<
     SortableTableContainerRef,
     SortableTableContainerProps
@@ -28,3 +27,5 @@ export const SortableTableContainer = forwardRef<
         </table>
     );
 });
+
+SortableTableContainer.displayName = 'SortableTableContainer';

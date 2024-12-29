@@ -37,7 +37,6 @@ const defaultProps = {
     multiple: false,
 };
 
-// eslint-disable-next-line react/display-name
 export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
     DropDownNativeSelectRef,
     DropDownNativeSelectProps
@@ -81,3 +80,5 @@ export const DropDownNativeSelect: DropDownNativeSelectComponent = forwardRef<
         </select>
     );
 });
+
+DropDownNativeSelect.displayName = 'DropDownNativeSelect';

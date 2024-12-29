@@ -44,6 +44,7 @@ const heightDecorator = (Story) => (
 
 export const Default = {
     args: {
+        id: 'default',
         items: getDefaultItems(),
         multiple: true,
     },
@@ -88,6 +89,7 @@ export const NestedMenus = {
         hideOnScroll: false,
         position: {
             position: 'right-start',
+            margin: 2,
         },
     },
     decorators: [heightDecorator],

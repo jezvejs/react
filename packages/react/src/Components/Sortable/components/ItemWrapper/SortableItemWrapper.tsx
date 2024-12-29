@@ -31,7 +31,6 @@ const defaultProps = {
     transitionTimeout: 500,
 };
 
-// eslint-disable-next-line react/display-name
 export const SortableItemWrapper = forwardRef<
     SortableItemWrapperRef,
     SortableItemWrapperProps
@@ -185,3 +184,5 @@ export const SortableItemWrapper = forwardRef<
         <ListItem {...listItemProps} ref={innerRef} />
     );
 });
+
+SortableItemWrapper.displayName = 'SortableItemWrapper';

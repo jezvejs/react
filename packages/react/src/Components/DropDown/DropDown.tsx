@@ -68,7 +68,6 @@ type DropDownRef = HTMLDivElement | null;
 /**
  * DropDown component
  */
-// eslint-disable-next-line react/display-name
 export const DropDown = forwardRef<DropDownRef, DropDownProps>((props, ref) => {
     const reducers = useMemo(() => {
         const extraReducers = asArray(props.reducers);
@@ -90,3 +89,5 @@ export const DropDown = forwardRef<DropDownRef, DropDownProps>((props, ref) => {
         </StoreProvider>
     );
 });
+
+DropDown.displayName = 'DropDown';

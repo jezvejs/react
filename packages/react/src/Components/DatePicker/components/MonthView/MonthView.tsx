@@ -105,7 +105,6 @@ const defaultProps = {
 
 type DatePickerMonthViewRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const DatePickerMonthView = forwardRef<
     DatePickerMonthViewRef,
     DatePickerMonthViewProps
@@ -276,3 +275,5 @@ export const DatePickerMonthView = forwardRef<
         </div>
     );
 });
+
+DatePickerMonthView.displayName = 'DatePickerMonthView';

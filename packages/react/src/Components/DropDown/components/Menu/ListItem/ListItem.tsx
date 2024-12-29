@@ -9,7 +9,6 @@ const defaultProps = {
     hidden: false,
 };
 
-// eslint-disable-next-line react/display-name
 export const DropDownListItem: MenuItemComponent = memo((p: DropDownMenuItemProps) => {
     const props = {
         ...defaultProps,
@@ -24,4 +23,5 @@ export const DropDownListItem: MenuItemComponent = memo((p: DropDownMenuItemProp
     );
 });
 
+DropDownListItem.displayName = 'DropDownListItem';
 DropDownListItem.selector = MenuItem.selector;

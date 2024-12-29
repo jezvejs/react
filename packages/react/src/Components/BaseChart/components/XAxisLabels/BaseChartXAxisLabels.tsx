@@ -17,7 +17,6 @@ type BaseChartXAxisLabelsRef = HTMLDivElement | null;
 /**
  * BaseChartXAxisLabels component
  */
-// eslint-disable-next-line react/display-name
 export const BaseChartXAxisLabels = forwardRef<
     BaseChartXAxisLabelsRef,
     BaseChartState
@@ -250,3 +249,5 @@ export const BaseChartXAxisLabels = forwardRef<
         </div>
     );
 });
+
+BaseChartXAxisLabels.displayName = 'BaseChartXAxisLabels';

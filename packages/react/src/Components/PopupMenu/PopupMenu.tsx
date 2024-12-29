@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 
 import {
@@ -24,8 +29,11 @@ const defaultProps = {
     fixed: true,
     position: {
         allowChangeAxis: true,
+        scrollOnOverflow: false,
+        allowResize: false,
         updateProps: {
             scrollOnOverflow: false,
+            allowResize: false,
         },
     },
 };
@@ -48,8 +56,8 @@ export const PopupMenu = (p: PopupMenuProps) => {
     };
 
     const [state, setState] = useState<PopupMenuState>({
-        ...props,
         open: false,
+        ...props,
         listenScroll: false,
         ignoreTouch: false,
     });
@@ -58,6 +66,7 @@ export const PopupMenu = (p: PopupMenuProps) => {
         setState((prev: PopupMenuState) => ({
             ...prev,
             open: !prev.open,
+            activeItem: (!prev.open && prev.parentId) ? prev.items[0].id : null,
         }));
     };
 
@@ -83,6 +92,7 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
     const onScroll = (e: Event) => {
         if (!state.hideOnScroll) {
+            e.stopPropagation();
             return;
         }
 
@@ -135,13 +145,13 @@ export const PopupMenu = (p: PopupMenuProps) => {
         props?.handleHideOnSelect?.();
     };
 
-    const onItemClick = (item: MenuItemProps) => {
+    const onItemClick = useCallback((item: MenuItemProps) => {
         if (MenuHelpers.isCheckbox(item)) {
             setState((prev) => MenuHelpers.toggleSelectItem(prev, item.id));
         }
 
         handleHideOnSelect(item);
-    };
+    }, []);
 
     useEffect(() => {
         if (state.open) {
@@ -177,13 +187,9 @@ export const PopupMenu = (p: PopupMenuProps) => {
         }));
     }, [props.items, props.activeItem]);
 
-    if (!props.children) {
-        return null;
-    }
-
     const container = props.container ?? document.body;
 
-    const containerProps = {
+    const containerProps = useMemo(() => ({
         getItemComponent: (item: MenuItemProps) => {
             if (item.type === 'parent') {
                 return PopupMenuParentItem;
@@ -194,6 +200,8 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
         getItemProps: (item: MenuItemProps, st: MenuListProps) => ({
             ...MenuHelpers.getItemProps(item, st),
+            container,
+            position: (st as PopupMenuProps).position,
             handleHideOnSelect: () => handleHideOnSelect(),
         }),
 
@@ -209,15 +217,21 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
             return false;
         },
-    };
+    }), []);
 
-    const popup = <Menu
-        {...state}
-        {...containerProps}
-        className="popup-menu-list"
-        onItemClick={onItemClick}
-        ref={elementRef}
-    />;
+    const popup = useMemo(() => (
+        <Menu
+            {...state}
+            {...containerProps}
+            className="popup-menu-list"
+            onItemClick={onItemClick}
+            ref={elementRef}
+        />
+    ), [state, containerProps]);
+
+    if (!props.children) {
+        return null;
+    }
 
     return (
         <>

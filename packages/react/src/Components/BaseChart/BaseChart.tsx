@@ -22,7 +22,6 @@ export type BaseChartRef = HTMLDivElement | null;
 /**
  * BaseChart component
  */
-// eslint-disable-next-line react/display-name
 export const BaseChart = forwardRef<
     BaseChartRef,
     Partial<BaseChartProps>
@@ -45,3 +44,5 @@ export const BaseChart = forwardRef<
         </StoreProvider>
     );
 });
+
+BaseChart.displayName = 'BaseChart';

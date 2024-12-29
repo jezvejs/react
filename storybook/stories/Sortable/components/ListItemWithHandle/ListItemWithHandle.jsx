@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { forwardRef } from 'react';
 
-// eslint-disable-next-line react/display-name
 export const ListItemWithHandle = forwardRef((props, ref) => {
     const {
         title = 'Item',
@@ -27,6 +26,7 @@ export const ListItemWithHandle = forwardRef((props, ref) => {
     );
 });
 
+ListItemWithHandle.displayName = 'ListItemWithHandle';
 ListItemWithHandle.selector = '.list_item';
 
 ListItemWithHandle.propTypes = {

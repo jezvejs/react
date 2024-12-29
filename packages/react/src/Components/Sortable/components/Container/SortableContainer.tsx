@@ -7,7 +7,6 @@ export interface SortableContainerProps {
 
 export type SortableContainerRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const SortableContainer = forwardRef<
     SortableContainerRef,
     SortableContainerProps
@@ -23,3 +22,5 @@ export const SortableContainer = forwardRef<
         </div>
     );
 });
+
+SortableContainer.displayName = 'SortableContainer';

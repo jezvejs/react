@@ -53,7 +53,7 @@ export function shouldIncludeParentItem<
 ): boolean {
     return !!(
         (item.type === 'group' && options?.includeGroupItems)
-        || (item.type === 'parent' && options?.includeChildItems)
+        || (item.type === 'parent')
     );
 }
 
@@ -71,7 +71,10 @@ export function shouldIncludeChildItems<
     item: T,
     options?: OPT | null,
 ): boolean {
-    return (item.type === 'parent' && !!options?.includeChildItems);
+    return !!(
+        (item.type === 'group')
+        || (item.type === 'parent' && !!options?.includeChildItems)
+    );
 }
 
 /**
@@ -218,6 +221,16 @@ export function getGroupById<T extends MenuItemProps = MenuItemProps>(
         && item.type === 'group'
     ));
 }
+
+/**
+ * Returns new identifier for menu
+ *
+ * @param {string} prefix optional string to prepend id with
+ */
+export const generateMenuId = (prefix: string = ''): string => {
+    const id = Date.now() * Math.random() * 10000;
+    return `${prefix}${id.toString(36)}`;
+};
 
 /**
  * Returns new identifier not existing in the specified list of items

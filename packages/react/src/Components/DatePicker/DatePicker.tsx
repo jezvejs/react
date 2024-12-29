@@ -35,7 +35,6 @@ export {
 
 type DatePickerRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const DatePicker = forwardRef<
     DatePickerRef,
     DatePickerProps
@@ -62,3 +61,5 @@ export const DatePicker = forwardRef<
         </StoreProvider>
     );
 });
+
+DatePicker.displayName = 'DatePicker';

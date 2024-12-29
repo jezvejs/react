@@ -22,7 +22,6 @@ type SVGRectAttrs = IndexedSVGAttributes<SVGRectElement>;
 /**
  * HistogramDataItem component
  */
-// eslint-disable-next-line react/display-name
 export const HistogramDataItem: HistogramDataItemComponent = forwardRef<
     HistogramDataItemRef,
     HistogramDataItemProps
@@ -95,3 +94,5 @@ export const HistogramDataItem: HistogramDataItemComponent = forwardRef<
         <rect {...itemProps} ref={ref} />
     );
 });
+
+HistogramDataItem.displayName = 'HistogramDataItem';

@@ -61,7 +61,6 @@ export interface PopupPositionState extends PopupPositionProps {
 
     isInitial: boolean,
     listeningWindow: boolean,
-    scrollRequested: boolean,
     fixedElement?: boolean,
     scrollParent?: HTMLElement | null,
     fixedParent?: HTMLElement | null,

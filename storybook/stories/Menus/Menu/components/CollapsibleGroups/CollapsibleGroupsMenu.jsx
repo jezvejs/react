@@ -24,7 +24,7 @@ export const CollapsibleGroupsMenu = (props) => {
 
         if (item.group) {
             const group = MenuHelpers.getItemById(item.group, state.items);
-            return group?.expanded;
+            return !!group?.expanded;
         }
 
         return true;

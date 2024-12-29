@@ -11,7 +11,6 @@ import './RangeSlider.scss';
 
 type RangeSliderRef = HTMLDivElement | null;
 
-// eslint-disable-next-line react/display-name
 export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, ref) => {
     const {
         tabIndex = 0,
@@ -101,3 +100,5 @@ export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, 
     );
     */
 });
+
+RangeSlider.displayName = 'RangeSlider';

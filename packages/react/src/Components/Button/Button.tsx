@@ -45,7 +45,6 @@ const defaultProps = {
     icon: null,
 };
 
-// eslint-disable-next-line react/display-name
 export const Button = forwardRef<ButtonRef, ButtonProps>((p, ref) => {
     const props = {
         ...defaultProps,
@@ -140,3 +139,5 @@ export const Button = forwardRef<ButtonRef, ButtonProps>((p, ref) => {
     // Invalid type of button
     return null;
 });
+
+Button.displayName = 'Button';

@@ -9,7 +9,6 @@ const locales = [
     'fr',
 ];
 
-// eslint-disable-next-line react/display-name
 export const LocaleSelect = forwardRef((props, ref) => (
     <select {...props} ref={ref}>
         {locales.map((item) => (
@@ -17,3 +16,5 @@ export const LocaleSelect = forwardRef((props, ref) => (
         ))}
     </select>
 ));
+
+LocaleSelect.displayName = 'LocaleSelect';

@@ -31,7 +31,6 @@ import {
     RangeSliderValueSliderType,
 } from '../types.ts';
 
-// eslint-disable-next-line react/display-name
 export const RangeSliderDragZone = forwardRef<
     RangeSliderDragZoneRef,
     RangeSliderDragZoneProps
@@ -227,3 +226,5 @@ export const RangeSliderDragZone = forwardRef<
         <RangeSliderValueSlider {...valueSliderProps} ref={innerRef} />
     );
 });
+
+RangeSliderDragZone.displayName = 'RangeSliderDragZone';
