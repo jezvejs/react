@@ -1,15 +1,14 @@
 import classNames from 'classnames';
 import { ReactNode, useCallback, useMemo } from 'react';
 
-import { useStore } from '../../../../utils/Store/StoreProvider.tsx';
-
+import { useMenuStore } from '../../hooks/useMenuStore.ts';
 import { getItemIdByElem } from '../../helpers.ts';
 import {
     MenuGroupHeaderProps,
     MenuGroupItemProps,
     MenuItemProps,
     MenuListProps,
-    MenuState,
+    MenuProps,
 } from '../../types.ts';
 
 import './MenuList.scss';
@@ -32,7 +31,7 @@ export const MenuList = (p: MenuListProps) => {
 
     const { components } = props;
     const { ListPlaceholder } = components;
-    const { getState } = useStore<MenuState>();
+    const { getState } = useMenuStore(props as MenuProps);
 
     /**
      * 'click' event handler

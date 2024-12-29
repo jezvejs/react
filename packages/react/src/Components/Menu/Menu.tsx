@@ -1,8 +1,13 @@
 import { asArray } from '@jezvejs/types';
-import { forwardRef, useMemo } from 'react';
+import {
+    forwardRef,
+    useEffect,
+    useMemo,
+    useRef,
+} from 'react';
 
 import { createSlice } from '../../utils/createSlice.ts';
-import { StoreProvider } from '../../utils/Store/StoreProvider.tsx';
+import { StoreProvider, useStore } from '../../utils/Store/StoreProvider.tsx';
 import { combineReducers } from '../../utils/combineReducers.ts';
 
 import { MenuCheckbox } from './components/Checkbox/MenuCheckbox.tsx';
@@ -15,7 +20,7 @@ import { MenuContainer } from './MenuContainer.tsx';
 
 import * as MenuDefProps from './defaultProps.ts';
 import * as MenuHelpers from './helpers.ts';
-import { MenuProps } from './types.ts';
+import { MenuProps, MultiMenuState } from './types.ts';
 import './Menu.scss';
 
 export {
@@ -45,11 +50,18 @@ const defaultProps = MenuDefProps.getDefaultProps();
  */
 // eslint-disable-next-line react/display-name
 export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
-    const props = {
+    const defaultId = useRef(MenuHelpers.generateMenuId('menu'));
+
+    const defProps = {
         ...defaultProps,
+        id: defaultId.current,
+    };
+
+    const props = {
+        ...defProps,
         ...p,
         components: {
-            ...defaultProps.components,
+            ...defProps.components,
             ...(p?.components ?? {}),
         },
     };
@@ -65,13 +77,50 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
     }, [props.reducers]);
 
     const initialState = useMemo(() => (
-        getInitialState(props, defaultProps)
+        getInitialState(props, defProps)
     ), [props]);
+
+    const storeInitial = useMemo(() => (
+        (props.useParentContext)
+            ? {
+                menu: {
+                    [initialState.id!]: { ...initialState },
+                },
+            }
+            : initialState
+    ), [props.useParentContext, initialState]);
+
+    const parentStore = useStore();
+
+    useEffect(() => {
+        const menuId = initialState.id;
+        if (!props.useParentContext || !parentStore || !menuId) {
+            return;
+        }
+
+        parentStore.setState((prev: MultiMenuState) => (
+            (prev?.menu?.[menuId])
+                ? prev
+                : {
+                    ...prev,
+                    menu: {
+                        ...(prev.menu ?? {}),
+                        [menuId]: {
+                            ...initialState,
+                        },
+                    },
+                }
+        ));
+    }, []);
+
+    if (props.useParentContext) {
+        return <MenuContainer ref={ref} {...initialState} />;
+    }
 
     return (
         <StoreProvider
             reducer={reducers}
-            initialState={initialState}
+            initialState={storeInitial}
         >
             <MenuContainer ref={ref} {...initialState} />
         </StoreProvider>

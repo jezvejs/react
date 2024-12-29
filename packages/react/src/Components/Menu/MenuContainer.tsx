@@ -8,7 +8,7 @@ import {
 } from 'react';
 import classNames from 'classnames';
 
-import { useStore } from '../../utils/Store/StoreProvider.tsx';
+import { useMenuStore } from './hooks/useMenuStore.ts';
 
 import { MenuCheckbox } from './components/Checkbox/MenuCheckbox.tsx';
 import { MenuList } from './components/List/MenuList.tsx';
@@ -74,7 +74,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         },
     };
 
-    const { getState, setState } = useStore<MenuState>();
+    const { getState, setState } = useMenuStore(props);
 
     const innerRef = useRef<HTMLDivElement | null>(null);
     useImperativeHandle<MenuRef, MenuRef>(ref, () => innerRef?.current);
@@ -106,6 +106,10 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
                 }
         ));
     };
+
+    const availCallback = (item: MenuItemProps): boolean => (
+        props.isAvailableItem?.(item, getState()) ?? true
+    );
 
     /**
      * Captured 'focus' event handler
@@ -362,16 +366,17 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     }, []);
 
     const onKeyDown = (e: React.KeyboardEvent) => {
+        const focused = document.activeElement;
+        if (!innerRef.current?.contains(focused)) {
+            return;
+        }
+
         const customRes = props.onKeyDown?.(e) ?? false;
         if (customRes) {
             return;
         }
 
         const st = getState();
-
-        const availCallback = (item: MenuItemProps): boolean => (
-            props.isAvailableItem?.(item, st) ?? true
-        );
 
         const options = {
             includeGroupItems: true, // st.allowActiveGroupHeader,
@@ -446,6 +451,10 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     };
 
     useEffect(() => {
+        if (props.useParentContext) {
+            return;
+        }
+
         setState((prev: MenuState) => ({
             ...prev,
             items: mapItems(

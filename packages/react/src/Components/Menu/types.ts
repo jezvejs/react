@@ -131,6 +131,7 @@ export interface MenuGroupItemProps extends MenuItemProps {
 export interface MenuListProps {
     id?: string;
     parentId?: string;
+    useParentContext?: boolean;
     items: MenuItemProps[];
 
     className?: string | null;
@@ -232,6 +233,8 @@ export interface MenuProps<
     id?: string;
     /* Optional identifier of parent */
     parentId?: string;
+    /* If enabled component will use parent store provider */
+    useParentContext?: boolean;
     /* Children menu items */
     items: MenuItemProps[];
     /* Additional CSS class names */
@@ -310,6 +313,14 @@ export interface MenuProps<
 export interface MenuState extends MenuProps {
     ignoreTouch: boolean;
 }
+
+export interface MultiMenuState {
+    menu: {
+        [id: string]: MenuState;
+    },
+}
+
+export type MenuStore = MenuState | MultiMenuState;
 
 /**
  * Attributes of Menu component root element

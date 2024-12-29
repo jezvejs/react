@@ -220,6 +220,16 @@ export function getGroupById<T extends MenuItemProps = MenuItemProps>(
 }
 
 /**
+ * Returns new identifier for menu
+ *
+ * @param {string} prefix optional string to prepend id with
+ */
+export const generateMenuId = (prefix: string = ''): string => {
+    const id = Date.now() * Math.random() * 10000;
+    return `${prefix}${id.toString(36)}`;
+};
+
+/**
  * Returns new identifier not existing in the specified list of items
  *
  * @param {<T = MenuItemProps>[]} items array of items to search in
