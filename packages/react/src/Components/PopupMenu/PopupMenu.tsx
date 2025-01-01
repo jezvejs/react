@@ -279,7 +279,7 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
     return (
         <>
-            <div ref={referenceRef} onClick={onRefClick} >
+            <div ref={referenceRef} onClickCapture={onRefClick} >
                 {props.children}
             </div>
             {state.open && !state.fixed && popup}
