@@ -87,23 +87,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     );
 
     const setActive = (itemId: string | null) => {
-        setState((prev: MenuState) => (
-            (prev.activeItem === itemId)
-                ? prev
-                : {
-                    ...prev,
-                    items: mapItems(
-                        prev.items ?? [],
-                        (item) => (
-                            (item.active !== (item.id === itemId))
-                                ? { ...item, active: !item.active }
-                                : item
-                        ),
-                        { includeGroupItems: prev.allowActiveGroupHeader },
-                    ),
-                    activeItem: itemId,
-                }
-        ));
+        setState((prev: MenuState) => MenuHelpers.setActiveItemById(prev, itemId));
     };
 
     const availCallback = (item: MenuItemProps): boolean => (
@@ -131,7 +115,12 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
                 if (nextItem) {
                     setActive(nextItem.id);
+
+                    activateItem(nextItem.id);
+                    scrollToItem();
                 }
+            } else {
+                setActive(null);
             }
 
             return;
@@ -141,9 +130,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const closestElem = getClosestItemElement(target, selector);
         const itemId = closestElem?.dataset?.id ?? null;
 
-        if (itemId) {
-            setActive(itemId);
-        }
+        setActive(itemId);
     };
 
     /**
@@ -183,9 +170,9 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
 
         const focusOptions = { preventScroll: true };
-
+        const menuSelector = MenuHelpers.getMenuSelector(st);
         const itemSelector = getItemSelector(st);
-        const itemEl = innerRef.current.querySelector(`${itemSelector}[data-id="${itemId}"]`) as HTMLElement;
+        const itemEl = document.querySelector(`${menuSelector} ${itemSelector}[data-id="${itemId}"]`) as HTMLElement;
         if (!itemEl) {
             return;
         }
@@ -320,6 +307,22 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setState((prev: MenuState) => toggleSelectItem(prev, itemId));
     };
 
+    const openItemMenu = (itemId: string | null) => {
+        if (itemId === null) {
+            return;
+        }
+
+        setState((prev: MenuState) => MenuHelpers.openItemMenu(prev, itemId));
+    };
+
+    const closeItemMenu = (itemId: string | null) => {
+        if (itemId === null) {
+            return;
+        }
+
+        setState((prev: MenuState) => MenuHelpers.closeItemMenu(prev, itemId));
+    };
+
     /**
      * Item click event handler
      * @param itemId
@@ -396,7 +399,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const st = getState();
 
         const options = {
-            includeGroupItems: true, // st.allowActiveGroupHeader,
+            includeGroupItems: st.allowActiveGroupHeader,
             includeChildItems: false,
         };
 
@@ -417,7 +420,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             }
         }
 
-        if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+        if (e.code === 'ArrowDown') {
             let nextItem = (activeItem)
                 ? getNextItem(activeItem.id, menuItems, availCallback, options)
                 : findMenuItem(menuItems, availCallback, options);
@@ -436,7 +439,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+        if (e.code === 'ArrowUp') {
             let nextItem = (activeItem)
                 ? getPreviousItem(activeItem.id, menuItems, availCallback, options)
                 : findLastMenuItem(menuItems, availCallback, options);
@@ -455,12 +458,35 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
+        if (e.code === 'ArrowLeft') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (st.activeItem && activeItem?.parentId && props.id) {
+                closeItemMenu(activeItem.parentId ?? props.id);
+            }
+
+            return;
+        }
+
+        if (e.code === 'ArrowRight') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (st.activeItem && activeItem?.type === 'parent') {
+                openItemMenu(activeItem.id);
+            }
+
+            return;
+        }
+
         if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
             if (st.activeItem) {
                 onItemClick(st.activeItem, e);
             }
-
-            e.preventDefault();
         }
     };
 
@@ -486,6 +512,14 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             activeItem: props.activeItem,
         }));
     }, [props.items, props.activeItem]);
+
+    useEffect(() => {
+        const st = getState();
+
+        if (st.activeItem) {
+            activateItem(st.activeItem);
+        }
+    }, [getState().activeItem]);
 
     // Prepare alignment before and after item content
     const columns = useMemo(() => {

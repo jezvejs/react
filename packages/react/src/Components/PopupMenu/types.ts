@@ -3,6 +3,7 @@ import { PopupPositionProps } from '../../hooks/usePopupPosition/types.ts';
 import { MenuItemProps, MenuProps } from '../Menu/types.ts';
 
 export interface PopupMenuProps extends MenuProps {
+    open?: boolean;
     fixed?: boolean;
     toggleOnClick?: boolean;
     hideOnScroll?: boolean;
@@ -13,6 +14,7 @@ export interface PopupMenuProps extends MenuProps {
     container?: Element | DocumentFragment;
 
     handleHideOnSelect?: ((item?: MenuItemProps | null) => void) | null;
+    onClose?: (() => void) | null;
 }
 
 export interface PopupMenuState extends PopupMenuProps {
@@ -22,10 +24,12 @@ export interface PopupMenuState extends PopupMenuProps {
 }
 
 export interface PopupMenuParentItemProps extends MenuItemProps {
+    open?: boolean;
     position?: PopupPositionProps;
     container?: Element | DocumentFragment;
 
     handleHideOnSelect?: ((item?: MenuItemProps | null) => void) | null;
+    onClose?: ((id?: string) => void) | null;
 }
 
 type WithSelector = {

@@ -52,7 +52,7 @@ export const MenuItem: MenuItemComponent = memo<MenuItemProps>((p: MenuItemProps
         after,
     } = props;
 
-    const isButton = type === 'button' || type === 'checkbox';
+    const isButton = type === 'button' || type === 'checkbox' || type === 'parent';
     const isLink = type === 'link' || type === 'checkbox-link';
     const isCheckbox = type === 'checkbox' || type === 'checkbox-link';
 

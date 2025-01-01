@@ -16,6 +16,7 @@ import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.ts';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
 
 import { MenuItemProps, MenuListProps } from '../Menu/types.ts';
+import { useMenuStore } from '../Menu/hooks/useMenuStore.ts';
 
 import { PopupMenuParentItem } from './components/ChildItemContainer/PopupMenuParentItem.tsx';
 import { PopupMenuProps, PopupMenuState } from './types.ts';
@@ -56,11 +57,13 @@ export const PopupMenu = (p: PopupMenuProps) => {
     };
 
     const [state, setState] = useState<PopupMenuState>({
-        open: false,
         ...props,
+        open: false,
         listenScroll: false,
         ignoreTouch: false,
     });
+
+    const menuStore = useMenuStore({ ...props, id: props.parentId });
 
     const onToggle = () => {
         setState((prev: PopupMenuState) => ({
@@ -71,7 +74,13 @@ export const PopupMenu = (p: PopupMenuProps) => {
     };
 
     const closeMenu = () => {
-        setState((prev: PopupMenuState) => ({ ...prev, open: false }));
+        setState((prev: PopupMenuState) => ({
+            ...prev,
+            open: false,
+            activeItem: null,
+        }));
+
+        props.onClose?.();
     };
 
     const {
@@ -89,6 +98,20 @@ export const PopupMenu = (p: PopupMenuProps) => {
             }));
         },
     });
+
+    const onClosed = (id?: string) => {
+        if (!id) {
+            return;
+        }
+
+        setState((prev: PopupMenuState) => MenuHelpers.closeItemMenu(prev, id!));
+        menuStore?.setState?.((prev: PopupMenuState) => MenuHelpers.closeItemMenu(prev, id!));
+
+        setState((prev: PopupMenuState) => ({
+            ...prev,
+            activeItem: id ?? null,
+        }));
+    };
 
     const onScroll = (e: Event) => {
         if (!state.hideOnScroll) {
@@ -182,10 +205,9 @@ export const PopupMenu = (p: PopupMenuProps) => {
     useEffect(() => {
         setState((prev) => ({
             ...prev,
-            items: MenuHelpers.createItems(props.items, prev),
-            activeItem: props.activeItem,
+            open: props.open ?? false,
         }));
-    }, [props.items, props.activeItem]);
+    }, [props.open]);
 
     const container = props.container ?? document.body;
 
@@ -203,14 +225,29 @@ export const PopupMenu = (p: PopupMenuProps) => {
             container,
             position: (st as PopupMenuProps).position,
             handleHideOnSelect: () => handleHideOnSelect(),
+            onClose: onClosed,
         }),
 
         onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (state.parentId) {
+                    closeMenu();
+                }
+
+                return true;
+            }
+
             if (e.code === 'Escape') {
                 closeMenu();
 
                 const target = e.target as HTMLElement;
                 target?.blur();
+
+                e.preventDefault();
+                e.stopPropagation();
 
                 return true;
             }
@@ -229,13 +266,20 @@ export const PopupMenu = (p: PopupMenuProps) => {
         />
     ), [state, containerProps]);
 
+    const onRefClick = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        onToggle();
+    }, []);
+
     if (!props.children) {
         return null;
     }
 
     return (
         <>
-            <div ref={referenceRef} onClick={onToggle} >
+            <div ref={referenceRef} onClick={onRefClick} >
                 {props.children}
             </div>
             {state.open && !state.fixed && popup}

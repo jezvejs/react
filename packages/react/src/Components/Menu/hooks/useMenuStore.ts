@@ -12,15 +12,18 @@ export function useMenuStore(props: MenuProps): StoreProviderContext<MenuState> 
     const store = useStore<MenuStore>();
     const menuStore = store as StoreProviderContext<MenuState>;
 
-    const menuId = props.id;
-
-    const getState = (): MenuState => {
+    const getState = (menuId = props.id): MenuState => {
         const st = store.getState();
+        if (menuId === null) {
+            return st as MenuState;
+        }
+
         return (st as MultiMenuState).menu?.[menuId!] ?? {};
     };
 
-    const setState = (updater: StoreUpdater) => {
+    const setState = (updater: StoreUpdater, menuId = props.id) => {
         if (!menuId) {
+            store.setState(updater);
             return;
         }
 
@@ -43,7 +46,7 @@ export function useMenuStore(props: MenuProps): StoreProviderContext<MenuState> 
 
     const res = useMemo(() => ({
         store,
-        state: getState(),
+        state: getState() as MenuState,
         getState,
         setState,
         dispatch: store.dispatch,

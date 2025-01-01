@@ -1,4 +1,5 @@
 import { asArray, isFunction } from '@jezvejs/types';
+import { PopupMenuParentItemProps } from '../PopupMenu/types.ts';
 import {
     IncludeGroupItemsParam,
     MenuItemCallback,
@@ -89,6 +90,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
     options?: ToFlatListParam,
 ): T[] {
     const res: T[] = [];
+    const parentId = options?.parentId;
 
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
@@ -96,7 +98,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
 
         if (isChildItemsAvailable(item)) {
             if (shouldIncludeParentItem(item, options)) {
-                res.push({ ...item, disabled });
+                res.push({ ...item, parentId, disabled });
             }
 
             if (shouldIncludeChildItems(item, options)) {
@@ -105,6 +107,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
                         asArray(item.items),
                         {
                             ...options,
+                            parentId: item.id,
                             disabled,
                             includeGroupItems: options?.includeGroupItems,
                         },
@@ -112,7 +115,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
                 );
             }
         } else {
-            res.push({ ...item, disabled });
+            res.push({ ...item, parentId, disabled });
         }
     }
 
@@ -138,16 +141,22 @@ export function findMenuItem<T extends MenuItemProps = MenuItemProps>(
         throw new Error('Invalid callback parameter');
     }
 
+    const parentId = options?.parentId;
+
     for (let index = 0; index < items.length; index += 1) {
         let item: T | null = items[index];
         if (callback(item)) {
-            return item;
+            return { ...item, parentId };
         }
 
         if (isChildItemsAvailable(item) && Array.isArray(item.items)) {
-            item = findMenuItem<T>((item.items ?? []) as T[], callback, options);
+            item = findMenuItem<T>(
+                (item.items ?? []) as T[],
+                callback,
+                { ...options, parentId: item.id },
+            );
             if (item) {
-                return item;
+                return { ...item, parentId };
             }
         }
     }
@@ -622,6 +631,134 @@ export function toggleSelectItem<T extends MenuProps = MenuState>(
 }
 
 /**
+ * Reducer function. Toggle opens menu by specified id
+ * @param {T} state
+ * @param {string} itemId
+ * @returns {T}
+ */
+export function toggleOpenItem<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string,
+): T {
+    return {
+        ...state,
+        items: mapItems(
+            state.items,
+            (item) => {
+                if (item.id?.toString() !== itemId) {
+                    return { ...item, open: false };
+                }
+
+                if (item.disabled || item.type !== 'parent') {
+                    return { ...item, open: false };
+                }
+
+                // TODO : don't use PopupMenu types here
+                const parentItem = item as PopupMenuParentItemProps;
+                return {
+                    ...parentItem,
+                    open: !parentItem.open,
+                };
+            },
+            { includeGroupItems: state.allowActiveGroupHeader },
+        ),
+    };
+}
+
+/**
+ * Reducer function. Closes or opens menu by specified id
+ * @param {T} state
+ * @param {string} itemId
+ * @param {boolean} open
+ * @returns {T}
+ */
+export function setItemMenuOpen<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string,
+    open: boolean,
+): T {
+    return {
+        ...state,
+        items: mapItems(
+            state.items,
+            (item) => {
+                if (item.id?.toString() !== itemId) {
+                    return { ...item, open: false };
+                }
+
+                if (item.disabled || item.type !== 'parent') {
+                    return { ...item, open: false };
+                }
+
+                // TODO : don't use PopupMenu types here
+                const parentItem = item as PopupMenuParentItemProps;
+                return {
+                    ...parentItem,
+                    open,
+                };
+            },
+            { includeGroupItems: state.allowActiveGroupHeader },
+        ),
+    };
+}
+
+/**
+ * Reducer function. Opens menu by specified id
+ * @param {T} state
+ * @param {string} itemId
+ * @returns {T}
+ */
+export function openItemMenu<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string,
+): T {
+    return setItemMenuOpen(state, itemId, true);
+}
+
+/**
+ * Reducer function. Closes menu by specified id
+ * @param {T} state
+ * @param {string} itemId
+ * @returns {T}
+ */
+export function closeItemMenu<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string,
+): T {
+    return setItemMenuOpen(state, itemId, false);
+}
+
+/**
+ * Reducer function. Activates menu item by specified id.
+ * Deactivates all items if null is specified as itemId.
+ * @param {T} state
+ * @param {string|null} itemId
+ * @returns {T}
+ */
+export function setActiveItemById<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string | null,
+): T {
+    return (
+        (state.activeItem === itemId)
+            ? state
+            : {
+                ...state,
+                items: mapItems(
+                    state.items ?? [],
+                    (item) => (
+                        (item.active !== (item.id === itemId))
+                            ? { ...item, active: !item.active }
+                            : item
+                    ),
+                    { includeGroupItems: state.allowActiveGroupHeader },
+                ),
+                activeItem: itemId,
+            }
+    );
+}
+
+/**
  * Appends specified item to the end of list or group and returns resulting list
  * @param {MenuItemProps} item
  * @param {MenuItemProps[]} items
@@ -668,6 +805,7 @@ export const createMenuItem = <T extends MenuItemProps, S extends MenuState>(
         ...props,
         active: false,
         id: props.id?.toString() ?? generateItemId(state?.items ?? [], 'item'),
+        parentId: state.id,
         type: props.type ?? defaultItemType,
     };
 

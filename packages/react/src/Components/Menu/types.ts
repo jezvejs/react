@@ -38,6 +38,7 @@ export interface IncludeGroupItemsParam {
  * toFlatList() function params
  */
 export interface ToFlatListParam extends IncludeGroupItemsParam {
+    parentId?: string;
     disabled?: boolean;
 }
 
@@ -267,7 +268,9 @@ export interface MenuProps<
     renderNotSelected?: boolean;
     /* Enables activation of menu group header */
     allowActiveGroupHeader?: boolean;
-    /* Identified or active menu item */
+    /* Identified of active menu */
+    activeMenu?: string | null;
+    /* Identified of active menu item */
     activeItem?: string | null;
 
     /* Additional reducers */
