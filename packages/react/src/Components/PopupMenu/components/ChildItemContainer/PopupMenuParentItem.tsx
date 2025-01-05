@@ -30,9 +30,11 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
 
     const {
         id,
+        parentId,
         container,
         position,
         open,
+        activeItem,
     } = props;
 
     const items = useMemo(() => asArray(props.items), [props.items]);
@@ -48,7 +50,7 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
     const handleOnClose = () => {
         setActive(id);
         setMenuOpen(false);
-        props.onClose?.(id);
+        props.onClose?.(id, parentId);
     };
 
     useEffect(() => {
@@ -60,8 +62,8 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
 
     const containerProps = useMemo(() => ({
         id,
-        'data-parent': id,
-        parentId: id,
+        'data-parent': parentId,
+        parentId,
         items: items.map((item: MenuItemProps) => ({
             ...item,
             open: false,
@@ -75,6 +77,8 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         })),
         container,
         open,
+        active: open,
+        activeItem: null,
         position: {
             position: 'right-start' as PopupPositions,
             ...position,
@@ -89,7 +93,7 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         isAvailableItem: (item: MenuItemProps, state: MenuState) => (
             MenuHelpers.isAvailableItem(item, state)
         ),
-    }), [id, items, open]);
+    }), [id, parentId, items, open, activeItem]);
 
     const itemProps = useMemo(() => ({
         ...props,

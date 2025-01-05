@@ -14,6 +14,7 @@ export interface PopupMenuProps extends MenuProps {
     container?: Element | DocumentFragment;
 
     handleHideOnSelect?: ((item?: MenuItemProps | null) => void) | null;
+    onOpen?: (() => void) | null;
     onClose?: (() => void) | null;
 }
 
@@ -29,7 +30,8 @@ export interface PopupMenuParentItemProps extends MenuItemProps {
     container?: Element | DocumentFragment;
 
     handleHideOnSelect?: ((item?: MenuItemProps | null) => void) | null;
-    onClose?: ((id?: string) => void) | null;
+    onOpen?: (() => void) | null;
+    onClose?: ((id?: string, parentId?: string | null) => void) | null;
 }
 
 type WithSelector = {

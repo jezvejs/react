@@ -315,12 +315,14 @@ export interface MenuProps<
 
 export interface MenuState extends MenuProps {
     ignoreTouch: boolean;
+    inputDevice: string | null;
 }
 
 export interface MultiMenuState {
     menu: {
         [id: string]: MenuState;
-    },
+    };
+    inputDevice: string | null;
 }
 
 export type MenuStore = MenuState | MultiMenuState;

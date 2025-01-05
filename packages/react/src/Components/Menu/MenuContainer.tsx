@@ -102,9 +102,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const st = getState();
 
         const target = e?.target as HTMLElement;
+        const inputDevice = getInputDevice();
+
         if (innerRef?.current === target) {
             // Activate first item
-            if (props.parentId) {
+            if (props.parentId && inputDevice === 'keyboard') {
                 const options = {
                     includeGroupItems: true,
                     includeChildItems: false,
@@ -119,7 +121,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
                     activateItem(nextItem.id);
                     scrollToItem();
                 }
-            } else {
+            } else if (!props.parentId) {
                 setActive(null);
             }
 
@@ -129,6 +131,9 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const selector = getItemSelector(st);
         const closestElem = getClosestItemElement(target, selector);
         const itemId = closestElem?.dataset?.id ?? null;
+        if (!itemId) {
+            return;
+        }
 
         setActive(itemId);
     };
@@ -145,7 +150,9 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        setActive(null);
+        if (!props.parentId) {
+            setActive(null);
+        }
     };
 
     /**
@@ -153,13 +160,23 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param {React.FocusEvent} e
      */
     const onTouchStart = (e: React.TouchEvent) => {
+        setInputDevice('mouse');
+
         if (e.touches) {
             disableTouch();
         }
     };
 
+    /**
+     * Captured 'mousedown' event handler
+     * @param {React.FocusEvent} e
+     */
+    const onMouseDown = () => {
+        setInputDevice('mouse');
+    };
+
     const activateItem = (itemId: string | null) => {
-        if (!innerRef?.current) {
+        if (!innerRef?.current || !itemId) {
             return;
         }
 
@@ -169,19 +186,24 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        const focusOptions = { preventScroll: true };
-        const menuSelector = MenuHelpers.getMenuSelector(st);
-        const itemSelector = getItemSelector(st);
-        const itemEl = document.querySelector(`${menuSelector} ${itemSelector}[data-id="${itemId}"]`) as HTMLElement;
+        const menuSelector = MenuHelpers.getExactMenuSelector(st);
+        const itemSelector = MenuHelpers.getExactItemSelector(st, itemId);
+        if (!menuSelector || !itemSelector) {
+            return;
+        }
+
+        const selector = `${menuSelector} ${itemSelector}`;
+        const itemEl = document.querySelector(selector) as HTMLElement;
         if (!itemEl) {
             return;
         }
 
+        const focusOptions = { preventScroll: true };
         if (item.type === 'group' && st.allowActiveGroupHeader) {
             const { GroupHeader } = st.components ?? {};
-            const selector = GroupHeader?.selector ?? null;
-            const groupHeader = (selector)
-                ? (itemEl?.querySelector(selector) as HTMLElement ?? null)
+            const groupSelector = GroupHeader?.selector ?? null;
+            const groupHeader = (groupSelector)
+                ? (itemEl?.querySelector(groupSelector) as HTMLElement ?? null)
                 : null;
             groupHeader?.focus(focusOptions);
         } else {
@@ -385,18 +407,31 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         finishClick(() => props.onItemClick?.(clickedItem, e));
     }, []);
 
+    const setInputDevice = (inputDevice: string | null) => {
+        setState((prev) => ({
+            ...prev,
+            inputDevice,
+        }), null);
+    };
+
+    const getInputDevice = () => {
+        const st = getState(null);
+        return st?.inputDevice;
+    };
+
     const onKeyDown = (e: React.KeyboardEvent) => {
         const focused = document.activeElement;
         if (!innerRef.current?.contains(focused)) {
             return;
         }
 
+        const st = getState();
+        setInputDevice('keyboard');
+
         const customRes = props.onKeyDown?.(e) ?? false;
         if (customRes) {
             return;
         }
-
-        const st = getState();
 
         const options = {
             includeGroupItems: st.allowActiveGroupHeader,
@@ -618,6 +653,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             onFocusCapture: onFocus,
             onBlurCapture: onBlur,
             onTouchStartCapture: onTouchStart,
+            onMouseDownCapture: onMouseDown,
             onKeyDownCapture: onKeyDown,
             onScrollCapture: onScroll,
             onContextMenuCapture: onContextMenu,

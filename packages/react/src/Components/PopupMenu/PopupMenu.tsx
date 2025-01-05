@@ -65,12 +65,36 @@ export const PopupMenu = (p: PopupMenuProps) => {
 
     const menuStore = useMenuStore({ ...props, id: props.parentId });
 
+    const setActive = (itemId: string | null, parentId = props.id) => {
+        setState((prev: PopupMenuState) => MenuHelpers.setActiveItemById(prev, itemId));
+        menuStore?.setState?.(
+            (prev: PopupMenuState) => MenuHelpers.setActiveItemById(prev, itemId),
+            parentId,
+        );
+    };
+
     const onToggle = () => {
         setState((prev: PopupMenuState) => ({
             ...prev,
             open: !prev.open,
-            activeItem: (!prev.open && prev.parentId) ? prev.items[0].id : null,
         }));
+
+        setTimeout(() => {
+            setActive(null);
+        });
+    };
+
+    const openMenu = () => {
+        setState((prev: PopupMenuState) => ({
+            ...prev,
+            open: true,
+        }));
+
+        setTimeout(() => {
+            setActive(null);
+        });
+
+        props.onOpen?.();
     };
 
     const closeMenu = () => {
@@ -99,18 +123,18 @@ export const PopupMenu = (p: PopupMenuProps) => {
         },
     });
 
-    const onClosed = (id?: string) => {
+    const onClosed = (id?: string, parentId?: string | null) => {
         if (!id) {
             return;
         }
 
         setState((prev: PopupMenuState) => MenuHelpers.closeItemMenu(prev, id!));
-        menuStore?.setState?.((prev: PopupMenuState) => MenuHelpers.closeItemMenu(prev, id!));
+        menuStore?.setState?.(
+            (prev: PopupMenuState) => MenuHelpers.closeItemMenu(prev, id!),
+            parentId,
+        );
 
-        setState((prev: PopupMenuState) => ({
-            ...prev,
-            activeItem: id ?? null,
-        }));
+        setActive(id, parentId ?? undefined);
     };
 
     const onScroll = (e: Event) => {
@@ -169,11 +193,20 @@ export const PopupMenu = (p: PopupMenuProps) => {
     };
 
     const onItemClick = useCallback((item: MenuItemProps) => {
+        const itemId = item?.id;
+
         if (MenuHelpers.isCheckbox(item)) {
-            setState((prev) => MenuHelpers.toggleSelectItem(prev, item.id));
+            setState((prev) => MenuHelpers.toggleSelectItem(prev, itemId));
         }
 
         handleHideOnSelect(item);
+
+        // Schedule a restoration of active item at parent menu after child menu opened
+        if (item.type === 'parent') {
+            setTimeout(() => {
+                setActive(itemId);
+            });
+        }
     }, []);
 
     useEffect(() => {
@@ -205,6 +238,9 @@ export const PopupMenu = (p: PopupMenuProps) => {
     useEffect(() => {
         setState((prev) => ({
             ...prev,
+            ...props,
+            listenScroll: false,
+            ignoreTouch: false,
             open: props.open ?? false,
         }));
     }, [props.open]);
@@ -267,6 +303,11 @@ export const PopupMenu = (p: PopupMenuProps) => {
     ), [state, containerProps]);
 
     const onRefClick = useCallback((e: React.MouseEvent) => {
+        if (state.parentId) {
+            openMenu();
+            return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 

@@ -483,6 +483,16 @@ export const getMenuSelector = (props: MenuState | MenuListProps): string | null
 );
 
 /**
+ * Returns exact menu container CSS selector string for specified props
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getExactMenuSelector = (props: MenuState | MenuListProps): string | null => {
+    const menuSelector = getMenuSelector(props);
+    return (menuSelector) ? `${menuSelector}[data-id="${props.id}"]` : null;
+};
+
+/**
  * Returns menu item CSS selector string for specified props
  * @param {MenuState | MenuListProps} props
  * @returns {string | null}
@@ -490,6 +500,19 @@ export const getMenuSelector = (props: MenuState | MenuListProps): string | null
 export const getItemSelector = (props: MenuState | MenuListProps): string | null => (
     props?.itemSelector ?? props?.components?.ListItem?.selector ?? null
 );
+
+/**
+ * Returns exact menu item CSS selector string for specified props
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getExactItemSelector = (
+    props: MenuState | MenuListProps,
+    itemId: string,
+): string | null => {
+    const itemSelector = getItemSelector(props);
+    return (itemSelector) ? `${itemSelector}[data-id="${itemId}"]` : null;
+};
 
 /**
  * Returns element closest to the specified element and matching selector
@@ -586,6 +609,7 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
     const res: MenuItemProps = {
         ...itemDefaultProps,
         ...item,
+        parentId: state.id,
         active: item.id === state.activeItem,
         iconAlign: item.iconAlign || state.iconAlign,
         disabled: item.disabled || state.disabled,
@@ -608,7 +632,7 @@ export function toggleSelectItem<T extends MenuProps = MenuState>(
     return {
         ...state,
         items: mapItems(
-            state.items,
+            state.items ?? [],
             (item) => {
                 if (item.id?.toString() === itemId) {
                     if (!item.selectable || item.disabled) {
@@ -643,7 +667,7 @@ export function toggleOpenItem<T extends MenuProps = MenuState>(
     return {
         ...state,
         items: mapItems(
-            state.items,
+            state.items ?? [],
             (item) => {
                 if (item.id?.toString() !== itemId) {
                     return { ...item, open: false };
@@ -680,7 +704,7 @@ export function setItemMenuOpen<T extends MenuProps = MenuState>(
     return {
         ...state,
         items: mapItems(
-            state.items,
+            state.items ?? [],
             (item) => {
                 if (item.id?.toString() !== itemId) {
                     return { ...item, open: false };
@@ -849,6 +873,7 @@ export const getInitialState = (
         ...(defProps ?? {}),
         ...props,
         ignoreTouch: false,
+        inputDevice: null,
         components: {
             ...(defProps?.components ?? {}),
             ...props.components,
