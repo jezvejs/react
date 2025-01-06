@@ -329,22 +329,6 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setState((prev: MenuState) => toggleSelectItem(prev, itemId));
     };
 
-    const openItemMenu = (itemId: string | null) => {
-        if (itemId === null) {
-            return;
-        }
-
-        setState((prev: MenuState) => MenuHelpers.openItemMenu(prev, itemId));
-    };
-
-    const closeItemMenu = (itemId: string | null) => {
-        if (itemId === null) {
-            return;
-        }
-
-        setState((prev: MenuState) => MenuHelpers.closeItemMenu(prev, itemId));
-    };
-
     /**
      * Item click event handler
      * @param itemId
@@ -493,28 +477,6 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        if (e.code === 'ArrowLeft') {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (st.activeItem && activeItem?.parentId && props.id) {
-                closeItemMenu(activeItem.parentId ?? props.id);
-            }
-
-            return;
-        }
-
-        if (e.code === 'ArrowRight') {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (st.activeItem && activeItem?.type === 'parent') {
-                openItemMenu(activeItem.id);
-            }
-
-            return;
-        }
-
         if (e.key === 'Enter') {
             e.preventDefault();
             e.stopPropagation();
@@ -620,6 +582,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             id: st.id!,
             items: st.items ?? [],
             getItemProps: st.getItemProps ?? MenuHelpers.getItemProps,
+            getItemComponent: props.getItemComponent,
             onItemClick,
             onMouseEnter,
             onMouseLeave,

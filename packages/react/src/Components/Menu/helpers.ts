@@ -1,5 +1,4 @@
 import { asArray, isFunction } from '@jezvejs/types';
-import { PopupMenuParentItemProps } from '../PopupMenu/types.ts';
 import {
     IncludeGroupItemsParam,
     MenuItemCallback,
@@ -8,6 +7,7 @@ import {
     MenuLoopParam,
     MenuProps,
     MenuState,
+    MultiMenuState,
     ToFlatListParam,
 } from './types.ts';
 
@@ -655,88 +655,46 @@ export function toggleSelectItem<T extends MenuProps = MenuState>(
 }
 
 /**
- * Reducer function. Toggle opens menu by specified id
- * @param {T} state
- * @param {string} itemId
- * @returns {T}
- */
-export function toggleOpenItem<T extends MenuProps = MenuState>(
-    state: T,
-    itemId: string,
-): T {
-    return {
-        ...state,
-        items: mapItems(
-            state.items ?? [],
-            (item) => {
-                if (item.id?.toString() !== itemId) {
-                    return { ...item, open: false };
-                }
-
-                if (item.disabled || item.type !== 'parent') {
-                    return { ...item, open: false };
-                }
-
-                // TODO : don't use PopupMenu types here
-                const parentItem = item as PopupMenuParentItemProps;
-                return {
-                    ...parentItem,
-                    open: !parentItem.open,
-                };
-            },
-            { includeGroupItems: state.allowActiveGroupHeader },
-        ),
-    };
-}
-
-/**
  * Reducer function. Closes or opens menu by specified id
  * @param {T} state
  * @param {string} itemId
  * @param {boolean} open
  * @returns {T}
  */
-export function setItemMenuOpen<T extends MenuProps = MenuState>(
+export function setMenuOpen<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
     state: T,
     itemId: string,
     open: boolean,
 ): T {
     return {
         ...state,
-        items: mapItems(
-            state.items ?? [],
-            (item) => {
-                if (item.id?.toString() !== itemId) {
-                    return { ...item, open: false };
-                }
-
-                if (item.disabled || item.type !== 'parent') {
-                    return { ...item, open: false };
-                }
-
-                // TODO : don't use PopupMenu types here
-                const parentItem = item as PopupMenuParentItemProps;
-                return {
-                    ...parentItem,
-                    open,
-                };
+        menu: {
+            ...(state.menu ?? {}),
+            [itemId]: {
+                ...(state.menu?.[itemId] ?? {}),
+                open,
             },
-            { includeGroupItems: state.allowActiveGroupHeader },
-        ),
+        },
     };
 }
 
 /**
  * Reducer function. Opens menu by specified id
- * @param {T} state
+ * @param {S} state
  * @param {string} itemId
  * @returns {T}
  */
-export function openItemMenu<T extends MenuProps = MenuState>(
+export function openMenu<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
     state: T,
     itemId: string,
 ): T {
-    return setItemMenuOpen(state, itemId, true);
+    return setMenuOpen(state, itemId, true);
 }
 
 /**
@@ -745,11 +703,14 @@ export function openItemMenu<T extends MenuProps = MenuState>(
  * @param {string} itemId
  * @returns {T}
  */
-export function closeItemMenu<T extends MenuProps = MenuState>(
+export function closeMenu<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
     state: T,
     itemId: string,
 ): T {
-    return setItemMenuOpen(state, itemId, false);
+    return setMenuOpen(state, itemId, false);
 }
 
 /**

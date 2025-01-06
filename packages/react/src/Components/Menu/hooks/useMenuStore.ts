@@ -4,7 +4,6 @@ import { Store } from '../../../utils/Store/Store.ts';
 import { useStore } from '../../../utils/Store/StoreProvider.tsx';
 import {
     StoreAction,
-    StoreProviderContext,
     StoreState,
     StoreUpdater,
 } from '../../../utils/Store/types.ts';
@@ -23,22 +22,24 @@ export interface MenuStoreProviderContext<State extends StoreState = StoreState>
     dispatch: (action: StoreAction) => void,
 }
 
-export function useMenuStore(props: MenuProps): MenuStoreProviderContext<MenuState> {
-    const store = useStore<MenuStore>();
-    const menuStore = store as StoreProviderContext<MenuState>;
+export function useMenuStore<
+    T extends MenuState = MenuState,
+    P extends MenuProps = MenuProps,
+>(props: P): MenuStoreProviderContext<T> {
+    const store = useStore<MenuStore<T>>();
 
-    const getState = (menuId?: string | null): MenuState => {
+    const getState = (menuId?: string | null): T => {
         const st = store.getState();
         if (menuId === null) {
-            return st as MenuState;
+            return st as T;
         }
 
         const id = menuId ?? props.id;
         if (!id) {
-            return st as MenuState;
+            return st as T;
         }
 
-        return (st as MultiMenuState).menu?.[id] ?? {};
+        return (st as MultiMenuState<T>).menu?.[id] ?? {};
     };
 
     const setState = (updater: StoreUpdater, menuId?: string | null) => {
@@ -52,7 +53,7 @@ export function useMenuStore(props: MenuProps): MenuStoreProviderContext<MenuSta
             return;
         }
 
-        store.setState((prev: MultiMenuState) => {
+        store.setState((prev: MultiMenuState<T>) => {
             const itemState = (typeof updater === 'function')
                 ? updater(prev?.menu?.[id] ?? {})
                 : updater;
@@ -71,15 +72,11 @@ export function useMenuStore(props: MenuProps): MenuStoreProviderContext<MenuSta
 
     const res = useMemo(() => ({
         store,
-        state: getState() as MenuState,
+        state: getState() as T,
         getState,
         setState,
         dispatch: store.dispatch,
     }), [store.state, props.id]);
-
-    if (!props.useParentContext) {
-        return menuStore;
-    }
 
     return res;
 }

@@ -318,14 +318,14 @@ export interface MenuState extends MenuProps {
     inputDevice: string | null;
 }
 
-export interface MultiMenuState {
+export interface MultiMenuState<T extends MenuState = MenuState> {
     menu: {
-        [id: string]: MenuState;
+        [id: string]: T;
     };
     inputDevice: string | null;
 }
 
-export type MenuStore = MenuState | MultiMenuState;
+export type MenuStore<T extends MenuState = MenuState> = T | MultiMenuState<T>;
 
 /**
  * Attributes of Menu component root element

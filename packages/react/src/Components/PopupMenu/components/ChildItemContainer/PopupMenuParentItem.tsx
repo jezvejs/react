@@ -39,8 +39,11 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
 
     const items = useMemo(() => asArray(props.items), [props.items]);
 
-    const setActive = (itemId: string | null) => {
-        setState((prev: PopupMenuState) => MenuHelpers.setActiveItemById(prev, itemId));
+    const setActive = (itemId: string | null, parentItemId?: string | null) => {
+        const updater = (prev: PopupMenuState) => MenuHelpers.setActiveItemById(prev, itemId);
+
+        setState(updater);
+        setState(updater, parentItemId);
     };
 
     const setMenuOpen = (value: boolean) => {
@@ -48,7 +51,7 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
     };
 
     const handleOnClose = () => {
-        setActive(id);
+        setActive(id, parentId);
         setMenuOpen(false);
         props.onClose?.(id, parentId);
     };
@@ -64,17 +67,7 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         id,
         'data-parent': parentId,
         parentId,
-        items: items.map((item: MenuItemProps) => ({
-            ...item,
-            open: false,
-            active: false,
-            parentId: id,
-            container,
-            position,
-            handleHideOnSelect: () => props.handleHideOnSelect?.(item),
-            onClose: () => handleOnClose(),
-            disabled: props.disabled || item.disabled,
-        })),
+        items,
         container,
         open,
         active: open,

@@ -22,6 +22,7 @@ export interface PopupMenuState extends PopupMenuProps {
     open: boolean;
     listenScroll: boolean;
     ignoreTouch: boolean;
+    inputDevice: string | null;
 }
 
 export interface PopupMenuParentItemProps extends MenuItemProps {
