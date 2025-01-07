@@ -89,7 +89,7 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
     useEffect(() => {
         const menuId = initialState.id;
-        if (!props.useParentContext || !parentStore || !menuId) {
+        if (!parentStore || !menuId) {
             return;
         }
 

@@ -106,6 +106,15 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
     };
 
     const onToggle = () => {
+        const st = getState();
+        const itemId = props.id ?? null;
+
+        if (st.open) {
+            openItemMenu(itemId);
+        } else {
+            closeItemMenu(itemId);
+        }
+
         setState((prev: PopupMenuState) => ({
             ...prev,
             open: !prev.open,
@@ -117,6 +126,9 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
     };
 
     const openMenu = () => {
+        const itemId = props.id ?? null;
+        openItemMenu(itemId);
+
         setState((prev: PopupMenuState) => ({
             ...prev,
             open: true,

@@ -655,6 +655,40 @@ export function toggleSelectItem<T extends MenuProps = MenuState>(
 }
 
 /**
+ * Compares two items on the tree and returns true if item B is parent of item A.
+ *
+ * @param {T} state
+ * @param {string|null} itemId
+ * @param {string|null} compareId
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function isParentItem<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
+    state: T,
+    itemId: string | null,
+    compareId: string | null,
+    options: ToFlatListParam = {},
+): boolean {
+    if (!itemId || !compareId) {
+        return false;
+    }
+
+    const items = Object.values(state.menu ?? {}) as unknown as MenuItemProps[];
+    const item = getItemById(itemId, items);
+    const compareItem = getItemById(compareId, items);
+    if (!item || !compareItem) {
+        return false;
+    }
+
+    const flatList = toFlatList(compareItem?.items ?? [], options);
+    const ids = flatList.map(({ id }) => id);
+    return ids.includes(itemId);
+}
+
+/**
  * Reducer function. Closes or opens menu by specified id
  * @param {T} state
  * @param {string} itemId
@@ -669,7 +703,7 @@ export function setMenuOpen<
     itemId: string,
     open: boolean,
 ): T {
-    return {
+    const res = {
         ...state,
         menu: {
             ...(state.menu ?? {}),
@@ -679,6 +713,23 @@ export function setMenuOpen<
             },
         },
     };
+
+    const options = {
+        includeGroupItems: true,
+        includeChildItems: true,
+    };
+
+    const menuIds = Object.keys(state.menu ?? {});
+    menuIds.forEach((id) => {
+        const isParent = isParentItem(state, itemId, id, options);
+
+        res.menu[id] = {
+            ...(res.menu?.[id] ?? {}),
+            open: (id === itemId || isParent) && open,
+        };
+    });
+
+    return res;
 }
 
 /**
