@@ -302,7 +302,7 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
             const st = getState();
             const activeItem = MenuHelpers.getActiveItem(st);
 
-            if (e.code === 'ArrowLeft') {
+            if (MenuHelpers.isLeaveItemKey(e, st)) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -313,7 +313,7 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
                 return true;
             }
 
-            if (e.code === 'ArrowRight') {
+            if (MenuHelpers.isEnterItemKey(e, st)) {
                 e.preventDefault();
                 e.stopPropagation();
 

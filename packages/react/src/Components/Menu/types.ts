@@ -145,6 +145,8 @@ export interface MenuListProps {
     renderNotSelected?: boolean;
     tabThrough?: boolean;
 
+    horizontal?: boolean;
+
     iconAlign?: MenuItemContentAlign;
     checkboxSide?: MenuItemContentAlign;
     beforeContent?: boolean;
@@ -254,6 +256,8 @@ export interface MenuProps<
     multiple?: boolean;
     /* Disables all interactions with component */
     disabled?: boolean;
+    /* Enables horizontal component */
+    horizontal?: boolean;
     /* Allows navigate between menu items using Tab key */
     tabThrough?: boolean;
     /* Sets tabIndex property */

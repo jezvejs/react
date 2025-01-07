@@ -439,7 +439,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             }
         }
 
-        if (e.code === 'ArrowDown') {
+        if (MenuHelpers.isNextItemKey(e, st)) {
             let nextItem = (activeItem)
                 ? getNextItem(activeItem.id, menuItems, availCallback, options)
                 : findMenuItem(menuItems, availCallback, options);
@@ -458,7 +458,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        if (e.code === 'ArrowUp') {
+        if (MenuHelpers.isPrevItemKey(e, st)) {
             let nextItem = (activeItem)
                 ? getPreviousItem(activeItem.id, menuItems, availCallback, options)
                 : findLastMenuItem(menuItems, availCallback, options);

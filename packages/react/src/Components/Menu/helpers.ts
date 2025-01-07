@@ -896,3 +896,27 @@ export const getInitialState = (
 
     return res;
 };
+
+export const isPrevItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowLeft')
+        : (e.code === 'ArrowUp')
+);
+
+export const isNextItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowRight')
+        : (e.code === 'ArrowDown')
+);
+
+export const isEnterItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowDown')
+        : (e.code === 'ArrowRight')
+);
+
+export const isLeaveItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowUp')
+        : (e.code === 'ArrowLeft')
+);
