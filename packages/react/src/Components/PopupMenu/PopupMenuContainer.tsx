@@ -149,7 +149,6 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
             ...prev,
             open: false,
         }));
-        closeItemMenu(activeItem?.parentId ?? props.id ?? null);
 
         setTimeout(() => {
             setActive(null);
@@ -248,10 +247,6 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
 
     const onItemClick = useCallback((item: MenuItemProps) => {
         const itemId = item?.id;
-
-        if (MenuHelpers.isCheckbox(item)) {
-            setState((prev: PopupMenuState) => MenuHelpers.toggleSelectItem(prev, itemId));
-        }
 
         handleHideOnSelect(item);
 
