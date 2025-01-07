@@ -142,9 +142,6 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
     };
 
     const closeMenu = () => {
-        const st = getState();
-        const activeItem = MenuHelpers.getActiveItem(st);
-
         setState((prev: PopupMenuState) => ({
             ...prev,
             open: false,
