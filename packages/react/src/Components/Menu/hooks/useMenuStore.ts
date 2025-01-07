@@ -1,6 +1,12 @@
 import { useMemo } from 'react';
+
+import { Store } from '../../../utils/Store/Store.ts';
 import { useStore } from '../../../utils/Store/StoreProvider.tsx';
-import { StoreProviderContext, StoreUpdater } from '../../../utils/Store/types.ts';
+import {
+    StoreAction,
+    StoreState,
+    StoreUpdater,
+} from '../../../utils/Store/types.ts';
 import {
     MenuProps,
     MenuState,
@@ -8,32 +14,55 @@ import {
     MultiMenuState,
 } from '../types.ts';
 
-export function useMenuStore(props: MenuProps): StoreProviderContext<MenuState> {
-    const store = useStore<MenuStore>();
-    const menuStore = store as StoreProviderContext<MenuState>;
+export interface MenuStoreProviderContext<State extends StoreState = StoreState> {
+    store: Store | object,
+    state: State,
+    getState: (menuId?: string | null) => State,
+    setState: (state: StoreUpdater, menuId?: string | null) => void,
+    dispatch: (action: StoreAction) => void,
+}
 
-    const menuId = props.id;
+export function useMenuStore<
+    T extends MenuState = MenuState,
+    P extends MenuProps = MenuProps,
+>(props: P): MenuStoreProviderContext<T> {
+    const store = useStore<MenuStore<T>>();
 
-    const getState = (): MenuState => {
+    const getState = (menuId?: string | null): T => {
         const st = store.getState();
-        return (st as MultiMenuState).menu?.[menuId!] ?? {};
+        if (menuId === null) {
+            return st as T;
+        }
+
+        const id = menuId ?? props.id;
+        if (!id) {
+            return st as T;
+        }
+
+        return (st as MultiMenuState<T>).menu?.[id] ?? {};
     };
 
-    const setState = (updater: StoreUpdater) => {
-        if (!menuId) {
+    const setState = (updater: StoreUpdater, menuId?: string | null) => {
+        if (menuId === null) {
+            store.setState(updater);
             return;
         }
 
-        store.setState((prev: MultiMenuState) => {
+        const id = menuId ?? props.id;
+        if (!id) {
+            return;
+        }
+
+        store.setState((prev: MultiMenuState<T>) => {
             const itemState = (typeof updater === 'function')
-                ? updater(prev?.menu?.[menuId] ?? {})
+                ? updater(prev?.menu?.[id] ?? {})
                 : updater;
 
             const res = {
                 ...prev,
                 menu: {
                     ...(prev?.menu ?? {}),
-                    [menuId]: itemState,
+                    [id]: itemState,
                 },
             };
 
@@ -43,15 +72,11 @@ export function useMenuStore(props: MenuProps): StoreProviderContext<MenuState> 
 
     const res = useMemo(() => ({
         store,
-        state: getState(),
+        state: getState() as T,
         getState,
         setState,
         dispatch: store.dispatch,
     }), [store.state, props.id]);
-
-    if (!props.useParentContext) {
-        return menuStore;
-    }
 
     return res;
 }

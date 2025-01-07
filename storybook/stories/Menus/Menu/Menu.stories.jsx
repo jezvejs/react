@@ -69,6 +69,7 @@ export const Horizontal = {
         items: getHorizontalItems(),
         className: 'horizontal-menu',
         preventNavigation: true,
+        horizontal: true,
     },
 };
 
@@ -120,6 +121,7 @@ export const FocusItemOnHover = {
         id: 'focusOnHoverMenu',
         focusItemOnHover: false,
         className: 'horizontal-menu',
+        horizontal: true,
         items: initItems({ title: 'Menu item', count: 4 }),
     },
 };

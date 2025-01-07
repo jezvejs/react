@@ -79,37 +79,30 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         getInitialState(props, defProps)
     ), [props]);
 
-    const storeInitial = useMemo(() => (
-        (props.useParentContext)
-            ? {
-                menu: {
-                    [initialState.id!]: { ...initialState },
-                },
-            }
-            : initialState
-    ), [props.useParentContext, initialState]);
+    const storeInitial = useMemo(() => ({
+        menu: {
+            [initialState.id!]: { ...initialState },
+        },
+    }), [initialState]);
 
     const parentStore = useStore();
 
     useEffect(() => {
         const menuId = initialState.id;
-        if (!props.useParentContext || !parentStore || !menuId) {
+        if (!parentStore || !menuId) {
             return;
         }
 
-        parentStore.setState((prev: MultiMenuState) => (
-            (prev?.menu?.[menuId])
-                ? prev
-                : {
-                    ...prev,
-                    menu: {
-                        ...(prev.menu ?? {}),
-                        [menuId]: {
-                            ...initialState,
-                        },
-                    },
-                }
-        ));
+        parentStore.setState((prev: MultiMenuState) => ({
+            ...prev,
+            menu: {
+                ...(prev.menu ?? {}),
+                [menuId]: {
+                    ...(prev.menu?.[menuId] ?? {}),
+                    ...initialState,
+                },
+            },
+        }));
     }, []);
 
     if (props.useParentContext) {

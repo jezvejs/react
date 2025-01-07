@@ -92,6 +92,6 @@ export const getNestedMenuItems = () => ([
         icon: GlyphIcon,
         iconAlign: 'right',
         type: 'parent',
-        items: nestedItems2(),
+        items: nestedItems2('nested2_'),
     },
 ]);

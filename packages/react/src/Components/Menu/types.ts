@@ -38,6 +38,7 @@ export interface IncludeGroupItemsParam {
  * toFlatList() function params
  */
 export interface ToFlatListParam extends IncludeGroupItemsParam {
+    parentId?: string;
     disabled?: boolean;
 }
 
@@ -143,6 +144,8 @@ export interface MenuListProps {
     defaultItemType?: string;
     renderNotSelected?: boolean;
     tabThrough?: boolean;
+
+    horizontal?: boolean;
 
     iconAlign?: MenuItemContentAlign;
     checkboxSide?: MenuItemContentAlign;
@@ -253,6 +256,8 @@ export interface MenuProps<
     multiple?: boolean;
     /* Disables all interactions with component */
     disabled?: boolean;
+    /* Enables horizontal component */
+    horizontal?: boolean;
     /* Allows navigate between menu items using Tab key */
     tabThrough?: boolean;
     /* Sets tabIndex property */
@@ -267,7 +272,9 @@ export interface MenuProps<
     renderNotSelected?: boolean;
     /* Enables activation of menu group header */
     allowActiveGroupHeader?: boolean;
-    /* Identified or active menu item */
+    /* Identified of active menu */
+    activeMenu?: string | null;
+    /* Identified of active menu item */
     activeItem?: string | null;
 
     /* Additional reducers */
@@ -312,15 +319,17 @@ export interface MenuProps<
 
 export interface MenuState extends MenuProps {
     ignoreTouch: boolean;
+    inputDevice: string | null;
 }
 
-export interface MultiMenuState {
+export interface MultiMenuState<T extends MenuState = MenuState> {
     menu: {
-        [id: string]: MenuState;
-    },
+        [id: string]: T;
+    };
+    inputDevice: string | null;
 }
 
-export type MenuStore = MenuState | MultiMenuState;
+export type MenuStore<T extends MenuState = MenuState> = T | MultiMenuState<T>;
 
 /**
  * Attributes of Menu component root element

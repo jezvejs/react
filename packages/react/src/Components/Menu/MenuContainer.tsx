@@ -87,23 +87,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
     );
 
     const setActive = (itemId: string | null) => {
-        setState((prev: MenuState) => (
-            (prev.activeItem === itemId)
-                ? prev
-                : {
-                    ...prev,
-                    items: mapItems(
-                        prev.items ?? [],
-                        (item) => (
-                            (item.active !== (item.id === itemId))
-                                ? { ...item, active: !item.active }
-                                : item
-                        ),
-                        { includeGroupItems: prev.allowActiveGroupHeader },
-                    ),
-                    activeItem: itemId,
-                }
-        ));
+        setState((prev: MenuState) => MenuHelpers.setActiveItemById(prev, itemId));
     };
 
     const availCallback = (item: MenuItemProps): boolean => (
@@ -118,9 +102,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const st = getState();
 
         const target = e?.target as HTMLElement;
+        const inputDevice = getInputDevice();
+
         if (innerRef?.current === target) {
             // Activate first item
-            if (props.parentId) {
+            if (props.parentId && inputDevice === 'keyboard') {
                 const options = {
                     includeGroupItems: true,
                     includeChildItems: false,
@@ -131,7 +117,12 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
 
                 if (nextItem) {
                     setActive(nextItem.id);
+
+                    activateItem(nextItem.id);
+                    scrollToItem();
                 }
+            } else if (!props.parentId) {
+                setActive(null);
             }
 
             return;
@@ -140,10 +131,11 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         const selector = getItemSelector(st);
         const closestElem = getClosestItemElement(target, selector);
         const itemId = closestElem?.dataset?.id ?? null;
-
-        if (itemId) {
-            setActive(itemId);
+        if (!itemId) {
+            return;
         }
+
+        setActive(itemId);
     };
 
     /**
@@ -158,7 +150,9 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        setActive(null);
+        if (!props.parentId) {
+            setActive(null);
+        }
     };
 
     /**
@@ -166,13 +160,23 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
      * @param {React.FocusEvent} e
      */
     const onTouchStart = (e: React.TouchEvent) => {
+        setInputDevice('mouse');
+
         if (e.touches) {
             disableTouch();
         }
     };
 
+    /**
+     * Captured 'mousedown' event handler
+     * @param {React.FocusEvent} e
+     */
+    const onMouseDown = () => {
+        setInputDevice('mouse');
+    };
+
     const activateItem = (itemId: string | null) => {
-        if (!innerRef?.current) {
+        if (!innerRef?.current || !itemId) {
             return;
         }
 
@@ -182,19 +186,24 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        const focusOptions = { preventScroll: true };
+        const menuSelector = MenuHelpers.getExactMenuSelector(st);
+        const itemSelector = MenuHelpers.getExactItemSelector(st, itemId);
+        if (!menuSelector || !itemSelector) {
+            return;
+        }
 
-        const itemSelector = getItemSelector(st);
-        const itemEl = innerRef.current.querySelector(`${itemSelector}[data-id="${itemId}"]`) as HTMLElement;
+        const selector = `${menuSelector} ${itemSelector}`;
+        const itemEl = document.querySelector(selector) as HTMLElement;
         if (!itemEl) {
             return;
         }
 
+        const focusOptions = { preventScroll: true };
         if (item.type === 'group' && st.allowActiveGroupHeader) {
             const { GroupHeader } = st.components ?? {};
-            const selector = GroupHeader?.selector ?? null;
-            const groupHeader = (selector)
-                ? (itemEl?.querySelector(selector) as HTMLElement ?? null)
+            const groupSelector = GroupHeader?.selector ?? null;
+            const groupHeader = (groupSelector)
+                ? (itemEl?.querySelector(groupSelector) as HTMLElement ?? null)
                 : null;
             groupHeader?.focus(focusOptions);
         } else {
@@ -382,21 +391,34 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         finishClick(() => props.onItemClick?.(clickedItem, e));
     }, []);
 
+    const setInputDevice = (inputDevice: string | null) => {
+        setState((prev) => ({
+            ...prev,
+            inputDevice,
+        }), null);
+    };
+
+    const getInputDevice = () => {
+        const st = getState(null);
+        return st?.inputDevice;
+    };
+
     const onKeyDown = (e: React.KeyboardEvent) => {
         const focused = document.activeElement;
         if (!innerRef.current?.contains(focused)) {
             return;
         }
 
+        const st = getState();
+        setInputDevice('keyboard');
+
         const customRes = props.onKeyDown?.(e) ?? false;
         if (customRes) {
             return;
         }
 
-        const st = getState();
-
         const options = {
-            includeGroupItems: true, // st.allowActiveGroupHeader,
+            includeGroupItems: st.allowActiveGroupHeader,
             includeChildItems: false,
         };
 
@@ -417,7 +439,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             }
         }
 
-        if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+        if (MenuHelpers.isNextItemKey(e, st)) {
             let nextItem = (activeItem)
                 ? getNextItem(activeItem.id, menuItems, availCallback, options)
                 : findMenuItem(menuItems, availCallback, options);
@@ -436,7 +458,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+        if (MenuHelpers.isPrevItemKey(e, st)) {
             let nextItem = (activeItem)
                 ? getPreviousItem(activeItem.id, menuItems, availCallback, options)
                 : findLastMenuItem(menuItems, availCallback, options);
@@ -456,11 +478,12 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
 
         if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
             if (st.activeItem) {
                 onItemClick(st.activeItem, e);
             }
-
-            e.preventDefault();
         }
     };
 
@@ -486,6 +509,14 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             activeItem: props.activeItem,
         }));
     }, [props.items, props.activeItem]);
+
+    useEffect(() => {
+        const st = getState();
+
+        if (st.activeItem) {
+            activateItem(st.activeItem);
+        }
+    }, [getState().activeItem]);
 
     // Prepare alignment before and after item content
     const columns = useMemo(() => {
@@ -551,6 +582,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             id: st.id!,
             items: st.items ?? [],
             getItemProps: st.getItemProps ?? MenuHelpers.getItemProps,
+            getItemComponent: props.getItemComponent,
             onItemClick,
             onMouseEnter,
             onMouseLeave,
@@ -584,6 +616,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             onFocusCapture: onFocus,
             onBlurCapture: onBlur,
             onTouchStartCapture: onTouchStart,
+            onMouseDownCapture: onMouseDown,
             onKeyDownCapture: onKeyDown,
             onScrollCapture: onScroll,
             onContextMenuCapture: onContextMenu,

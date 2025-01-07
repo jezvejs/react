@@ -1,24 +1,22 @@
+import { asArray } from '@jezvejs/types';
 import {
-    useCallback,
-    useEffect,
+    forwardRef,
     useMemo,
-    useState,
+    useRef,
 } from 'react';
-import { createPortal } from 'react-dom';
+
+import { combineReducers } from '../../utils/combineReducers.ts';
+import { createSlice } from '../../utils/createSlice.ts';
+import { StoreProvider } from '../../utils/Store/StoreProvider.tsx';
 
 import {
-    Menu,
-    MenuHelpers,
     MenuDefProps,
+    MenuHelpers,
 } from '../Menu/Menu.tsx';
 
-import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.ts';
-import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
+import { PopupMenuContainer } from './PopupMenuContainer.tsx';
+import { PopupMenuProps } from './types.ts';
 
-import { MenuItemProps, MenuListProps } from '../Menu/types.ts';
-
-import { PopupMenuParentItem } from './components/ChildItemContainer/PopupMenuParentItem.tsx';
-import { PopupMenuProps, PopupMenuState } from './types.ts';
 import './PopupMenu.scss';
 
 const defaultProps = {
@@ -38,210 +36,67 @@ const defaultProps = {
     },
 };
 
+type PopupMenuRef = HTMLDivElement | null;
+
 const menuProps = MenuDefProps.getDefaultProps();
 
-export const PopupMenu = (p: PopupMenuProps) => {
+export const PopupMenu = forwardRef<PopupMenuRef, PopupMenuProps>((p, ref) => {
+    const defaultId = useRef(MenuHelpers.generateMenuId('popupmenu'));
+
+    const defProps = {
+        ...defaultProps,
+        id: defaultId.current,
+    };
+
     const props = {
         ...menuProps,
-        ...defaultProps,
+        ...defProps,
         ...p,
         position: {
-            ...defaultProps.position,
+            ...defProps.position,
             ...(p?.position ?? {}),
             updateProps: {
-                ...(defaultProps.position?.updateProps ?? {}),
+                ...(defProps.position?.updateProps ?? {}),
                 ...(p?.position?.updateProps ?? {}),
             },
         },
     };
 
-    const [state, setState] = useState<PopupMenuState>({
-        open: false,
+    const slice = createSlice({
+    });
+
+    const reducers = useMemo(() => {
+        const extraReducers = asArray(props.reducers);
+        return (extraReducers.length > 0)
+            ? combineReducers(slice.reducer, ...extraReducers)
+            : slice.reducer;
+    }, [props.reducers]);
+
+    const initialState = useMemo(() => ({
         ...props,
+        open: false,
         listenScroll: false,
         ignoreTouch: false,
-    });
+    }), [p]);
 
-    const onToggle = () => {
-        setState((prev: PopupMenuState) => ({
-            ...prev,
-            open: !prev.open,
-            activeItem: (!prev.open && prev.parentId) ? prev.items[0].id : null,
-        }));
-    };
-
-    const closeMenu = () => {
-        setState((prev: PopupMenuState) => ({ ...prev, open: false }));
-    };
-
-    const {
-        referenceRef,
-        elementRef,
-        elem,
-        reference,
-    } = usePopupPosition({
-        ...state.position,
-        open: state.open,
-        onScrollDone: () => {
-            setState((prev: PopupMenuState) => ({
-                ...prev,
-                listenScroll: true,
-            }));
+    const storeInitial = useMemo(() => ({
+        menu: {
+            [initialState.id!]: { ...initialState },
         },
-    });
+    }), [initialState]);
 
-    const onScroll = (e: Event) => {
-        if (!state.hideOnScroll) {
-            e.stopPropagation();
-            return;
-        }
-
-        const target = e.target as HTMLElement;
-        if (!target.contains(elem.current as HTMLElement)) {
-            return;
-        }
-
-        // Ignore scroll of menu itself
-        const listElem = (typeof target.closest === 'function')
-            ? target.closest('.popup-menu-list')
-            : null;
-        if (listElem === elem.current) {
-            return;
-        }
-
-        closeMenu();
-    };
-
-    const addScrollListener = () => {
-        if (state.open && state.listenScroll) {
-            window.addEventListener('scroll', onScroll, { passive: true, capture: true });
-        }
-    };
-
-    const removeScrollListener = () => {
-        if (!state.listenScroll) {
-            return;
-        }
-
-        setState((prev) => ({
-            ...prev,
-            listenScroll: false,
-        }));
-
-        window.removeEventListener('scroll', onScroll, { capture: true });
-    };
-
-    const handleHideOnSelect = (item: MenuItemProps | null = null) => {
-        if (
-            !props.hideOnSelect
-            || (item && item.type === 'parent')
-        ) {
-            return;
-        }
-
-        removeScrollListener();
-        closeMenu();
-
-        props?.handleHideOnSelect?.();
-    };
-
-    const onItemClick = useCallback((item: MenuItemProps) => {
-        if (MenuHelpers.isCheckbox(item)) {
-            setState((prev) => MenuHelpers.toggleSelectItem(prev, item.id));
-        }
-
-        handleHideOnSelect(item);
-    }, []);
-
-    useEffect(() => {
-        if (state.open) {
-            addScrollListener();
-
-            if (state.listenScroll) {
-                elem.current?.focus();
-            }
-        } else {
-            removeScrollListener();
-        }
-
-        return () => {
-            removeScrollListener();
-        };
-    }, [state.open, state.listenScroll]);
-
-    const closeMenuCached = useCallback(() => {
-        closeMenu();
-    }, []);
-
-    useEmptyClick(
-        closeMenuCached,
-        [elem, reference],
-        state.open && state.hideOnEmptyClick,
-    );
-
-    useEffect(() => {
-        setState((prev) => ({
-            ...prev,
-            items: MenuHelpers.createItems(props.items, prev),
-            activeItem: props.activeItem,
-        }));
-    }, [props.items, props.activeItem]);
-
-    const container = props.container ?? document.body;
-
-    const containerProps = useMemo(() => ({
-        getItemComponent: (item: MenuItemProps) => {
-            if (item.type === 'parent') {
-                return PopupMenuParentItem;
-            }
-
-            return null;
-        },
-
-        getItemProps: (item: MenuItemProps, st: MenuListProps) => ({
-            ...MenuHelpers.getItemProps(item, st),
-            container,
-            position: (st as PopupMenuProps).position,
-            handleHideOnSelect: () => handleHideOnSelect(),
-        }),
-
-        onKeyDown: (e: React.KeyboardEvent) => {
-            if (e.code === 'Escape') {
-                closeMenu();
-
-                const target = e.target as HTMLElement;
-                target?.blur();
-
-                return true;
-            }
-
-            return false;
-        },
-    }), []);
-
-    const popup = useMemo(() => (
-        <Menu
-            {...state}
-            {...containerProps}
-            className="popup-menu-list"
-            onItemClick={onItemClick}
-            ref={elementRef}
-        />
-    ), [state, containerProps]);
-
-    if (!props.children) {
-        return null;
+    if (props.useParentContext) {
+        return <PopupMenuContainer ref={ref} {...initialState} />;
     }
 
     return (
-        <>
-            <div ref={referenceRef} onClick={onToggle} >
-                {props.children}
-            </div>
-            {state.open && !state.fixed && popup}
-            {state.open && state.fixed && (
-                createPortal(popup, container)
-            )}
-        </>
+        <StoreProvider
+            reducer={reducers}
+            initialState={storeInitial}
+        >
+            <PopupMenuContainer ref={ref} {...initialState} />
+        </StoreProvider>
     );
-};
+});
+
+PopupMenu.displayName = 'PopupMenu';

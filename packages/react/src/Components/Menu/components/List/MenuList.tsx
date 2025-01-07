@@ -74,9 +74,9 @@ export const MenuList = (p: MenuListProps) => {
         } = props.components;
         const st = getState();
 
-        const item = props.getItemProps?.(itemData, props) ?? itemData;
+        const item = props.getItemProps?.(itemData, st as MenuListProps) ?? itemData;
 
-        const CustomItem = st.getItemComponent?.(item, props);
+        const CustomItem = props.getItemComponent?.(item, props);
         if (CustomItem) {
             return CustomItem && <CustomItem {...item} key={item.id} />;
         }

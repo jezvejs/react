@@ -30,6 +30,7 @@ export const defaultProps: MenuProps = {
     checkboxSide: 'left',
     multiple: false,
     disabled: false,
+    horizontal: false,
     tabThrough: true,
     tabIndex: 0,
     loopNavigation: true,

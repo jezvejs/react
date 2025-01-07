@@ -1,13 +1,15 @@
 import { asArray } from '@jezvejs/types';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { MenuItemProps, MenuState } from '../../../Menu/types.ts';
 import { PopupMenu } from '../../PopupMenu.tsx';
-import { PopupMenuParentItemComponent, PopupMenuParentItemProps } from '../../types.ts';
+import { PopupMenuParentItemComponent, PopupMenuParentItemProps, PopupMenuState } from '../../types.ts';
 import { PopupPositions } from '../../../../hooks/usePopupPosition/types.ts';
 import { MenuHelpers } from '../../../Menu/MenuContainer.tsx';
+import { useMenuStore } from '../../../Menu/hooks/useMenuStore.ts';
 
 const defaultProps = {
+    open: false,
     selectable: true,
     items: [],
     components: {
@@ -24,23 +26,52 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         },
     };
 
-    const { id, container, position } = props;
+    const { setState } = useMenuStore(props);
+
+    const {
+        id,
+        parentId,
+        container,
+        position,
+        open,
+        activeItem,
+    } = props;
 
     const items = useMemo(() => asArray(props.items), [props.items]);
 
+    const setActive = (itemId: string | null, parentItemId?: string | null) => {
+        const updater = (prev: PopupMenuState) => MenuHelpers.setActiveItemById(prev, itemId);
+
+        setState(updater);
+        setState(updater, parentItemId);
+    };
+
+    const setMenuOpen = (value: boolean) => {
+        setState((prev: PopupMenuState) => ({ ...prev, open: value }));
+    };
+
+    const handleOnClose = () => {
+        setActive(id, parentId);
+        setMenuOpen(false);
+        props.onClose?.(id, parentId);
+    };
+
+    useEffect(() => {
+        setState((prev) => ({
+            ...prev,
+            open: props.open ?? false,
+        }));
+    }, [props.open]);
+
     const containerProps = useMemo(() => ({
-        id: `${id}_submenu`,
-        'data-parent': id,
-        parentId: id,
-        items: items.map((item: MenuItemProps) => ({
-            ...item,
-            parentId: id,
-            container,
-            position,
-            handleHideOnSelect: () => props.handleHideOnSelect?.(item),
-            disabled: props.disabled || item.disabled,
-        })),
+        id,
+        'data-parent': parentId,
+        parentId,
+        items,
         container,
+        open,
+        active: open,
+        activeItem: null,
         position: {
             position: 'right-start' as PopupPositions,
             ...position,
@@ -50,11 +81,12 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         useParentContext: true,
         hideOnScroll: false,
         handleHideOnSelect: () => props.handleHideOnSelect?.(),
+        onClose: () => handleOnClose(),
 
         isAvailableItem: (item: MenuItemProps, state: MenuState) => (
             MenuHelpers.isAvailableItem(item, state)
         ),
-    }), [id, items]);
+    }), [id, parentId, items, open, activeItem]);
 
     const itemProps = useMemo(() => ({
         ...props,

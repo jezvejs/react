@@ -7,6 +7,7 @@ import {
     MenuLoopParam,
     MenuProps,
     MenuState,
+    MultiMenuState,
     ToFlatListParam,
 } from './types.ts';
 
@@ -89,6 +90,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
     options?: ToFlatListParam,
 ): T[] {
     const res: T[] = [];
+    const parentId = options?.parentId;
 
     for (let index = 0; index < items.length; index += 1) {
         const item = items[index];
@@ -96,7 +98,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
 
         if (isChildItemsAvailable(item)) {
             if (shouldIncludeParentItem(item, options)) {
-                res.push({ ...item, disabled });
+                res.push({ ...item, parentId, disabled });
             }
 
             if (shouldIncludeChildItems(item, options)) {
@@ -105,6 +107,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
                         asArray(item.items),
                         {
                             ...options,
+                            parentId: item.id,
                             disabled,
                             includeGroupItems: options?.includeGroupItems,
                         },
@@ -112,7 +115,7 @@ export function toFlatList<T extends MenuItemProps = MenuItemProps>(
                 );
             }
         } else {
-            res.push({ ...item, disabled });
+            res.push({ ...item, parentId, disabled });
         }
     }
 
@@ -138,16 +141,22 @@ export function findMenuItem<T extends MenuItemProps = MenuItemProps>(
         throw new Error('Invalid callback parameter');
     }
 
+    const parentId = options?.parentId;
+
     for (let index = 0; index < items.length; index += 1) {
         let item: T | null = items[index];
         if (callback(item)) {
-            return item;
+            return { ...item, parentId };
         }
 
         if (isChildItemsAvailable(item) && Array.isArray(item.items)) {
-            item = findMenuItem<T>((item.items ?? []) as T[], callback, options);
+            item = findMenuItem<T>(
+                (item.items ?? []) as T[],
+                callback,
+                { ...options, parentId: item.id },
+            );
             if (item) {
-                return item;
+                return { ...item, parentId };
             }
         }
     }
@@ -474,6 +483,16 @@ export const getMenuSelector = (props: MenuState | MenuListProps): string | null
 );
 
 /**
+ * Returns exact menu container CSS selector string for specified props
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getExactMenuSelector = (props: MenuState | MenuListProps): string | null => {
+    const menuSelector = getMenuSelector(props);
+    return (menuSelector) ? `${menuSelector}[data-id="${props.id}"]` : null;
+};
+
+/**
  * Returns menu item CSS selector string for specified props
  * @param {MenuState | MenuListProps} props
  * @returns {string | null}
@@ -481,6 +500,19 @@ export const getMenuSelector = (props: MenuState | MenuListProps): string | null
 export const getItemSelector = (props: MenuState | MenuListProps): string | null => (
     props?.itemSelector ?? props?.components?.ListItem?.selector ?? null
 );
+
+/**
+ * Returns exact menu item CSS selector string for specified props
+ * @param {MenuState | MenuListProps} props
+ * @returns {string | null}
+ */
+export const getExactItemSelector = (
+    props: MenuState | MenuListProps,
+    itemId: string,
+): string | null => {
+    const itemSelector = getItemSelector(props);
+    return (itemSelector) ? `${itemSelector}[data-id="${itemId}"]` : null;
+};
 
 /**
  * Returns element closest to the specified element and matching selector
@@ -577,6 +609,7 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
     const res: MenuItemProps = {
         ...itemDefaultProps,
         ...item,
+        parentId: state.id,
         active: item.id === state.activeItem,
         iconAlign: item.iconAlign || state.iconAlign,
         disabled: item.disabled || state.disabled,
@@ -599,7 +632,7 @@ export function toggleSelectItem<T extends MenuProps = MenuState>(
     return {
         ...state,
         items: mapItems(
-            state.items,
+            state.items ?? [],
             (item) => {
                 if (item.id?.toString() === itemId) {
                     if (!item.selectable || item.disabled) {
@@ -619,6 +652,146 @@ export function toggleSelectItem<T extends MenuProps = MenuState>(
             { includeGroupItems: state.allowActiveGroupHeader },
         ),
     };
+}
+
+/**
+ * Compares two items on the tree and returns true if item B is parent of item A.
+ *
+ * @param {T} state
+ * @param {string|null} itemId
+ * @param {string|null} compareId
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function isParentItem<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
+    state: T,
+    itemId: string | null,
+    compareId: string | null,
+    options: ToFlatListParam = {},
+): boolean {
+    if (!itemId || !compareId) {
+        return false;
+    }
+
+    const items = Object.values(state.menu ?? {}) as unknown as MenuItemProps[];
+    const item = getItemById(itemId, items);
+    const compareItem = getItemById(compareId, items);
+    if (!item || !compareItem) {
+        return false;
+    }
+
+    const flatList = toFlatList(compareItem?.items ?? [], options);
+    const ids = flatList.map(({ id }) => id);
+    return ids.includes(itemId);
+}
+
+/**
+ * Reducer function. Closes or opens menu by specified id
+ * @param {T} state
+ * @param {string} itemId
+ * @param {boolean} open
+ * @returns {T}
+ */
+export function setMenuOpen<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
+    state: T,
+    itemId: string,
+    open: boolean,
+): T {
+    const res = {
+        ...state,
+        menu: {
+            ...(state.menu ?? {}),
+            [itemId]: {
+                ...(state.menu?.[itemId] ?? {}),
+                open,
+            },
+        },
+    };
+
+    const options = {
+        includeGroupItems: true,
+        includeChildItems: true,
+    };
+
+    const menuIds = Object.keys(state.menu ?? {});
+    menuIds.forEach((id) => {
+        const isParent = isParentItem(state, itemId, id, options);
+
+        res.menu[id] = {
+            ...(res.menu?.[id] ?? {}),
+            open: (id === itemId || isParent) && open,
+        };
+    });
+
+    return res;
+}
+
+/**
+ * Reducer function. Opens menu by specified id
+ * @param {S} state
+ * @param {string} itemId
+ * @returns {T}
+ */
+export function openMenu<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
+    state: T,
+    itemId: string,
+): T {
+    return setMenuOpen(state, itemId, true);
+}
+
+/**
+ * Reducer function. Closes menu by specified id
+ * @param {T} state
+ * @param {string} itemId
+ * @returns {T}
+ */
+export function closeMenu<
+    S extends MenuState = MenuState,
+    T extends MultiMenuState<S> = MultiMenuState<S>,
+>(
+    state: T,
+    itemId: string,
+): T {
+    return setMenuOpen(state, itemId, false);
+}
+
+/**
+ * Reducer function. Activates menu item by specified id.
+ * Deactivates all items if null is specified as itemId.
+ * @param {T} state
+ * @param {string|null} itemId
+ * @returns {T}
+ */
+export function setActiveItemById<T extends MenuProps = MenuState>(
+    state: T,
+    itemId: string | null,
+): T {
+    return (
+        (state.activeItem === itemId)
+            ? state
+            : {
+                ...state,
+                items: mapItems(
+                    state.items ?? [],
+                    (item) => (
+                        (item.active !== (item.id === itemId))
+                            ? { ...item, active: !item.active }
+                            : item
+                    ),
+                    { includeGroupItems: state.allowActiveGroupHeader },
+                ),
+                activeItem: itemId,
+            }
+    );
 }
 
 /**
@@ -668,6 +841,7 @@ export const createMenuItem = <T extends MenuItemProps, S extends MenuState>(
         ...props,
         active: false,
         id: props.id?.toString() ?? generateItemId(state?.items ?? [], 'item'),
+        parentId: state.id,
         type: props.type ?? defaultItemType,
     };
 
@@ -711,6 +885,7 @@ export const getInitialState = (
         ...(defProps ?? {}),
         ...props,
         ignoreTouch: false,
+        inputDevice: null,
         components: {
             ...(defProps?.components ?? {}),
             ...props.components,
@@ -721,3 +896,27 @@ export const getInitialState = (
 
     return res;
 };
+
+export const isPrevItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowLeft')
+        : (e.code === 'ArrowUp')
+);
+
+export const isNextItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowRight')
+        : (e.code === 'ArrowDown')
+);
+
+export const isEnterItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowDown')
+        : (e.code === 'ArrowRight')
+);
+
+export const isLeaveItemKey = (e: React.KeyboardEvent, state: MenuState) => (
+    (state.horizontal)
+        ? (e.code === 'ArrowUp')
+        : (e.code === 'ArrowLeft')
+);
