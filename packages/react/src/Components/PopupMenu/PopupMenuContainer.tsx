@@ -351,7 +351,8 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
     ), [state, containerProps]);
 
     const onRefClick = useCallback((e: React.MouseEvent) => {
-        if (state.parentId) {
+        const st = getState();
+        if (st.parentId) {
             openMenu();
             return;
         }
