@@ -58,8 +58,6 @@ export const DefaultDragZone = forwardRef<
         ...state,
         id: props.id,
         title: props.title,
-        left: props.left,
-        top: props.top,
     };
 
     const content = <Content {...origProps} ref={dragZoneRef} />;
