@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "type": "module",
     "files": [
         "src",
@@ -32,7 +32,7 @@
         "classnames": "^2.5.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "vite": "^5.4.11",
+        "vite": "^5.4.14",
         "vite-plugin-svgr": "^4.3.0"
     },
     "peerDependencies": {
@@ -42,10 +42,14 @@
     "exports": {
         ".": "./src/index.ts",
         "./package.json": "./package.json",
-        "./style": "./src/common.scss"
+        "./style.scss": "./src/common.scss"
     },
     "main": "./src/index.ts",
     "module": "./src/index.ts",
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "publishConfig": {
         "access": "public"
     }

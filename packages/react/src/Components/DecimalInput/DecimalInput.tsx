@@ -12,11 +12,11 @@ import { ControlledInputProps } from '../ControlledInput/types.ts';
 import { InputProps } from '../Input/Input.tsx';
 
 export interface DecimalInputProps extends ControlledInputProps {
-    min: number,
-    max: number,
-    digits: number,
-    allowNegative: boolean,
-    allowMultipleLeadingZeros: boolean,
+    min?: number,
+    max?: number,
+    digits?: number,
+    allowNegative?: boolean,
+    allowMultipleLeadingZeros?: boolean,
 }
 
 const defaultProps = {
@@ -28,7 +28,7 @@ const defaultProps = {
     allowMultipleLeadingZeros: false,
 };
 
-export const DecimalInput = (p: DecimalInputProps) => {
+export const DecimalInput: React.FC<DecimalInputProps> = (p) => {
     const props = {
         ...defaultProps,
         ...p,

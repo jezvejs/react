@@ -16,10 +16,12 @@ import {
 } from './types.ts';
 import './Histogram.scss';
 
+export * from './types.ts';
+
 /**
  * Histogram component
  */
-export const Histogram = (props: HistogramProps) => {
+export const Histogram: React.FC<HistogramProps> = (props: HistogramProps) => {
     const defaultProps = {
         yAxisGrid: true,
         xAxisGrid: false,
@@ -106,7 +108,7 @@ export const Histogram = (props: HistogramProps) => {
             state: BaseChartState,
             elem: Element,
         ): BaseChartItemSearchResult | null => {
-            const result = BaseChartHelpers.findItemByEvent(e, state, elem);
+            const result = BaseChartHelpers.findItemByEvent<HistogramDataItemType>(e, state, elem);
             if (!Array.isArray(result.item)) {
                 return result;
             }
@@ -128,7 +130,8 @@ export const Histogram = (props: HistogramProps) => {
 
                 const y = e.nativeEvent.offsetY;
                 index = result.item.findIndex((bar) => (
-                    x >= bar.x
+                    bar
+                    && x >= bar.x
                     && x < bar.x + bar.width
                     && y >= bar.y
                     && y < bar.y + bar.height
@@ -138,11 +141,11 @@ export const Histogram = (props: HistogramProps) => {
                     const diffs = result.item.map((bar, ind) => ({
                         bar,
                         ind,
-                        diff: Math.min(
+                        diff: (bar) ? Math.min(
                             Math.abs(y - bar.y),
                             Math.abs(y - bar.y - bar.height),
-                        ),
-                    })).filter(({ bar }) => (x >= bar.x && x < bar.x + bar.width));
+                        ) : 0,
+                    })).filter(({ bar }) => (bar && x >= bar.x && x < bar.x + bar.width));
 
                     if (diffs.length > 0) {
                         diffs.sort((a, b) => a.diff - b.diff);
@@ -151,13 +154,14 @@ export const Histogram = (props: HistogramProps) => {
                 }
             } else {
                 index = result.item.findIndex((bar) => (
-                    x >= bar.x
+                    bar
+                    && x >= bar.x
                     && x < bar.x + bar.width
                 ));
             }
 
             if (index >= 0 && index < result.item.length) {
-                item = result.item[index];
+                item = result.item[index] as HistogramDataItemType;
             } else {
                 index = -1;
             }

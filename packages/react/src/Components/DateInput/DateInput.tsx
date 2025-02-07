@@ -27,7 +27,10 @@ const defaultProps: DateInputProps = {
     locales: [],
 };
 
-export const DateInput = (p: DateInputProps) => {
+export * from './types.ts';
+export * as DateInputHelpers from './helpers.ts';
+
+export const DateInput: React.FC<DateInputProps> = (p) => {
     const props = {
         ...defaultProps,
         ...p,

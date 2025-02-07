@@ -62,18 +62,18 @@ export interface OnDragEnterParams {
  * Drag source zone
  */
 export interface DragZone {
-    id: string,
-    touchMoveTimeout?: number,
-    mouseMoveThreshold?: number,
-    elem?: Element | null,
-    handles?: DragHandle[],
-    copyWidth?: boolean,
+    id: string;
+    touchMoveTimeout?: number;
+    mouseMoveThreshold?: number;
+    elem?: Element | null;
+    handles?: DragHandle | DragHandle[];
+    copyWidth?: boolean;
 
-    onDragStart: (params: OnDragStartParams) => DragAvatar | null,
+    onDragStart: (params: OnDragStartParams) => DragAvatar | null;
 
-    isValidDragHandle?: (hnd: DragHandle) => boolean,
+    isValidDragHandle?: (hnd: DragHandle) => boolean;
 
-    findDragZoneItem?: (el: Element) => Element | null,
+    findDragZoneItem?: (el: Element) => Element | null;
 }
 
 export interface DragAvatarInfo {
@@ -82,63 +82,66 @@ export interface DragAvatarInfo {
 }
 
 export interface DragAvatarInitParam {
-    downX: number,
-    downY: number,
-    e: TouchEvent | MouseEvent,
+    downX: number;
+    downY: number;
+    e: TouchEvent | MouseEvent;
 }
 
 /**
  * Dragging element
  */
 export interface DragAvatar {
-    scrollRequested?: boolean,
+    scrollRequested?: boolean;
 
-    dragZone?: DragZone | null,
-    dropTarget?: DropTarget | null,
+    dragZone?: DragZone | null;
+    dropTarget?: DropTarget | null;
 
-    initFromEvent: (params: DragAvatarInitParam) => boolean,
+    initFromEvent: (params: DragAvatarInitParam) => boolean;
 
-    getTargetElem: () => Element | null,
-    getDragInfo: (e?: TouchEvent | MouseEvent | Event) => DragAvatarInfo,
+    getTargetElem: () => Element | null;
+    getDragInfo: (e?: TouchEvent | MouseEvent | Event) => DragAvatarInfo;
 
-    onDragMove: (params: OnDragMoveParams) => void,
+    onDragMove: (params: OnDragMoveParams) => void;
 
-    onDragEnd?: () => void,
+    onDragEnd?: () => void;
 
-    onDragCancel?: (params: OnDragCancelParams) => void,
+    onDragCancel?: (params: OnDragCancelParams) => void;
 }
 
 /**
  * Drop target
  */
 export interface DropTarget {
-    id: string,
-    elem?: Element | null,
+    id: string;
+    elem?: Element | null;
 
-    onDragEnter?: (params: OnDragEnterParams) => void,
+    onDragEnter?: (params: OnDragEnterParams) => void;
 
-    onDragLeave?: (params: OnDragLeaveParams) => void,
+    onDragLeave?: (params: OnDragLeaveParams) => void;
 
-    onDragMove?: (params: OnDragMoveParams) => void,
+    onDragMove?: (params: OnDragMoveParams) => void;
 
-    onDragEnd?: (params: OnDragEndParams) => void,
+    onDragEnd?: (params: OnDragEndParams) => void;
 
-    onDragCancel?: (params: OnDragCancelParams) => void,
+    onDragCancel?: (params: OnDragCancelParams) => void;
 }
 
 /**
  * Drag'n'Drop state
  */
 export interface DragnDropState {
-    dragging: boolean,
-    draggingId: string | null,
+    dragging: boolean;
+    draggingId: string | null;
 
-    left: number,
-    top: number,
+    left: number;
+    top: number;
 
-    origLeft: number,
-    origTop: number,
+    origLeft: number;
+    origTop: number;
 
-    shiftX: number,
-    shiftY: number,
+    rect?: DOMRect;
+    offset?: DOMRect;
+
+    shiftX: number;
+    shiftY: number;
 }

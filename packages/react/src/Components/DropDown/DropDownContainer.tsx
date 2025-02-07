@@ -44,6 +44,7 @@ import {
     SHOW_LIST_SCROLL_TIMEOUT,
 } from './constants.ts';
 import {
+    DropDownComboBoxProps,
     DropDownMenuItemProps,
     DropDownMenuProps,
     DropDownNativeSelectProps,
@@ -155,8 +156,8 @@ export const DropDownContainer = forwardRef<
 
     /** Return index of selected item contains specified element */
     const getSelectedItemIndex = (el: HTMLElement) => {
-        const SelectionItemComponent = state.components.MultiSelectionItem;
-        const selector = SelectionItemComponent.selector ?? null;
+        const SelectionItemComponent = state.components?.MultiSelectionItem;
+        const selector = SelectionItemComponent?.selector ?? null;
         const selItemElem = (selector) ? (el?.closest(selector) as HTMLElement) : null;
         if (!selItemElem) {
             return -1;
@@ -219,8 +220,8 @@ export const DropDownContainer = forwardRef<
 
     /** Returns true if element is delete selection item button or its child */
     const isSelectionItemDeleteButtonTarget = (target: HTMLElement) => {
-        const { MultiSelectionItem } = state.components;
-        return target?.closest(`.${MultiSelectionItem.buttonClass}`);
+        const { MultiSelectionItem } = state.components ?? {};
+        return !!MultiSelectionItem && !!target?.closest(`.${MultiSelectionItem.buttonClass}`);
     };
 
     /** Returns true if element is allowed to toggle menu list */
@@ -256,7 +257,7 @@ export const DropDownContainer = forwardRef<
     /** Returns selected items data for 'itemselect' and 'change' events */
     const getSelectionData = (): DropDownSelectedItem[] | DropDownSelectedItem | null => {
         const selectedItems = getSelectedItems(getState())
-            .map((item) => ({ id: item.id, value: item.title }));
+            .map((item) => ({ id: item.id, value: item.title ?? '' }));
 
         if (state.multiple) {
             return selectedItems;
@@ -841,7 +842,7 @@ export const DropDownContainer = forwardRef<
         }
 
         if (item.type === 'group' && state.allowActiveGroupHeader) {
-            const { GroupHeader } = state.components;
+            const { GroupHeader } = state.components ?? {};
             const selector = GroupHeader?.selector ?? null;
             const groupHeader = (selector) ? itemEl?.querySelector(selector) as HTMLElement : null;
             groupHeader?.focus(focusOptions);
@@ -1089,7 +1090,7 @@ export const DropDownContainer = forwardRef<
         };
     }, [innerRef.current, reference.current, elem.current, resizeHandler]);
 
-    const { Menu, ComboBox } = state.components;
+    const { Menu, ComboBox } = state.components ?? {};
 
     const attachedTo = props.listAttach && props.children;
     const editable = isEditable({
@@ -1098,7 +1099,7 @@ export const DropDownContainer = forwardRef<
     });
 
     // Combo box
-    const comboBoxProps = {
+    const comboBoxProps: DropDownComboBoxProps = {
         ...state,
         inputRef: inputElem,
         disabled: props.disabled,
@@ -1109,7 +1110,7 @@ export const DropDownContainer = forwardRef<
         onDeleteSelectedItem,
         onClearSelection,
     };
-    const comboBox = !props.listAttach && (
+    const comboBox = !props.listAttach && !!ComboBox && (
         <ComboBox
             {...comboBoxProps}
             ref={referenceRef}
@@ -1160,12 +1161,12 @@ export const DropDownContainer = forwardRef<
                 multiple: props.multiple,
                 onInput,
                 components: {
-                    Input: props.components.Input,
+                    Input: props.components?.Input ?? null,
                 },
             };
         }
 
-        return st.visible && (
+        return st.visible && !!Menu && (
             <Menu {...menuProps} ref={elementRef} />
         );
     }, [state.items, state.activeItem, state.visible, state.inputString]);
@@ -1196,7 +1197,7 @@ export const DropDownContainer = forwardRef<
     }
 
     // Native select
-    const { NativeSelect } = state.components;
+    const { NativeSelect } = state.components ?? {};
 
     const nativeSelectProps: DropDownNativeSelectProps = {
         id: props.id,

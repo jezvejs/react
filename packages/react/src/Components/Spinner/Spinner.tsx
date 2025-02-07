@@ -1,25 +1,14 @@
 import classNames from 'classnames';
-
 import './Spinner.scss';
 
-export interface SpinnerProps {
-    id: string,
-    className: string,
-}
+export type SpinnerProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Spinner component
  */
-export const Spinner = (props: SpinnerProps) => {
-    const {
-        className,
-        ...rest
-    } = props;
-
-    return (
-        <div
-            className={classNames('spinner', className)}
-            {...rest}
-        />
-    );
-};
+export const Spinner = (props: SpinnerProps) => (
+    <div
+        {...props}
+        className={classNames('spinner', props.className)}
+    />
+);

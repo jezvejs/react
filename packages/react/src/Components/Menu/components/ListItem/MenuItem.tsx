@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import {
     MenuItemComponent,
     MenuItemProps,
-    NativeButtonType,
+    MenuNativeButtonType,
 } from '../../types.ts';
 import './MenuItem.scss';
 
@@ -129,7 +129,7 @@ export const MenuItem: MenuItemComponent = memo<MenuItemProps>((p: MenuItemProps
         return <a {...commonProps}>{content}</a>;
     }
 
-    const btnType = (isCheckbox) ? 'button' : (type as NativeButtonType);
+    const btnType = (isCheckbox) ? 'button' : (type as MenuNativeButtonType);
     return (
         <button
             {...commonProps}

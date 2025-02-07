@@ -48,7 +48,7 @@ export type DropDownMultiSelectionItemProps = TagProps;
 export type DropDownMultiSelectionItemComponent = React.FC<DropDownMultiSelectionItemProps> & {
     selector: string;
     buttonClass: string;
-    placeholderClass: string;
+    placeholderClass?: string;
 };
 
 /**
@@ -88,12 +88,12 @@ export type DropDownInputComponent = React.ForwardRefExoticComponent<
  */
 export interface OptionProps {
     id: string,
-    title: string,
+    title?: string,
 }
 
 export interface OptGroupProps {
     id: string,
-    title: string,
+    title?: string,
     type: 'group',
     disabled?: boolean,
     items: OptionProps[],
@@ -145,7 +145,7 @@ export interface DropDownMenuHeaderProps {
     multiple?: boolean;
     onInput?: (params: DropDownOnInputParam<DropDownState> | null) => void;
     components?: {
-        Input: DropDownInputComponent | null;
+        Input?: DropDownInputComponent | null;
     };
 }
 
@@ -203,7 +203,7 @@ export interface DropDownMenuProps extends MenuProps<DropDownMenuHeaderProps> {
 
     header?: DropDownMenuHeaderProps;
 
-    components: DropDownMenuComponents;
+    components?: Partial<DropDownMenuComponents>;
 }
 
 export type DropDownMenuRef = HTMLDivElement | null;
@@ -244,7 +244,7 @@ export type DropDownPlaceholderComponent = React.FC<DropDownPlaceholderProps>;
 export interface DropDownSingleSelectionProps {
     className?: string;
     item: {
-        title: string;
+        title?: string;
     };
 }
 
@@ -303,6 +303,7 @@ export interface OnDeleteSelectedItemParam {
 export interface DropDownComboBoxProps {
     className?: string;
     inputRef: React.MutableRefObject<HTMLInputElement | null>;
+    items?: DropDownMenuItemProps[];
     inputString: string | null;
     multiple?: boolean;
     editable?: boolean;
@@ -320,7 +321,7 @@ export interface DropDownComboBoxProps {
     onClearSelection: () => void;
     onToggle: () => void;
 
-    components: DropDownComboBoxComponents;
+    components?: Partial<DropDownComboBoxComponents>;
 }
 
 export type DropDownComboBoxRef = HTMLDivElement | null;
@@ -353,7 +354,7 @@ export interface DropDownCreateGroupParam {
  * DropDown children components
  */
 export interface DropDownComponents {
-    Input: DropDownInputComponent | null;
+    Input: DropDownInputComponent;
     NativeSelect: DropDownNativeSelectComponent;
     Placeholder: DropDownPlaceholderComponent;
     SingleSelection: DropDownSingleSelectionComponent;
@@ -377,7 +378,7 @@ export interface DropDownComponents {
  */
 export interface DropDownProps {
     /* DropDown container element 'id' property */
-    id: string;
+    id?: string;
     /* DropDown menu items */
     items?: DropDownMenuItemProps[];
     /* Select element 'name' property */
@@ -446,6 +447,8 @@ export interface DropDownProps {
     onChange: ((params: DropDownSelectionParam | null) => void) | null;
     /* filter input event handler */
     onInput?: (params: DropDownOnInputParam<DropDownState> | null) => void;
+    /* click event handler */
+    onClick?: React.MouseEventHandler | null;
 
     isAvailableItem?: ((item: MenuItemProps, state: MenuState) => boolean) | null;
 
@@ -457,7 +460,7 @@ export interface DropDownProps {
     ) | null;
 
     /* Children components */
-    components: DropDownComponents;
+    components?: Partial<DropDownComponents>;
 }
 
 export interface DropDownState extends DropDownProps {

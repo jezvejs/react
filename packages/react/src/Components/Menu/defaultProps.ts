@@ -49,15 +49,12 @@ export const defaultProps: MenuProps = {
     activeItem: null,
     items: [],
     components: {
-        Header: null,
         List: MenuList,
         ListItem: MenuItem,
-        ListPlaceholder: null,
         Check: MenuCheckbox,
         Separator: MenuSeparator,
         GroupHeader: MenuGroupHeader,
         GroupItem: MenuGroupItem,
-        Footer: null,
     },
 };
 

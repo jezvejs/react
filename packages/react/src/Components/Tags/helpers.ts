@@ -13,6 +13,6 @@ export const removeItemsById = (state: TagsProps, itemId: string | string[]) => 
 
     return {
         ...state,
-        items: state.items.filter((item) => !ids.includes(item.id.toString())),
+        items: state.items.filter((item) => !ids.includes(item.id?.toString())),
     };
 };

@@ -52,14 +52,31 @@ export interface BaseChartBaseItem {
     active: boolean,
 }
 
+export type BaseChartItemSearchResult<
+    ITEM extends BaseChartBaseItem = BaseChartBaseItem
+> = {
+    item: ITEM | BaseChartDataItemsGroup<ITEM> | null;
+    index: number;
+    x?: number;
+    series?: BaseChartDataSerie | null;
+    group?: BaseChartDataItemsGroup<ITEM> | null;
+    value?: number;
+    valueOffset?: number;
+    groupIndex?: number;
+    columnIndex?: number;
+    category?: BaseChartDataCategory;
+    categoryIndex?: number;
+};
+
 /** Target item */
-export interface BaseChartTarget extends BaseChartBaseItem {
-    item: BaseChartBaseItem | null,
-    group: BaseChartBaseItem[] | null,
-}
+export type BaseChartTarget<
+    ITEM extends BaseChartBaseItem = BaseChartBaseItem
+> = BaseChartItemSearchResult<ITEM>;
 
 /** Group of data items */
-export type BaseChartDataItemsGroup = (BaseChartBaseItem | null)[];
+export type BaseChartDataItemsGroup<
+    ITEM extends BaseChartBaseItem = BaseChartBaseItem
+> = (ITEM | null)[];
 
 /** 'XAxisLabels' component types */
 export type BaseChartXAxisLabelsPosition = 'bottom' | 'top' | 'none';
@@ -95,8 +112,8 @@ export type BaseChartPopupContainerComponent = React.ForwardRefExoticComponent<
 /**
  * Chart popup component
  */
-export interface BaseChartPopupProps {
-    target: BaseChartTarget;
+export interface BaseChartPopupProps<ITEM extends BaseChartBaseItem = BaseChartBaseItem> {
+    target: BaseChartTarget<ITEM>;
 }
 
 export type BaseChartPopupComponent = ComponentType<BaseChartPopupProps>;
@@ -311,20 +328,6 @@ export interface BaseChartVisibleItems<DataItemsGroup = BaseChartDataItemsGroup>
     lastGroupIndex: number;
     visibleGroups: number;
     items: DataItemsGroup[];
-}
-
-export interface BaseChartItemSearchResult {
-    item: object | null;
-    index: number;
-    x?: number;
-    series?: BaseChartDataSerie | null;
-    group?: BaseChartBaseItem[];
-    value?: number;
-    valueOffset?: number;
-    groupIndex?: number;
-    columnIndex?: number;
-    category?: BaseChartDataCategory;
-    categoryIndex?: number;
 }
 
 export interface BaseChartXAxisLabelProps {

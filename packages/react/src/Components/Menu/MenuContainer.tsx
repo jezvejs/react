@@ -498,7 +498,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         setState((prev: MenuState) => ({
             ...prev,
             items: mapItems(
-                createItems(props.items, prev),
+                createItems(props.items ?? [], prev),
                 (item) => (
                     (item.active !== (item.id === props.activeItem))
                         ? { ...item, active: !item.active }

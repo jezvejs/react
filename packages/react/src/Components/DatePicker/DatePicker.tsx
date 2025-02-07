@@ -6,6 +6,7 @@ import {
 
 import { StoreProvider } from '../../utils/Store/StoreProvider.tsx';
 import { combineReducers } from '../../utils/combineReducers.ts';
+import { DragnDropProvider } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 
 // Local components
 import { DatePickerContainer } from './components/Container/DatePickerContainer.tsx';
@@ -20,8 +21,8 @@ import { reducer } from './reducer.ts';
 import * as DatePickerHelpers from './helpers.ts';
 import { DatePickerProps } from './types.ts';
 import './DatePicker.scss';
-import { DragnDropProvider } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 
+export * from './types.ts';
 export {
     // Child components
     DatePickerHeader,

@@ -5,8 +5,8 @@ import { CloseButton } from '../CloseButton/CloseButton.tsx';
 import './Tag.scss';
 
 export interface TagProps {
-    id: string,
-    title: string,
+    id?: string,
+    title?: string,
     active?: boolean,
     disabled?: boolean,
     closeable?: boolean,

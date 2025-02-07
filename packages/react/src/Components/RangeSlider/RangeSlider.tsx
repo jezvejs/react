@@ -11,6 +11,8 @@ import './RangeSlider.scss';
 
 type RangeSliderRef = HTMLDivElement | null;
 
+export type * from './types.ts';
+
 export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, ref) => {
     const {
         tabIndex = 0,

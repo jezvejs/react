@@ -3,10 +3,10 @@ import classNames from 'classnames';
 import './Progress.scss';
 
 export interface ProgressProps {
-    id: string,
-    className: string,
-    disabled: boolean,
-    value: number,
+    id?: string,
+    className?: string,
+    disabled?: boolean,
+    value?: number,
 }
 
 const defaultProps = {

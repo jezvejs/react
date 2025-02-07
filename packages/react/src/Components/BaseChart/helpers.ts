@@ -11,6 +11,7 @@ import {
     BaseChartItemSearchResult,
     BaseChartProps,
     BaseChartState,
+    BaseChartTarget,
 } from './types.ts';
 
 const SVG_VALUE_PRECISION = 3;
@@ -18,13 +19,13 @@ const SVG_VALUE_PRECISION = 3;
 /**
  * Returns true if objects target to the same data items
  *
- * @param {BaseChartBaseItem} a
- * @param {BaseChartBaseItem} b
+ * @param {BaseChartBaseItem | BaseChartTarget} a
+ * @param {BaseChartBaseItem | BaseChartTarget} b
  * @returns {boolean}
  */
 export const isSameTarget = (
-    a: BaseChartBaseItem | null,
-    b: BaseChartBaseItem | null,
+    a: BaseChartBaseItem | BaseChartTarget | null,
+    b: BaseChartBaseItem | BaseChartTarget | null,
 ): boolean => (
     (a === b) || (
         !!a
@@ -336,11 +337,11 @@ export const isVerticalScaleNeeded = (
 );
 
 /** Find item by event object */
-export const findItemByEvent = (
+export function findItemByEvent<ITEM extends BaseChartBaseItem = BaseChartBaseItem>(
     e: React.MouseEvent,
     state: BaseChartState,
     elem: Node,
-): BaseChartItemSearchResult => {
+): BaseChartItemSearchResult<ITEM> {
     if (
         !state?.contentOffset
         || !elem?.contains(e?.target as Node)
@@ -348,8 +349,8 @@ export const findItemByEvent = (
         return { item: null, index: -1 };
     }
 
-    const { contentOffset } = state;
-    const { items } = state.dataSeries;
+    const { contentOffset, dataSeries } = state;
+    const items = dataSeries.items as BaseChartDataItemsGroup<ITEM>[];
 
     const firstGroupIndex = state.getFirstVisibleGroupIndex(state);
 
@@ -367,4 +368,4 @@ export const findItemByEvent = (
         index,
         series: state.getSeriesByIndex(index, state),
     };
-};
+}

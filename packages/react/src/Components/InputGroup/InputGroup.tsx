@@ -2,15 +2,15 @@ import classNames from 'classnames';
 import { ReactNode } from 'react';
 import './InputGroup.scss';
 
-export { InputGroupInput } from './components/Input/InputGroupInput.tsx';
-export { InputGroupText } from './components/Text/InputGroupText.tsx';
-export { InputGroupButton } from './components/Button/InputGroupButton.tsx';
-export { InputGroupInnerButton } from './components/InnerButton/InputGroupInnerButton.tsx';
-export { InputGroupOuterContainer } from './components/OuterContainer/InputGroupOuterContainer.tsx';
+export * from './components/Input/InputGroupInput.tsx';
+export * from './components/Text/InputGroupText.tsx';
+export * from './components/Button/InputGroupButton.tsx';
+export * from './components/InnerButton/InputGroupInnerButton.tsx';
+export * from './components/OuterContainer/InputGroupOuterContainer.tsx';
 
 export interface InputGroupProps {
-    className: string,
-    children: ReactNode,
+    className?: string,
+    children?: ReactNode,
 }
 
 /**

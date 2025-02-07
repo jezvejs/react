@@ -15,12 +15,12 @@ export type RangeScrollChartChangeType =
 
 // Main chart props
 export interface RangeScrollChartMainProps extends Partial<BaseChartProps> {
-    type: ChartType;
+    type?: ChartType;
 }
 
 // Navigation chart props
-export interface RangeScrollChartNavigationProps extends BaseChartProps {
-    type: ChartType;
+export interface RangeScrollChartNavigationProps extends Partial<BaseChartProps> {
+    type?: ChartType;
 }
 
 export interface RangeScrollChartProps {

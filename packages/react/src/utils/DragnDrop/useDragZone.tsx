@@ -9,6 +9,7 @@ import { useDragnDrop } from './DragnDropProvider.tsx';
 import {
     DragAvatarInfo,
     DragAvatarInitParam,
+    DragHandle,
     DragnDropState,
     DragZone,
     OnDragMoveParams,
@@ -22,6 +23,7 @@ export interface UseDragZoneProps {
     top?: number;
     dragOriginal?: boolean;
     absolutePos?: boolean;
+    handles?: DragHandle | DragHandle[];
 
     mouseMoveThreshold?: number;
     touchMoveTimeout?: number;
@@ -29,16 +31,19 @@ export interface UseDragZoneProps {
     elem?: Element | null;
 }
 
-export function useDragZone(props: UseDragZoneProps) {
+export function useDragZone<
+    ZONE_ELEM extends Element = HTMLElement,
+    AVATAR_ELEM extends Element = HTMLElement
+>(props: UseDragZoneProps) {
     const {
         dragOriginal = false,
         ...dragZoneProps
     } = props;
 
-    const dragZoneRef = useRef<Element | null>(null);
-    const avatarRef = useRef<HTMLElement | null>(null);
+    const dragZoneRef = useRef<ZONE_ELEM | null>(null);
+    const avatarRef = useRef<AVATAR_ELEM | null>(null);
     const animationFrameRef = useRef<number>(0);
-    const currentTargetElemRef = useRef<Element | null>(null);
+    const currentTargetElemRef = useRef<ZONE_ELEM | null>(null);
 
     const { getState, setState } = useDragnDrop<DragnDropState>();
 
@@ -125,11 +130,15 @@ export function useDragZone(props: UseDragZoneProps) {
                         const page = DragMaster.getEventPageCoordinates(e);
                         const client = DragMaster.getEventClientCoordinates(e);
 
+                        if (!avatarRef.current) {
+                            return;
+                        }
+
                         currentTargetElemRef.current = DragMaster.getElementUnderClientXY(
-                            avatarRef.current,
+                            avatarRef.current as Element as HTMLElement,
                             client.x,
                             client.y,
-                        );
+                        ) as ZONE_ELEM;
 
                         animationFrameRef.current = requestAnimationFrame(() => {
                             animationFrameRef.current = 0;
