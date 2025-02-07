@@ -130,6 +130,12 @@ export function useDragZone<
                         const page = DragMaster.getEventPageCoordinates(e);
                         const client = DragMaster.getEventClientCoordinates(e);
 
+                        setState((prev: DragnDropState) => ({
+                            ...prev,
+                            dragging: true,
+                            draggingId: props.id,
+                        }));
+
                         if (!avatarRef.current) {
                             return;
                         }
