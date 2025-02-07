@@ -202,13 +202,13 @@ export function findLastMenuItem<T extends MenuItemProps = MenuItemProps>(
  */
 export function getItemById<T extends MenuItemProps = MenuItemProps>(
     id: string | null,
-    items: T[],
+    items?: T[],
 ): T | null {
     if (id === null) {
         return null;
     }
 
-    return findMenuItem<T>(items, (item: T) => item.id?.toString() === id);
+    return findMenuItem<T>(items ?? [], (item: T) => item.id?.toString() === id);
 }
 
 /**

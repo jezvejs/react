@@ -10,12 +10,14 @@ const autoFeatures = {
     autoCorrect: 'off',
 };
 
+export * from './types.ts';
+
 export const ControlledInputHelpers = {
     getInputContent,
     replaceSelection,
 };
 
-export const ControlledInput = (props: ControlledInputProps) => {
+export const ControlledInput: React.FC<ControlledInputProps> = (props) => {
     const {
         handleValueProperty = true,
         disableAutoFeatures = true,

@@ -7,6 +7,8 @@ import { arraySum } from './helpers.ts';
 import { PieChartProps, PieChartSectorProps } from './types.ts';
 import './PieChart.scss';
 
+export * from './types.ts';
+
 export const PieChart = (props: PieChartProps) => {
     const {
         radius = 150,

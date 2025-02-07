@@ -8,10 +8,10 @@ import { StoreDispatchFunction, StoreReducersList } from '../../utils/Store/Stor
 
 export type MenuItemContentAlign = 'left' | 'right';
 
-export type NativeButtonType = 'button' | 'submit' | 'reset';
+export type MenuNativeButtonType = 'button' | 'submit' | 'reset';
 
 export type MenuItemButtonType =
-    NativeButtonType
+    MenuNativeButtonType
     | 'link'
     | 'checkbox'
     | 'checkbox-link';
@@ -68,12 +68,12 @@ export interface OnGroupHeaderClickParam<T = MenuState> {
  */
 export interface MenuItemProps {
     id: string;
-    type: MenuItemType;
+    type?: MenuItemType;
     group?: string | null;
     parentId?: string;
 
     className?: string;
-    title: string;
+    title?: string;
     url?: string;
 
     active?: boolean;
@@ -105,8 +105,8 @@ export interface MenuItemProps {
  * Separator menu item props
  */
 export interface MenuSeparatorProps {
-    id: string;
-    type: string;
+    id?: string;
+    type?: string;
     className?: string;
 }
 
@@ -114,16 +114,19 @@ export interface MenuSeparatorProps {
  * Menu group item props
  */
 export interface MenuGroupItemProps extends MenuItemProps {
-    items: MenuItemProps[];
+    items?: MenuItemProps[];
 
-    header: MenuGroupHeaderProps;
-    list: MenuListProps;
+    header?: MenuGroupHeaderProps;
+    list?: MenuListProps;
+
+    /* Enables activation of menu group header */
+    allowActiveGroupHeader?: boolean;
 
     getItemProps?: (
         (item: MenuItemProps, state: MenuListProps) => MenuItemProps
     ) | null;
 
-    components: MenuCommonComponents;
+    components?: MenuCommonComponents;
 }
 
 /**
@@ -141,7 +144,7 @@ export interface MenuListProps {
 
     activeItem?: string | null;
     disabled?: boolean;
-    defaultItemType?: string;
+    defaultItemType?: MenuItemType;
     renderNotSelected?: boolean;
     tabThrough?: boolean;
 
@@ -170,13 +173,14 @@ export interface MenuListProps {
 
     getPlaceholderProps?: ((state: MenuListProps) => (MenuPlaceholderProps | null)) | null;
 
-    components: MenuCommonComponents;
+    components?: MenuCommonComponents;
 }
 
 /**
  * 'ListPlaceholder' component props
  */
 export interface MenuPlaceholderProps {
+    title?: string;
     className?: string;
     active?: boolean;
     selectable?: boolean;
@@ -199,16 +203,16 @@ export type MenuGroupItemComponent = React.FC<MenuGroupItemProps> & WithSelector
 /**
  * Menu group header component
  */
-export type MenuGroupHeaderProps = MenuItemProps;
+export type MenuGroupHeaderProps = Partial<MenuItemProps>;
 
 export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & WithSelector;
 
 export interface MenuCommonComponents {
-    List?: ComponentType<MenuListProps>;
-    ListItem?: MenuItemComponent;
+    List?: ComponentType<MenuListProps> | null;
+    ListItem?: MenuItemComponent | null;
     ListPlaceholder?: MenuPlaceholderComponent | null;
     Check?: ComponentType | null;
-    Separator?: ComponentType<MenuSeparatorProps>;
+    Separator?: ComponentType<MenuSeparatorProps> | null;
     GroupHeader?: MenuGroupHeaderComponent;
     GroupItem?: MenuGroupItemComponent;
 }
@@ -239,7 +243,7 @@ export interface MenuProps<
     /* If enabled component will use parent store provider */
     useParentContext?: boolean;
     /* Children menu items */
-    items: MenuItemProps[];
+    items?: MenuItemProps[];
     /* Additional CSS class names */
     className?: string | null;
     /* CSS selector for menu element */
@@ -247,7 +251,7 @@ export interface MenuProps<
     /* CSS selector for menu item element */
     itemSelector?: string | null;
     /* Default type of menu item */
-    defaultItemType?: string;
+    defaultItemType?: MenuItemType;
     /* Alignment of icon component inside menu item */
     iconAlign?: MenuItemContentAlign;
     /* Select alignment of checkbox component inside menu item */

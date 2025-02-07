@@ -2,6 +2,7 @@ import { asArray } from '@jezvejs/types';
 import {
     forwardRef,
     useMemo,
+    useRef,
 } from 'react';
 
 import { StoreProvider } from '../../utils/Store/StoreProvider.tsx';
@@ -34,6 +35,7 @@ import * as DropDownHelpers from './helpers.ts';
 import { reducer } from './reducer.ts';
 import { DropDownProps } from './types.ts';
 import './DropDown.scss';
+import { MenuHelpers } from '../Menu/MenuContainer.tsx';
 
 export {
     // Child components
@@ -68,7 +70,7 @@ type DropDownRef = HTMLDivElement | null;
 /**
  * DropDown component
  */
-export const DropDown = forwardRef<DropDownRef, DropDownProps>((props, ref) => {
+export const DropDown = forwardRef<DropDownRef, Partial<DropDownProps>>((props, ref) => {
     const reducers = useMemo(() => {
         const extraReducers = asArray(props.reducers);
         return (extraReducers.length > 0)
@@ -76,8 +78,15 @@ export const DropDown = forwardRef<DropDownRef, DropDownProps>((props, ref) => {
             : reducer;
     }, [props.reducers]);
 
+    const defaultId = useRef(MenuHelpers.generateMenuId('dropdown'));
+
+    const defProps = {
+        ...DropDownDefProps.defaultProps,
+        id: defaultId.current,
+    };
+
     const initialState = (
-        DropDownHelpers.getInitialState(props, DropDownDefProps.defaultProps)
+        DropDownHelpers.getInitialState(props, defProps)
     );
 
     return (

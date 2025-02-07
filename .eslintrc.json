@@ -4,6 +4,7 @@
         "airbnb-base",
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
@@ -41,6 +42,9 @@
         "class-methods-use-this": [
             "warn"
         ],
+        "import/no-cycle": [
+            "warn"
+        ],
         "import/prefer-default-export": [
             "warn"
         ],
@@ -63,6 +67,16 @@
     "settings": {
         "react": {
             "version": "18.2"
+        },
+        "import/parsers": {
+            "@typescript-eslint/parser": [
+                ".ts",
+                ".tsx"
+            ]
+        },
+        "import/resolver": {
+            "typescript": true,
+            "node": true
         }
     }
 }

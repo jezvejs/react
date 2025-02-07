@@ -13,6 +13,10 @@ export const BaseChartActiveGroup = (props: BaseChartState) => {
 
     const groupWidth = props.getGroupOuterWidth(props);
     const { groupIndex } = props.activeTarget;
+    if (typeof groupIndex !== 'number') {
+        return null;
+    }
+
     const rectProps = {
         x: formatCoord(groupIndex * groupWidth),
         y: 0,

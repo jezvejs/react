@@ -15,5 +15,5 @@ export interface ControlledInputProps extends InputProps {
     onValidateInput?: (e: ControlledInputEvent) => void;
     onValue?: (value: string, prev: string) => string;
 
-    onSelectCapture?: (e: React.SyntheticEvent) => void;
+    onSelectCapture?: (e: React.SyntheticEvent<HTMLInputElement>) => void;
 }

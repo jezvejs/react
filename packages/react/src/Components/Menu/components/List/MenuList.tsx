@@ -30,7 +30,7 @@ export const MenuList = (p: MenuListProps) => {
     };
 
     const { components } = props;
-    const { ListPlaceholder } = components;
+    const { ListPlaceholder } = components ?? {};
     const { getState } = useMenuStore(props as MenuProps);
 
     /**
@@ -71,7 +71,7 @@ export const MenuList = (p: MenuListProps) => {
             ListItem,
             Separator,
             GroupItem,
-        } = props.components;
+        } = props.components ?? {};
         const st = getState();
 
         const item = props.getItemProps?.(itemData, st as MenuListProps) ?? itemData;
@@ -82,7 +82,7 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         if (item.type === 'separator') {
-            return Separator && <Separator {...item} key={item.id} />;
+            return !!Separator && <Separator {...item} key={item.id} />;
         }
 
         if (item.type === 'group') {

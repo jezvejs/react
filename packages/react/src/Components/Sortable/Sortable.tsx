@@ -38,6 +38,8 @@ import {
 import { useSortableDragZone } from './useSortableDragZone.tsx';
 import { useSortableDropTarget } from './useSortableDropTarget.tsx';
 
+export * from './types.ts';
+
 export {
     SortableItemWrapper,
 };

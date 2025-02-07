@@ -1,6 +1,5 @@
-import { BaseChartProps } from '../../../BaseChart/types.ts';
-import { Histogram } from '../../../Histogram/Histogram.tsx';
-import { LineChart } from '../../../LineChart/LineChart.tsx';
+import { Histogram, HistogramProps } from '../../../Histogram/Histogram.tsx';
+import { LineChart, LineChartProps } from '../../../LineChart/LineChart.tsx';
 
 import { RangeScrollChartNavigationProps } from '../../types.ts';
 import './RangeScrollChartNavigation.scss';
@@ -28,20 +27,28 @@ export const RangeScrollChartNavigation = (p: RangeScrollChartNavigationProps) =
 
     const { type, ...commonProps } = props;
 
-    const navChartProps: BaseChartProps = {
+    const navChartProps = {
         ...defaultProps,
         ...commonProps,
         className: 'range-scroll-chart__nav-chart',
         fitToWidth: true,
     };
 
-    if (!(type in chartTypesMap)) {
+    if (typeof type !== 'string' || !(type in chartTypesMap)) {
         return null;
     }
 
-    const ChartComponent = chartTypesMap[type];
+    if (type === 'linechart') {
+        const lineChartProps = navChartProps as LineChartProps;
+
+        return (
+            <LineChart {...lineChartProps} />
+        );
+    }
+
+    const histogramProps = navChartProps as HistogramProps;
 
     return (
-        <ChartComponent {...navChartProps} />
+        <Histogram {...histogramProps} />
     );
 };

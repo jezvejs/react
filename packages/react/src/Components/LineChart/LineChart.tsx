@@ -19,6 +19,8 @@ import {
 } from './types.ts';
 import './LineChart.scss';
 
+export * from './types.ts';
+
 /**
  * LineChart component
  */
@@ -128,24 +130,26 @@ export const LineChart = (props: LineChartProps) => {
             state: BaseChartState,
             elem: Element,
         ): BaseChartItemSearchResult | null => {
-            const result = BaseChartHelpers.findItemByEvent(e, state, elem);
+            const result = BaseChartHelpers.findItemByEvent<LineChartDataItemType>(e, state, elem);
             if (!Array.isArray(result.item)) {
                 return result;
             }
 
             const y = e.nativeEvent.offsetY;
-            const diffs = result.item.map((item, ind) => ({ ind, diff: Math.abs(y - item.cy) }));
+            const diffs = result.item
+                .filter((item) => !!item)
+                .map((item, ind) => ({ ind, diff: Math.abs(y - item.cy) }));
             diffs.sort((a, b) => a.diff - b.diff);
 
             let item: LineChartDataItemType | null = null;
             let index = diffs[0].ind;
             if (index >= 0 && index < result.item.length) {
-                item = result.item[index];
+                item = result.item[index] as LineChartDataItemType;
             } else {
                 index = -1;
             }
 
-            const res = {
+            const res: BaseChartItemSearchResult = {
                 item,
                 index,
                 series: result.series,

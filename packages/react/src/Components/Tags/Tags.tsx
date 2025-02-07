@@ -25,7 +25,7 @@ export interface TagsProps<T extends TagProps = TagProps> {
     listMode?: string;
 
     items: T[];
-    ItemComponent: ComponentType<T>;
+    ItemComponent?: ComponentType<T>;
 
     onItemClick?: (itemId: string, e: ClickEventType) => void;
 
@@ -33,6 +33,7 @@ export interface TagsProps<T extends TagProps = TagProps> {
 }
 
 const defaultProps = {
+    items: [],
     ItemComponent: Tag,
     activeItemId: null,
     closeable: false,

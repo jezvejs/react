@@ -13,6 +13,7 @@ import { reducer } from './reducer.ts';
 import { BaseChartProps } from './types.ts';
 import './BaseChart.scss';
 
+export * from './types.ts';
 export {
     BaseChartHelpers,
 };

@@ -250,11 +250,12 @@ const slice = createSlice({
                 return;
             }
 
-            exactMatch = exactMatch || item.title.toLowerCase() === lfstr;
+            const lowerTitle = item.title?.toLowerCase() ?? '';
+            exactMatch = exactMatch || lowerTitle === lfstr;
 
             const newItem = {
                 ...item,
-                matchFilter: item.title.toLowerCase().includes(lfstr),
+                matchFilter: lowerTitle.includes(lfstr),
                 active: false,
             };
             if (newItem.type === 'group') {

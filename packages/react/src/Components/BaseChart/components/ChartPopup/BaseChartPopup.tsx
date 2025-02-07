@@ -7,13 +7,17 @@ import './BaseChartPopup.scss';
 export const BaseChartPopup = (props: BaseChartPopupProps) => {
     const { target } = props;
 
+    if (!target?.item || Array.isArray(target.item)) {
+        return null;
+    }
+
     const content = (!target?.group)
         ? <span>{target.item?.value}</span>
         : (
             <ul className="chart__popup-list">
                 {target.group.map((item, ind: number) => (
                     <li className="chart__popup-list-item" key={`chpopupli_${ind}`}>
-                        {item.value}
+                        {item?.value}
                     </li>
                 ))}
             </ul>

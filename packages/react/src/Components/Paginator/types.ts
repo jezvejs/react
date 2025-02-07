@@ -9,9 +9,9 @@ export interface PaginatorItemProps {
 }
 
 export interface PaginatorCommonItemProps {
-    allowActiveLink: boolean;
-    pageParam: string;
-    url: string;
+    allowActiveLink?: boolean;
+    pageParam?: string;
+    url?: string;
 }
 
 export interface PaginatorArrowProps {
@@ -37,7 +37,7 @@ export interface PaginatorProps {
     showSingleItem: boolean;
     arrows: boolean;
     pageParam: string;
-    url: string;
+    url?: string;
     onChange: (page: number) => void;
 }
 

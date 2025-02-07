@@ -18,7 +18,7 @@ interface WeekDayParams {
 }
 
 const defaultProps = {
-    defaultItemType: 'link',
+    defaultItemType: 'link' as MenuItemType,
     locales: [],
 };
 

@@ -5,6 +5,7 @@ import {
 import { Point } from '../../utils/types.ts';
 import {
     DragAvatar,
+    DragHandle,
     DragnDropState,
     DragZone,
     DropTarget,
@@ -28,7 +29,7 @@ export interface SortableTreeItem extends BaseTreeItem {
 
     title?: string;
     className?: string;
-    group?: string;
+    group?: string | GetGroupFunction;
     placeholder?: boolean;
     style?: React.CSSProperties,
 
@@ -84,9 +85,10 @@ export interface SortableDragAvatar extends DragAvatar {
 }
 
 export interface SortableAvatarColumn {
-    innerStyle: {
-        width: string;
-    },
+    id?: string;
+    style?: Partial<React.CSSProperties>;
+    innerStyle?: Partial<React.CSSProperties>;
+    content?: React.ReactNode;
 }
 
 export interface SortableAvatarState {
@@ -157,12 +159,21 @@ export interface OnSortMoveParam {
     animateElems: SortableItemAnimation[] | null;
 }
 
+type WithSelector = {
+    selector?: string;
+};
+
 /**
  * 'ListItem' component type
  */
-export type SortableListItemComponent = ForwardRefExoticComponent<
-    SortableItemWrapperProps & RefAttributes<SortableItemWrapperRef>
->;
+export type SortableListItemComponent = (
+    (React.FC<SortableItemWrapperProps> & WithSelector)
+    | (
+        ForwardRefExoticComponent<
+            SortableItemWrapperProps & RefAttributes<SortableItemWrapperRef>
+        > & WithSelector
+    )
+);
 
 /**
  * 'Avatar' component type
@@ -176,7 +187,7 @@ export interface SortableItemWrapperProps extends SortableTreeItem {
     id: string;
     items?: SortableTreeItem[];
 
-    group?: string;
+    group?: string | GetGroupFunction;
     zoneId?: string;
 
     title?: string;
@@ -196,6 +207,8 @@ export interface SortableItemWrapperProps extends SortableTreeItem {
     rect?: AnimationBox;
     targetRect?: AnimationBox;
     childContainer?: AnimationBox;
+
+    renderItem?: (item: SortableTreeItem) => React.ReactNode;
 
     components?: {
         ItemWrapper?: SortableListItemComponent;
@@ -296,21 +309,35 @@ export interface SortableAnimationTransform {
 /**
  * Sortable props
  */
-export interface SortableProps {
+export interface SortableProps<ITEM_TYPE = SortableTreeItem> {
     id?: string;
+    group?: string | GetGroupFunction;
     className?: string;
     itemId?: string | null;
+    items?: ITEM_TYPE[];
+    selector?: string;
+    containerSelector?: string;
     placeholderClass?: string;
     animatedClass?: string;
     dragClass?: string | boolean;
+    handles?: DragHandle | DragHandle[];
+    onlyRootHandle?: boolean;
+
     table?: boolean;
     wrapInTbody?: boolean;
     tree?: boolean;
     vertical?: boolean;
     animated?: boolean;
     copyWidth?: boolean;
+    allowSingleItemSort?: boolean;
     transitionTimeout?: number;
+
+    container: Element | DocumentFragment | null;
     onSort?: (params: OnSortParam) => void;
+
+    // renderItem?: (item: ITEM_TYPE) => React.ReactNode;
+    renderItem?: (item: SortableTreeItem) => React.ReactNode;
+
     components?: {
         ListItem?: SortableListItemComponent;
         Avatar?: SortableAvatarComponent;
@@ -358,7 +385,9 @@ export type SortablePositionType = 'boxes' | 'targetBoxes';
 /**
  * Sortable state
  */
-export interface SortableState extends DragnDropState, SortableProps {
+export interface SortableState<
+    ITEM_TYPE = SortableTreeItem
+> extends DragnDropState, SortableProps<ITEM_TYPE> {
     zones: {
         [id: string]: SortableZone;
     },

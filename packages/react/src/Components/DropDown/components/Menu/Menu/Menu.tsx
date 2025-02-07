@@ -28,16 +28,6 @@ const defaultProps = {
         inputPlaceholder: '',
         useSingleSelectionAsPlaceholder: false,
     },
-    components: {
-        Header: null,
-        Input: null,
-        MenuList: null,
-        ListItem: null,
-        Check: null,
-        Checkbox: null,
-        ListPlaceholder: null,
-        GroupItem: null,
-    },
 };
 
 /**
@@ -53,10 +43,6 @@ export const DropDownMenu: DropDownMenuComponent = forwardRef<
         header: {
             ...defaultProps.header,
             ...(p?.header ?? {}),
-        },
-        components: {
-            ...defaultProps.components,
-            ...(p?.components ?? {}),
         },
     };
 

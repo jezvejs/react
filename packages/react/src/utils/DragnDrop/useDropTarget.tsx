@@ -13,19 +13,19 @@ export interface UseDropTargetProps extends DropTarget {
     applyNewTarget?: (avatar: DragAvatar, elem: HTMLElement) => void,
 }
 
-export function useDropTarget(props: UseDropTargetProps) {
-    const dropTargetRef = useRef<Element | null>(null);
+export function useDropTarget<ELEM = Element>(props: UseDropTargetProps) {
+    const dropTargetRef = useRef<ELEM | null>(null);
 
     useEffect(() => {
         const dropTarget: DropTarget = {
             ...props,
 
-            elem: dropTargetRef.current,
+            elem: dropTargetRef.current as Element,
 
             onDragEnd(params: OnDragEndParams) {
                 const { avatar, e } = params;
 
-                const elem = dropTargetRef.current;
+                const elem = dropTargetRef.current as HTMLElement;
                 const offset = getOffset(elem);
                 const border = {
                     top: elem?.clientTop ?? 0,

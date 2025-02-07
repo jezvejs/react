@@ -18,7 +18,7 @@ const ButtonContent = (title: ReactNode) => (
 export type NativeButtonType = 'button' | 'submit' | 'reset';
 export type ButtonTypes = NativeButtonType | 'link' | 'static';
 
-export interface ButtonProps {
+export interface ButtonProps extends React.HTMLAttributes<HTMLElement> {
     className?: string;
     tabIndex?: number;
     type?: ButtonTypes;

@@ -5,6 +5,7 @@ import {
     BaseChartDataCategory,
     BaseChartDataGroup,
     BaseChartHorizontalAlign,
+    BaseChartPopupProps,
     BaseChartProps,
     BaseChartState,
     BaseChartVisibleItems,
@@ -14,6 +15,13 @@ export interface HistogramItemProps extends BaseChartBaseItem {
     groupName: BaseChartDataGroup;
     animateNow: boolean;
 }
+
+/**
+ * Histogram popup component
+ */
+export type HistogramPopupProps = BaseChartPopupProps<HistogramItemProps>;
+
+export type HistogramPopupComponent = React.ComponentType<HistogramPopupProps>;
 
 export interface HistogramDataItemType extends HistogramItemProps {
     x: number;

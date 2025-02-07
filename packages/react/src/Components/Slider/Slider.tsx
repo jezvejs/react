@@ -6,6 +6,8 @@ import { SliderContainer } from './SliderContainer.tsx';
 import { SliderProps } from './types.ts';
 import './Slider.scss';
 
+export * from './types.ts';
+
 export const Slider = (p: SliderProps) => {
     const defaultProps = {
         vertical: false,

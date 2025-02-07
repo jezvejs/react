@@ -14,7 +14,7 @@ import { LineChartDataSeries } from '../../../LineChart/components/DataSeries/Li
 import { LineChart } from '../../../LineChart/LineChart.tsx';
 import { LineChartComponents, LineChartProps } from '../../../LineChart/types.ts';
 
-import { RangeScrollChartMainProps } from '../../types.ts';
+import { ChartType, RangeScrollChartMainProps } from '../../types.ts';
 
 /**
  * Range scroll chart: main chart component
@@ -22,7 +22,7 @@ import { RangeScrollChartMainProps } from '../../types.ts';
  */
 export const RangeScrollChartMain = (p: RangeScrollChartMainProps) => {
     const defaultProps = {
-        type: 'histogram',
+        type: 'histogram' as ChartType,
         height: 300,
         resizeTimeout: 0,
     };

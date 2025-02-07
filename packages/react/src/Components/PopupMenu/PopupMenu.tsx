@@ -40,6 +40,8 @@ type PopupMenuRef = HTMLDivElement | null;
 
 const menuProps = MenuDefProps.getDefaultProps();
 
+export type * from './types.ts';
+
 export const PopupMenu = forwardRef<PopupMenuRef, PopupMenuProps>((p, ref) => {
     const defaultId = useRef(MenuHelpers.generateMenuId('popupmenu'));
 

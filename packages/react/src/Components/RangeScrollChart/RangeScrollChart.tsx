@@ -29,10 +29,12 @@ import {
 } from './types.ts';
 import './RangeScrollChart.scss';
 
+export * from './types.ts';
+
 /**
  * RangeScrollChart component
  */
-export const RangeScrollChart = (props: RangeScrollChartProps) => {
+export const RangeScrollChart: React.FC<RangeScrollChartProps> = (props) => {
     const {
         type = 'histogram',
         mainChart,

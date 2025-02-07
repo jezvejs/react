@@ -42,10 +42,14 @@
     "exports": {
         ".": "./src/index.ts",
         "./package.json": "./package.json",
-        "./style": "./src/common.scss"
+        "./style.scss": "./src/common.scss"
     },
     "main": "./src/index.ts",
     "module": "./src/index.ts",
+    "sideEffects": [
+        "**/*.css",
+        "**/*.scss"
+    ],
     "publishConfig": {
         "access": "public"
     }
