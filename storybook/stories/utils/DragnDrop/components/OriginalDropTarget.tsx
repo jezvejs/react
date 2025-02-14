@@ -26,6 +26,8 @@ export const OriginalDropTarget = (props: OriginalDropTargetProps) => {
     const { setState } = useDragnDrop();
 
     const { dropTargetRef } = useDropTarget<HTMLDivElement>({
+        ...props,
+
         id: props.id ?? '',
 
         onDragEnd(params: OnDragEndParams) {

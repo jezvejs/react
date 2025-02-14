@@ -18,6 +18,7 @@ import {
 
 export interface UseDragZoneProps {
     id: string;
+    type?: string;
     title?: string;
     left?: number;
     top?: number;
@@ -58,10 +59,11 @@ export function useDragZone<
 
         const dragZone = {
             makeAvatar() {
-                const { id } = props;
+                const { id, type } = props;
 
                 return {
                     id,
+                    type,
                     elem: avatarRef.current,
                     scrollRequested: false,
                     dragZone,

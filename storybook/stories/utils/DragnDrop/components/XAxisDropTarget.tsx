@@ -1,8 +1,9 @@
-import { DragMaster, OnDragEndParams } from '@jezvejs/react';
+import { DragMaster, IsDropAllowedParams, OnDragEndParams } from '@jezvejs/react';
 import { useEffect, useRef } from 'react';
 
 export type XAxisDropTargetProps = {
     id?: string;
+    isDropAllowed?: (params: IsDropAllowedParams) => boolean;
     onDragEnd?: (params: OnDragEndParams) => void;
     children?: React.ReactNode;
 };
@@ -12,6 +13,7 @@ export const XAxisDropTarget = (props: XAxisDropTargetProps) => {
 
     useEffect(() => {
         const dropTarget = {
+            ...props,
             id: props.id ?? '',
             elem: dropTargetRef?.current,
             onDragEnd({ avatar }: OnDragEndParams) {
