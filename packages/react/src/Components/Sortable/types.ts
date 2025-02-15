@@ -81,7 +81,7 @@ export interface MoveTreeItemParam {
  * Sortable drag avatar
  */
 export interface SortableDragAvatar extends DragAvatar {
-    saveSortTarget: (target: DropTarget | null) => void;
+    saveSortTarget?: (target: DropTarget | null) => void;
 }
 
 export interface SortableAvatarColumn {
@@ -244,6 +244,13 @@ export interface OnSortStartParam {
     zoneId: string | null;
 }
 
+/** acceptChild() callback params */
+export interface AcceptChildParam {
+    avatar: SortableDragAvatar;
+    e: Event;
+    dropTarget?: UseSortableDropTargetProps;
+}
+
 /** onSortEnd() callback params */
 export interface OnSortEndParam {
     avatar: SortableDragAvatar;
@@ -333,6 +340,9 @@ export interface SortableProps<ITEM_TYPE = SortableTreeItem> {
     transitionTimeout?: number;
 
     container: Element | DocumentFragment | null;
+
+    acceptChild?: (params: AcceptChildParam) => boolean;
+
     onSort?: (params: OnSortParam) => void;
 
     // renderItem?: (item: ITEM_TYPE) => React.ReactNode;
@@ -471,6 +481,9 @@ export interface UseSortableDragZoneProps extends UseDragZoneProps {
 export interface UseSortableDropTargetProps extends UseDropTargetProps {
     group?: string | GetGroupFunction;
 
+    parent_id?: string;
+    zone_id?: string;
+
     selector?: string;
     placeholderClass?: string;
     hoverClass?: string;
@@ -480,6 +493,7 @@ export interface UseSortableDropTargetProps extends UseDropTargetProps {
     getGroup?: () => string | null;
 
     isAceptableAvatar?: (avatar: DragAvatar | null) => boolean;
+    acceptChild?: (params: AcceptChildParam) => boolean;
 
     onSortMove?: (params: OnSortMoveParam) => void;
     onSortEnd?: (params: OnSortEndParam) => void;

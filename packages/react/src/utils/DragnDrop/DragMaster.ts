@@ -545,7 +545,11 @@ export class DragMaster {
 
         if (this.avatar) {
             const dropAllowed = (
-                this.dropTarget?.isDropAllowed?.({ avatar: this.avatar, e })
+                this.dropTarget?.isDropAllowed?.({
+                    avatar: this.avatar,
+                    e,
+                    dropTarget: this.dropTarget,
+                })
             ) ?? false;
 
             if (!cancel && dropAllowed && this.dropTarget) {

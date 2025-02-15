@@ -59,13 +59,13 @@ export const getCustomGroupItems = () => (
         }))
 );
 
-export const getTreeItems = () => (
-    initItems({ idPrefix: 'tree_', count: 4 })
+export const getTreeItems = ({ idPrefix = 'tree_' } = {}) => (
+    initItems({ idPrefix, count: 4 })
         .map((item, index) => ({
             ...item,
             items: (index < 2)
                 ? initItems({
-                    idPrefix: `tree_${item.id}_`,
+                    idPrefix: `${idPrefix}${item.id}_`,
                     count: 3,
                     title: `Item ${index + 1}.`,
                 })

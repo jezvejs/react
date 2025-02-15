@@ -32,6 +32,7 @@ export interface OnDragMoveParams {
 export interface IsDropAllowedParams {
     e: TouchEvent | MouseEvent | Event;
     avatar: DragAvatar;
+    dropTarget?: DropTarget;
 }
 
 /** Drag end parameters */
