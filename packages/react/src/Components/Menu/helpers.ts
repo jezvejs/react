@@ -610,7 +610,6 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
         ...itemDefaultProps,
         ...item,
         parentId: state.id,
-        active: item.id === state.activeItem,
         iconAlign: item.iconAlign || state.iconAlign,
         disabled: item.disabled || state.disabled,
         checkboxSide: item.checkboxSide || state.checkboxSide,
