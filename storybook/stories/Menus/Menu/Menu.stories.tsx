@@ -17,6 +17,7 @@ import {
     getHorizontalItems,
     groupItems,
     checkboxGroupItems,
+    collapsibleGroupItems,
 } from './data.ts';
 import './Menu.stories.scss';
 
@@ -151,7 +152,7 @@ export const CheckboxGroups: Story = {
 
 export const CollapsibleGroups: Story = {
     args: {
-        items: groupItems,
+        items: collapsibleGroupItems,
         allowActiveGroupHeader: true,
     },
     render: function Render(args) {

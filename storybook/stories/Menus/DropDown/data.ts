@@ -36,6 +36,8 @@ export const groupsItems = () => ([{
 }]);
 
 export const initGroupItems = () => ([
+    { id: 'item1', title: 'Not in group 1' },
+    { id: 'item2', title: 'Not in group 2' },
     {
         id: 'group10',
         type: 'group' as MenuItemType,

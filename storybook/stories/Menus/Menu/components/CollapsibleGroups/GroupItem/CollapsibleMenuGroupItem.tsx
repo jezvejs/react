@@ -20,6 +20,7 @@ export const CollapsibleMenuGroupItem: MenuGroupItemComponent = (p) => {
                 { expanded: !!props.expanded },
                 props.className,
             )}
+            allowActiveGroupHeader
         />
     );
 };
