@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
 import { DebounceOptions, useDebounce } from '@jezvejs/react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
 
@@ -23,13 +23,13 @@ const DebouncedDemo: React.FC<DebouncedDemoProps> = (args) => {
         counter: 0,
     });
 
-    const run = () => {
+    const run = useCallback(() => {
         setState((prev) => ({ ...prev, counter: prev.counter + 1 }));
-    };
+    }, []);
 
     const debounced = useDebounce(run, ms, options);
 
-    const runDebouced = () => {
+    const runDebouced = useCallback(() => {
         if (!debounced) {
             return;
         }
@@ -39,13 +39,14 @@ const DebouncedDemo: React.FC<DebouncedDemoProps> = (args) => {
         } else {
             debounced();
         }
-    };
+    }, [debounced]);
 
-    const cancelDebounced = () => {
+
+    const cancelDebounced = useCallback(() => {
         if (debounced && 'cancel' in debounced) {
             debounced.cancel();
         }
-    };
+    }, [debounced]);
 
     const cancelBtn = !!options?.cancellable && (
         <ActionButton title="Cancel" onClick={cancelDebounced} />
