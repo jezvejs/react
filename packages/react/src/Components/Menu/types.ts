@@ -4,7 +4,7 @@ import {
     ReactNode,
     SetStateAction,
 } from 'react';
-import { StoreDispatchFunction, StoreReducersList } from '../../utils/Store/Store.ts';
+import { StoreDispatchFunction, StoreGetStateFunction, StoreReducersList } from '../../utils/Store/Store.ts';
 
 export type MenuItemContentAlign = 'left' | 'right';
 
@@ -60,6 +60,7 @@ export interface OnGroupHeaderClickParam<T = MenuState> {
 
     state: T;
     setState: Dispatch<SetStateAction<T>>;
+    getState?: StoreGetStateFunction;
     dispatch?: StoreDispatchFunction;
 }
 
