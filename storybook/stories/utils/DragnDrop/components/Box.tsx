@@ -9,6 +9,7 @@ export type BoxProps = {
     title?: string;
     left?: number;
     top?: number;
+    type?: string;
     hidden?: boolean;
     dragging?: boolean;
     absolutePos?: boolean;

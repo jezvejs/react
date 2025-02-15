@@ -16,6 +16,7 @@ export const DefaultDropTarget = (props: DefaultDropTargetProps) => {
 
     useEffect(() => {
         const dropTarget = {
+            ...props,
             id: props.id,
             elem: dropTargetRef?.current,
             onDragEnd(params: OnDragEndParams) {

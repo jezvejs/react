@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import {
     createSlice,
     DragnDropProvider,
@@ -61,15 +60,4 @@ export const ProvidedExchangeable = (props: ExchangeableProps) => {
             </div>
         </DragnDropProvider>
     );
-};
-
-const listShape = PropTypes.shape({
-    id: PropTypes.string,
-    group: PropTypes.string,
-    items: PropTypes.array,
-});
-
-ProvidedExchangeable.propTypes = {
-    source: listShape,
-    destination: listShape,
 };

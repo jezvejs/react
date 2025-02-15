@@ -28,6 +28,13 @@ export interface OnDragMoveParams {
     avatar?: DragAvatar;
 }
 
+/** Drop allowed callback parameters */
+export interface IsDropAllowedParams {
+    e: TouchEvent | MouseEvent | Event;
+    avatar: DragAvatar;
+    dropTarget?: DropTarget;
+}
+
 /** Drag end parameters */
 export interface OnDragEndParams {
     e: TouchEvent | MouseEvent | Event;
@@ -63,6 +70,7 @@ export interface OnDragEnterParams {
  */
 export interface DragZone {
     id: string;
+    type?: string;
     touchMoveTimeout?: number;
     mouseMoveThreshold?: number;
     elem?: Element | null;
@@ -78,6 +86,7 @@ export interface DragZone {
 
 export interface DragAvatarInfo {
     id: string;
+    type?: string;
     mouseShift: Point;
 }
 
@@ -91,6 +100,9 @@ export interface DragAvatarInitParam {
  * Dragging element
  */
 export interface DragAvatar {
+    id?: string;
+    type?: string;
+
     scrollRequested?: boolean;
 
     dragZone?: DragZone | null;
@@ -120,6 +132,8 @@ export interface DropTarget {
     onDragLeave?: (params: OnDragLeaveParams) => void;
 
     onDragMove?: (params: OnDragMoveParams) => void;
+
+    isDropAllowed?: (params: IsDropAllowedParams) => boolean;
 
     onDragEnd?: (params: OnDragEndParams) => void;
 

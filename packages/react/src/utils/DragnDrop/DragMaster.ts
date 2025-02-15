@@ -544,7 +544,15 @@ export class DragMaster {
         this.dragStarted = false;
 
         if (this.avatar) {
-            if (!cancel && this.dropTarget) {
+            const dropAllowed = (
+                this.dropTarget?.isDropAllowed?.({
+                    avatar: this.avatar,
+                    e,
+                    dropTarget: this.dropTarget,
+                })
+            ) ?? false;
+
+            if (!cancel && dropAllowed && this.dropTarget) {
                 this.dropTarget.onDragEnd?.({ avatar: this.avatar, e });
             } else {
                 this.avatar.onDragCancel?.({ e });

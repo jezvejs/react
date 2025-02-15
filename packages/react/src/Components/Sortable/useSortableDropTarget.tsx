@@ -232,7 +232,17 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 ? isTreeContains(targetId, sourceId, origSourceZoneItems)
                 : !!getTreeItemById(sourceId, origSourceZoneItems);
 
-            const allowChildren = !!props.tree;
+            const targetAcceptChilds = this.acceptChild?.({
+                avatar,
+                e,
+                dropTarget: {
+                    id: targetId ?? '',
+                    parent_id: targetParentId,
+                    zone_id: targetZoneId,
+                },
+            }) ?? false;
+
+            const allowChildren = !!props.tree && targetAcceptChilds;
 
             const moveInfo: SortableMoveInfo = {
                 sourceId,
@@ -360,7 +370,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                     }
                 } else if (!isTargetDragZoneRoot) {
                     if (props.tree && targetIsContainer) {
-                        if (newTargetElem.childElementCount === 0) {
+                        if (targetAcceptChilds && newTargetElem.childElementCount === 0) {
                             newTargetElem.append(tmpSourceClone);
                         }
                     } else if (dragZoneBeforeTarget) {
@@ -371,7 +381,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 } else {
                     skipMeasure = true;
                 }
-            } else if (isSameTreeContainer) {
+            } else if (isSameTreeContainer && targetAcceptChilds) {
                 targetContainer.append(tmpSourceClone);
             } else if (dragZoneBeforeTarget && !dragZoneContainsTarget) {
                 newTargetElem.after(tmpSourceClone);
@@ -438,7 +448,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 if (!skipMeasure) {
                     animateElems = this.getMovingItems?.(moveInfo) ?? null;
                 }
-            } else if (isSameTreeContainer) {
+            } else if (isSameTreeContainer && targetAcceptChilds) {
                 /* new target element has empty container */
                 moveInfo.targetParentId = targetId;
                 moveInfo.targetId = null;

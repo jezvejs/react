@@ -49,6 +49,7 @@ export const DefaultDragZone = forwardRef<
         ...state,
         id: props.id,
         title: props.title,
+        type: props.type,
         absolutePos: props.absolutePos,
         dragging: false,
         hidden: !showOriginal,
@@ -58,6 +59,7 @@ export const DefaultDragZone = forwardRef<
         ...state,
         id: props.id,
         title: props.title,
+        type: props.type,
     };
 
     const content = <Content {...origProps} ref={dragZoneRef} />;

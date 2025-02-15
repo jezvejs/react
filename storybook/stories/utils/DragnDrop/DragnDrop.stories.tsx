@@ -6,12 +6,13 @@ import {
     DragZone,
     DragnDropProvider,
     DragnDropState,
+    IsDropAllowedParams,
     OnDragEndParams,
     createSlice,
     px,
     useDragnDrop,
 } from '@jezvejs/react';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 
 import MenuIcon from '../../../common/assets/icons/menu.svg';
 
@@ -23,6 +24,7 @@ import { XAxisDropTarget } from './components/XAxisDropTarget.tsx';
 import { XAxisDragZone } from './components/XAxisDragZone.tsx';
 
 import './DragnDrop.stories.scss';
+import { useUniqueDragZoneId } from '../../Sortable/hooks/useUniqueDragZoneId.ts';
 
 export type DragZoneItemState = DragZone & DragnDropState;
 
@@ -47,9 +49,11 @@ const DefaultDragBox = () => {
 };
 
 const DragOriginalDemo = () => {
+    const boxId = useUniqueDragZoneId('box');
+
     const initialState = {
         box: {
-            id: 'box',
+            id: boxId,
             left: 0,
             top: 0,
             absolutePos: true,
@@ -64,9 +68,13 @@ const DragOriginalDemo = () => {
     const slice = createSlice({
     });
 
+    const isDropAllowed = useCallback(({ avatar }: IsDropAllowedParams) => (
+        avatar?.id === boxId
+    ), [boxId]);
+
     return (
         <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-            <OriginalDropTarget>
+            <OriginalDropTarget isDropAllowed={isDropAllowed}>
                 <DefaultDragBox />
             </OriginalDropTarget>
         </DragnDropProvider>
@@ -97,8 +105,14 @@ export const DragOriginal: Story = {
     },
 };
 
+const CLONED_ITEM_TYPE = 'cloned';
+
 const DragClonedDropTargets = () => {
     const { state, setState } = useDragnDrop<DragClonedState>();
+
+    const isDropAllowed = useCallback(({ avatar }: IsDropAllowedParams) => (
+        avatar?.type === CLONED_ITEM_TYPE
+    ), []);
 
     const onDragEnd = ({ avatarInfo, dropTarget }: OnDragEndParams) => {
         const dropToLeft = (dropTarget?.id === 'leftContainer');
@@ -143,11 +157,13 @@ const DragClonedDropTargets = () => {
             <DefaultDropTarget
                 id="leftContainer"
                 items={state.leftItems}
+                isDropAllowed={isDropAllowed}
                 onDragEnd={onDragEnd}
             />
             <DefaultDropTarget
                 id="rightContainer"
                 items={state.rightItems}
+                isDropAllowed={isDropAllowed}
                 onDragEnd={onDragEnd}
             />
         </>
@@ -161,7 +177,15 @@ export const DragCloned: Story = {
     name: 'Drag copy object',
     render: function Render() {
         const initialState = {
-            leftItems: [{ id: '1', title: '1' }, { id: '2', title: '2' }],
+            leftItems: [{
+                id: '1',
+                title: '1',
+                type: CLONED_ITEM_TYPE,
+            }, {
+                id: '2',
+                title: '2',
+                type: CLONED_ITEM_TYPE,
+            }],
             rightItems: [],
             left: 0,
             top: 0,
@@ -198,10 +222,14 @@ export const XAxisAvatar: Story = {
         const slice = createSlice({
         });
 
+        const isDropAllowed = useCallback(({ avatar }: IsDropAllowedParams) => (
+            avatar?.id === 'xAxisDragZone'
+        ), []);
+
         return (
             <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
                 <div className="section-h200">
-                    <XAxisDropTarget>
+                    <XAxisDropTarget isDropAllowed={isDropAllowed}>
                         <XAxisDragZone id="xAxisDragZone" />
                     </XAxisDropTarget>
                 </div>
@@ -321,23 +349,28 @@ const DoubleHandleDragItem = forwardRef<
 
 DoubleHandleDragItem.displayName = 'DoubleHandleDragItem';
 
+const HANDLE_TEST_ITEM = 'handleTest';
+
 export const Handles: Story = {
     render: function HandlesDemo() {
         const initialState = {
             handleItem1: {
                 id: 'handleItem1',
+                type: HANDLE_TEST_ITEM,
                 left: 0,
                 top: 0,
                 absolutePos: true,
             },
             handleItem2: {
                 id: 'handleItem2',
+                type: HANDLE_TEST_ITEM,
                 left: 0,
                 top: 50,
                 absolutePos: true,
             },
             handleItem3: {
                 id: 'handleItem3',
+                type: HANDLE_TEST_ITEM,
                 left: 0,
                 top: 100,
                 absolutePos: true,
@@ -352,22 +385,29 @@ export const Handles: Story = {
         const slice = createSlice({
         });
 
+        const isDropAllowed = useCallback(({ avatar }: IsDropAllowedParams) => (
+            avatar?.type === HANDLE_TEST_ITEM
+        ), []);
+
         return (
             <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-                <OriginalDropTarget>
+                <OriginalDropTarget isDropAllowed={isDropAllowed}>
                     <DefaultDragZone
                         id="handleItem1"
+                        type={HANDLE_TEST_ITEM}
                         Content={SimpleDragItem}
                         dragOriginal
                     />
                     <DefaultDragZone
                         id="handleItem2"
+                        type={HANDLE_TEST_ITEM}
                         Content={HandleDragItem}
                         dragOriginal
                         handles={{ query: '.drag-handle' }}
                     />
                     <DefaultDragZone
                         id="handleItem3"
+                        type={HANDLE_TEST_ITEM}
                         Content={DoubleHandleDragItem}
                         dragOriginal
                         handles={[

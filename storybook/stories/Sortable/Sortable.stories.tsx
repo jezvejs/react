@@ -171,6 +171,42 @@ export const Tree: SortableStory = {
     render: ProvidedSortable,
 };
 
+/**
+ * acceptChild() callback test
+ */
+export const TreeItemAcceptChild: SortableStory = {
+    args: {
+        id: 'treeAcceptChild',
+        items: getTreeItems({ idPrefix: 'tree_accept_' }),
+        className: 'tree',
+        selector: '.tree-item',
+        containerSelector: '.tree-item__content',
+        placeholderClass: 'tree-item__placeholder',
+        dragClass: true,
+        animated: true,
+        group: 'tree',
+        copyWidth: true,
+        tree: true,
+        handles: treeTitleHandle,
+        acceptChild: ({ dropTarget }) => (
+            [
+                'tree_accept_1',
+                'tree_accept_tree_accept_1_1',
+                'tree_accept_tree_accept_1_2',
+                'tree_accept_tree_accept_1_3',
+            ].includes(dropTarget?.id ?? '')
+        ),
+        components: {
+            ListItem: SortableTreeItem,
+        },
+    },
+    parameters: {
+        layout: 'fullscreen',
+    },
+    decorators: [containerDecorator],
+    render: ProvidedSortable,
+};
+
 export const TreeExchange: ExchangeableStory = {
     args: {
         className: 'tree',
