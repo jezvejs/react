@@ -13,7 +13,7 @@ export type StoreActionFunction = (api: StoreActionAPI | null) => void;
 
 export type StoreAction = StoreActionObject | StoreActionFunction;
 
-export type StoreState = {};
+export type StoreState = object;
 
 export type StoreReducer<State extends StoreState = StoreState> = (
     state: State,

@@ -41,7 +41,6 @@ const DebouncedDemo: React.FC<DebouncedDemoProps> = (args) => {
         }
     }, [debounced]);
 
-
     const cancelDebounced = useCallback(() => {
         if (debounced && 'cancel' in debounced) {
             debounced.cancel();
