@@ -2,6 +2,8 @@ import {
     ForwardRefExoticComponent,
     RefAttributes,
 } from 'react';
+import type { Offset } from '@jezvejs/dom';
+
 import { Point } from '../../utils/types.ts';
 import {
     DragAvatar,
@@ -274,6 +276,33 @@ export interface OnSortParam {
     targetIndex: number;
     targetZoneId: string | null;
     targetParentId: string | null;
+}
+
+/** transformZones action params */
+export interface TransformZonesParams {
+    elems: SortableItemAnimation[];
+    swapWithPlaceholder: boolean;
+}
+
+/** setTransform() function params */
+export interface SetTransformParams extends TransformZonesParams {
+    item: SortableItemWrapperProps;
+}
+
+/** initDrag action params */
+export interface InitDragParams {
+    downX: number;
+    downY: number;
+    offset: Offset;
+    avatarState?: SortableAvatarState;
+    width?: number | null;
+}
+
+/** updatePositions action params */
+export interface UpdatePositionsParams {
+    name: SortablePositionType;
+    newBoxes: SortableZonePositionsMap;
+    zones: string[];
 }
 
 /**

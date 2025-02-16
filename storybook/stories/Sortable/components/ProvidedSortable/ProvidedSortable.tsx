@@ -1,8 +1,8 @@
 import {
-    createSlice,
     DragnDropProvider,
     Sortable,
     SortableProps,
+    sortableReducer,
 } from '@jezvejs/react';
 
 import { usePortalElement } from '../../../../common/hooks/usePortalElement.tsx';
@@ -27,13 +27,10 @@ export const ProvidedSortable = (props: SortableProps) => {
         },
     };
 
-    const slice = createSlice({
-    });
-
     const portalElement = usePortalElement();
 
     return (
-        <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+        <DragnDropProvider reducer={sortableReducer} initialState={initialState}>
             <Sortable {...sortableProps} container={portalElement} />
         </DragnDropProvider>
     );

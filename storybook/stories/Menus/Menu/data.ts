@@ -79,6 +79,45 @@ export const groupItems = [{
     title: 'No group item 3',
 }];
 
+export const collapsibleGroupItems = [{
+    id: 'noGroupItem1',
+    title: 'No group item 1',
+}, {
+    id: 'group1',
+    type: 'group' as MenuItemType,
+    title: 'Group 1',
+    expanded: false,
+    items: [{
+        id: 'groupItem11',
+        title: 'Group 1 item 1',
+        group: 'group1',
+    }, {
+        id: 'groupItem12',
+        title: 'Group 1 item 2',
+        group: 'group1',
+    }, {
+        id: 'groupItem13',
+        title: 'Group 1 item 3',
+        group: 'group1',
+    }],
+}, {
+    id: 'noGroupItem2',
+    title: 'No group item 2',
+}, {
+    id: 'group2',
+    type: 'group' as MenuItemType,
+    title: 'Group 2',
+    expanded: false,
+    items: [{
+        id: 'groupItem21',
+        title: 'Group 2 item 1',
+        group: 'group2',
+    }],
+}, {
+    id: 'noGroupItem3',
+    title: 'No group item 3',
+}];
+
 export const checkboxGroupItems = [{
     id: 'noGroupItem1',
     title: 'No group item 1',

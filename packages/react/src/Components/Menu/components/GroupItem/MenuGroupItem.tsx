@@ -9,11 +9,7 @@ import './MenuGroupItem.scss';
 
 const defaultProps = {
     items: [],
-    components: {
-        List: null,
-        ListItem: null,
-        GroupHeader: null,
-    },
+    components: {},
 };
 
 export const MenuGroupItem: MenuGroupItemComponent = (p: MenuGroupItemProps) => {
@@ -51,7 +47,13 @@ export const MenuGroupItem: MenuGroupItemComponent = (p: MenuGroupItemProps) => 
         items: props.items.map((item) => ({
             ...item,
             disabled: props.disabled || item.disabled,
+            checkboxSide: props.checkboxSide || item.checkboxSide,
+            tabThrough: props.tabThrough || item.tabThrough,
+            renderNotSelected: props.renderNotSelected || item.renderNotSelected,
         })),
+        components: {
+            ...(props.components ?? {}),
+        },
     };
 
     return (

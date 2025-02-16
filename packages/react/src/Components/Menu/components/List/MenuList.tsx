@@ -74,7 +74,12 @@ export const MenuList = (p: MenuListProps) => {
         } = props.components ?? {};
         const st = getState();
 
-        const item = props.getItemProps?.(itemData, st as MenuListProps) ?? itemData;
+        const item = {
+            ...(props.getItemProps?.(itemData, st as MenuListProps) ?? itemData),
+            components: {
+                ...(props.components ?? {}),
+            },
+        };
 
         const CustomItem = props.getItemComponent?.(item, props);
         if (CustomItem) {
@@ -98,10 +103,12 @@ export const MenuList = (p: MenuListProps) => {
             const groupProps: MenuGroupItemProps = {
                 ...item,
                 items: (item.items ?? []),
+                activeItem: st.activeItem,
                 list,
                 header,
                 getItemProps: props.getItemProps,
-                components: props.components,
+                tabThrough: props.tabThrough,
+                renderNotSelected: props.renderNotSelected,
             };
 
             return GroupItem && <GroupItem {...groupProps} key={item.id} />;

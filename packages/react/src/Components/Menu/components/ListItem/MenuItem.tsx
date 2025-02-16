@@ -23,7 +23,6 @@ const defaultProps = {
     disabled: false,
     renderNotSelected: false,
     components: {
-        Check: null,
     },
 };
 

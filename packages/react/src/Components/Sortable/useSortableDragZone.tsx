@@ -12,7 +12,6 @@ import {
     OnDragStartParams,
 } from '../../utils/DragnDrop/types.ts';
 import { useDragZone } from '../../utils/DragnDrop/useDragZone.tsx';
-import { StoreUpdater } from '../../utils/Store/Store.ts';
 import { StyleDeclaration } from '../../utils/types.ts';
 
 import {
@@ -21,10 +20,10 @@ import {
     SortableState,
     UseSortableDragZoneProps,
 } from './types.ts';
+import { actions } from './reducer.ts';
 
 export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
-    const dragDrop = useDragnDrop();
-    const setState = (update: StoreUpdater) => dragDrop?.setState(update);
+    const { dispatch } = useDragnDrop<SortableState>();
 
     const dragItemRef = useRef<Element | null>(null);
 
@@ -264,13 +263,13 @@ export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
                     }
 
                     const offset = getOffset(avatar.dragZone.elem);
-                    setState((prev: SortableState) => ({
-                        ...prev,
+                    const { downX, downY } = params;
+
+                    dispatch(actions.initDrag({
                         avatarState,
-                        origLeft: prev.left,
-                        origTop: prev.top,
-                        shiftX: params.downX - offset.left,
-                        shiftY: params.downY - offset.top,
+                        downX,
+                        downY,
+                        offset,
                     }));
 
                     return true;
@@ -350,12 +349,11 @@ export function useSortableDragZone(props: Partial<UseSortableDragZoneProps>) {
             const { downX, downY } = params;
             const offset = getOffset(itemEl);
             const width = (props.copyWidth) ? itemEl.offsetWidth : null;
-            setState((prev: SortableState) => ({
-                ...prev,
-                origLeft: prev.left,
-                origTop: prev.top,
-                shiftX: downX - offset.left,
-                shiftY: downY - offset.top,
+
+            dispatch(actions.initDrag({
+                downX,
+                downY,
+                offset,
                 width,
             }));
 

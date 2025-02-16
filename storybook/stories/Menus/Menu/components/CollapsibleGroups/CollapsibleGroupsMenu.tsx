@@ -20,7 +20,7 @@ export const CollapsibleGroupsMenu = (props: CollapsibleGroupsMenuProps) => {
             (item.type === 'group' && item.id.toString() === id)
                 ? { ...item, expanded: !item.expanded }
                 : item
-        )),
+        ), { includeGroupItems: true }),
     });
 
     const onGroupHeaderClick = ({ item, setState }: OnGroupHeaderClickParam) => {

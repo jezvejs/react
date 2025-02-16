@@ -49,8 +49,8 @@ export const CheckboxGroupsMenu: CheckboxGroupsMenuComponent = (props) => {
                 'checkbox-groups-menu',
                 props.className,
             )}
-            checkboxSide={'right'}
-            defaultItemType={'checkbox'}
+            checkboxSide="right"
+            defaultItemType="checkbox"
             onGroupHeaderClick={onGroupHeaderClick}
             allowActiveGroupHeader
             renderNotSelected

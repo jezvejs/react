@@ -5,7 +5,7 @@ import { DropDownCollapsibleMenuGroupHeader } from '../GroupHeader/CollapsibleMe
 import './CollapsibleMenuGroupItem.scss';
 
 const defaultProps = {
-    expanded: true,
+    expanded: false,
     components: {
         GroupHeader: DropDownCollapsibleMenuGroupHeader,
     },

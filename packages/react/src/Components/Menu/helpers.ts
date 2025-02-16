@@ -610,12 +610,11 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
         ...itemDefaultProps,
         ...item,
         parentId: state.id,
-        active: item.id === state.activeItem,
         iconAlign: item.iconAlign || state.iconAlign,
         disabled: item.disabled || state.disabled,
         checkboxSide: item.checkboxSide || state.checkboxSide,
         renderNotSelected: item.renderNotSelected || state.renderNotSelected,
-        tabThrough: state.tabThrough,
+        tabThrough: item.tabThrough || state.tabThrough,
         type: item.type ?? state.defaultItemType,
         beforeContent: item.beforeContent || state.beforeContent,
         afterContent: item.afterContent || state.afterContent,
@@ -843,6 +842,10 @@ export const createMenuItem = <T extends MenuItemProps, S extends MenuState>(
         id: props.id?.toString() ?? generateItemId(state?.items ?? [], 'item'),
         parentId: state.id,
         type: props.type ?? defaultItemType,
+        components: {
+            ...(itemDefaultProps?.components ?? {}),
+            ...(props?.components ?? {}),
+        },
     };
 
     const { type } = res;

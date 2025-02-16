@@ -1,9 +1,10 @@
 import {
-    createSlice,
     DragnDropProvider,
     Sortable,
     SortableProps,
+    sortableReducer,
 } from '@jezvejs/react';
+
 import { usePortalElement } from '../../../../common/hooks/usePortalElement.tsx';
 import { useUniqueDragZoneId } from '../../hooks/useUniqueDragZoneId.ts';
 
@@ -47,13 +48,10 @@ export const ProvidedExchangeable = (props: ExchangeableProps) => {
         },
     };
 
-    const slice = createSlice({
-    });
-
     const portalElement = usePortalElement();
 
     return (
-        <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
+        <DragnDropProvider reducer={sortableReducer} initialState={initialState}>
             <div className="exch-lists-container">
                 <Sortable {...sourceProps} container={portalElement} />
                 <Sortable {...destProps} container={portalElement} />

@@ -379,6 +379,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
                     e,
                     state: st,
                     setState,
+                    getState,
                 };
 
                 return props.onGroupHeaderClick?.(clickParams);
