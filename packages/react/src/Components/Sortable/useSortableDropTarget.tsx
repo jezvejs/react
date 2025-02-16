@@ -31,12 +31,10 @@ import {
     getTreeItemById,
     insertAtElementPosition,
     isTreeContains,
-    mapTreeItems,
     toFlatList,
     toggleMeasureMode,
 } from './helpers.ts';
 import {
-    AnimationBox,
     ItemOffset,
     OnSortCancelParam,
     OnSortEndParam,
@@ -52,6 +50,7 @@ import {
     UseSortableDragZoneProps,
     UseSortableDropTargetProps,
 } from './types.ts';
+import { actions } from './reducer.ts';
 
 export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>) {
     const defaultProps = {
@@ -65,7 +64,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
 
     const targetElem = useRef<HTMLElement | null>(null);
 
-    const { getState, setState } = useDragnDrop<SortableState>();
+    const { getState, dispatch } = useDragnDrop<SortableState>();
 
     const dropTargetProps: UseSortableDropTargetProps = {
         ...defaultProps,
@@ -537,50 +536,7 @@ export function useSortableDropTarget(props: Partial<UseSortableDropTargetProps>
                 newBoxes[id] = positions;
             }
 
-            const findItemBox = (itemId: string | null | undefined): AnimationBox | null => {
-                if (itemId === null || typeof itemId === 'undefined') {
-                    return null;
-                }
-
-                const zoneId = zones.find((id: string) => newBoxes[id][itemId]);
-                const box = (zoneId) ? (newBoxes[zoneId]?.[itemId]) : null;
-                return box ?? null;
-            };
-
-            const getItemBox = (item: AnimationBox | SortableTreeItem): AnimationBox => ({
-                ...(findItemBox(item.id) ?? {}),
-                id: item.id,
-                ...(
-                    ((item.items?.length ?? 0) > 0)
-                        ? { items: (item.items ?? []).map(getItemBox) }
-                        : {}
-                ),
-            });
-
-            const useNextItems = (name !== 'boxes');
-            const mapZoneBoxes = (zoneId: string, state: SortableState): AnimationBox[] => (
-                mapTreeItems<AnimationBox>(
-                    (useNextItems)
-                        ? getNextZoneItems(zoneId, state)
-                        : getDragZoneItems(zoneId, state),
-                    getItemBox,
-                )
-            );
-
-            setState((prev: SortableState) => {
-                const newState: SortableState = {
-                    ...prev,
-                    [name]: {
-                        ...(prev[name] ?? {}),
-                    },
-                };
-
-                Object.keys(newBoxes).forEach((id: string) => {
-                    newState[name][id] = mapZoneBoxes(id, newState);
-                });
-
-                return newState;
-            });
+            dispatch(actions.updatePositions({ name, newBoxes, zones }));
         },
 
         /** Updates cache of positions if needed */

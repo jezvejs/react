@@ -5,7 +5,9 @@ import {
     AnimationBox,
     BaseTreeItem,
     MoveTreeItemParam,
+    SetTransformParams,
     SortableItemPosition,
+    SortableItemWrapperProps,
     SortableNodePosition,
     SortableState,
     SortableTreeItem,
@@ -574,6 +576,52 @@ export const formatMatrixTransform = (
 export const formatOffsetMatrix = ({ x, y }: Point) => (
     `translate3d(${px(x)}, ${px(y)}, 0)`
 );
+
+/**
+ * Applies transformation to the specified sortable item and returns result
+ * @param {SetTransformParams} param0
+ * @returns {SortableItemWrapperProps}
+ */
+export const setTransform = (
+    { item, elems, swapWithPlaceholder }: SetTransformParams,
+): SortableItemWrapperProps => {
+    const found = elems?.find((i) => i.id === item.id);
+    if (!found) {
+        return item;
+    }
+
+    const initialOffset = item.initialOffset ?? ({ x: 0, y: 0 });
+    const initialTransform = formatOffsetMatrix(initialOffset);
+
+    const { rect, targetRect, parent } = found;
+    if (!rect || !targetRect) {
+        return item;
+    }
+
+    const offset = {
+        x: ((targetRect.left ?? 0) - (rect.left ?? 0)) + initialOffset.x,
+        y: ((targetRect.top ?? 0) - (rect.top ?? 0)) + initialOffset.y,
+    };
+    const offsetTransform = formatOffsetMatrix(offset);
+
+    const res = {
+        ...item,
+        animationInProgress: true,
+        initialOffset,
+        initialTransform,
+        offset,
+        offsetTransform,
+        rect,
+        targetRect,
+        parent,
+    };
+
+    if (swapWithPlaceholder) {
+        res.animated = false;
+    }
+
+    return res;
+};
 
 /**
  * Cleans up the state of sortable item and returns result
