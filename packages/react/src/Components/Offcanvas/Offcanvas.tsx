@@ -13,6 +13,7 @@ export interface OffcanvasProps {
     className?: string,
     placement: OffcanvasPlacement,
     closed?: boolean,
+    usePortal?: boolean,
     useScrollLock?: boolean,
     onOpened?: (() => void) | null,
     onClosed?: (() => void) | null,
@@ -28,6 +29,7 @@ interface OffcanvasState extends OffcanvasProps {
 const defaultProps = {
     placement: 'left',
     closed: true,
+    usePortal: true,
     useScrollLock: true,
     onOpened: null,
     onClosed: null,
@@ -84,7 +86,7 @@ export const Offcanvas = (p: OffcanvasProps) => {
 
     const container = props.container ?? document.body;
 
-    return createPortal(
+    const content = (
         <>
             <div
                 className={classNames(
@@ -104,7 +106,8 @@ export const Offcanvas = (p: OffcanvasProps) => {
                 </div>
             </div>
             {background}
-        </>,
-        container,
+        </>
     );
+
+    return (props.usePortal) ? createPortal(content, container) : content;
 };

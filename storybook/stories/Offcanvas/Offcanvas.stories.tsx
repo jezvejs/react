@@ -30,7 +30,7 @@ const OpenOffcanvas = (args: OffcanvasProps) => {
     const showOffcanvas = (visible: boolean) => setState((prev) => ({ ...prev, visible }));
 
     return (
-        <>
+        <div className="page">
             <ActionButton title='Show' onClick={() => showOffcanvas(true)} />
             <Offcanvas
                 {...args}
@@ -38,13 +38,25 @@ const OpenOffcanvas = (args: OffcanvasProps) => {
                 onClosed={() => showOffcanvas(false)}
                 container={portalElement}
             />
-        </>
+        </div>
     );
 };
 
 export const Default: Story = {
     args: {
         children: 'Offcanvas value',
+    },
+    render: OpenOffcanvas,
+};
+
+/**
+ * Disable 'usePortal' option to render component in place
+ */
+export const UsePortal: Story = {
+    args: {
+        usePortal: false,
+        children: 'Offcanvas value',
+        placement: 'left',
     },
     render: OpenOffcanvas,
 };
