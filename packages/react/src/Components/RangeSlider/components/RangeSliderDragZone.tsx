@@ -195,17 +195,20 @@ export const RangeSliderDragZone = forwardRef<
     };
 
     useEffect(() => {
-        if (!innerRef?.current?.offsetParent) {
+        if (!innerRef?.current) {
             return undefined;
         }
 
         const observer = new ResizeObserver(onResize);
-        observer.observe(innerRef.current.offsetParent);
+        observer.observe(innerRef.current);
+        if (innerRef.current?.offsetParent) {
+            observer.observe(innerRef.current.offsetParent);
+        }
 
         return () => {
             observer.disconnect();
         };
-    }, [innerRef]);
+    }, [innerRef.current, innerRef.current?.offsetParent]);
 
     if (type === 'selectedArea') {
         const selectedAreaProps: RangeSliderSelectedAreaProps = {
