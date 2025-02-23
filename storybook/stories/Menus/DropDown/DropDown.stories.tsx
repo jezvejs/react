@@ -2,7 +2,13 @@ import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 import { asArray } from '@jezvejs/types';
 import '@jezvejs/react/style.scss';
-import { DropDown, DropDownSelectionParam, Tags } from '@jezvejs/react';
+import {
+    createSlice,
+    DropDown,
+    DropDownSelectionParam,
+    StoreProvider,
+    Tags,
+} from '@jezvejs/react';
 import { useState } from 'react';
 
 import { usePortalElement } from '../../../common/hooks/usePortalElement.tsx';
@@ -71,11 +77,19 @@ export const Inline: DropDownStory = {
             items: initItems('Long item test Lorem ipsum dolor sit amet'),
         };
 
+        const slice = createSlice({});
+        const initialState = {};
+
         return (
-            <div className='inline-container'>
-                <DropDown {...args1} container={portalElement} />
-                <DropDown {...args2} container={portalElement} />
-            </div>
+            <StoreProvider
+                reducer={slice.reducer}
+                initialState={initialState}
+            >
+                <div className='inline-container'>
+                    <DropDown {...args1} container={portalElement} />
+                    <DropDown {...args2} container={portalElement} />
+                </div>
+            </StoreProvider>
         );
     },
 };
@@ -328,7 +342,7 @@ export type MultipleSelectionTag = {
 
 export type MultipleSelectionTagsState = {
     items: MultipleSelectionTag[];
-}
+};
 
 export const ShowMultipleSelection: DropDownStory = {
     name: '\'showMultipleSelection\' option',
