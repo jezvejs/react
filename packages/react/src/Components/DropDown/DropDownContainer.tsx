@@ -1136,6 +1136,7 @@ export const DropDownContainer = forwardRef<
             }),
             itemSelector: '.menu-item',
             tabThrough: false,
+            useParentContext: true,
             activeItem: activeItem?.id ?? null,
             editable,
             getPlaceholderProps: renderNotFound,
