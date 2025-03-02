@@ -18,13 +18,14 @@ import { RangeSliderAfterArea } from './components/RangeSliderAfterArea.tsx';
 
 import { positionToValue, valueToPosition, stepValue } from './helpers.ts';
 import {
+    RangeSliderAxisType,
     RangeSliderBeforeChangeType,
     RangeSliderProps,
     RangeSliderState,
     RangeSliderValue,
 } from './types.ts';
 
-type RangeSliderContainerProps = RangeSliderProps;
+type RangeSliderContainerProps = Partial<RangeSliderProps> & { id: string };
 type RangeSliderContainerRef = HTMLDivElement | null;
 
 export const RangeSliderContainer = forwardRef<
@@ -311,9 +312,9 @@ export const RangeSliderContainer = forwardRef<
     };
 
     useEffect(() => {
-        const { start, end, value } = props;
+        const { start = 0, end = 100, value = 0 } = props;
 
-        setState((prev) => ({
+        setState((prev: RangeSliderState) => ({
             ...prev,
             start,
             end,
@@ -322,6 +323,10 @@ export const RangeSliderContainer = forwardRef<
     }, [props.start, props.end, props.value]);
 
     const commonProps = {
+        axis: 'x' as RangeSliderAxisType,
+        range: false,
+        beforeArea: false,
+        afterArea: false,
         ...props,
     };
 
@@ -344,6 +349,7 @@ export const RangeSliderContainer = forwardRef<
     const slider = (
         <RangeSliderDragZone
             {...commonProps}
+            type="startSlider"
             onPosChange={(pos) => onPosChange(pos, (props.range) ? 'startSlider' : null)}
             ref={sliderRef}
         />

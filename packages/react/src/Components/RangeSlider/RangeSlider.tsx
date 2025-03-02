@@ -1,32 +1,45 @@
-import { forwardRef } from 'react';
+import { forwardRef, useRef } from 'react';
 
 import { DragnDropProvider } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 import { createSlice } from '../../utils/createSlice.ts';
 
-import { getStepPrecision } from './helpers.ts';
+import { generateId, getStepPrecision } from './helpers.ts';
 import { RangeSliderContainer } from './RangeSliderContainer.tsx';
 import { RangeSliderProps, RangeSliderState } from './types.ts';
 
+import { defaultProps } from './defaultProps.ts';
 import './RangeSlider.scss';
 
 type RangeSliderRef = HTMLDivElement | null;
 
 export type * from './types.ts';
 
-export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, ref) => {
+export const RangeSlider = forwardRef<RangeSliderRef, Partial<RangeSliderProps>>((p, ref) => {
+    const defaultId = useRef(generateId('rangeslider'));
+
+    const defProps = {
+        ...defaultProps,
+        id: defaultId.current,
+    };
+
+    const props = {
+        ...defProps,
+        ...p,
+    };
+
     const {
-        tabIndex = 0,
-        axis = 'x',
-        value = 0,
-        start = 0,
-        end = 100,
-        min = 0,
-        max = 100,
-        step = 1,
-        range = false,
-        beforeArea = false,
-        afterArea = false,
-        scrollOnClickOutsideRange = false,
+        tabIndex,
+        axis,
+        value,
+        start,
+        end,
+        min,
+        max,
+        step,
+        range,
+        beforeArea,
+        afterArea,
+        scrollOnClickOutsideRange,
     } = props;
 
     const commonProps = {
@@ -57,7 +70,7 @@ export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, 
         offset: { ...defaultOffset },
     };
 
-    const initialState: RangeSliderState = {
+    const initialState: Partial<RangeSliderState> = {
         ...commonProps,
         startSlider: {
             ...commonSliderProps,
@@ -93,14 +106,6 @@ export const RangeSlider = forwardRef<RangeSliderRef, RangeSliderProps>((props, 
             <RangeSliderContainer {...commonProps} ref={ref} />
         </DragnDropProvider >
     );
-
-    /*
-    return (
-        <DragnDropProvider<RangeSliderState> initialState={initialState}>
-            <RangeSliderContainer {...commonProps} ref={ref} />
-        </DragnDropProvider >
-    );
-    */
 });
 
 RangeSlider.displayName = 'RangeSlider';
