@@ -49,7 +49,7 @@ export const DropDownMenu: DropDownMenuComponent = forwardRef<
     const { multiple, filtered } = props;
     const defaultItemType: MenuItemType = (multiple) ? 'checkbox' : 'button';
 
-    const items = props.items.map((item: MenuItemProps) => ({
+    const items = MenuHelpers.mapItems(props.items, (item: MenuItemProps) => ({
         ...item,
         type: (item.type !== 'group') ? defaultItemType : item.type,
         multiple,

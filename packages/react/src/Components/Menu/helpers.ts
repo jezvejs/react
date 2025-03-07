@@ -609,6 +609,7 @@ export const getItemProps = (item: MenuItemProps, state: MenuListProps): MenuIte
     const res: MenuItemProps = {
         ...itemDefaultProps,
         ...item,
+        active: item.id === state.activeItem,
         parentId: state.id,
         iconAlign: item.iconAlign || state.iconAlign,
         disabled: item.disabled || state.disabled,

@@ -6,7 +6,7 @@ import { MenuList } from './components/List/MenuList.tsx';
 import { MenuSeparator } from './components/Separator/MenuSeparator.tsx';
 
 import { getItemProps, isAvailableItem } from './helpers.ts';
-import { MenuItemType, MenuProps } from './types.ts';
+import { MenuItemContentAlign, MenuItemType } from './types.ts';
 
 export const itemDefaultProps = {
     type: 'button' as MenuItemType,
@@ -21,13 +21,13 @@ export const itemDefaultProps = {
 
 export const getItemDefaultProps = () => itemDefaultProps;
 
-export const defaultProps: MenuProps = {
+export const getDefaultProps = () => ({
     useParentContext: false,
     menuSelector: '.menu',
     itemSelector: null,
-    defaultItemType: 'button',
-    iconAlign: 'left',
-    checkboxSide: 'left',
+    defaultItemType: 'button' as MenuItemType,
+    iconAlign: 'left' as MenuItemContentAlign,
+    checkboxSide: 'left' as MenuItemContentAlign,
     multiple: false,
     disabled: false,
     horizontal: false,
@@ -56,6 +56,4 @@ export const defaultProps: MenuProps = {
         GroupHeader: MenuGroupHeader,
         GroupItem: MenuGroupItem,
     },
-};
-
-export const getDefaultProps = () => defaultProps;
+});

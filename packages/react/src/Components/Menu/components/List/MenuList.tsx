@@ -1,14 +1,16 @@
 import classNames from 'classnames';
 import { ReactNode, useCallback, useMemo } from 'react';
 
-import { useMenuStore } from '../../hooks/useMenuStore.ts';
+import { MenuHelpers } from '../../MenuContainer.tsx';
+
 import { getItemIdByElem } from '../../helpers.ts';
 import {
     MenuGroupHeaderProps,
     MenuGroupItemProps,
+    MenuItemContentAlign,
     MenuItemProps,
+    MenuListComponent,
     MenuListProps,
-    MenuProps,
 } from '../../types.ts';
 
 import './MenuList.scss';
@@ -18,12 +20,13 @@ const defaultProps = {
     activeItem: null,
     beforeContent: false,
     afterContent: false,
+    checkboxSide: 'left' as MenuItemContentAlign,
 };
 
 /**
  * MenuList component
  */
-export const MenuList = (p: MenuListProps) => {
+export const MenuList: MenuListComponent = (p: MenuListProps) => {
     const props = {
         ...defaultProps,
         ...p,
@@ -31,7 +34,6 @@ export const MenuList = (p: MenuListProps) => {
 
     const { components } = props;
     const { ListPlaceholder } = components ?? {};
-    const { getState } = useMenuStore(props as MenuProps);
 
     /**
      * 'click' event handler
@@ -66,16 +68,17 @@ export const MenuList = (p: MenuListProps) => {
         props.onMouseLeave?.(itemId, e);
     }, []);
 
-    const renderItem = useCallback((itemData: MenuItemProps): ReactNode => {
+    const renderItem = (itemData: MenuItemProps): ReactNode => {
         const {
             ListItem,
             Separator,
             GroupItem,
         } = props.components ?? {};
-        const st = getState();
+        const st = props;
 
         const item = {
             ...(props.getItemProps?.(itemData, st as MenuListProps) ?? itemData),
+            active: !!st.activeItem && itemData.id === st.activeItem,
             components: {
                 ...(props.components ?? {}),
             },
@@ -115,7 +118,7 @@ export const MenuList = (p: MenuListProps) => {
         }
 
         return ListItem && <ListItem {...item} key={item.id} />;
-    }, []);
+    };
 
     const getPlaceholderProps = (state: MenuListProps) => (
         state.getPlaceholderProps?.(state) ?? state.placeholder ?? {}
@@ -137,17 +140,21 @@ export const MenuList = (p: MenuListProps) => {
         onMouseOut: onMouseLeave,
     }), [props.beforeContent, props.afterContent, props.className]);
 
+    const visibleItems = useMemo(() => (
+        MenuHelpers.filterItems(props.items, (item) => !!item && !item.hidden)
+    ), [props.items]);
+
     const placeholderProps = useMemo(() => (
-        (props.items.length === 0)
+        (visibleItems.length === 0)
             ? getPlaceholderProps(props)
             : {}
-    ), [props.items, props.placeholder, props.getPlaceholderProps]);
+    ), [visibleItems, props.placeholder, props.getPlaceholderProps]);
 
     const listContent = useMemo(() => (
-        (props.items.length > 0)
-            ? props.items.map((item) => renderItem(item))
+        (visibleItems.length > 0)
+            ? visibleItems.map((item) => renderItem(item))
             : (ListPlaceholder && <ListPlaceholder {...placeholderProps} />)
-    ), [props.items, props.activeItem, placeholderProps]);
+    ), [visibleItems, props.activeItem, placeholderProps]);
 
     return (
         <div {...containerProps}>

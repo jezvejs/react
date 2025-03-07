@@ -177,6 +177,8 @@ export interface MenuListProps {
     components?: MenuCommonComponents;
 }
 
+export type MenuListComponent = ComponentType<MenuListProps>;
+
 /**
  * 'ListPlaceholder' component props
  */
@@ -209,7 +211,7 @@ export type MenuGroupHeaderProps = Partial<MenuItemProps>;
 export type MenuGroupHeaderComponent = React.FC<MenuGroupHeaderProps> & WithSelector;
 
 export interface MenuCommonComponents {
-    List?: ComponentType<MenuListProps> | null;
+    List?: MenuListComponent | null;
     ListItem?: MenuItemComponent | null;
     ListPlaceholder?: MenuPlaceholderComponent | null;
     Check?: ComponentType | null;

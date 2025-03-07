@@ -15,10 +15,12 @@ import classNames from 'classnames';
 import { DebounceRunFunction, px } from '../../utils/common.ts';
 import { ListenerFunctionsGroup, ListenersGroup } from '../../utils/types.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
+import { StoreAction } from '../../utils/Store/types.ts';
 
 // Common components
 import { MenuHelpers } from '../Menu/Menu.tsx';
-import { MenuItemProps, OnGroupHeaderClickParam } from '../Menu/types.ts';
+import { MenuItemProps, MenuProps, OnGroupHeaderClickParam } from '../Menu/types.ts';
+import { useMenuStore } from '../Menu/hooks/useMenuStore.ts';
 
 // Common hooks
 import { useDebounce } from '../../hooks/useDebounce/useDebounce.ts';
@@ -63,12 +65,34 @@ export const DropDownContainer = forwardRef<
     DropDownRef,
     DropDownProps
 >((props, ref) => {
+    const store = useStore<DropDownState>();
     const {
         state,
         getState,
-        dispatch,
         setState,
-    } = useStore<DropDownState>();
+    } = store;
+
+    const menuStore = useMenuStore(props as MenuProps);
+
+    const copyMenuState = () => {
+        const excludedProps = ['menu'];
+        const st = getState();
+
+        const upd = Object.fromEntries(
+            Object.entries(st).filter(([name]) => !excludedProps.includes(name)),
+        );
+
+        menuStore.setState((prev) => ({
+            ...prev,
+            ...upd,
+            items: [...(upd.items ?? [])],
+        }));
+    };
+
+    const dispatch = useCallback((action: StoreAction) => {
+        store.dispatch(action);
+        copyMenuState();
+    }, [store.dispatch]);
 
     const onResize = useCallback(updateListPosition, []);
     const resizeHandler = useDebounce(onResize, RESIZE_DEBOUNCE_TIMEOUT) as DebounceRunFunction;

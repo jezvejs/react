@@ -79,9 +79,9 @@ export interface RangeSliderValueSliderProps {
 export interface RangeSliderDragZoneProps {
     id: string;
     axis: RangeSliderAxisType;
-    type?: RangeSliderType;
+    type: RangeSliderType;
     range: boolean;
-    onPosChange: (position: number) => void;
+    onPosChange?: (position: number) => void;
 }
 
 export type RangeSliderDragZoneRef = HTMLDivElement | null;
@@ -91,16 +91,16 @@ export type RangeSliderDragZoneRef = HTMLDivElement | null;
  */
 export interface RangeSliderDropTargetProps {
     id: string;
-    className: string;
-    axis: RangeSliderAxisType;
-    disabled: boolean;
+    className?: string;
+    axis?: RangeSliderAxisType;
+    disabled?: boolean;
 
-    children: React.ReactNode;
+    children?: React.ReactNode;
 
-    onClickCapture: (e: React.MouseEvent) => void;
-    onFocusCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
-    onBlurCapture: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
-    onKeyDownCapture: (e: React.KeyboardEvent) => void;
+    onClickCapture?: (e: React.MouseEvent) => void;
+    onFocusCapture?: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
+    onBlurCapture?: (e: React.FocusEvent<HTMLDivElement, Element>) => void;
+    onKeyDownCapture?: (e: React.KeyboardEvent) => void;
 }
 
 export type RangeSliderDropTargetRef = HTMLDivElement | null;
@@ -109,38 +109,38 @@ export type RangeSliderDropTargetRef = HTMLDivElement | null;
  * RangeSlider component props
  */
 export interface RangeSliderProps {
-    id: string,
-    className: string,
-    tabIndex: number,
-    value: number,
-    start: number,
-    end: number,
-    axis: RangeSliderAxisType,
-    min: number,
-    max: number,
-    step: number | null,
-    disabled: boolean,
-    range: boolean,
-    beforeArea: boolean,
-    afterArea: boolean,
-    scrollOnClickOutsideRange: boolean,
+    id: string;
+    className: string;
+    tabIndex: number;
+    value: number;
+    start: number;
+    end: number;
+    axis: RangeSliderAxisType;
+    min: number;
+    max: number;
+    step: number | null;
+    disabled: boolean;
+    range: boolean;
+    beforeArea: boolean;
+    afterArea: boolean;
+    scrollOnClickOutsideRange: boolean;
 
-    onClick: (e: React.MouseEvent<Element, MouseEvent>) => void,
+    onClick: (e: React.MouseEvent<Element, MouseEvent>) => void;
 
-    onFocus: (e: React.FocusEvent) => void,
+    onFocus: (e: React.FocusEvent) => void;
 
-    onBlur: (e: React.FocusEvent) => void,
+    onBlur: (e: React.FocusEvent) => void;
 
-    onKey: (e: React.KeyboardEvent) => void,
+    onKey: (e: React.KeyboardEvent) => void;
 
     onBeforeChange: (
         value: RangeSliderValue,
         changeType: RangeSliderBeforeChangeType,
-    ) => RangeSliderValue,
+    ) => RangeSliderValue;
 
-    onChange: (value: RangeSliderValue) => void,
+    onChange: (value: RangeSliderValue) => void;
 
-    onScroll: (value: RangeSliderValue) => void,
+    onScroll: (value: RangeSliderValue) => void;
 }
 
 export interface RangeSliderState extends RangeSliderProps {

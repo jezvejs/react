@@ -22,6 +22,7 @@ import * as MenuHelpers from './helpers.ts';
 import {
     MenuAttrs,
     MenuItemProps,
+    MenuListProps,
     MenuProps,
     MenuState,
     OnGroupHeaderClickParam,
@@ -58,21 +59,10 @@ const {
     createItems,
 } = MenuHelpers;
 
-const defaultProps = MenuDefProps.getDefaultProps();
-
 /**
  * Menu container component
  */
-export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
-    const props = {
-        ...defaultProps,
-        ...p,
-        components: {
-            ...defaultProps.components,
-            ...(p?.components ?? {}),
-        },
-    };
-
+export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
     const { getState, setState } = useMenuStore(props);
 
     const innerRef = useRef<HTMLDivElement | null>(null);
@@ -150,7 +140,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             return;
         }
 
-        if (!props.parentId) {
+        if (!props.useParentContext && !props.parentId) {
             setActive(null);
         }
     };
@@ -509,7 +499,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             ),
             activeItem: props.activeItem,
         }));
-    }, [props.items, props.activeItem]);
+    }, [props.activeItem]);
 
     useEffect(() => {
         const st = getState();
@@ -518,6 +508,8 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
             activateItem(st.activeItem);
         }
     }, [getState().activeItem]);
+
+    const state = getState();
 
     // Prepare alignment before and after item content
     const columns = useMemo(() => {
@@ -562,32 +554,40 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         }
 
         return res;
-    }, [props.items]);
+    }, [state.items]);
 
-    const { Header, Footer, List } = (getState()).components ?? {};
+    const components = {
+        ...(props.components ?? {}),
+        ...(state.components ?? {}),
+    };
+
+    const { Header, Footer, List } = components;
 
     const menuHeader = Header && (
         <Header {...(props.header ?? {})} />
     );
 
-    const state = getState();
     const menuList = useMemo(() => {
         const st = getState();
 
-        const { ...rest } = st;
-        delete rest.className;
+        const excludedProps = ['menu', 'className'];
+        const upd = Object.fromEntries(
+            Object.entries(st).filter(([name]) => !excludedProps.includes(name)),
+        );
 
-        const listProps = {
-            ...rest,
+        const listProps: MenuListProps = {
+            ...upd,
             ...columns,
+            activeItem: st.activeItem,
             id: st.id!,
             items: st.items ?? [],
+            checkboxSide: props.checkboxSide,
             getItemProps: st.getItemProps ?? MenuHelpers.getItemProps,
             getItemComponent: props.getItemComponent,
             onItemClick,
             onMouseEnter,
             onMouseLeave,
-            components: rest.components!,
+            components,
         };
 
         listProps.itemSelector = listProps.components?.ListItem?.selector ?? null;
@@ -595,7 +595,7 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((p, ref) => {
         return List && (
             <List {...listProps} />
         );
-    }, [state.items, state.activeItem]);
+    }, [state.items, state.activeItem, columns, List, components]);
 
     const menuFooter = Footer && (
         <Footer {...(props.footer ?? {})} />

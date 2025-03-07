@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { Store } from '../../../utils/Store/Store.ts';
 import { useStore } from '../../../utils/Store/StoreProvider.tsx';
@@ -28,7 +28,7 @@ export function useMenuStore<
 >(props: P): MenuStoreProviderContext<T> {
     const store = useStore<MenuStore<T>>();
 
-    const getState = (menuId?: string | null): T => {
+    const getState = useCallback((menuId?: string | null): T => {
         const st = store.getState();
         if (menuId === null) {
             return st as T;
@@ -40,9 +40,9 @@ export function useMenuStore<
         }
 
         return (st as MultiMenuState<T>).menu?.[id] ?? {};
-    };
+    }, [props.id, store.state]);
 
-    const setState = (updater: StoreUpdater, menuId?: string | null) => {
+    const setState = useCallback((updater: StoreUpdater, menuId?: string | null) => {
         if (menuId === null) {
             store.setState(updater);
             return;
@@ -68,11 +68,11 @@ export function useMenuStore<
 
             return res;
         });
-    };
+    }, [props.id, store.state]);
 
     const res = useMemo(() => ({
         store,
-        state: getState() as T,
+        state: store.state as T,
         getState,
         setState,
         dispatch: store.dispatch,

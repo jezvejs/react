@@ -46,6 +46,7 @@ export const MenuGroupItem: MenuGroupItemComponent = (p: MenuGroupItemProps) => 
         id,
         items: props.items.map((item) => ({
             ...item,
+            active: !!props.activeItem && item.id === props.activeItem,
             disabled: props.disabled || item.disabled,
             checkboxSide: props.checkboxSide || item.checkboxSide,
             tabThrough: props.tabThrough || item.tabThrough,
