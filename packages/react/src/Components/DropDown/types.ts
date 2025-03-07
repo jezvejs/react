@@ -13,6 +13,7 @@ import {
     MenuGroupHeaderProps,
     MenuGroupItemProps,
     MenuItemProps,
+    MenuItemType,
     MenuListProps,
     MenuPlaceholderProps,
     MenuProps,
@@ -464,6 +465,9 @@ export interface DropDownProps {
 }
 
 export interface DropDownState extends DropDownProps {
+    defaultItemType: MenuItemType;
+    renderNotSelected: boolean;
+
     active: boolean;
     activeItem?: string | null;
     changed: boolean;

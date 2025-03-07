@@ -21,6 +21,10 @@ const {
     pushItem,
 } = MenuHelpers;
 
+const deactivateAndShowAllItems = (items: DropDownMenuItemProps[]) => (
+    mapItems(items, (item: DropDownMenuItemProps) => ({ ...item, hidden: false, active: false }))
+);
+
 const deactivateAllItems = (items: DropDownMenuItemProps[]) => (
     mapItems(items, (item: DropDownMenuItemProps) => ({ ...item, active: false }))
 );
@@ -226,7 +230,7 @@ const slice = createSlice({
         filtered: false,
         inputString: (resetInput) ? null : '',
         createFromInputItemId: null,
-        items: deactivateAllItems(
+        items: deactivateAndShowAllItems(
             filterItems(
                 state.items ?? [],
                 (item) => item.id !== state.createFromInputItemId,
@@ -253,9 +257,12 @@ const slice = createSlice({
             const lowerTitle = item.title?.toLowerCase() ?? '';
             exactMatch = exactMatch || lowerTitle === lfstr;
 
+            const matchFilter = lowerTitle.includes(lfstr);
+
             const newItem = {
                 ...item,
-                matchFilter: lowerTitle.includes(lfstr),
+                matchFilter,
+                hidden: !matchFilter,
                 active: false,
             };
             if (newItem.type === 'group') {

@@ -207,6 +207,8 @@ export const getInitialState = (
     const res: DropDownState = {
         ...(defaultProps ?? {}),
         ...props,
+        defaultItemType: 'button',
+        renderNotSelected: true,
         active: false,
         changed: false,
         visible: false,
@@ -229,6 +231,8 @@ export const getInitialState = (
             ...props.components,
         },
     };
+
+    res.defaultItemType = (res.multiple) ? 'checkbox' : 'button';
 
     res.isAvailableItem = (typeof props.isAvailableItem === 'function')
         ? (item, state) => !!props.isAvailableItem?.(item, state)
