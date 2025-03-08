@@ -1,4 +1,11 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { afterTransition } from '@jezvejs/dom';
+import {
+    ReactNode,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 
@@ -7,6 +14,12 @@ import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.ts';
 import './Offcanvas.scss';
 
 export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
+
+const TRANSITION_END_TIMEOUT = 500;
+
+interface Callable {
+    (): void,
+}
 
 export interface OffcanvasProps {
     id?: string,
@@ -42,6 +55,10 @@ export const Offcanvas = (p: OffcanvasProps) => {
         ...p,
     };
 
+    const animationFrameRef = useRef(0);
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const clearTransitionRef = useRef<Callable | null>(null);
+
     const [state, setState] = useState<OffcanvasState>(props);
     const showBackground = state.transitionInProgress || state.closed === false;
 
@@ -66,13 +83,50 @@ export const Offcanvas = (p: OffcanvasProps) => {
         }));
 
         props.onClosed?.();
+
+        handleAnimationEnd();
     };
 
-    const handleTransitionEnd = () => {
+    const onAnimationDone = useCallback(() => {
+        clearTransitionRef.current = null;
+
         setState((prev) => ({
             ...prev,
             transitionInProgress: false,
         }));
+    }, []);
+
+    const cancelAnimation = () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = 0;
+        }
+
+        if (clearTransitionRef.current) {
+            clearTransitionRef.current?.();
+            clearTransitionRef.current = null;
+        }
+    };
+
+    const handleAnimationEnd = () => {
+        cancelAnimation();
+
+        animationFrameRef.current = requestAnimationFrame(() => {
+            animationFrameRef.current = 0;
+
+            if (!contentRef.current) {
+                return;
+            }
+
+            clearTransitionRef.current = afterTransition(
+                contentRef.current,
+                {
+                    duration: TRANSITION_END_TIMEOUT,
+                    target: contentRef.current,
+                },
+                () => onAnimationDone(),
+            );
+        });
     };
 
     const background = (showBackground)
@@ -99,7 +153,7 @@ export const Offcanvas = (p: OffcanvasProps) => {
                     },
                     props.className,
                 )}
-                onTransitionEndCapture={handleTransitionEnd}
+                ref={contentRef}
             >
                 <div className='offcanvas__content'>
                     {props.children}
