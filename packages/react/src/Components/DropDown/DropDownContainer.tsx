@@ -544,7 +544,8 @@ export const DropDownContainer = forwardRef<
     };
 
     const handlePlaceholderSelect = () => {
-        const { allowCreate, inputString } = state;
+        const st = getState();
+        const { allowCreate, inputString } = st;
 
         if (
             !allowCreate
@@ -556,7 +557,7 @@ export const DropDownContainer = forwardRef<
 
         removeCreatableMenuItem();
         addItem({
-            id: MenuHelpers.generateItemId(state?.items ?? [], 'item'),
+            id: MenuHelpers.generateItemId(st?.items ?? [], 'item'),
             title: inputString,
             selected: true,
         });
@@ -589,7 +590,8 @@ export const DropDownContainer = forwardRef<
             return;
         }
 
-        if (item.id === state.createFromInputItemId) {
+        const st = getState();
+        if (item.id === st.createFromInputItemId) {
             handlePlaceholderSelect();
             return;
         }
@@ -606,16 +608,16 @@ export const DropDownContainer = forwardRef<
         sendItemSelectEvent();
         setChanged();
 
-        if (!state.multiple) {
+        if (!st.multiple) {
             closeMenu();
-            if (props.enableFilter && state.filtered) {
+            if (props.enableFilter && st.filtered) {
                 showAllItems();
             }
 
             focusContainer();
         } else if (props.enableFilter) {
-            if (state.filtered) {
-                const visibleItems = getVisibleItems(state);
+            if (st.filtered) {
+                const visibleItems = getVisibleItems(st);
                 if (
                     props.clearFilterOnMultiSelect
                     || visibleItems.length === 1
