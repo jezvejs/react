@@ -14,6 +14,10 @@ export function useSlidableDropTarget(props: UseSlidableDropTargetProps) {
             return this.elem as HTMLElement;
         },
 
+        isDropAllowed({ avatar, dropTarget }) {
+            return !!avatar?.id && avatar.id === dropTarget?.id;
+        },
+
         onDragEnd(params: OnDragEndParams) {
             const state = getState();
             const { position, totalDistance, velocity } = state;

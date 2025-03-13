@@ -5,21 +5,29 @@ import { SliderContainer } from './SliderContainer.tsx';
 
 import { SliderProps } from './types.ts';
 import './Slider.scss';
+import { generateId } from './helpers.ts';
+import { useRef } from 'react';
 
 export * from './types.ts';
 
+const defaultProps = {
+    vertical: false,
+    allowMouse: false,
+    allowTouch: true,
+    allowWheel: true,
+    width: 400,
+    height: 300,
+};
+
 export const Slider = (p: SliderProps) => {
-    const defaultProps = {
-        vertical: false,
-        allowMouse: false,
-        allowTouch: true,
-        allowWheel: true,
-        width: 400,
-        height: 300,
+    const defaultId = useRef(generateId('slider'));
+    const defProps = {
+        ...defaultProps,
+        id: defaultId.current,
     };
 
     const props = {
-        ...defaultProps,
+        ...defProps,
         ...p,
     };
 
