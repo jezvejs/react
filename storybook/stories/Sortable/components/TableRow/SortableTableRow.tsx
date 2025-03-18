@@ -1,7 +1,10 @@
 import { SortableAvatarColumn } from '@jezvejs/react';
 import { forwardRef } from 'react';
 import classNames from 'classnames';
-import { SortableElementProps, WithSelector } from '../../types.ts';
+
+import { SortableElementProps } from '../../../../common/Components/SortableListItem/SortableListItem.tsx';
+
+import { WithSelector } from '../../types.ts';
 
 export type SortableTableRowRef = HTMLTableRowElement | null;
 

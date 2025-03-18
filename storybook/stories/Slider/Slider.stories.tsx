@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
 
+import { getSliderItems } from '../../common/utils/getSliderItems.tsx';
+
 import { ControlledSlider } from './components/ControlledSlider/ControlledSlider.tsx';
-import { SlideContent } from './components/SlideContent/SlideContent.tsx';
 
 import './Slider.stories.scss';
 
@@ -18,29 +19,6 @@ const meta: Meta<typeof ControlledSlider> = {
     tags: ['autodocs'],
 };
 export default meta;
-
-export type GetSliderItemsParams = {
-    idPrefix?: string;
-    itemsCount?: number;
-};
-
-const getSliderItems = (options: GetSliderItemsParams = {}) => {
-    const {
-        itemsCount = 3,
-        idPrefix = 'slide',
-    } = options;
-    const res = [];
-
-    for (let i = 1; i <= itemsCount; i += 1) {
-        res.push({
-            id: `${idPrefix}-${i}`,
-            name: `${idPrefix}-${i}`,
-            content: <SlideContent>{`Slide ${i}`}</SlideContent>,
-        });
-    }
-
-    return res;
-};
 
 export const Default: Story = {
     args: {

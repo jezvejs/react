@@ -2,11 +2,11 @@ import { useState } from 'react';
 import classNames from 'classnames';
 
 import { MenuDefProps, MenuList, MenuHelpers } from '../Menu/Menu.tsx';
+import { MenuListProps, MenuState } from '../Menu/types.ts';
 
 import { TabListItemProps, TabListProps } from './types.ts';
 import { generateId, selectItem } from './helpers.ts';
 import './TabList.scss';
-import { MenuListProps, MenuState } from '../Menu/types.ts';
 
 const defaultProps = {
     items: [],

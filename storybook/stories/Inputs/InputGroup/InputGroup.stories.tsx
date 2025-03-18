@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import '@jezvejs/react/style.scss';
 import {
     InputGroup,
-    InputGroupInput,
-    InputGroupText,
     InputGroupButton,
     InputGroupInnerButton,
-    InputGroupOuterContainer,
+    InputGroupInput,
     InputGroupInputProps,
+    InputGroupOuterContainer,
+    InputGroupText,
 } from '@jezvejs/react';
+import '@jezvejs/react/style.scss';
 
 // Icons
 import SmallCloseIcon from '../../../common/assets/icons/close-sm.svg';
@@ -17,6 +17,7 @@ import SearchIcon from '../../../common/assets/icons/search.svg';
 
 // Hooks
 import { useInputState } from '../../../common/hooks/useInputState.ts';
+import { withInputState } from '../../../common/utils/withInputState.tsx';
 
 // Common components
 import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
@@ -36,13 +37,7 @@ const meta: Meta<typeof InputGroup> = {
 };
 export default meta;
 
-const InputWithState: React.FC<InputGroupInputProps> = (props) => {
-    const { inputProps } = useInputState(props);
-
-    return (
-        <InputGroupInput {...inputProps} />
-    );
-};
+const InputWithState = withInputState<InputGroupInputProps>(InputGroupInput);
 
 export const TextAfterInput: Story = {
     args: {

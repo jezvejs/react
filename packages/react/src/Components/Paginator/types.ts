@@ -26,19 +26,39 @@ export interface PaginatorItemAttr {
     href?: string;
 }
 
+export type PaginatorOnChangeHandler = (page: number) => void;
+
 export interface PaginatorProps {
-    id: string;
-    className: string;
-    breakLimit: number;
-    groupLimit: number;
-    pageNum: number;
-    pagesCount: number;
-    allowActiveLink: boolean;
-    showSingleItem: boolean;
-    arrows: boolean;
-    pageParam: string;
+    id?: string;
+    className?: string;
+    breakLimit?: number;
+    groupLimit?: number;
+    pageNum?: number;
+    pagesCount?: number;
+    allowActiveLink?: boolean;
+    showSingleItem?: boolean;
+    arrows?: boolean;
+    pageParam?: string;
     url?: string;
-    onChange: (page: number) => void;
+    onChange?: PaginatorOnChangeHandler | null;
 }
 
-export type PaginatorState = PaginatorProps;
+type PaginatorStateProps =
+    | 'breakLimit'
+    | 'groupLimit'
+    | 'pageNum'
+    | 'pagesCount'
+    | 'allowActiveLink'
+    | 'arrows'
+    | 'pageParam'
+    | 'url'
+    | 'onChange'
+    | 'showSingleItem';
+
+export type PaginatorRequiredProps = Required<Pick<PaginatorProps, PaginatorStateProps>>;
+
+type PaginatorStateBase = Omit<PaginatorProps, PaginatorStateProps> & PaginatorRequiredProps;
+
+export interface PaginatorState extends PaginatorStateBase {
+    pagesCount: number;
+}

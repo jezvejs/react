@@ -5,10 +5,11 @@ import { useState } from 'react';
 import { RangeSlider, RangeSliderProps, RangeSliderValue } from '@jezvejs/react';
 
 import { ActionButton } from '../../common/Components/ActionButton/ActionButton.tsx';
+import { RangeSliderStyled } from '../../common/Components/RangeSliderStyled/RangeSliderStyled.tsx';
 
 import './RangeSlider.stories.scss';
 
-const LabeledRangeSlider = (args: RangeSliderProps) => {
+const LabeledRangeSlider = (args: Partial<RangeSliderProps>) => {
     const [state, setState] = useState({
         value: 0,
         start: 0,
@@ -27,9 +28,13 @@ const LabeledRangeSlider = (args: RangeSliderProps) => {
         ? `${state.start} - ${state.end}`
         : state.value;
 
+    const RangeSliderComponent = (args.className?.includes('styled'))
+        ? RangeSliderStyled
+        : RangeSlider;
+
     return (
         <div className="range-slider-container">
-            <RangeSlider {...args} onChange={onChange} />
+            <RangeSliderComponent {...args} onChange={onChange} />
             <div className="range-slider-value">{sliderValue}</div>
         </div>
     );

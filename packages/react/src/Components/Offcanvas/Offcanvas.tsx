@@ -24,7 +24,7 @@ interface Callable {
 export interface OffcanvasProps {
     id?: string,
     className?: string,
-    placement: OffcanvasPlacement,
+    placement?: OffcanvasPlacement,
     closed?: boolean,
     usePortal?: boolean,
     useScrollLock?: boolean,
@@ -40,7 +40,7 @@ interface OffcanvasState extends OffcanvasProps {
 }
 
 const defaultProps = {
-    placement: 'left',
+    placement: 'left' as OffcanvasPlacement,
     closed: true,
     usePortal: true,
     useScrollLock: true,

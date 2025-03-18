@@ -11,7 +11,9 @@ import {
 } from '@jezvejs/react';
 import { useState } from 'react';
 
+import { groupsItems, initGroupItems } from '../../../common/assets/data/dropDownData.ts';
 import { usePortalElement } from '../../../common/hooks/usePortalElement.tsx';
+import { initItems } from '../../../common/utils/utils.ts';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.tsx';
@@ -21,11 +23,6 @@ import { CustomListItem } from './components/CustomListItem/CustomListItem.tsx';
 import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.tsx';
 import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.tsx';
 
-import {
-    initItems,
-    groupsItems,
-    initGroupItems,
-} from './data.ts';
 import { DropDownStory } from './types.ts';
 import './DropDown.stories.scss';
 
@@ -74,7 +71,7 @@ export const Inline: DropDownStory = {
             className: 'dd__container_ellipsis',
             placeholder: 'Select item 2',
             static: true,
-            items: initItems('Long item test Lorem ipsum dolor sit amet'),
+            items: initItems({ title: 'Long item test Lorem ipsum dolor sit amet' }),
         };
 
         const slice = createSlice({});
@@ -107,7 +104,7 @@ export const FixedMenu: DropDownStory = {
     args: {
         fixedMenu: true,
         className: 'dd_form',
-        items: initItems('Item', 50),
+        items: initItems({ count: 50 }),
     },
     decorators: [fixedDecorator],
     render: function Render(args) {
@@ -147,7 +144,7 @@ export const AttachToBlock: AttachedToBlockStory = {
     args: {
         listAttach: true,
         isValidToggleTarget: (elem) => !elem.closest('.close-btn'),
-        items: initItems('Long Item Lorem Lorem', 10),
+        items: initItems({ title: 'Long Item Lorem Lorem' }),
     },
     decorators: [heightDecorator],
     render: function Render(args) {
@@ -159,7 +156,7 @@ export const AttachToInline: DropDownStory = {
     args: {
         className: 'dd_inline',
         listAttach: true,
-        items: initItems('Long Item Lorem Lorem', 10),
+        items: initItems({ title: 'Long Item Lorem Lorem' }),
     },
     decorators: [textDecorator],
     render: function Render(args) {
@@ -208,7 +205,7 @@ export const MultipleSelect: DropDownStory = {
         className: 'dd_stretch',
         placeholder: 'Multi select control',
         multiple: true,
-        items: initItems('Multi select', 10).map((item) => ({
+        items: initItems({ title: 'Multi select' }).map((item) => ({
             ...item,
             disabled: (item.id === '3'),
         })),
@@ -221,7 +218,7 @@ export const DisabledSingle: DropDownStory = {
         className: 'dd_stretch',
         disabled: true,
         placeholder: 'Single select control',
-        items: initItems('Item', 10).map((item) => ({
+        items: initItems().map((item) => ({
             ...item,
             selected: (item.id === '3'),
             disabled: (item.id === '4'),
@@ -237,7 +234,7 @@ export const DisabledMultiple: DropDownStory = {
         disabled: true,
         multiple: true,
         placeholder: 'Multiple select control',
-        items: initItems('Item', 10).map((item) => ({
+        items: initItems().map((item) => ({
             ...item,
             selected: (item.id === '3' || item.id === '5'),
             disabled: (item.id === '4'),
@@ -253,7 +250,7 @@ export const FilterSingle: DropDownStory = {
         enableFilter: true,
         disabled: true,
         placeholder: 'Type to filter',
-        items: initItems('Filter item', 100),
+        items: initItems({ title: 'Filter item', count: 100 }),
     },
     decorators: [textDecorator],
     render: ToggleEnable,
@@ -266,7 +263,7 @@ export const FilterMultiple: DropDownStory = {
         disabled: true,
         multiple: true,
         placeholder: 'Type to filter',
-        items: initItems('Filter item', 100),
+        items: initItems({ title: 'Filter item', count: 100 }),
     },
     decorators: [textDecorator],
     render: ToggleEnable,
@@ -313,7 +310,7 @@ export const BlurInputOnSingleSelect: DropDownStory = {
         enableFilter: true,
         blurInputOnSingleSelect: false,
         placeholder: 'Type to filter',
-        items: initItems('Item', 10),
+        items: initItems(),
     },
     decorators: [textDecorator],
 };
@@ -330,7 +327,7 @@ export const ClearFilterOnSelect: DropDownStory = {
         multiple: true,
         placeholder: 'Type to filter',
         className: 'dd_stretch',
-        items: initItems('Item', 100),
+        items: initItems({ count: 100 }),
     },
     decorators: [textDecorator],
 };
@@ -353,7 +350,7 @@ export const ShowMultipleSelection: DropDownStory = {
         multiple: true,
         placeholder: 'Type to filter',
         className: 'dd_stretch',
-        items: initItems('Item', 20),
+        items: initItems({ count: 20 }),
     },
     decorators: [textDecorator],
     render: function Render(args) {
@@ -393,7 +390,7 @@ export const ShowClearButton: DropDownStory = {
         multiple: true,
         placeholder: 'Type to filter',
         className: 'dd_form',
-        items: initItems('Item', 20),
+        items: initItems({ count: 20 }),
     },
     decorators: [textDecorator],
 };
@@ -407,7 +404,7 @@ export const ShowToggleButton: DropDownStory = {
         multiple: true,
         placeholder: 'Type to filter',
         className: 'dd_form',
-        items: initItems('Item', 20),
+        items: initItems({ count: 20 }),
     },
     decorators: [textDecorator],
 };
@@ -421,7 +418,7 @@ export const AllowCreate: DropDownStory = {
         multiple: true,
         placeholder: 'Type to filter',
         className: 'dd_form',
-        items: initItems('Item', 20),
+        items: initItems({ count: 20 }),
     },
     decorators: [textDecorator],
 };
@@ -438,7 +435,7 @@ export const FilterAttachToBlock: AttachedToBlockStory = {
         noResultsMessage: 'Nothing found',
         placeholder: 'Type to filter',
         useSingleSelectionAsPlaceholder: false,
-        items: initItems('Filter item', 100),
+        items: initItems({ title: 'Filter item', count: 100 }),
     },
     decorators: [textDecorator],
     render: function Render(args) {
@@ -455,7 +452,7 @@ export const FilterMultiAttachToBlock: AttachedToBlockStory = {
         noResultsMessage: 'Nothing found',
         multiple: true,
         placeholder: 'Type to filter',
-        items: initItems('Filter item', 100),
+        items: initItems({ title: 'Filter item', count: 100 }),
     },
     decorators: [textDecorator],
     render: function Render(args) {
@@ -468,7 +465,7 @@ export const CustomComponents: DropDownStory = {
         className: 'dd__custom dd_stretch',
         placeholder: 'Multi select control',
         multiple: true,
-        items: initItems('Item', 11).map((item) => ({
+        items: initItems({ count: 11 }).map((item) => ({
             ...item,
             selected: item.id === '4' || item.id === '5',
         })),
@@ -486,7 +483,7 @@ export const CustomComboBoxComponents: DropDownStory = {
         placeholder: 'Multi select control',
         multiple: true,
         enableFilter: true,
-        items: initItems('Filter item', 100),
+        items: initItems({ title: 'Filter item', count: 100 }),
     },
     decorators: [textDecorator],
     render: function Render(args) {
@@ -520,7 +517,7 @@ export const NativeSelect: DropDownStory = {
         placeholder: 'Use native select',
         useNativeSelect: true,
         className: 'dd_form',
-        items: initItems('Item', 5),
+        items: initItems({ count: 5 }),
     },
     decorators: [textDecorator],
 };
@@ -532,7 +529,7 @@ export const NativeSelectMultiple: DropDownStory = {
         useNativeSelect: true,
         multiple: true,
         className: 'dd_form',
-        items: initItems('Item', 5),
+        items: initItems({ count: 5 }),
     },
     decorators: [textDecorator],
 };
@@ -542,7 +539,7 @@ export const FullScreen: DropDownStory = {
         placeholder: 'Full screen',
         className: 'dd_form',
         fullScreen: true,
-        items: initItems('Item', 20),
+        items: initItems({ count: 20 }),
     },
     decorators: [textDecorator],
     render: function Render(args) {
@@ -561,7 +558,7 @@ export const FullScreenFilterMultiple: DropDownStory = {
         multiple: true,
         enableFilter: true,
         className: 'dd_form',
-        items: initItems('Item', 50),
+        items: initItems({ count: 50 }),
     },
     decorators: [textDecorator],
     render: function Render(args) {

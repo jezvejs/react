@@ -52,15 +52,15 @@ export interface PieChartMouseEvent {
 }
 
 export interface PieChartProps {
-    id: string;
-    className: string;
-    radius: number;
-    innerRadius: number;
-    offset: number;
-    data: number[] | PieChartDataItem[];
-    colors: PieChartColorItem[];
+    id?: string;
+    className?: string;
+    radius?: number;
+    innerRadius?: number;
+    offset?: number;
+    data?: number[] | PieChartDataItem[];
+    colors?: PieChartColorItem[];
 
-    onItemClick: (params: PieChartMouseEvent) => void;
-    onItemOver: (params: PieChartMouseEvent) => void;
-    onItemOut: (params: PieChartMouseEvent) => void;
+    onItemClick?: (params: PieChartMouseEvent) => void;
+    onItemOver?: (params: PieChartMouseEvent) => void;
+    onItemOut?: (params: PieChartMouseEvent) => void;
 }

@@ -1,0 +1,9 @@
+/* Components section */
+.components-section {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--csection-column-width), 1fr)
+  );
+  gap: var(--csection-gap);
+}

@@ -9,8 +9,8 @@ export type DatePickerViewType = 'month' | 'year' | 'yearrange';
 export type DatePickerRangePart = 'start' | 'end';
 
 export interface DatePickerRange {
-    start: Date | null;
-    end: Date | null;
+    start?: Date | null;
+    end?: Date | null;
 }
 
 export type DatePickerDisabledDateFilter = (date: Date) => boolean;
@@ -73,8 +73,8 @@ export type DatePickerWeekDaysHeaderComponent = React.FC<DatePickerWeekDaysHeade
  * Weekday header component props
  */
 export interface DatePickerWeekDaysHeaderProps {
-    locales: string | string[];
-    firstDay: number | null;
+    locales?: string | string[];
+    firstDay?: number | null;
 }
 
 /**
@@ -110,7 +110,7 @@ export interface DatePickerMonthViewProps {
     renderWeekdays: boolean;
     renderHeader: boolean;
     showOtherMonthDays: boolean;
-    fixedHeight: boolean;
+    fixedHeight?: boolean;
     header: object;
     focusable: boolean;
     disabledDateFilter: DatePickerDisabledDateFilter | null;
@@ -190,27 +190,27 @@ export interface DatePickerViewTransform {
  */
 export interface DatePickerProps {
     /* Additional reducers */
-    reducers: StoreReducersList;
+    reducers?: StoreReducersList;
     /** Additional CSS classes */
-    className: string;
+    className?: string;
     /** Date select mode. Possible values: 'date', 'month', 'year' */
-    mode: DatePickerSelectMode;
+    mode?: DatePickerSelectMode;
     /** Initial date to render */
-    date: Date;
+    date?: Date;
     /** Show datepicker popup */
-    visible: boolean;
+    visible?: boolean;
     /** If enabled component will be rendered on place instead of wrapping it with popup */
-    inline: boolean;
+    inline?: boolean;
     /** If enabled popup will be hidden after select date */
-    hideOnSelect: boolean;
+    hideOnSelect?: boolean;
     /** Enables multiple items select mode */
-    multiple: boolean;
+    multiple?: boolean;
     /** Enables range select mode */
-    range: boolean;
+    range?: boolean;
     /** Range selection start date */
-    startDate: Date | null;
+    startDate?: Date | null;
     /** Range selection end date */
-    endDate: Date | null;
+    endDate?: Date | null;
     /** Columns gap in pixels */
     columnGap?: number;
     /** Rows gap in pixels */
@@ -220,38 +220,38 @@ export interface DatePickerProps {
     /** If enabled slide axis is changed from horizontal to vertical */
     vertical?: boolean;
     /** Set current target for range select mode. Possible values: 'start', 'end', null */
-    rangePart: DatePickerRangePart | null;
+    rangePart?: DatePickerRangePart | null;
     /** List of locales */
-    locales: string | string[];
+    locales?: string | string[];
     /** First day of week */
-    firstDay: number | null;
+    firstDay?: number | null;
     /** Enables keyboard navigation by child components */
-    keyboardNavigation: boolean;
+    keyboardNavigation?: boolean;
     /** If enabled child components will render days from other month */
-    showOtherMonthDays: boolean;
+    showOtherMonthDays?: boolean;
     /** If enabled month view will always render 6 weeks */
-    fixedHeight: boolean;
+    fixedHeight?: boolean;
     /** Enables animation */
-    animated: boolean;
+    animated?: boolean;
     /** Callback to set disabled state of items */
-    disabledDateFilter: DatePickerDisabledDateFilter | null;
+    disabledDateFilter?: DatePickerDisabledDateFilter | null;
     /** Range selected event handler */
-    onRangeSelect: DatePickerRangeSelectCallback | null;
+    onRangeSelect?: DatePickerRangeSelectCallback | null;
     /** Date selected event handler */
-    onDateSelect: DatePickerDateSelectCallback | null;
+    onDateSelect?: DatePickerDateSelectCallback | null;
     /** Component shown event handler */
-    onShow: (() => void) | null;
+    onShow?: (() => void) | null;
     /** Component hidden event handler */
-    onHide: (() => void) | null;
+    onHide?: (() => void) | null;
     /** Props for footer component */
-    footer: object;
+    footer?: object;
     /** If enabled popup will use fixed position */
-    fixed: boolean;
+    fixed?: boolean;
     /** Popup position props */
-    position: PopupPositionProps;
-    container: Element | DocumentFragment | null;
-    children: ReactNode | null;
-    components: {
+    position?: PopupPositionProps;
+    container?: Element | DocumentFragment | null;
+    children?: ReactNode | null;
+    components?: {
         Footer?: ComponentType | null;
         Header?: DatePickerHeaderComponent | null;
         WeekDaysHeader?: DatePickerWeekDaysHeaderComponent | null;
@@ -266,10 +266,25 @@ export interface DatePickerNextState {
     date: Date;
 }
 
+type DatePickerStateProps =
+    | 'date'
+    | 'locales'
+    | 'multiple'
+    | 'firstDay'
+    | 'range'
+    | 'disabledDateFilter'
+    | 'rangePart'
+    | 'showOtherMonthDays'
+    | 'components';
+
+export type DatePickerRequiredProps = Required<Pick<DatePickerProps, DatePickerStateProps>>;
+
+type DatePickerStateBase = Omit<DatePickerProps, DatePickerStateProps> & DatePickerRequiredProps;
+
 /**
  * DatePicker state
  */
-export interface DatePickerState extends DatePickerProps {
+export interface DatePickerState extends DatePickerStateBase {
     viewType: DatePickerViewType;
     actDate: Date | Date[] | null;
     curRange: DatePickerRange;

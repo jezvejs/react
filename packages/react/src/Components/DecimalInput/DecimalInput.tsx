@@ -93,6 +93,7 @@ export const DecimalInput: React.FC<DecimalInputProps> = (p) => {
         id: props.id,
         className: props.className,
         value: props.value,
+        placeholder: props.placeholder,
     };
 
     return (

@@ -1,12 +1,13 @@
+import { useRef } from 'react';
+
 import { createSlice } from '../../utils/createSlice.ts';
 import { DragnDropProvider } from '../../utils/DragnDrop/DragnDropProvider.tsx';
 
 import { SliderContainer } from './SliderContainer.tsx';
 
+import { generateId } from './helpers.ts';
 import { SliderProps } from './types.ts';
 import './Slider.scss';
-import { generateId } from './helpers.ts';
-import { useRef } from 'react';
 
 export * from './types.ts';
 

@@ -1,0 +1,353 @@
+@use "sass:list";
+
+@use "../../common/assets/colors/colors";
+
+:root {
+  --accent-color: #0072c6;
+  --accent-hover-color: #1e82cc;
+  --accent-active-color: #104b79;
+
+  /* Logo */
+  --logo-size: 100px;
+
+  /* Components section */
+  --csection-column-width: 300px;
+  --csection-gap: 1rem;
+
+  /* Primary button */
+  --primary-btn-border-radius: 6px;
+  --primary-btn-bg: var(--accent-color);
+  --primary-btn-hover-bg: var(--accent-hover-color);
+  --primary-btn-active-bg: var(--accent-active-color);
+}
+
+a,
+a:visited {
+  color: var(--accent-color);
+}
+
+a:active {
+  color: var(--accent-active-color);
+}
+
+@media (hover: hover) {
+  a:hover {
+    color: var(--accent-hover-color);
+  }
+}
+
+main {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main-header {
+  margin: 1.5rem 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.main-text {
+  margin: 0.5rem 0;
+}
+
+.code-block {
+  padding: 1rem;
+  background-color: #f6f8fa;
+  border-radius: 0.4rem;
+}
+
+/* Primary button */
+.btn.primary-btn,
+.btn.primary-btn:visited {
+  --btn-title-color: #ffffff;
+  --btn-background: var(--primary-btn-bg);
+  --btn-hover-title-color: #ffffff;
+  --btn-hover-background: var(--primary-btn-hover-bg);
+  --btn-border-radius: var(--primary-btn-border-radius);
+  --btn-active-background: var(--primary-btn-active-bg);
+  --btn-disabled-background: #5082aa;
+  --btn-padding: 0 22px;
+
+  margin-right: 15px;
+}
+
+.btn.primary-btn:focus {
+  outline: 2px #aee5ff solid;
+  outline-offset: 0.1rem;
+}
+
+/* Header component */
+.header.full-width {
+  position: static;
+  width: calc(100% - 2rem);
+  margin: 1rem;
+
+  .btn.header-menu-btn {
+    --btn-border-radius: 100vh;
+    --btn-padding: 4px;
+    --btn-icon-color: #dddddd;
+    --btn-active-background: #4e4e4e;
+    --btn-hover-background: #646464;
+
+    margin: 9px;
+    flex: 0 0 auto;
+  }
+}
+
+/* Header logo */
+.nav-header__logo,
+.nav-header__logo:visited {
+  --btn-title-color: #dddddd;
+  --btn-font-size: 1.1rem;
+  --btn-hover-title-color: #ffffff;
+  --btn-size: 50px;
+
+  white-space: nowrap;
+}
+
+/* Offcanvas */
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  .offcanvas {
+    position: absolute;
+  }
+
+  .offcanvas__content {
+    padding: 0.5rem;
+  }
+}
+
+/* Paginator */
+.paginator.styled {
+  gap: 2px;
+
+  .paginator-item {
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+    text-decoration: none;
+    border: 1px solid #ffffff00;
+    border-radius: 3px;
+    color: #447fd6;
+  }
+
+  .paginator-item__active {
+    font-weight: normal;
+    background-color: #557dff;
+    color: #ffffff;
+  }
+
+  .paginator-arrow {
+    width: 26px;
+    fill: #93beff;
+  }
+
+  .paginator-arrow[disabled] {
+    fill: #dbdbdb;
+  }
+}
+
+@media (hover: hover) {
+  .paginator.styled a.paginator-item:hover {
+    border-color: #93beff;
+  }
+
+  .paginator.styled a.paginator-arrow:hover {
+    fill: #447fd6;
+    border-color: #ffffff;
+  }
+}
+
+/* Popup */
+.popup.center_only {
+  .popup__content {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Progress */
+.w-500 {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.green-progress {
+  --progress-color: #00b909;
+}
+
+.thin-progress {
+  --progress-height: 2px;
+}
+
+.border-progress {
+  --progress-border: 1px solid #888888;
+}
+
+/* Range slider */
+.range-slider {
+  width: 100%;
+}
+
+/* Slider */
+.slide {
+  padding: 5px;
+}
+
+/* Sortable */
+.list-area {
+  width: 100%;
+}
+
+/* InputGroup */
+.input-group {
+  max-width: 450px;
+  margin-bottom: 1rem;
+}
+
+.amount-input {
+  width: 100%;
+  text-align: right;
+}
+
+.input-group.input-group__input-outer .input-group__text {
+  border: 0 none;
+  height: var(--ig-inner-height);
+}
+
+/* Input group button */
+.btn.input-group__btn,
+.btn.input-group__btn:focus {
+  --btn-title-color: #ffffff;
+  --btn-background: var(--action-btn-bg);
+  --btn-border-style: solid;
+  --btn-border-color: #0062a8;
+  --btn-hover-background: var(--action-btn-hover-bg);
+  --btn-active-background: var(--action-btn-active-bg);
+
+  min-width: var(--ig-height);
+  margin: 0;
+}
+
+/* DropDown */
+.dd_stretch {
+  align-self: auto;
+  width: 100%;
+}
+
+/* Histogram */
+.histogram,
+.linechart {
+  @for $i from 1 through list.length(colors.$colors) {
+    --charts-color-#{$i}: #{list.nth(colors.$colors, $i)};
+    --charts-active-color-#{$i}: #{list.nth(colors.$active-colors, $i)};
+  }
+}
+
+.chart-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  margin: 8px auto 16px auto;
+}
+
+@for $i from 1 through list.length(colors.$colors) {
+  .histogram_column-#{$i} {
+    --histogram-bar-color: var(--charts-color-#{$i});
+    --histogram-active-bar-color: var(--charts-active-color-#{$i});
+  }
+
+  .linechart_category-ind-#{$i} {
+    --linechart-item-border: var(--charts-color-#{$i});
+    --linechart-line-color: var(--charts-color-#{$i});
+    --linechart-active-item-fill: var(--charts-active-color-#{$i});
+    --linechart-active-item-border: var(--charts-active-color-#{$i});
+  }
+}
+
+/* Pie chart */
+.middle_pie {
+  .pie__sector-1 {
+    fill: #00b74a;
+  }
+
+  .pie__sector-2 {
+    fill: #ff8700;
+  }
+
+  .pie__sector-3 {
+    fill: #db0058;
+  }
+
+  .pie__sector-4 {
+    fill: #086ca2;
+  }
+}
+
+.std_chart_wrap {
+  position: relative;
+  width: fit-content;
+}
+
+.info-bottom {
+  height: 1rem;
+}
+
+@media (hover: hover) {
+  .middle_pie {
+    .pie__sector-1:hover {
+      fill: #37db79;
+    }
+
+    .pie__sector-2:hover {
+      fill: #ffa540;
+    }
+
+    .pie__sector-3:hover {
+      fill: #ed3b83;
+    }
+
+    .pie__sector-4:hover {
+      fill: #3c9dd1;
+    }
+  }
+}
+
+/* RangeScrollChart */
+.range-chart-card .component-card__content {
+  overflow: hidden;
+
+  .chart-container {
+    overflow: hidden;
+  }
+}
+
+/* Drag'n'drop */
+.section-h200 {
+  height: 200px;
+  width: 100%;
+}
+
+.drag-area {
+  position: relative;
+  border-width: 2px;
+  border-style: dashed;
+  border-color: #306da3db;
+}
+
+.square {
+  width: 75px;
+  height: 75px;
+  background-color: #77bbff;
+}
+
+.abs_pos_square {
+  position: absolute;
+}

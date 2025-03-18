@@ -1,17 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
-import { Input, InputProps } from '@jezvejs/react';
-import { useInputState } from '../../../common/hooks/useInputState.ts';
+import { Input } from '@jezvejs/react';
+
+import { withInputState } from '../../../common/utils/withInputState.tsx';
+
 import './Input.stories.scss';
 
-const InputWithState: React.FC<InputProps> = (props) => {
-    const { inputProps } = useInputState(props);
-
-    return (
-        <Input {...inputProps} />
-    );
-};
+const InputWithState = withInputState(Input);
 
 type Story = StoryObj<typeof InputWithState>;
 

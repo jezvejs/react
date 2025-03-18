@@ -24,15 +24,15 @@ export interface RangeScrollChartNavigationProps extends Partial<BaseChartProps>
 }
 
 export interface RangeScrollChartProps {
-    className: string;
-    type: ChartType;
-    hideScrollBar: boolean;
-    mainChart: RangeScrollChartMainProps;
-    navigationChart: RangeScrollChartNavigationProps;
-    navigationSlider: RangeSliderProps;
+    className?: string;
+    type?: ChartType;
+    hideScrollBar?: boolean;
+    mainChart?: RangeScrollChartMainProps;
+    navigationChart?: RangeScrollChartNavigationProps;
+    navigationSlider?: RangeSliderProps;
 }
 
-export interface RangeScrollChartState extends RangeScrollChartProps {
+export interface RangeScrollChartState extends Required<RangeScrollChartProps> {
     start: number;
     end: number;
     scrollLeft: number;

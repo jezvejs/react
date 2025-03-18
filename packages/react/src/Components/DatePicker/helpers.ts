@@ -26,18 +26,18 @@ export const toCSSValue = (val: number): number => (+val.toFixed(4));
 
 /** Returns initial state object for specified props */
 export const getInitialState = (props: DatePickerProps, defaultProps: DatePickerProps) => {
-    const mode = props.mode ?? defaultProps?.mode;
+    const mode = props.mode ?? defaultProps?.mode ?? 'date';
     if (!(mode in viewTypesMap)) {
         throw new Error('Invalid mode');
     }
 
     const res: DatePickerState = {
-        ...(defaultProps ?? {}),
+        ...(defaultProps as DatePickerState),
         ...props,
-        visible: !!props.inline || props.visible,
+        visible: !!props.inline || !!props.visible,
         fixed: false,
         viewType: viewTypesMap[mode] as DatePickerViewType,
-        date: isDate(props.date) ? props.date : new Date(),
+        date: isDate(props.date) ? props.date as Date : new Date(),
         curRange: { start: null, end: null },
         selRange: { start: null, end: null },
         actDate: null,

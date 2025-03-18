@@ -112,10 +112,10 @@ export interface LineChartProps extends BaseChartProps {
     getAlignedX?: (options: LineChartAlignedXOptions, state: LineChartState) => number;
     createItem?: (data: LineChartItemProps, state: LineChartState) => LineChartDataItemType | null;
 
-    components: LineChartComponents;
+    components?: LineChartComponents;
 }
 
-type LineChartBaseState = LineChartProps & BaseChartState;
+type LineChartBaseState = Required<LineChartProps> & BaseChartState;
 
 export interface LineChartVisibleItems extends BaseChartVisibleItems {
     items: LineChartDataGroup[];

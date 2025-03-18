@@ -5,7 +5,7 @@ import {
     useRef,
 } from 'react';
 
-import { usePortalElement } from '../../../../common/hooks/usePortalElement.tsx';
+import { usePortalElement } from '../../hooks/usePortalElement.tsx';
 
 import { Box } from './Box.tsx';
 import { OriginalDragAvatar } from './OriginalDragAvatar.tsx';

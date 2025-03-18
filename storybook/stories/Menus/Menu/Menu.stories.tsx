@@ -18,7 +18,7 @@ import {
     groupItems,
     checkboxGroupItems,
     collapsibleGroupItems,
-} from './data.ts';
+} from '../../../common/assets/data/menuData.ts';
 import './Menu.stories.scss';
 
 export type Story = StoryObj<typeof Menu>;

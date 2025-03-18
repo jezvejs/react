@@ -4,19 +4,19 @@ import classNames from 'classnames';
 import './Switch.scss';
 
 export interface SwitchProps {
-    id: string,
-    name: string,
-    className: string,
-    form: string,
-    tabIndex: number,
-    checked: boolean,
-    disabled: boolean,
-    value: string,
-    label: string,
-    tooltip: string,
-    onFocus: (e: React.FocusEvent<HTMLInputElement>) => void,
-    onBlur: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    id?: string,
+    name?: string,
+    className?: string,
+    form?: string,
+    tabIndex?: number,
+    checked?: boolean,
+    disabled?: boolean,
+    value?: string,
+    label?: string,
+    tooltip?: string,
+    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void,
+    onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
 /**

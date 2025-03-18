@@ -5,18 +5,13 @@ import { ControlledInput, ControlledInputProps } from '@jezvejs/react';
 
 // Hooks
 import { useInputState } from '../../../common/hooks/useInputState.ts';
+import { withInputState } from '../../../common/utils/withInputState.tsx';
 
 // Common components
 import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
 import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
 
-const InputWithState: React.FC<ControlledInputProps> = (props) => {
-    const { inputProps } = useInputState(props);
-
-    return (
-        <ControlledInput {...inputProps} />
-    );
-};
+const InputWithState = withInputState<ControlledInputProps>(ControlledInput);
 
 type Story = StoryObj<typeof InputWithState>;
 

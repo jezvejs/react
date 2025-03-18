@@ -5,8 +5,8 @@ import {
     sortableReducer,
 } from '@jezvejs/react';
 
-import { usePortalElement } from '../../../../common/hooks/usePortalElement.tsx';
-import { useUniqueDragZoneId } from '../../hooks/useUniqueDragZoneId.ts';
+import { usePortalElement } from '../../hooks/usePortalElement.tsx';
+import { useUniqueDragZoneId } from '../../../stories/Sortable/hooks/useUniqueDragZoneId.ts';
 
 export const ProvidedSortable = (props: SortableProps) => {
     const sortableProps = {

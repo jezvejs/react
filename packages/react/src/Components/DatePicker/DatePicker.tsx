@@ -38,7 +38,7 @@ type DatePickerRef = HTMLDivElement | null;
 
 export const DatePicker = forwardRef<
     DatePickerRef,
-    DatePickerProps
+    Partial<DatePickerProps>
 >((props, ref) => {
     const reducers = useMemo(() => {
         const extraReducers = asArray(props.reducers);

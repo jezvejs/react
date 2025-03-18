@@ -103,10 +103,10 @@ export interface HistogramProps extends BaseChartProps {
     getAlignedX?: (options: HistogramAlignedXOptions, state: HistogramState) => number;
     createItem?: (data: HistogramItemProps, state: HistogramState) => HistogramDataItemType | null;
 
-    components: HistogramComponents;
+    components?: HistogramComponents;
 }
 
-type HistogramBaseState = HistogramProps & BaseChartState;
+type HistogramBaseState = Required<HistogramProps> & BaseChartState;
 
 export type HistogramVisibleItems = BaseChartVisibleItems<HistogramDataGroup>;
 
