@@ -337,8 +337,8 @@ export const DatePickerContainer = forwardRef<
      * @param {Date|null} endDate  - date to finnish selection at
      */
     const setSelection = (
-        startDate: Date | null,
-        endDate: Date | null,
+        startDate?: Date | null,
+        endDate?: Date | null,
         navigateToFirst: boolean = true,
     ) => {
         if (waitingForAnimationRef.current) {
@@ -369,12 +369,12 @@ export const DatePickerContainer = forwardRef<
         dispatch(actions.setDisabledDateFilter(disabledDateFilter));
     };
 
-    const setRangePart = (rangePart: DatePickerRangePart | null) => {
+    const setRangePart = (rangePart?: DatePickerRangePart | null) => {
         if (waitingForAnimationRef.current) {
             return;
         }
 
-        dispatch(actions.setRangePart(rangePart));
+        dispatch(actions.setRangePart(rangePart ?? null));
     };
 
     /** Range select inner callback */
@@ -738,13 +738,13 @@ export const DatePickerContainer = forwardRef<
         if (!props.startDate && !props.endDate) {
             clearSelection();
         } else {
-            setSelection(props.startDate, props.endDate);
+            setSelection(props.startDate ?? null, props.endDate ?? null);
         }
     }, [props.startDate, props.endDate]);
 
     // Update disabled date filter
     useEffect(() => {
-        setDisabledDateFilter(props.disabledDateFilter);
+        setDisabledDateFilter(props.disabledDateFilter ?? null);
     }, [props.disabledDateFilter]);
 
     // Update range part

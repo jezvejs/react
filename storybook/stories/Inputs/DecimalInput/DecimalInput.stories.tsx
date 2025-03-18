@@ -1,9 +1,10 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 
-import '@jezvejs/react/style.scss';
 import { DecimalInput, DecimalInputProps } from '@jezvejs/react';
+import '@jezvejs/react/style.scss';
+
 import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
-import { useInputState } from '../../../common/hooks/useInputState.ts';
+import { withInputState } from '../../../common/utils/withInputState.tsx';
 
 const TempInputDecorator = (StoryComponent: StoryFn) => (
     <div>
@@ -14,13 +15,7 @@ const TempInputDecorator = (StoryComponent: StoryFn) => (
     </div>
 );
 
-const InputWithState: React.FC<DecimalInputProps> = (props) => {
-    const { inputProps } = useInputState<DecimalInputProps>(props);
-
-    return (
-        <DecimalInput {...inputProps} />
-    );
-};
+const InputWithState = withInputState<DecimalInputProps>(DecimalInput);
 
 type Story = StoryObj<typeof InputWithState>;
 

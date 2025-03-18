@@ -235,6 +235,11 @@ export const updateColumnWidth = (state: BaseChartState): BaseChartState => {
     };
 };
 
+/** Returns random identifier */
+export const generateId = () => (
+    Math.round(Date.now() * Math.random() * 100000).toString(30)
+);
+
 /** Calculates new state for specified chart data */
 export const getDataState = (data: BaseChartDataProp, state: BaseChartState): BaseChartState => {
     const newState: BaseChartState = {
@@ -261,7 +266,7 @@ export const getInitialState = (
     props: Partial<BaseChartProps>,
     defaultProps: BaseChartProps,
 ): BaseChartState => {
-    const state: BaseChartState = {
+    const state = {
         ...(defaultProps ?? {}),
         scrollLeft: 0,
         scrollerWidth: 0,
@@ -314,7 +319,7 @@ export const getInitialState = (
     const { height, marginTop } = state;
     state.chartHeight = (height ?? 0) - (marginTop ?? 0);
 
-    return getDataState(props.data ?? [], state);
+    return getDataState(props.data ?? [], state as BaseChartState);
 };
 
 export const isHorizontalScaleNeeded = (

@@ -1,11 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
-import { useState } from 'react';
-import { Offcanvas, OffcanvasProps } from '@jezvejs/react';
+import { Offcanvas } from '@jezvejs/react';
 
-import { usePortalElement } from '../../common/hooks/usePortalElement.tsx';
-import { ActionButton } from '../../common/Components/ActionButton/ActionButton.tsx';
+import { OpenOffcanvas } from '../../common/Components/OpenOffcanvas/OpenOffcanvas.tsx';
 
 import './Offcanvas.stories.scss';
 
@@ -20,27 +18,6 @@ const meta: Meta<typeof Offcanvas> = {
     tags: ['autodocs'],
 };
 export default meta;
-
-const OpenOffcanvas = (args: OffcanvasProps) => {
-    const portalElement = usePortalElement();
-    const [state, setState] = useState({
-        visible: false,
-    });
-
-    const showOffcanvas = (visible: boolean) => setState((prev) => ({ ...prev, visible }));
-
-    return (
-        <div className="page">
-            <ActionButton title='Show' onClick={() => showOffcanvas(true)} />
-            <Offcanvas
-                {...args}
-                closed={!state.visible}
-                onClosed={() => showOffcanvas(false)}
-                container={portalElement}
-            />
-        </div>
-    );
-};
 
 export const Default: Story = {
     args: {

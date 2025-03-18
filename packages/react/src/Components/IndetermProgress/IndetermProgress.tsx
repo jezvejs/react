@@ -1,13 +1,18 @@
 import classNames from 'classnames';
 
 import './IndetermProgress.scss';
+import { useMemo } from 'react';
 
 export interface IndetermProgressProps {
-    id: string,
-    className: string,
-    run: boolean,
-    circlesCount: number,
+    id?: string;
+    className?: string;
+    run?: boolean;
+    circlesCount?: number;
 }
+
+const generateId = () => (
+    Math.round(Date.now() * Math.random() * 100000).toString(30)
+);
 
 const defaultProps = {
     run: true,
@@ -30,13 +35,11 @@ export const IndetermProgress = (p: IndetermProgressProps) => {
         ...rest
     } = props;
 
-    const generateId = () => (
-        Math.round(Date.now() * Math.random() * 100000).toString(30)
-    );
-
-    const circles = Array(circlesCount).fill('indtp').map((item) => (
-        `${item}${generateId()}`
-    ));
+    const circles = useMemo(() => (
+        Array(circlesCount).fill('indtp').map((item) => (
+            `${item}${generateId()}`
+        ))
+    ), []);
 
     return (
         <div

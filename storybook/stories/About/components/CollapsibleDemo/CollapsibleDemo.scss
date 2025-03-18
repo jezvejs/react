@@ -1,0 +1,87 @@
+/* Collapsible */
+.demo-collapsible {
+  display: inline-flex;
+  min-width: 300px;
+  background-color: #55b0ff;
+
+  .collapsible-header {
+    flex-flow: row nowrap;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .collapsible-header:focus-within {
+    background-color: #1d93fa;
+  }
+
+  .collapsible-content {
+    background-color: #94bde0;
+  }
+}
+
+.demo-collapsible__title {
+  flex-grow: 1;
+  font-size: 16px;
+  padding: 8px 8px 8px 8px;
+}
+
+.demo-collapsible__header-btn {
+  width: 34px;
+  height: 34px;
+  padding: 5px;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+
+  .demo-collapsible__header-icon {
+    width: 24px;
+    height: 24px;
+    fill: #ffffff;
+    opacity: 0.5;
+  }
+}
+
+/* Focused header */
+.collapsible-header:focus-within .demo-collapsible__header-icon {
+  opacity: 0.5;
+}
+
+/* Focused header button */
+.demo-collapsible
+  .collapsible-header
+  .demo-collapsible__header-btn:focus-visible
+  .demo-collapsible__header-icon {
+  opacity: 1;
+}
+
+.demo-collapsible__content-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  width: 100%;
+}
+
+@media (hover: hover) {
+  .demo-collapsible .demo-collapsible__header-icon {
+    opacity: 0;
+  }
+
+  /* Hovered header */
+  .demo-collapsible .collapsible-header:hover .demo-collapsible__header-icon {
+    opacity: 0.5;
+  }
+
+  /* Hovered header button */
+  .demo-collapsible
+    .collapsible-header
+    .demo-collapsible__header-btn:hover
+    .demo-collapsible__header-icon {
+    opacity: 1;
+  }
+
+  .demo-collapsible .collapsible-header:hover {
+    background-color: #1d93fa;
+  }
+}

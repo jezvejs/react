@@ -14,29 +14,6 @@ export type InputModes = (
     | 'decimal'
 );
 
-/*
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    id?: string,
-    name?: string,
-    className?: string,
-    form?: string,
-    tabIndex?: number,
-    inputMode?: InputModes,
-    placeholder?: string,
-    type?: string,
-    disabled?: boolean,
-    value?: string,
-
-    onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void,
-    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void,
-    onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void,
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
-    value?: string;
-
-    renderValue?: (value: InputProps) => string;
-}
-*/
-
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'> & {
     value?: string;
 

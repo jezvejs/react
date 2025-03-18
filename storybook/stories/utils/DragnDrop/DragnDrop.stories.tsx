@@ -16,15 +16,17 @@ import React, { forwardRef, useCallback } from 'react';
 
 import MenuIcon from '../../../common/assets/icons/menu.svg';
 
+// Common components
+import { DragOriginalDemo } from '../../../common/Components/DragnDrop/DragOriginalDemo.tsx';
+
 // Local components
-import { DefaultDragZone } from './components/DefaultDragZone.tsx';
+import { DefaultDragZone } from '../../../common/Components/DragnDrop/DefaultDragZone.tsx';
 import { DefaultDropTarget } from './components/DefaultDropTarget.tsx';
-import { OriginalDropTarget } from './components/OriginalDropTarget.tsx';
+import { OriginalDropTarget } from '../../../common/Components/DragnDrop/OriginalDropTarget.tsx';
 import { XAxisDropTarget } from './components/XAxisDropTarget.tsx';
 import { XAxisDragZone } from './components/XAxisDragZone.tsx';
 
 import './DragnDrop.stories.scss';
-import { useUniqueDragZoneId } from '../../Sortable/hooks/useUniqueDragZoneId.ts';
 
 export type DragZoneItemState = DragZone & DragnDropState;
 
@@ -32,53 +34,9 @@ export type DefaultDragnDropState = DragnDropState & {
     [key: string]: DragZoneItemState;
 };
 
-export type DragDefaultState = DragnDropState & {
-    box: DragZoneItemState;
-};
-
 export type DragClonedState = DragnDropState & {
     leftItems: DragZoneItemState[];
     rightItems: DragZoneItemState[];
-};
-
-const DefaultDragBox = () => {
-    const { state } = useDragnDrop<DragDefaultState>();
-    return (
-        <DefaultDragZone {...state.box} dragOriginal />
-    );
-};
-
-const DragOriginalDemo = () => {
-    const boxId = useUniqueDragZoneId('box');
-
-    const initialState = {
-        box: {
-            id: boxId,
-            left: 0,
-            top: 0,
-            absolutePos: true,
-        },
-        left: 0,
-        top: 0,
-        shiftX: 0,
-        shiftY: 0,
-        dragging: false,
-    };
-
-    const slice = createSlice({
-    });
-
-    const isDropAllowed = useCallback(({ avatar }: IsDropAllowedParams) => (
-        avatar?.id === boxId
-    ), [boxId]);
-
-    return (
-        <DragnDropProvider reducer={slice.reducer} initialState={initialState}>
-            <OriginalDropTarget isDropAllowed={isDropAllowed}>
-                <DefaultDragBox />
-            </OriginalDropTarget>
-        </DragnDropProvider>
-    );
 };
 
 export type Story = StoryObj<typeof DragOriginalDemo>;

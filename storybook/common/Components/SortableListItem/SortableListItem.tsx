@@ -2,9 +2,12 @@ import { SortableItemWrapperProps, SortableListItemComponent } from '@jezvejs/re
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 
-import { SortableElementProps } from '../../types.ts';
-
 import './SortableListItem.scss';
+
+export type SortableElementProps = React.HTMLAttributes<HTMLDivElement> & {
+    'data-id': string,
+    'data-group'?: string,
+};
 
 export type SortableListItemRef = HTMLDivElement;
 

@@ -1,7 +1,7 @@
 import { MenuItemProps, MenuItemType } from '@jezvejs/react';
-import GlyphIcon from '../../../common/assets/icons/glyph.svg';
-import SearchIcon from '../../../common/assets/icons/search.svg';
-import SelectIcon from '../../../common/assets/icons/select.svg';
+import GlyphIcon from '../icons/glyph.svg';
+import SearchIcon from '../icons/search.svg';
+import SelectIcon from '../icons/select.svg';
 
 export const getDefaultItems = (): MenuItemProps[] => ([{
     id: 'selectBtnItem',

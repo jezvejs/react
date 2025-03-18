@@ -9,7 +9,6 @@ import { PaginatorProps, PaginatorState } from './types.ts';
 import './Paginator.scss';
 
 const defaultProps = {
-    id: undefined,
     breakLimit: 5,
     groupLimit: 3,
     pageNum: 1,

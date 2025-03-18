@@ -1,12 +1,7 @@
-import { ReactNode } from 'react';
 import classNames from 'classnames';
 import './Header.scss';
 
-export interface HeaderProps {
-    id: string,
-    className: string,
-    children: ReactNode,
-}
+export type HeaderProps = React.HTMLAttributes<HTMLElement>;
 
 /**
  * Header component

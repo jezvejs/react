@@ -368,7 +368,7 @@ export interface SortableProps<ITEM_TYPE = SortableTreeItem> {
     allowSingleItemSort?: boolean;
     transitionTimeout?: number;
 
-    container: Element | DocumentFragment | null;
+    container?: Element | DocumentFragment | null;
 
     acceptChild?: (params: AcceptChildParam) => boolean;
 

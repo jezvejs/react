@@ -4,14 +4,13 @@ import '@jezvejs/react/style.scss';
 import { useState } from 'react';
 import {
     PieChart,
-    PieChartDataItem,
     PieChartProps,
-    PieChartSectorProps,
 } from '@jezvejs/react';
 
 // Common components
 import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
 import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
+import { SelectablePieChart, SelectablePieChartDataState, toPieChartDataItem } from '../../../common/Components/SelectablePieChart/SelectablePieChart.tsx';
 
 import './PieChart.stories.scss';
 
@@ -27,13 +26,6 @@ const meta: Meta<typeof PieChart> = {
 };
 export default meta;
 
-const toggleSectorOffset = (data: PieChartDataItem[], sector: PieChartSectorProps) => (
-    data.map((item) => ({
-        ...item,
-        offset: (sector.id === item.id && item.offset !== 10) ? 10 : 0,
-    }))
-);
-
 export const Default: Story = {
     args: {
         className: 'small_pie',
@@ -44,74 +36,6 @@ export const Default: Story = {
         data: [100, 150, 120, 20, 10, 6, 8, 220],
         radius: 50,
     },
-};
-
-type PieChartSelected = {
-    title: string;
-};
-
-type SelectablePieChartDataState = {
-    data: PieChartDataItem[];
-    selected: PieChartSelected | null;
-};
-
-const toDataItem = (value: number | PieChartDataItem): PieChartDataItem => (
-    (typeof value === 'number')
-        ? { value }
-        : value
-);
-
-type SelectablePieChartProps = PieChartProps & {
-    infoClassName?: string;
-};
-
-const SelectablePieChart = (args: SelectablePieChartProps) => {
-    const [state, setState] = useState<SelectablePieChartDataState>({
-        data: args.data.map(toDataItem),
-        selected: null,
-    });
-
-    const chartProps: PieChartProps = {
-        ...args,
-        data: state.data,
-        onItemOver: ({ sector }) => {
-            if (!sector) {
-                return;
-            }
-
-            setState((prev) => ({
-                ...prev,
-                selected: { title: sector.title ?? '' },
-            }));
-        },
-        onItemOut: () => {
-            setState((prev) => ({
-                ...prev,
-                selected: null,
-            }));
-        },
-        onItemClick: ({ sector }) => {
-            if (!sector) {
-                return;
-            }
-
-            setState((prev) => ({
-                ...prev,
-                data: toggleSectorOffset(prev.data, sector),
-                selected: { title: sector.title ?? '' },
-            }));
-        },
-    };
-
-    return (
-        <div>
-            <PieChart {...chartProps} />
-
-            <div className={args.infoClassName}>
-                {state.selected?.title}
-            </div>
-        </div>
-    );
 };
 
 type SelectableStory = StoryObj<typeof SelectablePieChart>;
@@ -200,7 +124,7 @@ export const NoData: Story = {
     },
     render: function Render(args) {
         const [state, setState] = useState<SelectablePieChartDataState>({
-            data: args.data.map(toDataItem),
+            data: args.data?.map(toPieChartDataItem) ?? [],
             selected: null,
         });
 
@@ -236,7 +160,7 @@ export const NoData: Story = {
         const setData = () => {
             setState((prev) => ({
                 ...prev,
-                data: args.data.map(toDataItem),
+                data: args.data?.map(toPieChartDataItem) ?? [],
                 selected: null,
             }));
         };

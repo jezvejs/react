@@ -201,126 +201,131 @@ export type BaseChartScrollFunction = () => void;
  * BaseChart component props
  */
 export interface BaseChartProps {
-    id: string;
-    className: string;
+    id?: string;
+    className?: string;
+/*
+    | 'groupsGap'
+    | 'marginTop'
+    | 'alignColumns'
+*/
 
     // Layout
-    height: number;
-    columnWidth: number;
-    maxColumnWidth: number;
-    groupsGap: number;
-    marginTop: number;
-    alignColumns: BaseChartHorizontalAlign;
-    visibilityOffset: number;
-    scaleAroundAxis: boolean;
-    gridValuesMargin: number;
-    minGridStep: number;
-    maxGridStep: number;
+    height?: number;
+    columnWidth?: number;
+    maxColumnWidth?: number;
+    groupsGap?: number;
+    marginTop?: number;
+    alignColumns?: BaseChartHorizontalAlign;
+    visibilityOffset?: number;
+    scaleAroundAxis?: boolean;
+    gridValuesMargin?: number;
+    minGridStep?: number;
+    maxGridStep?: number;
 
-    scrollLeft: number;
+    scrollLeft?: number;
 
     // Grid
-    xAxisGrid: boolean;
-    yAxisGrid: boolean;
+    xAxisGrid?: boolean;
+    yAxisGrid?: boolean;
 
     // Render properties
-    fitToWidth: boolean;
-    allowLastXAxisLabelOverflow: boolean;
+    fitToWidth?: boolean;
+    allowLastXAxisLabelOverflow?: boolean;
 
     // Auto scale
-    autoScale: boolean;
-    autoScaleTimeout: number | false;
+    autoScale?: boolean;
+    autoScaleTimeout?: number | false;
 
     // Scroller
-    scrollToEnd: boolean;
+    scrollToEnd?: boolean;
     beforeScroller?: ReactNode;
     afterScroller?: ReactNode;
 
     // Animate chart options
-    animate: boolean;
-    animationEndTimeout: number;
+    animate?: boolean;
+    animationEndTimeout?: number;
 
-    resizeTimeout: number;
-    activateOnClick: boolean;
-    activateOnHover: boolean;
+    resizeTimeout?: number;
+    activateOnClick?: boolean;
+    activateOnHover?: boolean;
 
     // Labels
-    xAxis: BaseChartXAxisLabelsPosition;
-    yAxis: BaseChartYAxisLabelsPosition;
-    yAxisLabelsAlign: BaseChartHorizontalAlign;
-    renderXAxisLabel: BaseChartXAxisLabelsRenderer | null;
-    renderYAxisLabel: BaseChartYAxisLabelsRenderer | null;
+    xAxis?: BaseChartXAxisLabelsPosition;
+    yAxis?: BaseChartYAxisLabelsPosition;
+    yAxisLabelsAlign?: BaseChartHorizontalAlign;
+    renderXAxisLabel?: BaseChartXAxisLabelsRenderer | null;
+    renderYAxisLabel?: BaseChartYAxisLabelsRenderer | null;
 
     // Legend
-    showLegend: boolean;
-    renderLegend: (() => ReactNode) | null;
-    onlyVisibleCategoriesLegend: boolean;
+    showLegend?: boolean;
+    renderLegend?: (() => ReactNode) | null;
+    onlyVisibleCategoriesLegend?: boolean;
 
     // Active group
-    showActiveGroup: boolean;
+    showActiveGroup?: boolean;
 
     // Popup
-    showPopupOnClick: boolean;
-    pinPopupOnClick: boolean;
-    showPopupOnHover: boolean;
-    animatePopup: boolean;
-    renderPopup: ((target: BaseChartTarget, state: BaseChartState) => ReactNode) | null;
-    popupPosition: 'right';
+    showPopupOnClick?: boolean;
+    pinPopupOnClick?: boolean;
+    showPopupOnHover?: boolean;
+    animatePopup?: boolean;
+    renderPopup?: ((target: BaseChartTarget, state: BaseChartState) => ReactNode) | null;
+    popupPosition?: 'right';
 
     // Callbacks
     onStoreReady?: (store: StoreProviderContext<BaseChartState>) => void;
-    onItemClick: ((options: { e: React.MouseEvent; }) => void) | null;
-    onItemOver: ((options: { e: React.MouseEvent; }) => void) | null;
-    onItemOut: ((options: { e: React.MouseEvent; }) => void) | null;
-    onResize: ((lastHLabelOffset?: number) => void) | null;
-    onScroll: (() => void) | null;
-    scrollDone: (() => void) | null;
+    onItemClick?: ((options: { e: React.MouseEvent; }) => void) | null;
+    onItemOver?: ((options: { e: React.MouseEvent; }) => void) | null;
+    onItemOut?: ((options: { e: React.MouseEvent; }) => void) | null;
+    onResize?: ((lastHLabelOffset?: number) => void) | null;
+    onScroll?: (() => void) | null;
+    scrollDone?: (() => void) | null;
 
-    data: BaseChartDataProp;
-    reducers: ((state: BaseChartState, action: object) => BaseChartState) | null;
+    data?: BaseChartDataProp;
+    reducers?: ((state: BaseChartState, action: object) => BaseChartState) | null;
 
-    getGroupOuterWidth: (state: BaseChartState) => number;
+    getGroupOuterWidth?: (state: BaseChartState) => number;
 
-    getCategoriesCount: (state: BaseChartState) => number;
-    getColumnsInGroupCount: (state: BaseChartState) => number;
-    getGroupsCount: (state: BaseChartState) => number;
-    getDataSets: (state: BaseChartState) => BaseChartDataSet[];
-    getLongestDataSet: (state: BaseChartState) => number[];
+    getCategoriesCount?: (state: BaseChartState) => number;
+    getColumnsInGroupCount?: (state: BaseChartState) => number;
+    getGroupsCount?: (state: BaseChartState) => number;
+    getDataSets?: (state: BaseChartState) => BaseChartDataSet[];
+    getLongestDataSet?: (state: BaseChartState) => number[];
 
     // Stacked data
-    getStackedGroups: (state: BaseChartState) => BaseChartDataGroup[];
-    getStackedCategories: (state: BaseChartState) => BaseChartDataCategory[];
+    getStackedGroups?: (state: BaseChartState) => BaseChartDataGroup[];
+    getStackedCategories?: (state: BaseChartState) => BaseChartDataCategory[];
 
     // Visibility
-    getFirstVisibleGroupIndex: (state: BaseChartState) => number;
-    getVisibleGroupsCount: (firstItemIndex: number, state: BaseChartState) => number;
-    getSeriesByIndex: (index: number, state: BaseChartState) => BaseChartDataSerie | null;
-    getGroupIndexByX: (x: number, state: BaseChartState) => number;
+    getFirstVisibleGroupIndex?: (state: BaseChartState) => number;
+    getVisibleGroupsCount?: (firstItemIndex: number, state: BaseChartState) => number;
+    getSeriesByIndex?: (index: number, state: BaseChartState) => BaseChartDataSerie | null;
+    getGroupIndexByX?: (x: number, state: BaseChartState) => number;
 
-    isVisibleValue: (value: number) => boolean;
+    isVisibleValue?: (value: number) => boolean;
 
     // Scale
-    isHorizontalScaleNeeded: (state: BaseChartState, prevState?: BaseChartState) => boolean;
-    isVerticalScaleNeeded: (state: BaseChartState, prevState?: BaseChartState) => boolean;
+    isHorizontalScaleNeeded?: (state: BaseChartState, prevState?: BaseChartState) => boolean;
+    isVerticalScaleNeeded?: (state: BaseChartState, prevState?: BaseChartState) => boolean;
 
-    getVisibleCategories: (state: BaseChartState) => BaseChartDataCategory[];
-    getAllCategories: (state: BaseChartState) => BaseChartDataCategory[];
-    getVisibleItems: (state: BaseChartState) => BaseChartBaseItem[] | BaseChartDataItemsGroup[];
+    getVisibleCategories?: (state: BaseChartState) => BaseChartDataCategory[];
+    getAllCategories?: (state: BaseChartState) => BaseChartDataCategory[];
+    getVisibleItems?: (state: BaseChartState) => BaseChartBaseItem[] | BaseChartDataItemsGroup[];
 
-    findItemByEvent: (
+    findItemByEvent?: (
         e: React.MouseEvent,
         state: BaseChartState,
         elem: Element,
     ) => BaseChartItemSearchResult | null;
 
-    findItemByTarget: (target: BaseChartTarget, state: BaseChartState) => BaseChartBaseItem | null;
+    findItemByTarget?: (target: BaseChartTarget, state: BaseChartState) => BaseChartBaseItem | null;
 
-    calculateGrid: (
+    calculateGrid?: (
         values: number[] | BaseChartDataSet[],
         state: BaseChartState,
     ) => ChartGrid | null;
 
-    components: BaseChartComponents;
+    components?: BaseChartComponents;
 }
 
 export interface BaseChartVisibleItems<DataItemsGroup = BaseChartDataItemsGroup> {
@@ -339,10 +344,40 @@ export interface BaseChartXAxisLabelProps {
     hidden: boolean,
 }
 
+type BaseChartStateProps =
+    | 'height'
+    | 'columnWidth'
+    | 'maxColumnWidth'
+    | 'groupsGap'
+    | 'autoScaleTimeout'
+    | 'resizeTimeout'
+    | 'getGroupOuterWidth'
+    | 'getDataSets'
+    | 'getGroupsCount'
+    | 'getColumnsInGroupCount'
+    | 'getStackedGroups'
+    | 'getStackedCategories'
+    | 'getFirstVisibleGroupIndex'
+    | 'getVisibleGroupsCount'
+    | 'getVisibleCategories'
+    | 'getAllCategories'
+    | 'isVisibleValue'
+    | 'getVisibleItems'
+    | 'findItemByTarget'
+    | 'findItemByEvent'
+    | 'calculateGrid'
+    | 'getGroupIndexByX'
+    | 'getSeriesByIndex'
+    | 'components';
+
+export type BaseChartRequiredProps = Required<Pick<BaseChartProps, BaseChartStateProps>>;
+
+type BaseChartStateBase = Omit<BaseChartProps, BaseChartStateProps> & BaseChartRequiredProps;
+
 /**
  * State of BaseChart component
  */
-export interface BaseChartState extends BaseChartProps {
+export interface BaseChartState extends BaseChartStateBase {
     // Current dimensions of layout
     scrollLeft: number;
     scrollerWidth: number;

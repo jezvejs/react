@@ -1,13 +1,12 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
-import { PopupMenu, PopupMenuProps } from '@jezvejs/react';
-import { useState } from 'react';
+import { PopupMenu } from '@jezvejs/react';
 
-import { usePortalElement } from '../../../common/hooks/usePortalElement.tsx';
-import { MenuButton } from '../../../common/Components/MenuButton/MenuButton.tsx';
+import { getDefaultItems, getNestedMenuItems } from '../../../common/assets/data/popupMenuData.ts';
 
-import { getDefaultItems, getNestedMenuItems } from './data.ts';
+import { PopupMenuDemo } from '../../../common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
+
 import './PopupMenu.stories.scss';
 
 export type Story = StoryObj<typeof PopupMenu>;
@@ -21,24 +20,6 @@ const meta: Meta<typeof PopupMenu> = {
     tags: ['autodocs'],
 };
 export default meta;
-
-const PopupMenuDemo = (args: PopupMenuProps) => {
-    const portalElement = usePortalElement();
-    const [state, setState] = useState({
-        ...args,
-        open: false,
-    });
-
-    const toggleMenu = () => (
-        setState((prev) => ({ ...prev, open: !prev.open }))
-    );
-
-    return (
-        <PopupMenu {...state} container={portalElement}>
-            <MenuButton onClick={toggleMenu} />
-        </PopupMenu>
-    );
-};
 
 const heightDecorator = (StoryComponent: StoryFn) => (
     <div className="rel-container">
@@ -97,22 +78,5 @@ export const NestedMenus: Story = {
         },
     },
     decorators: [heightDecorator],
-    render: function Render(args) {
-        const portalElement = usePortalElement();
-
-        const [state, setState] = useState({
-            ...args,
-            open: false,
-        });
-
-        const toggleMenu = () => (
-            setState((prev) => ({ ...prev, open: !prev.open }))
-        );
-
-        return (
-            <PopupMenu {...state} container={portalElement}>
-                <MenuButton onClick={toggleMenu} />
-            </PopupMenu>
-        );
-    },
+    render: PopupMenuDemo,
 };

@@ -27,7 +27,7 @@ export interface DatePickerWeekDaysParams {
     },
 }
 
-export const DatePickerWeekDaysHeader = (props: DatePickerWeekDaysHeaderProps) => {
+export const DatePickerWeekDaysHeader: React.FC<DatePickerWeekDaysHeaderProps> = (props) => {
     const {
         locales = [],
         firstDay,

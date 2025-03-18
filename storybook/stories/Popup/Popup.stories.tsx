@@ -11,6 +11,7 @@ import { OkBtn } from '../../common/Components/ActionButton/OkBtn.tsx';
 import { CancelBtn } from '../../common/Components/ActionButton/CancelBtn.tsx';
 
 import './Popup.stories.scss';
+import { LaunchPopup } from '../../common/Components/LaunchPopup/LaunchPopup.tsx';
 
 export type Story = StoryObj<typeof Popup>;
 
@@ -65,29 +66,6 @@ const LaunchPopupForResult = (args: PopupProps) => {
                             <CancelBtn onClick={() => setResultAndClose(false)} />
                         </>
                     }
-                />
-            )}
-        </>
-    );
-};
-
-const LaunchPopup = (args: PopupProps) => {
-    const portalElement = usePortalElement();
-    const [state, setState] = useState({
-        visible: false,
-    });
-
-    const showPopup = (visible: boolean) => setState((prev) => ({ ...prev, visible }));
-
-    return (
-        <>
-            <ActionButton title='Show popup' onClick={() => showPopup(true)} />
-            {state.visible && (
-                <Popup
-                    {...args}
-                    show={true}
-                    onClose={() => showPopup(false)}
-                    container={portalElement}
                 />
             )}
         </>

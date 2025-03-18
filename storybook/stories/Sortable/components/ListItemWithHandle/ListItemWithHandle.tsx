@@ -2,7 +2,9 @@ import { SortableItemWrapperProps } from '@jezvejs/react';
 import classNames from 'classnames';
 import { forwardRef } from 'react';
 
-import { SortableElementProps, WithSelector } from '../../types.ts';
+import { SortableElementProps } from '../../../../common/Components/SortableListItem/SortableListItem.tsx';
+
+import { WithSelector } from '../../types.ts';
 
 export type ListItemWithHandleRef = HTMLDivElement | null;
 

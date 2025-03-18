@@ -1,15 +1,5 @@
 import { MenuItemType } from '@jezvejs/react';
 
-export const initItems = (title = 'Item', count = 10, startFrom = 1) => {
-    const res = [];
-
-    for (let ind = startFrom; ind < startFrom + count; ind += 1) {
-        res.push({ id: ind.toString(), title: `${title} ${ind}` });
-    }
-
-    return res;
-};
-
 export const groupsItems = () => ([{
     id: 'grVisible',
     title: 'Visible',

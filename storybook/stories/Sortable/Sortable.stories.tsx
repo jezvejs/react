@@ -3,12 +3,14 @@ import { Sortable, SortableListItemComponent } from '@jezvejs/react';
 
 import '@jezvejs/react/style.scss';
 
+// Global components
+import { ProvidedSortable } from '../../common/Components/ProvidedSortable/ProvidedSortable.tsx';
+import { SortableListItem } from '../../common/Components/SortableListItem/SortableListItem.tsx';
+
 // Local components
 import { ListItemWithHandle } from './components/ListItemWithHandle/ListItemWithHandle.tsx';
 import { ListItemWithInput } from './components/ListItemWithInput/ListItemWithInput.tsx';
 import { ProvidedExchangeable } from './components/ProvidedExchangeable/ProvidedExchangeable.tsx';
-import { ProvidedSortable } from './components/ProvidedSortable/ProvidedSortable.tsx';
-import { SortableListItem } from './components/SortableListItem/SortableListItem.tsx';
 import { SortableTile } from './components/SortableTile/SortableTile.tsx';
 import { SortableTreeItem } from './components/SortableTreeItem/SortableTreeItem.tsx';
 import { SortableTableRow } from './components/TableRow/SortableTableRow.tsx';

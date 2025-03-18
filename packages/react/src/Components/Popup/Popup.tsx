@@ -11,17 +11,17 @@ import { CloseButton } from '../CloseButton/CloseButton.tsx';
 import './Popup.scss';
 
 export interface PopupProps {
-    id: string,
-    className: string,
-    show: boolean,
-    nodim: boolean,
-    scrollMessage: boolean,
-    closeButton: boolean,
-    onClose: ((e: React.MouseEvent) => void) | null,
-    title: ReactNode,
-    footer: ReactNode,
-    children: ReactNode,
-    container: Element | DocumentFragment,
+    id?: string,
+    className?: string,
+    show?: boolean,
+    nodim?: boolean,
+    scrollMessage?: boolean,
+    closeButton?: boolean,
+    onClose?: ((e: React.MouseEvent) => void) | null,
+    title?: ReactNode,
+    footer?: ReactNode,
+    children?: ReactNode,
+    container?: Element | DocumentFragment,
 }
 
 const defaultProps: Partial<PopupProps> = {

@@ -1,0 +1,41 @@
+/* Component card */
+.component-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-items: center;
+  justify-content: normal;
+  min-height: 20rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 8px 0 #cccccc;
+}
+
+.component-card__header {
+  margin: 0 0 0.5rem 0;
+  text-decoration: none;
+}
+
+.component-card__title {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.component-card__descr {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #888888;
+}
+
+.component-card__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  transform: scale(1);
+  position: relative;
+}
+
+.component-card__content.component-card__content-vertical {
+  flex-flow: column nowrap;
+}
