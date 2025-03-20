@@ -175,7 +175,7 @@ const AboutComponent = () => (
                 url="/?path=/docs/components-offcanvas--docs"
                 description="Top level container attached to the edge of screen."
             >
-                <OpenOffcanvas usePortal={false} useScrollLock={false}>
+                <OpenOffcanvas>
                     <ListContent itemsCount={5} prefix="offcvn" />
                 </OpenOffcanvas>
             </ComponentCard>

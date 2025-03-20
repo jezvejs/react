@@ -4,6 +4,8 @@ import { Offcanvas, OffcanvasProps } from '@jezvejs/react';
 import { usePortalElement } from '../../hooks/usePortalElement.tsx';
 import { ActionButton } from '../ActionButton/ActionButton.tsx';
 
+import './OpenOffcanvas.scss';
+
 export const OpenOffcanvas = (args: OffcanvasProps) => {
     const portalElement = usePortalElement();
     const [state, setState] = useState({
@@ -17,6 +19,7 @@ export const OpenOffcanvas = (args: OffcanvasProps) => {
             <ActionButton title='Show' onClick={() => showOffcanvas(true)} />
             <Offcanvas
                 {...args}
+                className="offcanvas-demo"
                 closed={!state.visible}
                 onClosed={() => showOffcanvas(false)}
                 container={portalElement}
