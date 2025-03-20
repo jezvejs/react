@@ -85,12 +85,19 @@ export function useDragZone<
 
                     initFromEvent(params: DragAvatarInitParam) {
                         const offset = getOffset(dragZoneRef.current);
+                        const page = DragMaster.getEventPageCoordinates(params.e);
+
+                        const shiftX = params.downX - offset.left;
+                        const shiftY = params.downY - offset.top;
+
                         setState((prev: DragnDropState) => ({
                             ...prev,
+                            left: page.x - shiftX,
+                            top: page.y - shiftY,
                             origLeft: prev.left,
                             origTop: prev.top,
-                            shiftX: params.downX - offset.left,
-                            shiftY: params.downY - offset.top,
+                            shiftX,
+                            shiftY,
                         }));
 
                         return true;
