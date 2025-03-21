@@ -81,12 +81,12 @@ export const XAxisDragZone = forwardRef<
                         return true;
                     },
                     onDragMove({ e }: OnDragMoveParams) {
-                        const client = DragMaster.getEventClientCoordinates(e);
+                        const coord = DragMaster.getEventPageCoordinates(e);
 
                         const state = getState();
                         const { left, width } = state.offset ?? {};
                         const rectWidth = state.rect?.width ?? 0;
-                        const x = client.x - (left ?? 0) - state.shiftX;
+                        const x = coord.x - (left ?? 0) - state.shiftX;
                         const maxPos = Math.round((width ?? 0) - rectWidth);
 
                         setState((prev: DragnDropState) => ({
