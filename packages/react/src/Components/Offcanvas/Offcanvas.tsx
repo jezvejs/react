@@ -1,4 +1,3 @@
-import { afterTransition } from '@jezvejs/dom';
 import {
     ReactNode,
     useCallback,
@@ -10,16 +9,14 @@ import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 
 import { useScrollLock } from '../../hooks/useScrollLock/useScrollLock.ts';
+import { useAnimationStage } from '../../hooks/useAnimationStage/useAnimationStage.tsx';
+import { AnimationStages } from '../../utils/types.ts';
 
 import './Offcanvas.scss';
 
 export type OffcanvasPlacement = 'left' | 'right' | 'top' | 'bottom';
 
 const TRANSITION_END_TIMEOUT = 500;
-
-interface Callable {
-    (): void,
-}
 
 export interface OffcanvasProps {
     id?: string,
@@ -36,7 +33,13 @@ export interface OffcanvasProps {
 }
 
 interface OffcanvasState extends OffcanvasProps {
-    transitionInProgress?: boolean,
+    transitionInProgress: boolean,
+}
+
+type OffcanvasRef = HTMLDivElement | null;
+
+interface OffcanvasTransform {
+    transform?: string;
 }
 
 const defaultProps = {
@@ -55,27 +58,62 @@ export const Offcanvas = (p: OffcanvasProps) => {
         ...p,
     };
 
-    const animationFrameRef = useRef(0);
     const contentRef = useRef<HTMLDivElement | null>(null);
-    const clearTransitionRef = useRef<Callable | null>(null);
+    const [state, setState] = useState<OffcanvasState>({
+        ...props,
+        transitionInProgress: false,
+    });
 
-    const [state, setState] = useState<OffcanvasState>(props);
     const showBackground = state.transitionInProgress || state.closed === false;
 
+    const animation = useAnimationStage<OffcanvasRef, OffcanvasTransform>({
+        ref: contentRef,
+        id: 'offcanvasAnimation',
+        transform: null,
+        transitionTimeout: TRANSITION_END_TIMEOUT,
+        isTransformApplied: (transform: OffcanvasTransform | null) => (
+            !!transform?.transform
+        ),
+        onExiting: () => {
+            animation.setTransform(null);
+        },
+        onExited: () => {
+            onAnimationDone();
+        },
+    });
+
+    const isEntering = animation.stage === AnimationStages.entering;
+    const isExited = animation.stage === AnimationStages.exited;
+
     useEffect(() => {
-        setState((prev) => (
-            (props.closed === prev.closed)
-                ? prev
-                : {
-                    ...prev,
-                    closed: props.closed,
-                }
-        ));
-    }, [props.closed]);
+        if (state.closed === props.closed) {
+            return;
+        }
+
+        if (props.closed) {
+            handleClose();
+        } else {
+            handleOpen();
+        }
+    }, [props.closed, state.closed]);
 
     useScrollLock(props.useScrollLock && showBackground);
 
+    const handleOpen = () => {
+        setState((prev) => ({
+            ...prev,
+            transitionInProgress: true,
+            closed: false,
+        }));
+
+        animation.setTransform({ transform: 'opening' });
+
+        props.onOpened?.();
+    };
+
     const handleClose = () => {
+        animation.setTransform({ transform: 'closing' });
+
         setState((prev) => ({
             ...prev,
             transitionInProgress: true,
@@ -83,51 +121,14 @@ export const Offcanvas = (p: OffcanvasProps) => {
         }));
 
         props.onClosed?.();
-
-        handleAnimationEnd();
     };
 
     const onAnimationDone = useCallback(() => {
-        clearTransitionRef.current = null;
-
         setState((prev) => ({
             ...prev,
             transitionInProgress: false,
         }));
     }, []);
-
-    const cancelAnimation = () => {
-        if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = 0;
-        }
-
-        if (clearTransitionRef.current) {
-            clearTransitionRef.current?.();
-            clearTransitionRef.current = null;
-        }
-    };
-
-    const handleAnimationEnd = () => {
-        cancelAnimation();
-
-        animationFrameRef.current = requestAnimationFrame(() => {
-            animationFrameRef.current = 0;
-
-            if (!contentRef.current) {
-                return;
-            }
-
-            clearTransitionRef.current = afterTransition(
-                contentRef.current,
-                {
-                    duration: TRANSITION_END_TIMEOUT,
-                    target: contentRef.current,
-                },
-                () => onAnimationDone(),
-            );
-        });
-    };
 
     const background = (showBackground)
         ? (
@@ -138,7 +139,16 @@ export const Offcanvas = (p: OffcanvasProps) => {
         )
         : null;
 
+    const isClosed = state.closed && !state.transitionInProgress;
+    const isOpening = !state.closed && state.transitionInProgress;
+    const isClosing = state.closed && state.transitionInProgress;
+
+    if (isClosed && isExited) {
+        return null;
+    }
+
     const container = props.container ?? document.body;
+    const contentIsClosed = isClosing || isClosed || (isOpening && (isExited || isEntering));
 
     const content = (
         <>
@@ -146,7 +156,7 @@ export const Offcanvas = (p: OffcanvasProps) => {
                 className={classNames(
                     'offcanvas',
                     {
-                        offcanvas_closed: !!state.closed,
+                        offcanvas_closed: contentIsClosed,
                         offcanvas_right: state.placement === 'right',
                         offcanvas_top: state.placement === 'top',
                         offcanvas_bottom: state.placement === 'bottom',

@@ -15,6 +15,7 @@
   box-sizing: border-box;
   overflow-y: auto;
   z-index: var(--offcanvas-z);
+  transform: translate(0, 0);
   transition: transform var(--offcanvas-transition-duration) ease;
   background-color: var(--offcanvas-bg);
 }

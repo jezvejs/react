@@ -126,15 +126,15 @@ export const RangeSliderDragZone = forwardRef<
 
                     onDragMove(p: OnDragMoveParams) {
                         const { e } = p;
-                        const client = DragMaster.getEventClientCoordinates(e);
+                        const coord = DragMaster.getEventPageCoordinates(e);
 
                         const state = getState();
                         const currentState = state[sliderId];
                         const { offset, shift, border } = currentState;
 
                         const pos = (props.axis === 'x')
-                            ? (client.x - offset.left - shift.x - border.left)
-                            : (client.y - offset.top - shift.y - border.top);
+                            ? (coord.x - offset.left - shift.x - border.left)
+                            : (coord.y - offset.top - shift.y - border.top);
 
                         const maxPos = state?.maxPos ?? 0;
                         const newPos = minmax(0, maxPos, pos);

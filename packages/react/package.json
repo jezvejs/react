@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react",
-    "version": "1.11.2",
+    "version": "1.11.3",
     "type": "module",
     "files": [
         "src",

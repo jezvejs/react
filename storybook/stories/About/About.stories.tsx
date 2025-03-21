@@ -104,7 +104,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Button"
-                url="/?path=/docs/components-button--docs"
+                url="./?path=/docs/components-button--docs"
                 description="Common button and link component. Supports additional icon."
             >
                 <Button className="primary-btn">Click me</Button>
@@ -112,7 +112,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Checkbox"
-                url="/?path=/docs/components-checkbox--docs"
+                url="./?path=/docs/components-checkbox--docs"
                 description="Form checkbox component."
             >
                 <Checkbox className="demo-checkbox" value="" label="Option 1" />
@@ -120,7 +120,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="CloseButton"
-                url="/?path=/docs/components-closebutton--docs"
+                url="./?path=/docs/components-closebutton--docs"
                 description="Button with predefined close icon."
             >
                 <CloseButton />
@@ -129,7 +129,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Collapsible"
-                url="/?path=/docs/components-collapsible--docs"
+                url="./?path=/docs/components-collapsible--docs"
                 description="Component able to collapse/expand content."
             >
                 <CollapsibleDemo />
@@ -137,7 +137,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="DatePicker"
-                url="/?path=/docs/components-datepicker--docs"
+                url="./?path=/docs/components-datepicker--docs"
                 description="Renders calendar to view and select single, multiple or range of dates."
             >
                 <DatePicker inline fixedHeight animated />
@@ -145,7 +145,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Header"
-                url="/?path=/docs/components-header--docs"
+                url="./?path=/docs/components-header--docs"
                 description="Main page header component."
             >
                 <Header className="full-width">
@@ -164,7 +164,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="IndetermProgress"
-                url="/?path=/docs/components-indetermprogress--docs"
+                url="./?path=/docs/components-indetermprogress--docs"
                 description="Renders infinite sliding dots animation."
             >
                 <IndetermProgress />
@@ -172,7 +172,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Offcanvas"
-                url="/?path=/docs/components-offcanvas--docs"
+                url="./?path=/docs/components-offcanvas--docs"
                 description="Top level container attached to the edge of screen."
             >
                 <OpenOffcanvas>
@@ -182,7 +182,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Paginator"
-                url="/?path=/docs/components-paginator--docs"
+                url="./?path=/docs/components-paginator--docs"
                 description="Pages navigation component."
             >
                 <Paginator className="styled" pagesCount={10} onChange={() => { }} />
@@ -190,7 +190,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Popup"
-                url="/?path=/docs/components-popup--docs"
+                url="./?path=/docs/components-popup--docs"
                 description="Top level centered container."
             >
                 <LaunchPopup
@@ -204,7 +204,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Progress"
-                url="/?path=/docs/components-progress--docs"
+                url="./?path=/docs/components-progress--docs"
                 description="Completed portion in relation to total volume"
                 vertical
             >
@@ -214,7 +214,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Radio"
-                url="/?path=/docs/components-radio--docs"
+                url="./?path=/docs/components-radio--docs"
                 description="Form checkbox component."
                 vertical
             >
@@ -224,7 +224,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="RangeSlider"
-                url="/?path=/docs/components-rangeslider--docs"
+                url="./?path=/docs/components-rangeslider--docs"
                 description="Range value input component."
             >
                 <RangeSliderStyled start={30} end={70} range />
@@ -232,7 +232,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Slider"
-                url="/?path=/docs/components-slider--docs"
+                url="./?path=/docs/components-slider--docs"
             >
                 <Slider
                     width={300}
@@ -243,7 +243,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Sortable"
-                url="/?path=/docs/components-sortable--docs"
+                url="./?path=/docs/components-sortable--docs"
             >
                 <ProvidedSortable
                     id="list"
@@ -262,21 +262,21 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Spinner"
-                url="/?path=/docs/components-spinner--docs"
+                url="./?path=/docs/components-spinner--docs"
             >
                 <Spinner />
             </ComponentCard>
 
             <ComponentCard
                 title="Switch"
-                url="/?path=/docs/components-spinner--docs"
+                url="./?path=/docs/components-spinner--docs"
             >
                 <Switch label="Switch" />
             </ComponentCard>
 
             <ComponentCard
                 title="TabList"
-                url="/?path=/docs/components-tablist--docs"
+                url="./?path=/docs/components-tablist--docs"
             >
                 <TabListStyled
                     items={getTabListItems(true)}
@@ -285,7 +285,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Tags"
-                url="/?path=/docs/components-tags--docs"
+                url="./?path=/docs/components-tags--docs"
             >
                 <Tags
                     items={[
@@ -302,7 +302,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="ColorInput"
-                url="/?path=/docs/input-colorinput--docs"
+                url="./?path=/docs/input-colorinput--docs"
                 description="Color select component."
             >
                 <ColorInput />
@@ -310,7 +310,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="ControlledInput"
-                url="/?path=/docs/input-controlledinput--docs"
+                url="./?path=/docs/input-controlledinput--docs"
                 description="Input component with value change validation"
             >
                 <ControlledInputWithState
@@ -321,7 +321,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="DateInput"
-                url="/?path=/docs/input-dateinput--docs"
+                url="./?path=/docs/input-dateinput--docs"
                 description="Date specific ControlledInput"
             >
                 <DateInput />
@@ -329,7 +329,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="DecimalInput"
-                url="/?path=/docs/input-dateinput--docs"
+                url="./?path=/docs/input-dateinput--docs"
                 description="Number specific ControlledInput"
             >
                 <DecimalInputWithState placeholder="0.1234567" />
@@ -337,7 +337,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Input"
-                url="/?path=/docs/input-input--docs"
+                url="./?path=/docs/input-input--docs"
                 description="Simple input"
             >
                 <InputWithState />
@@ -345,7 +345,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="InputGroup"
-                url="/?path=/docs/input-inputgroup--docs"
+                url="./?path=/docs/input-inputgroup--docs"
                 description="Input groupped with text, buttons and other components"
             >
                 <InputGroup className="input-group__input-outer">
@@ -365,7 +365,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="DropDown"
-                url="/?path=/docs/menu-dropdown--docs"
+                url="./?path=/docs/menu-dropdown--docs"
                 description="Combo box with popup menu to select single or multiple items from list"
             >
                 <DropDown
@@ -381,7 +381,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Menu"
-                url="/?path=/docs/menu-menu--docs"
+                url="./?path=/docs/menu-menu--docs"
                 description="List of selectable action items"
             >
                 <Menu
@@ -393,7 +393,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="PopupMenu"
-                url="/?path=/docs/menu-popupmenu--docs"
+                url="./?path=/docs/menu-popupmenu--docs"
                 description="Attachable floating menu"
             >
                 <PopupMenuDemo
@@ -409,7 +409,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="WeekDaySelect"
-                url="/?path=/docs/menu-weekdayselect--docs"
+                url="./?path=/docs/menu-weekdayselect--docs"
                 description="Day of week select menu"
             >
                 <WeekDaySelect multiple />
@@ -421,7 +421,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Histogram"
-                url="/?path=/docs/charts-histogram--docs"
+                url="./?path=/docs/charts-histogram--docs"
                 description="Columns chart"
             >
                 <div className="chart-container">
@@ -439,7 +439,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="LineChart"
-                url="/?path=/docs/charts-linechart--docs"
+                url="./?path=/docs/charts-linechart--docs"
                 description="Polygonal chain"
             >
                 <div className="chart-container">
@@ -457,7 +457,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="PieChart"
-                url="/?path=/docs/charts-piechart--docs"
+                url="./?path=/docs/charts-piechart--docs"
                 description="Сircular statistical graphic for proportions illustration"
             >
                 <PieChart
@@ -481,7 +481,7 @@ const AboutComponent = () => (
             <ComponentCard
                 className="range-chart-card"
                 title="RangeScrollChart"
-                url="/?path=/docs/charts-rangescrollchart--docs"
+                url="./?path=/docs/charts-rangescrollchart--docs"
                 description="Horizontal chart with range slider scrollbar"
             >
                 <div className="chart-container">
@@ -504,7 +504,7 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="Drag'n'Drop"
-                url="/?path=/docs/utils-drag-n-drop--docs"
+                url="./?path=/docs/utils-drag-n-drop--docs"
             >
                 <DragOriginalDemo />
             </ComponentCard>
