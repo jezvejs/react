@@ -43,6 +43,7 @@ export const CollapsibleDemo = () => (
     <Collapsible
         className="demo-collapsible"
         header={CollapsibleDemoHeader}
+        animated
     >
         <CollapsibleDemoContent>
             <ListContent itemsCount={5} prefix="collapse" />

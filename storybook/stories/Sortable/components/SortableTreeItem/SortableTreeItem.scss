@@ -5,27 +5,29 @@
 }
 
 .tree-item:first-child {
-  margin-top: 10px;
+  margin-top: 0.25rem;
 }
 
 .tree-item__title {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding: 5px;
-  background-color: #55dd99;
-  color: #ffffff;
-  font-size: 18px;
+  padding: 0.6rem;
+  background-color: #e9e9e9;
+  color: #707070;
+  font-size: 0.9rem;
+  border-radius: 0.3rem;
 }
 
 .tree-item_red > .tree-item__title {
-  background-color: #dd5599;
+  background-color: #1c8f19;
+  color: #dddddd;
 }
 
 .tree-item__content {
   display: inline-flex;
   flex-flow: column nowrap;
-  row-gap: 10px;
+  row-gap: 0.25rem;
   max-width: 300px;
   width: 100%;
   padding: 0 0 0 1rem;

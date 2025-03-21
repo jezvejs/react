@@ -23,6 +23,9 @@
 
   /* Selected range */
   --rs-selected-background: #00ccbb;
+  --rs-selected-border-color: var(--rs-area-border-color);
+  --rs-selected-border-style: var(--rs-area-border-style);
+  --rs-selected-border-width: var(--rs-area-border-width);
   --rs-selected-opacity: 1;
 
   /* Before area */
@@ -57,6 +60,8 @@
   --rs-disabled-area-border-color: var(--rs-area-border-color);
   --rs-disabled-slider-background: #5c5c5c;
   --rs-disabled-slider-border-color: var(--rs-slider-border-color);
+  --rs-disabled-selected-border-color: var(--rs-selected-background);
+  --rs-disabled-selected-background: var(--rs-selected-background);
   --rs-disabled-before-border-color: var(--rs-disabled-area-border-color);
   --rs-disabled-before-background: var(--rs-disabled-background);
   --rs-disabled-after-border-color: var(--rs-disabled-area-border-color);
@@ -79,6 +84,9 @@
     position: absolute;
     opacity: var(--rs-selected-opacity);
     background: var(--rs-selected-background);
+    border-width: var(--rs-selected-border-width);
+    border-style: var(--rs-selected-border-style);
+    border-color: var(--rs-selected-border-color);
     cursor: move;
   }
 
@@ -205,6 +213,11 @@
   .range-slider__area {
     border-color: var(--rs-disabled-area-border-color);
     background: var(--rs-disabled-background);
+  }
+
+  .range-slider__selected-area {
+    border-color: var(--rs-disabled-selected-border-color);
+    background: var(--rs-disabled-selected-background);
   }
 
   .range-slider__slider {

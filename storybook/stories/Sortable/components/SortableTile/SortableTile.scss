@@ -2,15 +2,16 @@
 .sortable-tile {
   width: 100px;
   height: 100px;
-  background-color: #55dd99;
+  background-color: #e9e9e9;
   position: relative;
+  border-radius: 0.35rem;
 }
 
 .sortable-tile__title {
   position: absolute;
   bottom: 5px;
   left: 10px;
-  color: #ffffff;
+  color: #707070;
 }
 
 .sortable-tile__icon-container {
@@ -26,7 +27,7 @@
 .sortable-tile__icon {
   width: 60px;
   height: 54px;
-  fill: #ffffff;
+  fill: #707070;
 }
 
 .sortable-tile_placeholder {

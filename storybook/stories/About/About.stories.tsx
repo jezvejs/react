@@ -50,15 +50,18 @@ import { getNestedMenuItems } from '../../common/assets/data/popupMenuData.ts';
 // Utils
 import { getSliderItems } from '../../common/utils/getSliderItems.tsx';
 import { getSortableItems } from '../../common/utils/getSortableItems.tsx';
+import { getTabListItems } from '../../common/utils/getTabListItems.tsx';
 import { withInputState } from '../../common/utils/withInputState.tsx';
 
 // Common components
 import { DragOriginalDemo } from '../../common/Components/DragnDrop/DragOriginalDemo.tsx';
 import { LaunchPopup } from '../../common/Components/LaunchPopup/LaunchPopup.tsx';
 import { OpenOffcanvas } from '../../common/Components/OpenOffcanvas/OpenOffcanvas.tsx';
+import { PopupMenuDemo } from '../../common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
 import { ProvidedSortable } from '../../common/Components/ProvidedSortable/ProvidedSortable.tsx';
 import { RangeSliderStyled } from '../../common/Components/RangeSliderStyled/RangeSliderStyled.tsx';
 import { SortableListItem } from '../../common/Components/SortableListItem/SortableListItem.tsx';
+import { TabListStyled } from '../../common/Components/TabListStyled/TabListStyled.tsx';
 
 // Local components
 import { CodeBlock } from './components/CodeBlock/CodeBlock.tsx';
@@ -69,9 +72,6 @@ import { ComponentsSectionHeader } from './components/ComponentsSectionHeader/Co
 import { ListContent } from './components/ListContent/ListContent.tsx';
 import { LogoHeader } from './components/LogoHeader/LogoHeader.tsx';
 import { MainText } from './components/MainText/MainText.tsx';
-import { TabListDemo } from './components/TabListDemo/TabListDemo.tsx';
-
-import { PopupMenuDemo } from '../../common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
 import './About.stories.scss';
 
 const InputWithState = withInputState(Input);
@@ -107,7 +107,7 @@ const AboutComponent = () => (
                 url="/?path=/docs/components-button--docs"
                 description="Common button and link component. Supports additional icon."
             >
-                <Button className="primary-btn" type="link" url="#">Click me</Button>
+                <Button className="primary-btn">Click me</Button>
             </ComponentCard>
 
             <ComponentCard
@@ -140,7 +140,7 @@ const AboutComponent = () => (
                 url="/?path=/docs/components-datepicker--docs"
                 description="Renders calendar to view and select single, multiple or range of dates."
             >
-                <DatePicker inline fixedHeight />
+                <DatePicker inline fixedHeight animated />
             </ComponentCard>
 
             <ComponentCard
@@ -175,7 +175,7 @@ const AboutComponent = () => (
                 url="/?path=/docs/components-offcanvas--docs"
                 description="Top level container attached to the edge of screen."
             >
-                <OpenOffcanvas usePortal={false} useScrollLock={false}>
+                <OpenOffcanvas>
                     <ListContent itemsCount={5} prefix="offcvn" />
                 </OpenOffcanvas>
             </ComponentCard>
@@ -224,10 +224,10 @@ const AboutComponent = () => (
 
             <ComponentCard
                 title="RangeSlider"
-                url="/?path=/docs/components-radio--docs"
+                url="/?path=/docs/components-rangeslider--docs"
                 description="Range value input component."
             >
-                <RangeSliderStyled value={50} range />
+                <RangeSliderStyled start={30} end={70} range />
             </ComponentCard>
 
             <ComponentCard
@@ -278,7 +278,9 @@ const AboutComponent = () => (
                 title="TabList"
                 url="/?path=/docs/components-tablist--docs"
             >
-                <TabListDemo />
+                <TabListStyled
+                    items={getTabListItems(true)}
+                />
             </ComponentCard>
 
             <ComponentCard
@@ -371,6 +373,7 @@ const AboutComponent = () => (
                     enableFilter
                     openOnFocus
                     multiple
+                    fixedMenu
                     placeholder="Type to filter"
                     items={initGroupItems()}
                 />

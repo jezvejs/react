@@ -1,16 +1,16 @@
-/* RangeSlider */
+/* RangeSliderStyled */
 .range-slider.styled {
   /* Area */
-  --rs-area-size: 0.75rem;
+  --rs-area-size: 0.65rem;
   --rs-area-border-style: solid;
   --rs-area-border-width: 2px;
-  --rs-area-border-color: #6a2b97;
+  --rs-area-border-color: #ffffff;
   --rs-area-border-radius: 100vh;
-  --rs-background: #8b36c9;
+  --rs-background: #dddddd;
 
   /* Slider  */
   --rs-slider-size: 1.5rem;
-  --rs-slider-background: #ff9f20;
+  --rs-slider-background: #00be0a;
   --rs-slider-border-style: solid;
   --rs-slider-border-width: 2px;
   --rs-slider-border-color: #ffffff;
@@ -18,15 +18,28 @@
   --rs-slider-offset: calc((var(--rs-area-size) - var(--rs-slider-size)) / 2);
 
   /* Before area */
-  --rs-before-background: #2ac710;
+  --rs-before-background: #00be0a;
 
   /* After area */
   --rs-after-background: #1082c7;
 
+  /* Selected area */
+  --rs-selected-background: #00be0a;
+  --rs-selected-border-width: 2px;
+  --rs-selected-border-color: #00be0a;
+
   /* Hover state */
-  --rs-hover-background: #9e31ec;
-  --rs-hover-slider-color: #ffaf48;
+  --rs-hover-background: #dddddd;
+  --rs-hover-slider-background: #009908;
+  --rs-hover-slider-color: #009908;
   --rs-hover-slider-border-color: #ffeed8;
+
+  /* Disabled state */
+  --rs-disabled-background: #e9e9e9;
+  --rs-disabled-slider-background: #b1b1b1;
+  --rs-disabled-slider-border-color: #ffffff;
+  --rs-disabled-selected-background: #b1b1b1;
+  --rs-disabled-selected-border-color: #b1b1b1;
 
   &.range-slider_x-axis .range-slider__area {
     margin-left: 1px;
