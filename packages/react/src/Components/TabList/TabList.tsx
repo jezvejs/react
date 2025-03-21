@@ -5,13 +5,21 @@ import { MenuDefProps, MenuList, MenuHelpers } from '../Menu/Menu.tsx';
 import { MenuListProps, MenuState } from '../Menu/types.ts';
 
 import { TabListItemProps, TabListProps } from './types.ts';
-import { generateId, selectItem } from './helpers.ts';
+import * as TabListHelpers from './helpers.ts';
 import './TabList.scss';
 
 const defaultProps = {
     items: [],
     selectedId: null,
 };
+
+const { generateId, selectItem } = TabListHelpers;
+
+export {
+    TabListHelpers,
+};
+
+export * from './types.ts';
 
 /**
  * Tabs list component

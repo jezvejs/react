@@ -6,6 +6,7 @@
   --accent-color: #0072c6;
   --accent-hover-color: #1e82cc;
   --accent-active-color: #104b79;
+  --accent-disabled-color: #5082aa;
 
   /* Logo */
   --logo-size: 100px;
@@ -67,8 +68,10 @@ main {
   --btn-hover-background: var(--primary-btn-hover-bg);
   --btn-border-radius: var(--primary-btn-border-radius);
   --btn-active-background: var(--primary-btn-active-bg);
-  --btn-disabled-background: #5082aa;
+  --btn-disabled-background: var(--accent-disabled-color);
   --btn-padding: 0 22px;
+  --btn-font-size: 0.9rem;
+  --btn-font-weight: 500;
 
   margin-right: 15px;
 }
@@ -76,6 +79,11 @@ main {
 .btn.primary-btn:focus {
   outline: 2px #aee5ff solid;
   outline-offset: 0.1rem;
+}
+
+/* Checkbox */
+.demo-checkbox {
+  --checkbox-label-size: 0.9rem;
 }
 
 /* Header component */
@@ -136,18 +144,18 @@ main {
     text-decoration: none;
     border: 1px solid #ffffff00;
     border-radius: 3px;
-    color: #447fd6;
+    color: var(--accent-color);
   }
 
   .paginator-item__active {
     font-weight: normal;
-    background-color: #557dff;
+    background-color: var(--accent-color);
     color: #ffffff;
   }
 
   .paginator-arrow {
     width: 26px;
-    fill: #93beff;
+    fill: var(--accent-color);
   }
 
   .paginator-arrow[disabled] {
@@ -157,11 +165,11 @@ main {
 
 @media (hover: hover) {
   .paginator.styled a.paginator-item:hover {
-    border-color: #93beff;
+    border-color: var(--accent-hover-color);
   }
 
   .paginator.styled a.paginator-arrow:hover {
-    fill: #447fd6;
+    fill: var(--accent-hover-color);
     border-color: #ffffff;
   }
 }
@@ -228,7 +236,7 @@ main {
   --btn-title-color: #ffffff;
   --btn-background: var(--action-btn-bg);
   --btn-border-style: solid;
-  --btn-border-color: #0062a8;
+  --btn-border-color: var(--accent-color);
   --btn-hover-background: var(--action-btn-hover-bg);
   --btn-active-background: var(--action-btn-active-bg);
 

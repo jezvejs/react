@@ -14,6 +14,7 @@ const LabeledRangeSlider = (args: Partial<RangeSliderProps>) => {
         value: 0,
         start: 0,
         end: 100,
+        ...args,
     });
 
     const onChange = (value: RangeSliderValue) => {
@@ -53,17 +54,22 @@ const meta: Meta<typeof LabeledRangeSlider> = {
 export default meta;
 
 export const Default: Story = {
+    args: {
+        value: 50,
+    },
 };
 
 export const Vertical: Story = {
     args: {
         axis: 'y',
+        value: 50,
         className: 'vertical',
     },
 };
 
 export const Styled: Story = {
     args: {
+        value: 50,
         className: 'styled',
     },
 };
@@ -71,6 +77,7 @@ export const Styled: Story = {
 export const BeforeArea: Story = {
     args: {
         className: 'styled',
+        value: 50,
         beforeArea: true,
     },
 };
@@ -78,6 +85,7 @@ export const BeforeArea: Story = {
 export const AfterArea: Story = {
     args: {
         className: 'styled',
+        value: 50,
         afterArea: true,
     },
 };
@@ -85,6 +93,7 @@ export const AfterArea: Story = {
 export const BeforeAndAfterAreas: Story = {
     args: {
         className: 'styled',
+        value: 50,
         beforeArea: true,
         afterArea: true,
     },
@@ -96,6 +105,7 @@ export const BeforeAndAfterAreas: Story = {
 export const Step: Story = {
     args: {
         className: 'styled',
+        value: 0,
         step: 0.02,
         min: -10,
         max: 10,
@@ -106,6 +116,8 @@ export const Range: Story = {
     args: {
         className: 'styled',
         range: true,
+        start: 30,
+        end: 70,
     },
 };
 
@@ -116,21 +128,22 @@ export const ScrollRange: Story = {
     args: {
         className: 'styled',
         range: true,
+        start: 30,
+        end: 70,
         scrollOnClickOutsideRange: true,
     },
 };
 
 export const Disabled: Story = {
     args: {
+        className: 'styled',
+        range: true,
+        start: 30,
+        end: 70,
         disabled: true,
     },
     render: function Render(args) {
-        const [state, setState] = useState({
-            value: 0,
-            start: 0,
-            end: 100,
-            disabled: true,
-        });
+        const [state, setState] = useState({ ...args });
 
         const onToggleEnable = () => {
             setState((prev) => ({ ...prev, disabled: !prev.disabled }));
