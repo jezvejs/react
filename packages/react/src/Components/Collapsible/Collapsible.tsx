@@ -1,6 +1,7 @@
 import {
     useCallback,
     useEffect,
+    useRef,
     useState,
 } from 'react';
 import classNames from 'classnames';
@@ -51,6 +52,8 @@ export const Collapsible = (props: CollapsibleProps) => {
         expandedHeight: undefined,
     });
 
+    const contentElemRef = useRef<HTMLDivElement | null>(null);
+
     const contentRef = useCallback((node: HTMLDivElement | null) => {
         if (node) {
             setState((prev) => ({
@@ -59,6 +62,8 @@ export const Collapsible = (props: CollapsibleProps) => {
                 expandedHeight: node.offsetHeight,
             }));
         }
+
+        contentElemRef.current = node;
     }, []);
 
     useEffect(() => {
@@ -89,19 +94,46 @@ export const Collapsible = (props: CollapsibleProps) => {
         }
     };
 
-    const handleClick = () => {
-        if (state.toggleOnClick) {
-            toggle();
+    const resizeHandler = () => {
+        const rect = contentElemRef.current?.getBoundingClientRect() ?? null;
+        if (!rect) {
+            return;
         }
+
+        setState((prev) => ({
+            ...prev,
+            expandedHeight: rect.height,
+        }));
     };
 
-    const handleTransitionEnd = () => {
+    // ResizeObserver
+    useEffect(() => {
+        if (!contentElemRef.current) {
+            return undefined;
+        }
+
+        const observer = new ResizeObserver(resizeHandler);
+        observer.observe(contentElemRef.current);
+
+        return () => {
+            observer.disconnect();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [contentElemRef.current]);
+
+    const handleClick = useCallback(() => {
+        if (toggleOnClick) {
+            toggle();
+        }
+    }, [toggleOnClick]);
+
+    const handleTransitionEnd = useCallback(() => {
         setState((prev: CollapsibleState) => ({
             ...prev,
             animationInProgress: false,
             changed: false,
         }));
-    };
+    }, [state.expanded]);
 
     const animationStyle: {
         height?: number,
