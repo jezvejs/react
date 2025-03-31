@@ -368,15 +368,16 @@ const AboutComponent = () => (
                 url="./?path=/docs/menu-dropdown--docs"
                 description="Combo box with popup menu to select single or multiple items from list"
             >
-                <DropDown
-                    className="dd_stretch"
-                    enableFilter
-                    openOnFocus
-                    multiple
-                    fixedMenu
-                    placeholder="Type to filter"
-                    items={initGroupItems()}
-                />
+                <div>
+                    <DropDown
+                        enableFilter
+                        openOnFocus
+                        multiple
+                        fixedMenu
+                        placeholder="Type to filter"
+                        items={initGroupItems()}
+                    />
+                </div>
             </ComponentCard>
 
             <ComponentCard
