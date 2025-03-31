@@ -52,6 +52,7 @@ export const Collapsible = (props: CollapsibleProps) => {
         expandedHeight: undefined,
     });
 
+    const headerElemRef = useRef<HTMLDivElement | null>(null);
     const contentElemRef = useRef<HTMLDivElement | null>(null);
 
     const contentRef = useCallback((node: HTMLDivElement | null) => {
@@ -121,8 +122,13 @@ export const Collapsible = (props: CollapsibleProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contentElemRef.current]);
 
-    const handleClick = useCallback(() => {
-        if (toggleOnClick) {
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        if (!headerElemRef.current || !toggleOnClick) {
+            return;
+        }
+
+        const target = e.target as HTMLElement;
+        if (headerElemRef.current.contains(target)) {
             toggle();
         }
     }, [toggleOnClick]);
@@ -162,7 +168,7 @@ export const Collapsible = (props: CollapsibleProps) => {
             onClick={handleClick}
             onTransitionEndCapture={handleTransitionEnd}
         >
-            <div className='collapsible-header'>
+            <div className='collapsible-header' ref={headerElemRef}>
                 {props.header}
             </div>
             <div className='collapsible-content' style={animationStyle}>
