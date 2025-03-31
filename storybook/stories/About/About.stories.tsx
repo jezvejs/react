@@ -21,6 +21,7 @@ import {
     InputGroupInnerButton,
     InputGroupInput,
     InputGroupInputProps,
+    InputGroupOuterContainer,
     InputGroupText,
     LineChart,
     Menu,
@@ -348,14 +349,16 @@ const AboutComponent = () => (
                 url="./?path=/docs/input-inputgroup--docs"
                 description="Input groupped with text, buttons and other components"
             >
-                <InputGroup className="input-group__input-outer">
-                    <InputGroupButton title="€" />
-                    <InputGroupInputWithState
-                        className="amount-input"
-                        placeholder="0"
-                    />
-                    <InputGroupInnerButton icon={SmallCloseIcon} />
-                    <InputGroupText title=".00" />
+                <InputGroup>
+                    <InputGroupOuterContainer>
+                        <InputGroupButton title="€" />
+                        <InputGroupInputWithState
+                            className="amount-input"
+                            placeholder="0"
+                        />
+                        <InputGroupInnerButton icon={SmallCloseIcon} />
+                        <InputGroupText title=".00" />
+                    </InputGroupOuterContainer>
                 </InputGroup>
             </ComponentCard>
         </ComponentsSection>
