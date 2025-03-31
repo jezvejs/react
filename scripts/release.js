@@ -19,5 +19,4 @@ release({
     packageName,
     isMainPackage,
     newVersion,
-    updateCommand: '',
 });
