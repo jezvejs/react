@@ -303,7 +303,7 @@ export interface MenuProps<
         ) => void
     ) | null;
 
-    isAvailableItem?: ((item: MenuItemProps, state: MenuState) => void) | null;
+    isAvailableItem?: ((item: MenuItemProps, state: MenuState) => boolean) | null;
 
     getItemProps?: (
         (item: MenuItemProps, state: MenuListProps) => MenuItemProps
