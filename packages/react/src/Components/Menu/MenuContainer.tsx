@@ -377,7 +377,9 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
             return;
         }
 
-        toggleItem(itemId);
+        if (clickedItem.selectable) {
+            toggleItem(itemId);
+        }
 
         finishClick(() => props.onItemClick?.(clickedItem, e));
     }, []);
@@ -556,10 +558,10 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
         return res;
     }, [state.items]);
 
-    const components = {
+    const components = useMemo(() => ({
         ...(props.components ?? {}),
         ...(state.components ?? {}),
-    };
+    }), [props.components, state.components]);
 
     const { Header, Footer, List } = components;
 
