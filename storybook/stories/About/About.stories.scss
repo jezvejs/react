@@ -57,6 +57,7 @@ main {
   padding: 1rem;
   background-color: #f6f8fa;
   border-radius: 0.4rem;
+  overflow-x: auto;
 }
 
 /* Primary button */
@@ -211,7 +212,11 @@ main {
 
 /* Sortable */
 .list-area {
+  display: inline-flex;
+  flex-flow: column nowrap;
+  max-width: 300px;
   width: 100%;
+  gap: 0.25rem;
 }
 
 /* InputGroup */

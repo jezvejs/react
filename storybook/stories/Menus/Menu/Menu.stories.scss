@@ -58,6 +58,18 @@
 
 /* Collapbile groups */
 .collapsible-groups-menu {
-  max-width: 300px;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.collapsible-groups-menu > .menu {
+  max-width: 200px;
   width: 100%;
+}
+
+.collapsible-groups-menu__state {
+  font-size: 0.9rem;
 }

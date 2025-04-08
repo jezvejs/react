@@ -2,12 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
 import { Menu } from '@jezvejs/react';
+import { useState } from 'react';
 
 import { initItems } from '../../../common/utils/utils.ts';
 
 // Local components
 import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.tsx';
-import { CollapsibleGroupsMenu } from './components/CollapsibleGroups/CollapsibleGroupsMenu.tsx';
+import { CollapsibleGroupsMenu, CollapsibleGroupsMenuProps } from './components/CollapsibleGroups/CollapsibleGroupsMenu.tsx';
 import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.tsx';
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.tsx';
 import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.tsx';
@@ -35,6 +36,7 @@ export default meta;
 
 export const Default: Story = {
     args: {
+        id: 'defaultMenu',
         items: getDefaultItems(),
         preventNavigation: true,
         multiple: true,
@@ -43,6 +45,7 @@ export const Default: Story = {
 
 export const IconAlignment: Story = {
     args: {
+        id: 'iconAlignmentMenu',
         items: getDefaultItems(),
         iconAlign: 'right',
         preventNavigation: true,
@@ -52,6 +55,7 @@ export const IconAlignment: Story = {
 
 export const CheckboxSide: Story = {
     args: {
+        id: 'checkboxSideMenu',
         items: [
             ...getDefaultItems(),
             {
@@ -71,6 +75,7 @@ export const CheckboxSide: Story = {
 
 export const Horizontal: Story = {
     args: {
+        id: 'horizontalMenu',
         items: getHorizontalItems(),
         className: 'horizontal-menu',
         preventNavigation: true,
@@ -133,12 +138,14 @@ export const FocusItemOnHover: Story = {
 
 export const Groups: Story = {
     args: {
+        id: 'groupsMenu',
         items: groupItems,
     },
 };
 
 export const CheckboxGroups: Story = {
     args: {
+        id: 'checkboxGroupMenu',
         items: checkboxGroupItems,
         allowActiveGroupHeader: true,
         multiple: true,
@@ -150,14 +157,40 @@ export const CheckboxGroups: Story = {
     },
 };
 
+type CollapsibleGroupsState = {
+    message: string;
+};
+
 export const CollapsibleGroups: Story = {
     args: {
+        id: 'collapsibleGroupMenu',
         items: collapsibleGroupItems,
         allowActiveGroupHeader: true,
     },
+    parameters: {
+        layout: 'fullscreen',
+    },
     render: function Render(args) {
+        const [state, setState] = useState<CollapsibleGroupsState>({
+            message: '',
+        });
+
+        const props: CollapsibleGroupsMenuProps = {
+            ...args,
+            onItemClick: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                setState((prev) => ({ ...prev, message: `Clicked by '${item.id}' menu item` }));
+            },
+        };
+
         return (
-            <CollapsibleGroupsMenu {...args} />
+            <div className="collapsible-groups-menu">
+                <CollapsibleGroupsMenu {...props} />
+                <div className="collapsible-groups-menu__state">{state.message}</div>
+            </div>
         );
     },
 };

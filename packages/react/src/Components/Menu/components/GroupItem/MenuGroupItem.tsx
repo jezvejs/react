@@ -1,10 +1,13 @@
 import classNames from 'classnames';
+import { useMemo } from 'react';
+
 import {
     MenuGroupHeaderProps,
     MenuGroupItemComponent,
     MenuGroupItemProps,
     MenuListProps,
 } from '../../types.ts';
+
 import './MenuGroupItem.scss';
 
 const defaultProps = {
@@ -33,15 +36,18 @@ export const MenuGroupItem: MenuGroupItemComponent = (p: MenuGroupItemProps) => 
     const { id, className } = props;
 
     const containerProps = {
-        className: classNames('menu-item menu-group', className),
+        className: classNames(
+            'menu-item menu-group',
+            className,
+        ),
         'data-id': id,
     };
 
-    const headerProps: MenuGroupHeaderProps = {
+    const headerProps: MenuGroupHeaderProps = useMemo(() => ({
         ...props.header,
-    };
+    }), [props.header]);
 
-    const listProps: MenuListProps = {
+    const listProps: MenuListProps = useMemo(() => ({
         ...props.list,
         id,
         items: props.items.map((item) => ({
@@ -55,7 +61,16 @@ export const MenuGroupItem: MenuGroupItemComponent = (p: MenuGroupItemProps) => 
         components: {
             ...(props.components ?? {}),
         },
-    };
+    }), [
+        props.list,
+        props.items,
+        props.activeItem,
+        props.disabled,
+        props.checkboxSide,
+        props.tabThrough,
+        props.renderNotSelected,
+        props.components,
+    ]);
 
     return (
         <div {...containerProps}>

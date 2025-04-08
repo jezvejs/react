@@ -11,7 +11,7 @@ import {
     backspaceSelection,
     deleteSelection,
     cutSelection,
-} from '../utils/index.js';
+} from '../utils/index.ts';
 
 test.describe('DecimalInput', () => {
     test('Type to empty input', async ({ page }) => {

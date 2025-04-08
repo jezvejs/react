@@ -6,7 +6,12 @@ import './MenuSeparator.scss';
  * MenuSeparator component
  */
 export const MenuSeparator: React.FC<MenuSeparatorProps> = (props: MenuSeparatorProps) => {
-    const { id, className } = props;
+    const { className } = props;
 
-    return <div id={id} className={classNames('menu-separator', className)}></div>;
+    const separatorProps = {
+        className: classNames('menu-separator', className),
+        'data-id': props.id,
+    };
+
+    return <div {...separatorProps}></div>;
 };

@@ -4,7 +4,11 @@ import './MenuGroupHeader.scss';
 
 export const MenuGroupHeader: MenuGroupHeaderComponent = (props: MenuGroupHeaderProps) => (
     <div
-        className={classNames('menu-group__header', props.className)}
+        className={classNames(
+            'menu-group__header',
+            props.className,
+            { 'menu-item_active': !!props.activeItem && props.id === props.activeItem },
+        )}
         data-id={props.id}
     >
         {props.title}

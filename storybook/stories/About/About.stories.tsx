@@ -21,6 +21,7 @@ import {
     InputGroupInnerButton,
     InputGroupInput,
     InputGroupInputProps,
+    InputGroupOuterContainer,
     InputGroupText,
     LineChart,
     Menu,
@@ -348,14 +349,16 @@ const AboutComponent = () => (
                 url="./?path=/docs/input-inputgroup--docs"
                 description="Input groupped with text, buttons and other components"
             >
-                <InputGroup className="input-group__input-outer">
-                    <InputGroupButton title="€" />
-                    <InputGroupInputWithState
-                        className="amount-input"
-                        placeholder="0"
-                    />
-                    <InputGroupInnerButton icon={SmallCloseIcon} />
-                    <InputGroupText title=".00" />
+                <InputGroup>
+                    <InputGroupOuterContainer>
+                        <InputGroupButton title="€" />
+                        <InputGroupInputWithState
+                            className="amount-input"
+                            placeholder="0"
+                        />
+                        <InputGroupInnerButton icon={SmallCloseIcon} />
+                        <InputGroupText title=".00" />
+                    </InputGroupOuterContainer>
                 </InputGroup>
             </ComponentCard>
         </ComponentsSection>
@@ -368,15 +371,16 @@ const AboutComponent = () => (
                 url="./?path=/docs/menu-dropdown--docs"
                 description="Combo box with popup menu to select single or multiple items from list"
             >
-                <DropDown
-                    className="dd_stretch"
-                    enableFilter
-                    openOnFocus
-                    multiple
-                    fixedMenu
-                    placeholder="Type to filter"
-                    items={initGroupItems()}
-                />
+                <div>
+                    <DropDown
+                        enableFilter
+                        openOnFocus
+                        multiple
+                        fixedMenu
+                        placeholder="Type to filter"
+                        items={initGroupItems()}
+                    />
+                </div>
             </ComponentCard>
 
             <ComponentCard

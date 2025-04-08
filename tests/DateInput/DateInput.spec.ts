@@ -11,7 +11,7 @@ import {
     backspaceSelection,
     deleteSelection,
     cutSelection,
-} from '../utils/index.js';
+} from '../utils/index.ts';
 
 const inputId = 'localeInput';
 

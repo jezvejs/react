@@ -101,6 +101,7 @@ export const MenuList: MenuListComponent = (p: MenuListProps) => {
             };
             const header: MenuGroupHeaderProps = {
                 ...item,
+                activeItem: st.activeItem,
             };
 
             const groupProps: MenuGroupItemProps = {
