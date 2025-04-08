@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react';
 import {
     Menu,
     MenuHelpers,
@@ -14,20 +15,20 @@ import { CollapsibleMenuItemProps } from './types.ts';
 export type CollapsibleGroupsMenuProps = Partial<MenuProps>;
 
 export const CollapsibleGroupsMenu = (props: CollapsibleGroupsMenuProps) => {
-    const toggleGroup = (state: MenuState, id: string) => ({
+    const toggleGroup = useCallback((state: MenuState, id: string) => ({
         ...state,
         items: MenuHelpers.mapItems<CollapsibleMenuItemProps>(state.items ?? [], (item) => (
             (item.type === 'group' && item.id.toString() === id)
                 ? { ...item, expanded: !item.expanded }
                 : item
         ), { includeGroupItems: true }),
-    });
+    }), []);
 
-    const onGroupHeaderClick = ({ item, setState }: OnGroupHeaderClickParam) => {
+    const onGroupHeaderClick = useCallback(({ item, setState }: OnGroupHeaderClickParam) => {
         setState((prev) => toggleGroup(prev, item.id));
-    };
+    }, []);
 
-    const isAvailableItem = (item: MenuItemProps, state: MenuState) => {
+    const isAvailableItem = useCallback((item: MenuItemProps, state: MenuState) => {
         if (!MenuHelpers.isAvailableItem(item, state)) {
             return false;
         }
@@ -39,13 +40,13 @@ export const CollapsibleGroupsMenu = (props: CollapsibleGroupsMenuProps) => {
         }
 
         return true;
-    };
+    }, []);
 
-    const components = {
+    const components = useMemo(() => ({
         ...props.components,
         GroupHeader: CollapsibleMenuGroupHeader,
         GroupItem: CollapsibleMenuGroupItem,
-    };
+    }), [props.components]);
 
     return (
         <Menu
