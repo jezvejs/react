@@ -63,7 +63,7 @@ test.describe('Menu', () => {
     test('Checkbox group menu', async ({ page }) => {
         await loadCheckboxGroups({ page });
 
-        let view = new MenuPage(page, 'checkboxGroupMenu');
+        const view = new MenuPage(page, 'checkboxGroupMenu');
         await view.waitForLoad('checkboxGroupMenu');
 
         await view.clickCheckboxGroupMenuItem('noGroupItem1');
@@ -77,7 +77,7 @@ test.describe('Menu', () => {
     test('Collapsible group menu', async ({ page }) => {
         await loadCollapsibleGroups({ page });
 
-        let view = new MenuPage(page, 'collapsibleGroupMenu');
+        const view = new MenuPage(page, 'collapsibleGroupMenu');
         await view.waitForLoad('collapsibleGroupMenu');
 
         // Navigate over collapsed group

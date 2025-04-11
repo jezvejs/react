@@ -1,4 +1,20 @@
+import { isFunction } from '@jezvejs/types';
 import { expect } from '@playwright/test';
+
+export type AsyncCallback<T> = (value: T, index: number, array: T[]) => unknown
+
+/** Maps array using async callback function */
+export const asyncMap = async <T = unknown>(data: Array<T>, func: AsyncCallback<T>) => {
+    if (!Array.isArray(data)) {
+        throw new Error('Invalid data type');
+    }
+    if (!isFunction(func)) {
+        throw new Error('Invalid function type');
+    }
+
+    const tasks = data.map(func);
+    return Promise.all(tasks);
+};
 
 export const inputToEmpty = async ({ page }, name, value, expected) => {
     const inputLocator = page.locator(`#${name}`);

@@ -361,7 +361,6 @@ export function getItemById<T extends MenuItemState = MenuItemState>(
     return findMenuItem<T>(items ?? [], (item: T) => item.id?.toString() === id);
 }
 
-
 export const isAvailableItem = (item: MenuItemState, state: MenuState): boolean => !!(
     item
     && item.visible

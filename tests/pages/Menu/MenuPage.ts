@@ -16,6 +16,7 @@ import {
     isAvailableItem,
     mapItems,
 } from './utils.ts';
+import { asyncMap } from '../../utils/index.ts';
 
 export interface CollapsibleGroupsMenuItemState {
     id?: string;
@@ -74,7 +75,9 @@ const getMenuItemProps = (props: Partial<MenuItemState>): MenuItemState => ({
     ...props,
 });
 
-const getCollapsibleGroupMenuItemProps = (props: Partial<CollapsibleGroupsMenuItemState>): CollapsibleGroupsMenuItemState => ({
+const getCollapsibleGroupMenuItemProps = (
+    props: Partial<CollapsibleGroupsMenuItemState>,
+): CollapsibleGroupsMenuItemState => ({
     ...defaultCollapsibleGroupMenuItemProps,
     ...props,
 });
@@ -88,7 +91,13 @@ const initialState: MenuPageState = {
             getMenuItemProps({ id: 'selectBtnItem', title: 'Button item' }),
             getMenuItemProps({ id: 'linkItem', title: 'Link item', type: 'link' }),
             getMenuItemProps({ id: 'noIconItem', title: 'No icon item' }),
-            getMenuItemProps({ id: 'checkboxItem', title: 'Checkbox item', type: 'checkbox', selectable: true, selected: true }),
+            getMenuItemProps({
+                id: 'checkboxItem',
+                title: 'Checkbox item',
+                type: 'checkbox',
+                selectable: true,
+                selected: true,
+            }),
         ],
     },
     checkboxSideMenu: {
@@ -99,8 +108,20 @@ const initialState: MenuPageState = {
             getMenuItemProps({ id: 'selectBtnItem', title: 'Button item' }),
             getMenuItemProps({ id: 'linkItem', title: 'Link item', type: 'link' }),
             getMenuItemProps({ id: 'noIconItem', title: 'No icon item' }),
-            getMenuItemProps({ id: 'checkboxItem', title: 'Checkbox item', type: 'checkbox', selectable: true, selected: true }),
-            getMenuItemProps({ id: 'leftSideCheckboxItem', title: 'Checkbox item', type: 'checkbox', selectable: true, selected: true }),
+            getMenuItemProps({
+                id: 'checkboxItem',
+                title: 'Checkbox item',
+                type: 'checkbox',
+                selectable: true,
+                selected: true,
+            }),
+            getMenuItemProps({
+                id: 'leftSideCheckboxItem',
+                title: 'Checkbox item',
+                type: 'checkbox',
+                selectable: true,
+                selected: true,
+            }),
         ],
     },
     groupsMenu: {
@@ -172,9 +193,22 @@ const initialState: MenuPageState = {
                 type: 'group',
                 expanded: false,
                 items: [
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem11', title: 'Group 1 item 1', visible: false }),
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem12', title: 'Group 1 item 2', disabled: true, visible: false }),
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem13', title: 'Group 1 item 3', visible: false }),
+                    getCollapsibleGroupMenuItemProps({
+                        id: 'groupItem11',
+                        title: 'Group 1 item 1',
+                        visible: false,
+                    }),
+                    getCollapsibleGroupMenuItemProps({
+                        id: 'groupItem12',
+                        title: 'Group 1 item 2',
+                        disabled: true,
+                        visible: false,
+                    }),
+                    getCollapsibleGroupMenuItemProps({
+                        id: 'groupItem13',
+                        title: 'Group 1 item 3',
+                        visible: false,
+                    }),
                 ],
             }),
             getCollapsibleGroupMenuItemProps({ id: 'noGroupItem2', title: 'No group item 2' }),
@@ -185,7 +219,11 @@ const initialState: MenuPageState = {
                 disabled: true,
                 expanded: false,
                 items: [
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem21', title: 'Group 2 item 1', visible: false }),
+                    getCollapsibleGroupMenuItemProps({
+                        id: 'groupItem21',
+                        title: 'Group 2 item 1',
+                        visible: false,
+                    }),
                 ],
             }),
             getMenuItemProps({ id: 'noGroupItem3', title: 'No group item 3' }),
@@ -205,8 +243,11 @@ export class MenuPage {
     readonly page: Page;
 
     defaultMenu: Menu | null = null;
+
     checkboxSideMenu: Menu | null = null;
+
     checkboxGroupMenu: Menu | null = null;
+
     collapsibleGroupMenu: Menu | null = null;
 
     singleMenuId: string;
@@ -240,9 +281,7 @@ export class MenuPage {
         if (this.isSingleMenu()) {
             await this.assertMenuState(this.singleMenuId, state);
         } else {
-            for (const menuId of menuIds) {
-                await this.assertMenuState(menuId, state);
-            }
+            await asyncMap(menuIds, (menuId) => this.assertMenuState(menuId, state));
         }
     }
 
@@ -366,7 +405,12 @@ export class MenuPage {
                         const additionalProps = childItemIds[item.id] ?? {};
 
                         const res = (item.id === itemId)
-                            ? ({ ...item, selected: !item.selected, active: item.type !== 'group', ...additionalProps })
+                            ? ({
+                                ...item,
+                                selected: !item.selected,
+                                active: item.type !== 'group',
+                                ...additionalProps,
+                            })
                             : ({ ...item, active: false, ...additionalProps });
 
                         return res;
@@ -455,8 +499,8 @@ export class MenuPage {
         const expectedState = {
             ...this.state,
             ...(Object.fromEntries(
-                Object.entries(this.state).map(([menuId, value]) => ([
-                    menuId,
+                Object.entries(this.state).map(([id, value]) => ([
+                    id,
                     {
                         ...value,
                         items: mapItems(
