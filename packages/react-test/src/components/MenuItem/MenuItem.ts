@@ -6,10 +6,9 @@ export type MenuItemType =
     | 'checkbox'
     | 'group'
     | 'parent'
-    | 'separator'
-    ;
+    | 'separator';
 
-export const menuItemTypeClassNames = {
+export const menuItemTypeClassNames: Partial<Record<MenuItemType, string>> = {
     button: 'button-menu-item',
     link: 'link-menu-item',
     checkbox: 'checkbox-menu-item',
@@ -37,10 +36,13 @@ export interface MenuItemState {
  */
 export class MenuItem {
     readonly page: Page;
+
     readonly rootLocator: Locator;
 
     readonly contentLocator: Locator;
+
     readonly groupHeaderLocator: Locator;
+
     readonly itemsLocator: Locator;
 
     constructor(page: Page, rootLocator: Locator) {
@@ -58,7 +60,15 @@ export class MenuItem {
     }
 
     async assertState(expectedState: MenuItemState) {
-        const { id, visible, title, type, active, selected, items } = expectedState;
+        const {
+            id,
+            visible,
+            title,
+            type,
+            active,
+            selected,
+        } = expectedState;
+        const items = expectedState.items ?? [];
 
         if (id) {
             await expect(this.rootLocator).toHaveAttribute('data-id', id);
@@ -72,7 +82,7 @@ export class MenuItem {
         }
 
         // Type
-        const itemClassName = menuItemTypeClassNames[type];
+        const itemClassName = menuItemTypeClassNames[type] ?? '';
         const classRegExp = this.classNameRegExp(itemClassName);
         await expect(this.rootLocator).toHaveClass(classRegExp);
 

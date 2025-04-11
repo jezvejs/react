@@ -1,6 +1,11 @@
 import { expect, type Page } from '@playwright/test';
-import { Menu, MenuState } from '../../components/Menu/Menu.ts';
-import { MenuItemState, MenuItemType } from '../../components/MenuItem/MenuItem.ts';
+import {
+    Menu,
+    MenuState,
+    MenuItemState,
+    MenuItemType,
+} from '@jezvejs/react-test';
+
 import {
     findLastMenuItem,
     findMenuItem,

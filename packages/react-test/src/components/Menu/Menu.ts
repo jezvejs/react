@@ -13,7 +13,9 @@ export interface MenuState {
  */
 export class Menu {
     readonly page: Page;
+
     readonly rootLocator: Locator;
+
     readonly itemsLocator: Locator;
 
     constructor(page: Page, rootLocator: Locator) {

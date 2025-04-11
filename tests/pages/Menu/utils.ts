@@ -1,7 +1,8 @@
 import { asArray, isFunction } from '@jezvejs/types';
-import { MenuItemState } from '../../components/MenuItem/MenuItem.ts';
-import { MenuState } from '../../components/Menu/Menu.ts';
-
+import {
+    MenuState,
+    MenuItemState,
+} from '@jezvejs/react-test';
 
 /**
  * shouldIncludeParentItem() function params
@@ -31,7 +32,6 @@ export interface MenuLoopParam<
 > extends IncludeGroupItemsParam {
     group?: T | null;
 }
-
 
 const checkboxTypes = ['checkbox', 'checkbox-link'];
 
