@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { classNameRegExp, expectToHaveClass } from '../../utils/index.ts';
 
 export type MenuItemType =
     | 'button'
@@ -28,6 +29,7 @@ export interface MenuItemState {
     active: boolean;
     selected: boolean;
     selectable: boolean;
+    group?: string;
     items?: MenuItemState[];
 }
 
@@ -55,10 +57,6 @@ export class MenuItem {
         this.itemsLocator = this.rootLocator.locator(':scope > .menu-list > .menu-item');
     }
 
-    classNameRegExp(className: string) {
-        return new RegExp(`(^|\\s)${className}(\\s|$)`, 'g');
-    }
-
     async assertState(expectedState: MenuItemState) {
         const {
             id,
@@ -83,7 +81,7 @@ export class MenuItem {
 
         // Type
         const itemClassName = menuItemTypeClassNames[type] ?? '';
-        const classRegExp = this.classNameRegExp(itemClassName);
+        const classRegExp = classNameRegExp(itemClassName);
         await expect(this.rootLocator).toHaveClass(classRegExp);
 
         // Visible
@@ -91,22 +89,12 @@ export class MenuItem {
 
         // Active
         if (type !== 'group') {
-            const activeClassRegExp = this.classNameRegExp(menuItemActiveClassName);
-            if (active) {
-                await expect(this.rootLocator).toHaveClass(activeClassRegExp);
-            } else {
-                await expect(this.rootLocator).not.toHaveClass(activeClassRegExp);
-            }
+            await expectToHaveClass(this.rootLocator, menuItemActiveClassName, active);
         }
 
         // Selected
         if (type === 'checkbox') {
-            const selectedClassRegExp = this.classNameRegExp(menuItemSelectedClassName);
-            if (selected) {
-                await expect(this.rootLocator).toHaveClass(selectedClassRegExp);
-            } else {
-                await expect(this.rootLocator).not.toHaveClass(selectedClassRegExp);
-            }
+            await expectToHaveClass(this.rootLocator, menuItemSelectedClassName, selected);
         }
 
         // Child items

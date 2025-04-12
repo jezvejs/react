@@ -1,8 +1,10 @@
-import { asArray, isFunction } from '@jezvejs/types';
 import {
-    MenuState,
     MenuItemState,
+    MenuState,
 } from '@jezvejs/react-test';
+import { asArray, isFunction } from '@jezvejs/types';
+import { defaultCollapsibleGroupMenuItemProps, defaultMenuItemProps } from './defaultProps.ts';
+import { CollapsibleGroupsMenuItemState } from './types.ts';
 
 /**
  * shouldIncludeParentItem() function params
@@ -388,3 +390,19 @@ export const getActiveItem = (state: MenuState): MenuItemState | null => (
         },
     )
 );
+
+export const getMenuItemProps = (
+    props: Partial<MenuItemState>,
+    defaultProps: MenuItemState = defaultMenuItemProps,
+): MenuItemState => ({
+    ...defaultProps,
+    ...props,
+});
+
+export const getCollapsibleGroupMenuItemProps = (
+    props: Partial<CollapsibleGroupsMenuItemState>,
+    defaultProps: CollapsibleGroupsMenuItemState = defaultCollapsibleGroupMenuItemProps,
+): CollapsibleGroupsMenuItemState => ({
+    ...defaultProps,
+    ...props,
+});
