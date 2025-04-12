@@ -62,12 +62,13 @@ export const Inline: DropDownStory = {
         const portalElement = usePortalElement();
 
         const args1 = {
+            id: 'inlineDropDown',
             className: 'dd__container_no-shrink',
             placeholder: 'Select item',
             items: initItems(),
         };
         const args2 = {
-            id: 'arg2',
+            id: 'inlineDropDown2',
             className: 'dd__container_ellipsis',
             placeholder: 'Select item 2',
             static: true,
@@ -93,6 +94,7 @@ export const Inline: DropDownStory = {
 
 export const FullWidth: DropDownStory = {
     args: {
+        id: 'fullWidthDropDown',
         className: 'dd_stretch',
         placeholder: 'Select item 3',
         items: initItems(),
@@ -102,6 +104,7 @@ export const FullWidth: DropDownStory = {
 
 export const FixedMenu: DropDownStory = {
     args: {
+        id: 'fixedMenuDropDown',
         fixedMenu: true,
         className: 'dd_form',
         items: initItems({ count: 50 }),
@@ -118,6 +121,7 @@ export const FixedMenu: DropDownStory = {
 
 export const DisabledItems: DropDownStory = {
     args: {
+        id: 'disabledItemsDropDown',
         items: initItems().map((item) => (
             (item.id === '3' || item.id === '5')
                 ? { ...item, disabled: true }
@@ -129,6 +133,7 @@ export const DisabledItems: DropDownStory = {
 
 export const Groups: DropDownStory = {
     args: {
+        id: 'groupsDropDown',
         items: groupsItems(),
     },
     decorators: [heightDecorator],
@@ -142,6 +147,7 @@ type AttachedToBlockStory = StoryObj<typeof AttachedToBlock>;
  */
 export const AttachToBlock: AttachedToBlockStory = {
     args: {
+        id: 'attachedToBlockDropDown',
         listAttach: true,
         isValidToggleTarget: (elem) => !elem.closest('.close-btn'),
         items: initItems({ title: 'Long Item Lorem Lorem' }),
@@ -154,6 +160,7 @@ export const AttachToBlock: AttachedToBlockStory = {
 
 export const AttachToInline: DropDownStory = {
     args: {
+        id: 'attachedToInlineDropDown',
         className: 'dd_inline',
         listAttach: true,
         items: initItems({ title: 'Long Item Lorem Lorem' }),

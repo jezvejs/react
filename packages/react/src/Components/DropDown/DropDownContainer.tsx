@@ -1152,6 +1152,8 @@ export const DropDownContainer = forwardRef<
 
         const menuProps: DropDownMenuProps = {
             ...st,
+            id: `dropDownMenu_${st.id}`,
+            parentId: st.id,
             placeholder: null,
             items: st.items ?? [],
             inputRef: inputElem,
