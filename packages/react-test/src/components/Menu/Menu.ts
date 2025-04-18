@@ -42,14 +42,18 @@ export class Menu {
         }
     }
 
+    getItemLocator(itemId: string) {
+        return this.rootLocator.locator(`.menu-list > .menu-item[data-id="${itemId}"]`);
+    }
+
     async clickById(itemId: string) {
-        const itemLocator = this.rootLocator.locator(`.menu-list > .menu-item[data-id="${itemId}"]`);
+        const itemLocator = this.getItemLocator(itemId);
         const item = new MenuItem(this.page, itemLocator);
         return item.click();
     }
 
     async clickHeaderById(itemId: string) {
-        const itemLocator = this.rootLocator.locator(`.menu-list > .menu-item[data-id="${itemId}"]`);
+        const itemLocator = this.getItemLocator(itemId);
         const item = new MenuItem(this.page, itemLocator);
         return item.clickHeader();
     }

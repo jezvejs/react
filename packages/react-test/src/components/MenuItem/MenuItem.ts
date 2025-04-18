@@ -73,11 +73,8 @@ export class MenuItem {
         }
 
         // Title
-        if (type === 'group') {
-            await expect(this.groupHeaderLocator).toHaveText(title);
-        } else {
-            await expect(this.contentLocator).toHaveText(title);
-        }
+        const titleLocator = (type === 'group') ? this.groupHeaderLocator : this.contentLocator;
+        await expect(titleLocator).toHaveText(title);
 
         // Type
         const itemClassName = menuItemTypeClassNames[type] ?? '';
