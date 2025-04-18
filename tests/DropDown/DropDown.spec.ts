@@ -11,6 +11,7 @@ const loadFixedMenu = async ({ page }) => loadStoryById({ page }, 'fixed-menu');
 const loadGroups = async ({ page }) => loadStoryById({ page }, 'groups');
 const loadAttachedToBlock = async ({ page }) => loadStoryById({ page }, 'attach-to-block');
 const loadAttachedToInline = async ({ page }) => loadStoryById({ page }, 'attach-to-inline');
+const loadMultiSelect = async ({ page }) => loadStoryById({ page }, 'multiple-select');
 
 test.describe('DropDown', () => {
     test('Toggle menu by click on toggle button', async ({ page }) => {
@@ -92,5 +93,19 @@ test.describe('DropDown', () => {
 
         await view.clickByToggleButton('groupsDropDown');
         await view.clickItemById('groupsDropDown', 'groupItem26');
+    });
+
+    test('Multiple select', async ({ page }) => {
+        await loadMultiSelect({ page });
+
+        const view = new DropDownPage(page, 'multipleSelectDropDown');
+        await view.waitForLoad('multipleSelectDropDown');
+
+        await view.clickByToggleButton('multipleSelectDropDown');
+        await view.clickItemById('multipleSelectDropDown', '1');
+        await view.clickItemById('multipleSelectDropDown', '2');
+        await view.clickItemById('multipleSelectDropDown', '4');
+        await view.clickItemById('multipleSelectDropDown', '2');
+        await view.clickByToggleButton('multipleSelectDropDown');
     });
 });

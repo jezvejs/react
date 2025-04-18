@@ -87,4 +87,24 @@ export const initialState: DropDownPageState = {
             ),
         },
     }),
+    multipleSelectDropDown: getDropDownProps({
+        id: 'multipleSelectDropDown',
+        multiple: true,
+        value: '',
+        textValue: 'Long Item Lorem Lorem 1',
+        menu: {
+            id: 'multipleSelectDropDown',
+            allowActiveGroupHeader: false,
+            visible: false,
+            items: (
+                initItems({ title: 'Multi select' })
+                    .map((item) => (
+                        getDropDownMenuItemProps({
+                            ...item,
+                            disabled: (item.id === '3'),
+                        })
+                    ))
+            ),
+        },
+    }),
 };

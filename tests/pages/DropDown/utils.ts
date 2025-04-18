@@ -1,4 +1,7 @@
 import { DropDownState, MenuItemState, MenuItemType } from '@jezvejs/react-test';
+
+import { getItemById, mapItems, toFlatList } from '../Menu/utils.ts';
+
 import { defaultDropDownMenuItemProps, defaultDropDownProps } from './defaultProps.ts';
 import { InitItemsParams } from './types.ts';
 
@@ -68,3 +71,64 @@ export const groupsItems = () => ([
         ],
     }),
 ]);
+
+/**
+ * Returns DropDown component state after toggle select menu item
+ * @param {DropDownState} state
+ * @param {string} itemId
+ * @returns {DropDownState}
+ */
+export const toggleSelectItem = (state: DropDownState, itemId: string): DropDownState => {
+    if (!state.open) {
+        return state;
+    }
+
+    const menuItems = state.menu.items;
+
+    const options = {
+        includeGroupItems: state.menu.allowActiveGroupHeader,
+        includeChildItems: false,
+    };
+
+    const targetItem = getItemById(itemId, menuItems);
+    if (!targetItem || targetItem.disabled) {
+        return state;
+    }
+
+    let value: string | string[] = targetItem.id;
+    if (state.multiple) {
+        const selectedIds = toFlatList(menuItems, options)
+            .filter((item) => item?.selected)
+            .map((item) => item.id);
+
+        const expectedSelectedIds = (selectedIds.includes(itemId))
+            ? selectedIds.filter((id) => id !== itemId)
+            : [...selectedIds, itemId];
+
+        value = expectedSelectedIds.join(',');
+    }
+
+    return {
+        ...state,
+        open: !!state.multiple,
+        value,
+        textValue: targetItem.title,
+        menu: {
+            ...state.menu,
+            visible: !!state.multiple,
+            items: mapItems(menuItems, (item) => {
+                const isTargetItem = item?.id === itemId;
+                let selected = isTargetItem;
+                if (state.multiple) {
+                    selected = (isTargetItem) ? !item.selected : item.selected;
+                }
+
+                return {
+                    ...item,
+                    selected,
+                    active: (state.multiple) ? isTargetItem : false,
+                };
+            }, options),
+        },
+    };
+};

@@ -7,6 +7,7 @@ export interface DropDownPageState {
     groupsDropDown: DropDownState;
     attachedToBlockDropDown: DropDownState;
     attachedToInlineDropDown: DropDownState;
+    multipleSelectDropDown: DropDownState;
 }
 
 export type InitItemsParams = {

@@ -1,12 +1,13 @@
+import { DropDown } from '@jezvejs/react-test';
 import { expect, type Page } from '@playwright/test';
-import {
-    DropDown,
-} from '@jezvejs/react-test';
 
 import { asyncMap } from '../../utils/index.ts';
-import { DropDownPageState } from './types.ts';
-import { getItemById, mapItems } from '../Menu/utils.ts';
+
+import { mapItems } from '../Menu/utils.ts';
+
 import { initialState } from './initialState.ts';
+import { toggleSelectItem } from './utils.ts';
+import { DropDownPageState } from './types.ts';
 
 const componentIds = [
     'inlineDropDown',
@@ -16,6 +17,7 @@ const componentIds = [
     'groupsDropDown',
     'attachedToBlockDropDown',
     'attachedToInlineDropDown',
+    'multipleSelectDropDown',
 ];
 
 export class DropDownPage {
@@ -34,6 +36,8 @@ export class DropDownPage {
     attachedToBlockDropDown: DropDown | null = null;
 
     attachedToInlineDropDown: DropDown | null = null;
+
+    multipleSelectDropDown: DropDown | null = null;
 
     singleComponentId: string;
 
@@ -119,36 +123,16 @@ export class DropDownPage {
 
     onClickItemById(id: string, itemId: string) {
         const componentState = this.state[id];
-        const menuItems = componentState.menu.items;
-
-        if (!componentState.open) {
-            return this.state;
+        if (!componentState) {
+            throw new Error(`Invalid component id: '${id}'`);
         }
 
-        const options = {
-            includeGroupItems: componentState.menu.allowActiveGroupHeader,
-            includeChildItems: false,
-        };
-
-        const targetItem = getItemById(itemId, menuItems);
-        if (!targetItem) {
-            return this.state;
-        }
+        const menuState = toggleSelectItem(componentState, itemId);
 
         const expectedState: DropDownPageState = {
             ...this.state,
             [id]: {
-                ...this.state[id],
-                open: false,
-                value: targetItem.id,
-                textValue: targetItem.title,
-                menu: {
-                    ...this.state[id].menu,
-                    visible: false,
-                    items: mapItems(menuItems, (item) => (
-                        ({ ...item, active: false })
-                    ), options),
-                },
+                ...menuState,
             },
         };
 
@@ -185,7 +169,11 @@ export class DropDownPage {
         const expectedState = this.onClickItemById(id, itemId);
 
         await this[id].clickItemById(itemId);
-        await this[id].waitForMenu(expectedState[id].open);
+        if (expectedState[id].multiple) {
+            await this[id].waitForValue(expectedState[id].value);
+        } else {
+            await this[id].waitForMenu(expectedState[id].open);
+        }
         await this.assertState(expectedState);
 
         this.state = expectedState;

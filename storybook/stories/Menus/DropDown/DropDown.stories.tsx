@@ -209,6 +209,7 @@ export const Clipping: DropDownStory = {
 
 export const MultipleSelect: DropDownStory = {
     args: {
+        id: 'multipleSelectDropDown',
         className: 'dd_stretch',
         placeholder: 'Multi select control',
         multiple: true,
