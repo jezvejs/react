@@ -21,3 +21,19 @@ export interface WaitForOptions {
 
 /** waitForFunction() condition callback */
 export type WaitForFunctionConditionFunc = () => boolean | Promise<boolean>;
+
+/**
+ * shouldIncludeParentItem() function params
+ */
+export interface IncludeGroupItemsParam {
+    includeGroupItems?: boolean;
+    includeChildItems?: boolean;
+}
+
+/**
+ * toFlatList() function params
+ */
+export interface ToFlatListParam extends IncludeGroupItemsParam {
+    parentId?: string;
+    disabled?: boolean;
+}

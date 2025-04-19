@@ -104,7 +104,7 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
                 },
             },
         }));
-    }, []);
+    }, [props.items]);
 
     if (props.useParentContext) {
         return <MenuContainer ref={ref} {...initialState} />;

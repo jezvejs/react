@@ -18,6 +18,7 @@ export const initialState: MenuPageState = {
                 selected: true,
             }),
         ],
+        filteredItems: [],
     },
     checkboxSideMenu: {
         id: 'checkboxSideMenu',
@@ -42,6 +43,7 @@ export const initialState: MenuPageState = {
                 selected: true,
             }),
         ],
+        filteredItems: [],
     },
     groupsMenu: {
         id: 'groupsMenu',
@@ -70,6 +72,7 @@ export const initialState: MenuPageState = {
             }),
             getMenuItemProps({ id: 'noGroupItem3', title: 'No group item 3' }),
         ],
+        filteredItems: [],
     },
     checkboxGroupMenu: {
         id: 'checkboxGroupMenu',
@@ -99,6 +102,7 @@ export const initialState: MenuPageState = {
             }),
             getMenuItemProps({ id: 'noGroupItem3', title: 'No group item 3' }),
         ],
+        filteredItems: [],
     },
     collapsibleGroupMenu: {
         id: 'collapsibleGroupMenu',

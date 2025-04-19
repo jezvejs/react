@@ -504,6 +504,10 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
     }, [props.activeItem]);
 
     useEffect(() => {
+        if (props.useParentContext) {
+            return;
+        }
+
         const st = getState();
 
         if (st.activeItem) {

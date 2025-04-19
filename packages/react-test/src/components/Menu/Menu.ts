@@ -1,12 +1,16 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { MenuItem, MenuItemState } from '../MenuItem/MenuItem.ts';
+import { toFlatList, waitForFunction } from '../../utils/index.ts';
 
 export interface MenuState {
     id: string;
     visible: boolean;
     items: MenuItemState[];
+    filteredItems: MenuItemState[];
     allowActiveGroupHeader: boolean;
 }
+
+export const defaultItemSelector = '.menu-list > .menu-item';
 
 /**
  * Menu test component
@@ -18,11 +22,26 @@ export class Menu {
 
     readonly itemsLocator: Locator;
 
-    constructor(page: Page, rootLocator: Locator) {
+    readonly itemSelector: string;
+
+    itemsCount: number = 0;
+
+    constructor(page: Page, rootLocator: Locator, itemSelector: string = defaultItemSelector) {
         this.page = page;
         this.rootLocator = rootLocator;
+        this.itemSelector = itemSelector;
 
-        this.itemsLocator = this.rootLocator.locator(':scope > .menu-list > .menu-item');
+        this.itemsLocator = this.rootLocator.locator(itemSelector);
+    }
+
+    async parseContent() {
+        const element = await this.rootLocator.evaluate((el, itemSelector) => ({
+            itemsCount: Array.from(el?.querySelectorAll(itemSelector) ?? []).length,
+            itemsIds: (Array.from(el?.querySelectorAll(itemSelector) ?? [])
+                .map((item: Element) => (item as HTMLElement)?.dataset?.id)),
+        }), this.itemSelector);
+
+        this.itemsCount = element.itemsCount;
     }
 
     async assertState(expectedState: MenuState) {
@@ -30,16 +49,35 @@ export class Menu {
 
         await expect(this.rootLocator).toBeVisible({ visible });
 
-        await expect(this.itemsLocator).toHaveCount(items.length);
+        const options = {
+            includeGroupItems: true,
+            includeChildItems: false,
+        };
+
+        const flatItems = toFlatList(items ?? [], options)
+            .filter((item) => !!item && !item.hidden);
+
+        await expect(this.itemsLocator).toHaveCount(flatItems.length);
         const allItems = await this.itemsLocator.all();
 
-        for (let index = 0; index < items.length; index++) {
+        for (let index = 0; index < flatItems.length; index++) {
             const itemLocator = allItems[index];
-            const itemState = items[index];
+            const itemState = flatItems[index];
 
-            const item = new MenuItem(this.page, itemLocator);
+            const item = new MenuItem(this.page, itemLocator, this.itemSelector);
             await item.assertState(itemState);
         }
+    }
+
+    /**
+     * Waits until the input component value is equal to the specified value
+     * @param {string} expectedValue
+     */
+    async waitForItemsCount(itemsCount: number) {
+        await waitForFunction(async () => {
+            await this.parseContent();
+            return this.itemsCount === itemsCount;
+        });
     }
 
     getItemLocator(itemId: string) {

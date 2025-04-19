@@ -195,6 +195,49 @@ export function mapItems<T extends MenuItemState = MenuItemState>(
 }
 
 /**
+ * Returns list of menu items filtered by callback function
+ * @param {T[]} items menu items array
+ * @param {MenuItemCallback<T>} callback
+ * @param {MenuLoopParam<T>} options
+ * @returns {T[]}
+ */
+export function filterItems<T extends MenuItemState = MenuItemState>(
+    items: T[],
+    callback: MenuItemCallback<T>,
+    options: MenuLoopParam<T> | null = null,
+): T[] {
+    if (!isFunction(callback)) {
+        throw new Error('Invalid callback parameter');
+    }
+
+    const res: T[] = [];
+
+    for (let index = 0; index < items.length; index += 1) {
+        const item = items[index];
+
+        if (isChildItemsAvailable(item)) {
+            const includeParentItem = shouldIncludeParentItem(item, options);
+            if (
+                !includeParentItem
+                || callback(item, index, items)
+            ) {
+                const children = filterItems<T>((item.items ?? []) as T[], callback, options);
+                if (children.length > 0) {
+                    res.push({
+                        ...item,
+                        items: children,
+                    });
+                }
+            }
+        } else if (callback(item, index, items)) {
+            res.push({ ...item });
+        }
+    }
+
+    return res;
+}
+
+/**
  * Returns closest item before specified that satisfies filter
  *
  * @param {string|null} id identifier of item to start from

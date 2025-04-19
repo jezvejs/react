@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { classNameRegExp, expectToHaveClass } from '../../utils/index.ts';
+import { defaultItemSelector } from '../Menu/Menu.ts';
 
 export type MenuItemType =
     | 'button'
@@ -29,6 +30,7 @@ export interface MenuItemState {
     active: boolean;
     selected: boolean;
     selectable: boolean;
+    hidden?: boolean;
     group?: string;
     items?: MenuItemState[];
 }
@@ -47,14 +49,22 @@ export class MenuItem {
 
     readonly itemsLocator: Locator;
 
-    constructor(page: Page, rootLocator: Locator) {
+    readonly itemSelector: string;
+
+    constructor(page: Page, rootLocator: Locator, itemSelector: string = defaultItemSelector) {
         this.page = page;
         this.rootLocator = rootLocator;
+
+        if (!this.rootLocator) {
+            throw new Error('Invalid locator');
+        }
 
         this.contentLocator = this.rootLocator.locator('.menu-item__content');
 
         this.groupHeaderLocator = this.rootLocator.locator('.menu-group__header');
-        this.itemsLocator = this.rootLocator.locator(':scope > .menu-list > .menu-item');
+
+        this.itemSelector = itemSelector;
+        this.itemsLocator = this.rootLocator.locator(itemSelector);
     }
 
     async assertState(expectedState: MenuItemState) {

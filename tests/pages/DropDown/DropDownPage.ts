@@ -3,11 +3,12 @@ import { expect, type Page } from '@playwright/test';
 
 import { asyncMap } from '../../utils/index.ts';
 
-import { mapItems } from '../Menu/utils.ts';
+import { mapItems, toFlatList } from '../Menu/utils.ts';
 
 import { initialState } from './initialState.ts';
-import { toggleSelectItem } from './utils.ts';
+import { filterDropDownItems, toggleSelectItem } from './utils.ts';
 import { DropDownPageState } from './types.ts';
+import { ToggleEnableDropDown } from './components/ToggleEnableDropDown.ts';
 
 const componentIds = [
     'inlineDropDown',
@@ -18,7 +19,18 @@ const componentIds = [
     'attachedToBlockDropDown',
     'attachedToInlineDropDown',
     'multipleSelectDropDown',
+    'filterDropDown',
+    'filterMultiDropDown',
+    'attachedFilterDropDown',
+    'attachedFilterMultipleDropDown',
+    'filterGroupsDropDown',
+    'filterGroupsMultiDropDown',
 ];
+
+const toggleEnableButtonIds = {
+    filterDropDown: 'toggleEnableBtn',
+    filterMultiDropDown: 'toggleEnableFilterMultiBtn',
+};
 
 export class DropDownPage {
     readonly page: Page;
@@ -39,6 +51,18 @@ export class DropDownPage {
 
     multipleSelectDropDown: DropDown | null = null;
 
+    filterDropDown: ToggleEnableDropDown | null = null;
+
+    filterMultiDropDown: ToggleEnableDropDown | null = null;
+
+    attachedFilterDropDown: DropDown | null = null;
+
+    attachedFilterMultipleDropDown: DropDown | null = null;
+
+    filterGroupsDropDown: DropDown | null = null;
+
+    filterGroupsMultiDropDown: DropDown | null = null;
+
     singleComponentId: string;
 
     state: DropDownPageState = initialState;
@@ -55,11 +79,30 @@ export class DropDownPage {
     }
 
     createComponent(id: string) {
+        const btnId = toggleEnableButtonIds[id];
+        if (btnId) {
+            this.createToggleEnableComponent(id);
+            return;
+        }
+
         if (!componentIds.includes(id)) {
             return;
         }
 
         this[id] = new DropDown(this.page, this.page.locator(`#${id}`));
+    }
+
+    createToggleEnableComponent(id: string) {
+        const btnId = toggleEnableButtonIds[id];
+        if (!componentIds.includes(id) || !btnId) {
+            return;
+        }
+
+        this[id] = new ToggleEnableDropDown(
+            this.page,
+            this.page.locator(`#${id}`),
+            this.page.locator(`#${btnId}`),
+        );
     }
 
     isSingleComponent() {
@@ -94,12 +137,34 @@ export class DropDownPage {
         }
     }
 
+    async waitForItemsCount(state: DropDownPageState, id: string) {
+        expect(this.isValidComponentId(id)).toBeTruthy();
+
+        const componentState = state[id];
+        const { inputString } = componentState;
+        const items = (typeof inputString === 'string' && inputString.length > 0)
+            ? componentState.menu.filteredItems
+            : componentState.menu.items;
+
+        // Include group headers to the flat list results, because
+        // Menu test component includes all items to the search results
+        const options = {
+            includeGroupItems: true,
+            includeChildItems: false,
+        };
+
+        const flatList = toFlatList(items ?? [], options)
+            .filter((item) => !!item && !item.hidden);
+
+        await this[id].waitForItemsCount(flatList.length);
+    }
+
     onToggleMenu(id: string) {
         const componentState = this.state[id];
         const menuItems = componentState.menu.items;
 
         const options = {
-            includeGroupItems: componentState.menu.allowActiveGroupHeader,
+            includeGroupItems: true,
             includeChildItems: false,
         };
 
@@ -139,6 +204,41 @@ export class DropDownPage {
         return expectedState;
     }
 
+    onFilterItems(id: string, value: string) {
+        const componentState = this.state[id];
+        if (!componentState) {
+            throw new Error(`Invalid component id: '${id}'`);
+        }
+
+        const menuState = filterDropDownItems(componentState, value);
+
+        const expectedState: DropDownPageState = {
+            ...this.state,
+            [id]: {
+                ...menuState,
+            },
+        };
+
+        return expectedState;
+    }
+
+    onToggleEnable(id: string) {
+        const componentState = this.state[id];
+        if (!componentState) {
+            throw new Error(`Invalid component id: '${id}'`);
+        }
+
+        const expectedState: DropDownPageState = {
+            ...this.state,
+            [id]: {
+                ...componentState,
+                disabled: !componentState.disabled,
+            },
+        };
+
+        return expectedState;
+    }
+
     async clickByToggleButton(id: string) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
@@ -146,6 +246,9 @@ export class DropDownPage {
 
         await this[id].clickByToggleButton();
         await this[id].waitForMenu(expectedState[id].open);
+        if (expectedState[id].open) {
+            await this.waitForItemsCount(expectedState, id);
+        }
         await this.assertState(expectedState);
 
         this.state = expectedState;
@@ -174,6 +277,33 @@ export class DropDownPage {
         } else {
             await this[id].waitForMenu(expectedState[id].open);
         }
+        await this.assertState(expectedState);
+
+        this.state = expectedState;
+    }
+
+    async filter(id: string, value: string) {
+        expect(this.isValidComponentId(id)).toBeTruthy();
+
+        const expectedState = this.onFilterItems(id, value);
+
+        await this[id].inputFilterValue(value);
+        await this[id].waitForInputValue(value);
+        await this.waitForItemsCount(expectedState, id);
+
+        await this.assertState(expectedState);
+
+        this.state = expectedState;
+    }
+
+    async toggleEnable(id: string) {
+        expect(this.isValidComponentId(id)).toBeTruthy();
+
+        const expectedState = this.onToggleEnable(id);
+
+        const toggleEnableComponent = this[id] as ToggleEnableDropDown;
+
+        await toggleEnableComponent.toggleEnable();
         await this.assertState(expectedState);
 
         this.state = expectedState;

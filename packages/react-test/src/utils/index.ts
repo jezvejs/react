@@ -1,8 +1,15 @@
-import { isFunction } from '@jezvejs/types';
+import { asArray, isFunction } from '@jezvejs/types';
 import { expect, Locator } from '@playwright/test';
 import { setTimeout } from 'node:timers';
 
-import { WaitForConditionFunc, WaitForFunctionConditionFunc, WaitForOptions } from './types.ts';
+import {
+    IncludeGroupItemsParam,
+    ToFlatListParam,
+    WaitForConditionFunc,
+    WaitForFunctionConditionFunc,
+    WaitForOptions,
+} from './types.ts';
+import { MenuItemState } from '../components/MenuItem/MenuItem.ts';
 
 export const classNameRegExp = (className: string) => (
     new RegExp(`(^|\\s)${className}(\\s|$)`, 'g')
@@ -70,3 +77,102 @@ export const waitForFunction = async (condition: WaitForFunctionConditionFunc, o
         return false;
     }, options);
 };
+
+/**
+ * Returns true if specified item support child items
+ *
+ * @param {<T = MenuItemState>} item
+ * @returns {boolean}
+ */
+export function isChildItemsAvailable<T extends MenuItemState = MenuItemState>(
+    item: T,
+): boolean {
+    return (
+        item.type === 'group'
+        || item.type === 'parent'
+    );
+}
+
+/**
+ * Returns true if specified item itself should be included to the tree data processing
+ *
+ * @param {<T = MenuItemState>} item
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function shouldIncludeParentItem<
+    T extends MenuItemState = MenuItemState,
+    OPT extends IncludeGroupItemsParam = IncludeGroupItemsParam,
+>(
+    item: T,
+    options?: OPT | null,
+): boolean {
+    return !!(
+        (item.type === 'group' && options?.includeGroupItems)
+        || (item.type === 'parent')
+    );
+}
+
+/**
+ * Returns true if children of specified item should be included to the tree data processing
+ *
+ * @param {<T = MenuItemState>} item
+ * @param {ToFlatListParam} options
+ * @returns {boolean}
+ */
+export function shouldIncludeChildItems<
+    T extends MenuItemState = MenuItemState,
+    OPT extends IncludeGroupItemsParam = IncludeGroupItemsParam,
+>(
+    item: T,
+    options?: OPT | null,
+): boolean {
+    return !!(
+        (item.type === 'group')
+        || (item.type === 'parent' && !!options?.includeChildItems)
+    );
+}
+
+/**
+ * Converts multilevel menu list to flat array of items and returns result
+ *
+ * @param {<T = MenuItemState>[]} items
+ * @param {ToFlatListParam} options
+ * @returns {T[]}
+ */
+export function toFlatList<T extends MenuItemState = MenuItemState>(
+    items: T[],
+    options?: ToFlatListParam,
+): T[] {
+    const res: T[] = [];
+    const parentId = options?.parentId;
+
+    for (let index = 0; index < items.length; index += 1) {
+        const item = items[index];
+        const disabled = options?.disabled || item.disabled;
+
+        if (isChildItemsAvailable(item)) {
+            if (shouldIncludeParentItem(item, options)) {
+                res.push({ ...item, parentId, disabled });
+            }
+
+            if (shouldIncludeChildItems(item, options)) {
+                res.push(
+                    ...toFlatList<T>(
+                        asArray(item.items),
+                        {
+                            ...options,
+                            parentId: item.id,
+                            disabled,
+                            includeGroupItems: options?.includeGroupItems,
+                        },
+                    ),
+                );
+            }
+        } else {
+            res.push({ ...item, parentId, disabled });
+        }
+    }
+
+    return res;
+}

@@ -12,6 +12,16 @@ const loadGroups = async ({ page }) => loadStoryById({ page }, 'groups');
 const loadAttachedToBlock = async ({ page }) => loadStoryById({ page }, 'attach-to-block');
 const loadAttachedToInline = async ({ page }) => loadStoryById({ page }, 'attach-to-inline');
 const loadMultiSelect = async ({ page }) => loadStoryById({ page }, 'multiple-select');
+const loadFilterSingleSelect = async ({ page }) => loadStoryById({ page }, 'filter-single');
+const loadFilterMultiSelect = async ({ page }) => loadStoryById({ page }, 'filter-multiple');
+const loadFilterAttachedToBlock = async ({ page }) => loadStoryById({ page }, 'filter-attach-to-block');
+const loadFilterMultiAttachedToBlock = async ({ page }) => (
+    loadStoryById({ page }, 'filter-multi-attach-to-block')
+);
+const loadFilterGroups = async ({ page }) => loadStoryById({ page }, 'filter-groups');
+const loadFilterGroupsMultiSelect = async ({ page }) => (
+    loadStoryById({ page }, 'filter-groups-multiple')
+);
 
 test.describe('DropDown', () => {
     test('Toggle menu by click on toggle button', async ({ page }) => {
@@ -107,5 +117,79 @@ test.describe('DropDown', () => {
         await view.clickItemById('multipleSelectDropDown', '4');
         await view.clickItemById('multipleSelectDropDown', '2');
         await view.clickByToggleButton('multipleSelectDropDown');
+    });
+
+    test('Filter items', async ({ page }) => {
+        await loadFilterSingleSelect({ page });
+
+        const view = new DropDownPage(page, 'filterDropDown');
+        await view.waitForLoad('filterDropDown');
+
+        await view.toggleEnable('filterDropDown');
+        await view.clickByToggleButton('filterDropDown');
+        await view.filter('filterDropDown', '1');
+        await view.filter('filterDropDown', '10');
+        await view.filter('filterDropDown', '100');
+    });
+
+    test('Filter multiple items', async ({ page }) => {
+        await loadFilterMultiSelect({ page });
+
+        const view = new DropDownPage(page, 'filterMultiDropDown');
+        await view.waitForLoad('filterMultiDropDown');
+
+        await view.toggleEnable('filterMultiDropDown');
+        await view.clickByToggleButton('filterMultiDropDown');
+        await view.filter('filterMultiDropDown', '1');
+        await view.filter('filterMultiDropDown', '10');
+        await view.filter('filterMultiDropDown', '100');
+    });
+
+    test('Attached component with filter', async ({ page }) => {
+        await loadFilterAttachedToBlock({ page });
+
+        const view = new DropDownPage(page, 'attachedFilterDropDown');
+        await view.waitForLoad('attachedFilterDropDown');
+
+        await view.clickByContainer('attachedFilterDropDown');
+        await view.filter('attachedFilterDropDown', '5');
+        await view.filter('attachedFilterDropDown', '55');
+        await view.filter('attachedFilterDropDown', '555');
+    });
+
+    test('Attached component with multi select filter', async ({ page }) => {
+        await loadFilterMultiAttachedToBlock({ page });
+
+        const view = new DropDownPage(page, 'attachedFilterMultipleDropDown');
+        await view.waitForLoad('attachedFilterMultipleDropDown');
+
+        await view.clickByContainer('attachedFilterMultipleDropDown');
+        await view.filter('attachedFilterMultipleDropDown', '1');
+        await view.filter('attachedFilterMultipleDropDown', '10');
+        await view.filter('attachedFilterMultipleDropDown', '55');
+    });
+
+    test('Groups filter', async ({ page }) => {
+        await loadFilterGroups({ page });
+
+        const view = new DropDownPage(page, 'filterGroupsDropDown');
+        await view.waitForLoad('filterGroupsDropDown');
+
+        await view.clickByToggleButton('filterGroupsDropDown');
+        await view.filter('filterGroupsDropDown', '1');
+        await view.filter('filterGroupsDropDown', '10');
+        await view.filter('filterGroupsDropDown', '100');
+    });
+
+    test('Groups with multi select filter', async ({ page }) => {
+        await loadFilterGroupsMultiSelect({ page });
+
+        const view = new DropDownPage(page, 'filterGroupsMultiDropDown');
+        await view.waitForLoad('filterGroupsMultiDropDown');
+
+        await view.clickByToggleButton('filterGroupsMultiDropDown');
+        await view.filter('filterGroupsMultiDropDown', '1');
+        await view.filter('filterGroupsMultiDropDown', '10');
+        await view.filter('filterGroupsMultiDropDown', '100');
     });
 });

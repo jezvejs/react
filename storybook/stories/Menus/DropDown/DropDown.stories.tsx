@@ -23,7 +23,7 @@ import { CustomListItem } from './components/CustomListItem/CustomListItem.tsx';
 import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.tsx';
 import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.tsx';
 
-import { DropDownStory } from './types.ts';
+import { DropDownStory, ToggleEnableDropDownStory } from './types.ts';
 import './DropDown.stories.scss';
 
 const heightDecorator = (StoryComponent: StoryFn) => (
@@ -252,8 +252,10 @@ export const DisabledMultiple: DropDownStory = {
     render: ToggleEnable,
 };
 
-export const FilterSingle: DropDownStory = {
+export const FilterSingle: ToggleEnableDropDownStory = {
     args: {
+        id: 'filterDropDown',
+        btnId: 'toggleEnableBtn',
         className: 'dd_stretch',
         enableFilter: true,
         disabled: true,
@@ -264,8 +266,10 @@ export const FilterSingle: DropDownStory = {
     render: ToggleEnable,
 };
 
-export const FilterMultiple: DropDownStory = {
+export const FilterMultiple: ToggleEnableDropDownStory = {
     args: {
+        id: 'filterMultiDropDown',
+        btnId: 'toggleEnableFilterMultiBtn',
         className: 'dd_stretch',
         enableFilter: true,
         disabled: true,
@@ -280,8 +284,10 @@ export const FilterMultiple: DropDownStory = {
 /**
  * With 'openOnFocus' option enabled
  */
-export const FilterGroups: DropDownStory = {
+export const FilterGroups: ToggleEnableDropDownStory = {
     args: {
+        id: 'filterGroupsDropDown',
+        btnId: 'toggleEnableFilterGroupsBtn',
         className: 'dd_stretch',
         enableFilter: true,
         openOnFocus: true,
@@ -297,6 +303,7 @@ export const FilterGroups: DropDownStory = {
  */
 export const FilterGroupsMultiple: DropDownStory = {
     args: {
+        id: 'filterGroupsMultiDropDown',
         className: 'dd_stretch',
         enableFilter: true,
         openOnFocus: true,
@@ -437,6 +444,7 @@ export const AllowCreate: DropDownStory = {
 export const FilterAttachToBlock: AttachedToBlockStory = {
     name: 'Filter attached to block element',
     args: {
+        id: 'attachedFilterDropDown',
         boxId: 'filterBox',
         listAttach: true,
         enableFilter: true,
@@ -454,6 +462,7 @@ export const FilterAttachToBlock: AttachedToBlockStory = {
 export const FilterMultiAttachToBlock: AttachedToBlockStory = {
     name: 'Filter with multiple select attached',
     args: {
+        id: 'attachedFilterMultipleDropDown',
         boxId: 'boxFilterMulti',
         listAttach: true,
         enableFilter: true,
