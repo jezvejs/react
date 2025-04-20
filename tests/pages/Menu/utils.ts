@@ -1,7 +1,10 @@
+import {
+    MenuItemState,
+    MenuState,
+} from '@jezvejs/react-test';
 import { asArray, isFunction } from '@jezvejs/types';
-import { MenuItemState } from '../../components/MenuItem/MenuItem.ts';
-import { MenuState } from '../../components/Menu/Menu.ts';
-
+import { defaultCollapsibleGroupMenuItemProps, defaultMenuItemProps } from './defaultProps.ts';
+import { CollapsibleGroupsMenuItemState } from './types.ts';
 
 /**
  * shouldIncludeParentItem() function params
@@ -31,7 +34,6 @@ export interface MenuLoopParam<
 > extends IncludeGroupItemsParam {
     group?: T | null;
 }
-
 
 const checkboxTypes = ['checkbox', 'checkbox-link'];
 
@@ -186,6 +188,49 @@ export function mapItems<T extends MenuItemState = MenuItemState>(
             });
         } else {
             res.push(callback(item, index, items));
+        }
+    }
+
+    return res;
+}
+
+/**
+ * Returns list of menu items filtered by callback function
+ * @param {T[]} items menu items array
+ * @param {MenuItemCallback<T>} callback
+ * @param {MenuLoopParam<T>} options
+ * @returns {T[]}
+ */
+export function filterItems<T extends MenuItemState = MenuItemState>(
+    items: T[],
+    callback: MenuItemCallback<T>,
+    options: MenuLoopParam<T> | null = null,
+): T[] {
+    if (!isFunction(callback)) {
+        throw new Error('Invalid callback parameter');
+    }
+
+    const res: T[] = [];
+
+    for (let index = 0; index < items.length; index += 1) {
+        const item = items[index];
+
+        if (isChildItemsAvailable(item)) {
+            const includeParentItem = shouldIncludeParentItem(item, options);
+            if (
+                !includeParentItem
+                || callback(item, index, items)
+            ) {
+                const children = filterItems<T>((item.items ?? []) as T[], callback, options);
+                if (children.length > 0) {
+                    res.push({
+                        ...item,
+                        items: children,
+                    });
+                }
+            }
+        } else if (callback(item, index, items)) {
+            res.push({ ...item });
         }
     }
 
@@ -361,7 +406,6 @@ export function getItemById<T extends MenuItemState = MenuItemState>(
     return findMenuItem<T>(items ?? [], (item: T) => item.id?.toString() === id);
 }
 
-
 export const isAvailableItem = (item: MenuItemState, state: MenuState): boolean => !!(
     item
     && item.visible
@@ -389,3 +433,19 @@ export const getActiveItem = (state: MenuState): MenuItemState | null => (
         },
     )
 );
+
+export const getMenuItemProps = (
+    props: Partial<MenuItemState>,
+    defaultProps: MenuItemState = defaultMenuItemProps,
+): MenuItemState => ({
+    ...defaultProps,
+    ...props,
+});
+
+export const getCollapsibleGroupMenuItemProps = (
+    props: Partial<CollapsibleGroupsMenuItemState>,
+    defaultProps: CollapsibleGroupsMenuItemState = defaultCollapsibleGroupMenuItemProps,
+): CollapsibleGroupsMenuItemState => ({
+    ...defaultProps,
+    ...props,
+});

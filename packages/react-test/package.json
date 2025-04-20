@@ -1,0 +1,32 @@
+{
+    "name": "@jezvejs/react-test",
+    "version": "0.2.0",
+    "description": "JezveJS React library test components",
+    "type": "module",
+    "module": "./src/index.ts",
+    "files": [
+        "src"
+    ],
+    "main": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/feesler/JezveJS.git",
+        "directory": "packages/react-test"
+    },
+    "author": "Ilya Makarov",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/jezvejs/react/issues"
+    },
+    "homepage": "https://github.com/jezvejs/react#readme",
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@jezvejs/types": "^1.1.0",
+        "@playwright/test": "^1.52.0"
+    }
+}

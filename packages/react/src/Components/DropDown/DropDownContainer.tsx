@@ -1148,10 +1148,11 @@ export const DropDownContainer = forwardRef<
     // Menu
     const menu = useMemo(() => {
         const st = getState();
-        const activeItem = getActiveItem(st);
 
         const menuProps: DropDownMenuProps = {
             ...st,
+            id: `dropDownMenu_${st.id}`,
+            parentId: st.id,
             placeholder: null,
             items: st.items ?? [],
             inputRef: inputElem,
@@ -1163,7 +1164,6 @@ export const DropDownContainer = forwardRef<
             itemSelector: '.menu-item',
             tabThrough: false,
             useParentContext: true,
-            activeItem: activeItem?.id ?? null,
             editable,
             getPlaceholderProps: renderNotFound,
             onItemClick,

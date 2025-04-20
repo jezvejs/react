@@ -15,7 +15,7 @@ const compat = new FlatCompat({
 });
 
 export default [{
-    ignores: ['**/node_modules', '**/dist', '**/storybook-static'],
+    ignores: ['**/node_modules', '**/dist', '**/storybook-static', '**/test-results'],
 }, ...fixupConfigRules(compat.extends(
     'airbnb-base',
     'eslint:recommended',
@@ -78,6 +78,8 @@ export default [{
             allowConstantExport: true,
         }],
 
+        'no-plusplus': 'off',
+        'no-await-in-loop': 'off',
         'no-use-before-define': 'off',
         'react/prop-types': 'off',
     },

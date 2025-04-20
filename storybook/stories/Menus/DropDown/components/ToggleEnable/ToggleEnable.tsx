@@ -3,9 +3,14 @@ import { DropDown, DropDownProps } from '@jezvejs/react';
 import { ActionButton } from '../../../../../common/Components/ActionButton/ActionButton.tsx';
 import { SectionControls } from '../../../../../common/Components/SectionControls/SectionControls.tsx';
 
-export const ToggleEnable = (args: Partial<DropDownProps>) => {
+export type ToggleEnableProps = Partial<DropDownProps> & {
+    btnId?: string;
+};
+
+export const ToggleEnable = (args: ToggleEnableProps) => {
+    const { btnId, ...props } = args;
     const [state, setState] = useState({
-        ...args,
+        ...props,
     });
 
     const onToggle = () => {
@@ -14,9 +19,10 @@ export const ToggleEnable = (args: Partial<DropDownProps>) => {
 
     return (
         <>
-            <DropDown {...args} disabled={state.disabled} />
+            <DropDown {...props} disabled={state.disabled} />
             <SectionControls>
                 <ActionButton
+                    id={btnId}
                     title={(state.disabled ? 'Enable' : 'Disable')}
                     onClick={onToggle}
                 />

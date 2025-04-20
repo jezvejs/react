@@ -130,11 +130,7 @@ const slice = createSlice({
         inputString: (!state.visible) ? state.inputString : null,
         active: (!state.visible) ? true : state.active,
         activeItem: null,
-        items: (
-            (!state.visible)
-                ? state.items
-                : deactivateAllItems(state.items ?? [])
-        ),
+        items: deactivateAllItems(state.items ?? []),
     }),
 
     showMenu: (state: DropDownState, visible: boolean) => (
@@ -145,12 +141,8 @@ const slice = createSlice({
                 visible,
                 inputString: (visible) ? state.inputString : null,
                 active: (visible) ? true : state.active,
-                activeItem: (visible) ? state.activeItem : null,
-                items: (
-                    (visible)
-                        ? state.items
-                        : deactivateAllItems(state.items ?? [])
-                ),
+                activeItem: null,
+                items: deactivateAllItems(state.items ?? []),
             }
     ),
 
@@ -339,7 +331,7 @@ const slice = createSlice({
         ),
     }),
 
-    addGroup: (state: DropDownState, group: DropDownCreateGroupParam) => ({
+    addGroup: (state: DropDownState, group: DropDownCreateGroupParam) => processSingleSelection({
         ...state,
         items: pushItem(
             createGroup(group, state),

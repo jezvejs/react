@@ -5,7 +5,7 @@ import { getScreenWidth } from '../../hooks/usePopupPosition/helpers.ts';
 
 // Local components
 import { MenuHelpers } from '../Menu/Menu.tsx';
-import { MenuItemType, MenuState } from '../Menu/types.ts';
+import { MenuItemType, MenuProps, MenuState } from '../Menu/types.ts';
 
 import {
     DropDownCreateGroupParam,
@@ -15,6 +15,7 @@ import {
     DropDownState,
 } from './types.ts';
 import { MAX_MOBILE_SCREEN_WIDTH } from './constants.ts';
+import { toggleSelectItem } from '../Menu/helpers.ts';
 
 /** Returns true if current width of screen is lower than mobile breakpoint */
 export const isMobileViewport = () => (
@@ -204,7 +205,7 @@ export const getInitialState = (
     props: Partial<DropDownProps>,
     defaultProps: DropDownProps,
 ): DropDownState => {
-    const res: DropDownState = {
+    let res: DropDownState = {
         ...(defaultProps ?? {}),
         ...props,
         defaultItemType: 'button',
@@ -249,11 +250,7 @@ export const getInitialState = (
         ));
 
         if (itemToSelect) {
-            res.items = MenuHelpers.mapItems(res.items, (item) => (
-                (item.selected !== (item.id === itemToSelect.id))
-                    ? { ...item, selected: !item.selected }
-                    : item
-            ));
+            res = toggleSelectItem(res as MenuProps, itemToSelect?.id) as DropDownState;
         }
     }
 

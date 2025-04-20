@@ -23,7 +23,7 @@ import { CustomListItem } from './components/CustomListItem/CustomListItem.tsx';
 import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.tsx';
 import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.tsx';
 
-import { DropDownStory } from './types.ts';
+import { DropDownStory, ToggleEnableDropDownStory } from './types.ts';
 import './DropDown.stories.scss';
 
 const heightDecorator = (StoryComponent: StoryFn) => (
@@ -62,12 +62,13 @@ export const Inline: DropDownStory = {
         const portalElement = usePortalElement();
 
         const args1 = {
+            id: 'inlineDropDown',
             className: 'dd__container_no-shrink',
             placeholder: 'Select item',
             items: initItems(),
         };
         const args2 = {
-            id: 'arg2',
+            id: 'inlineDropDown2',
             className: 'dd__container_ellipsis',
             placeholder: 'Select item 2',
             static: true,
@@ -93,6 +94,7 @@ export const Inline: DropDownStory = {
 
 export const FullWidth: DropDownStory = {
     args: {
+        id: 'fullWidthDropDown',
         className: 'dd_stretch',
         placeholder: 'Select item 3',
         items: initItems(),
@@ -102,6 +104,7 @@ export const FullWidth: DropDownStory = {
 
 export const FixedMenu: DropDownStory = {
     args: {
+        id: 'fixedMenuDropDown',
         fixedMenu: true,
         className: 'dd_form',
         items: initItems({ count: 50 }),
@@ -118,6 +121,7 @@ export const FixedMenu: DropDownStory = {
 
 export const DisabledItems: DropDownStory = {
     args: {
+        id: 'disabledItemsDropDown',
         items: initItems().map((item) => (
             (item.id === '3' || item.id === '5')
                 ? { ...item, disabled: true }
@@ -129,6 +133,7 @@ export const DisabledItems: DropDownStory = {
 
 export const Groups: DropDownStory = {
     args: {
+        id: 'groupsDropDown',
         items: groupsItems(),
     },
     decorators: [heightDecorator],
@@ -142,6 +147,7 @@ type AttachedToBlockStory = StoryObj<typeof AttachedToBlock>;
  */
 export const AttachToBlock: AttachedToBlockStory = {
     args: {
+        id: 'attachedToBlockDropDown',
         listAttach: true,
         isValidToggleTarget: (elem) => !elem.closest('.close-btn'),
         items: initItems({ title: 'Long Item Lorem Lorem' }),
@@ -154,6 +160,7 @@ export const AttachToBlock: AttachedToBlockStory = {
 
 export const AttachToInline: DropDownStory = {
     args: {
+        id: 'attachedToInlineDropDown',
         className: 'dd_inline',
         listAttach: true,
         items: initItems({ title: 'Long Item Lorem Lorem' }),
@@ -202,6 +209,7 @@ export const Clipping: DropDownStory = {
 
 export const MultipleSelect: DropDownStory = {
     args: {
+        id: 'multipleSelectDropDown',
         className: 'dd_stretch',
         placeholder: 'Multi select control',
         multiple: true,
@@ -244,8 +252,10 @@ export const DisabledMultiple: DropDownStory = {
     render: ToggleEnable,
 };
 
-export const FilterSingle: DropDownStory = {
+export const FilterSingle: ToggleEnableDropDownStory = {
     args: {
+        id: 'filterDropDown',
+        btnId: 'toggleEnableBtn',
         className: 'dd_stretch',
         enableFilter: true,
         disabled: true,
@@ -256,8 +266,10 @@ export const FilterSingle: DropDownStory = {
     render: ToggleEnable,
 };
 
-export const FilterMultiple: DropDownStory = {
+export const FilterMultiple: ToggleEnableDropDownStory = {
     args: {
+        id: 'filterMultiDropDown',
+        btnId: 'toggleEnableFilterMultiBtn',
         className: 'dd_stretch',
         enableFilter: true,
         disabled: true,
@@ -272,8 +284,10 @@ export const FilterMultiple: DropDownStory = {
 /**
  * With 'openOnFocus' option enabled
  */
-export const FilterGroups: DropDownStory = {
+export const FilterGroups: ToggleEnableDropDownStory = {
     args: {
+        id: 'filterGroupsDropDown',
+        btnId: 'toggleEnableFilterGroupsBtn',
         className: 'dd_stretch',
         enableFilter: true,
         openOnFocus: true,
@@ -289,6 +303,7 @@ export const FilterGroups: DropDownStory = {
  */
 export const FilterGroupsMultiple: DropDownStory = {
     args: {
+        id: 'filterGroupsMultiDropDown',
         className: 'dd_stretch',
         enableFilter: true,
         openOnFocus: true,
@@ -429,6 +444,7 @@ export const AllowCreate: DropDownStory = {
 export const FilterAttachToBlock: AttachedToBlockStory = {
     name: 'Filter attached to block element',
     args: {
+        id: 'attachedFilterDropDown',
         boxId: 'filterBox',
         listAttach: true,
         enableFilter: true,
@@ -446,6 +462,7 @@ export const FilterAttachToBlock: AttachedToBlockStory = {
 export const FilterMultiAttachToBlock: AttachedToBlockStory = {
     name: 'Filter with multiple select attached',
     args: {
+        id: 'attachedFilterMultipleDropDown',
         boxId: 'boxFilterMulti',
         listAttach: true,
         enableFilter: true,

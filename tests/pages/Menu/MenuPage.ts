@@ -1,6 +1,10 @@
+import { Menu } from '@jezvejs/react-test';
 import { expect, type Page } from '@playwright/test';
-import { Menu, MenuState } from '../../components/Menu/Menu.ts';
-import { MenuItemState, MenuItemType } from '../../components/MenuItem/MenuItem.ts';
+
+import { asyncMap } from '../../utils/index.ts';
+
+import { initialState } from './initialState.ts';
+import { CollapsibleGroupsMenuItemState, MenuPageState } from './types.ts';
 import {
     findLastMenuItem,
     findMenuItem,
@@ -11,182 +15,6 @@ import {
     isAvailableItem,
     mapItems,
 } from './utils.ts';
-
-export interface CollapsibleGroupsMenuItemState {
-    id?: string;
-    title: string;
-    type: MenuItemType;
-    visible: boolean;
-    disabled: boolean;
-    active: boolean;
-    selectable: boolean;
-    selected: boolean;
-    expanded?: boolean;
-    items?: CollapsibleGroupsMenuItemState[];
-}
-
-export interface CollapsibleGroupsMenuState {
-    id: string;
-    visible: boolean;
-    items: CollapsibleGroupsMenuItemState[];
-    allowActiveGroupHeader: boolean;
-}
-
-export interface MenuPageState {
-    defaultMenu: MenuState;
-    checkboxSideMenu: MenuState;
-    groupsMenu: MenuState;
-    checkboxGroupMenu: MenuState;
-    collapsibleGroupMenu: CollapsibleGroupsMenuState;
-}
-
-const defaultMenuItemProps: MenuItemState = {
-    id: '',
-    title: '',
-    type: 'button',
-    visible: true,
-    disabled: false,
-    active: false,
-    selected: false,
-    selectable: false,
-};
-
-const defaultCollapsibleGroupMenuItemProps: CollapsibleGroupsMenuItemState = {
-    id: '',
-    title: '',
-    type: 'button',
-    visible: true,
-    disabled: false,
-    active: false,
-    selectable: false,
-    selected: false,
-    expanded: false,
-    items: [],
-};
-
-const getMenuItemProps = (props: Partial<MenuItemState>): MenuItemState => ({
-    ...defaultMenuItemProps,
-    ...props,
-});
-
-const getCollapsibleGroupMenuItemProps = (props: Partial<CollapsibleGroupsMenuItemState>): CollapsibleGroupsMenuItemState => ({
-    ...defaultCollapsibleGroupMenuItemProps,
-    ...props,
-});
-
-const initialState: MenuPageState = {
-    defaultMenu: {
-        id: 'defaultMenu',
-        visible: true,
-        allowActiveGroupHeader: false,
-        items: [
-            getMenuItemProps({ id: 'selectBtnItem', title: 'Button item' }),
-            getMenuItemProps({ id: 'linkItem', title: 'Link item', type: 'link' }),
-            getMenuItemProps({ id: 'noIconItem', title: 'No icon item' }),
-            getMenuItemProps({ id: 'checkboxItem', title: 'Checkbox item', type: 'checkbox', selectable: true, selected: true }),
-        ],
-    },
-    checkboxSideMenu: {
-        id: 'checkboxSideMenu',
-        visible: true,
-        allowActiveGroupHeader: false,
-        items: [
-            getMenuItemProps({ id: 'selectBtnItem', title: 'Button item' }),
-            getMenuItemProps({ id: 'linkItem', title: 'Link item', type: 'link' }),
-            getMenuItemProps({ id: 'noIconItem', title: 'No icon item' }),
-            getMenuItemProps({ id: 'checkboxItem', title: 'Checkbox item', type: 'checkbox', selectable: true, selected: true }),
-            getMenuItemProps({ id: 'leftSideCheckboxItem', title: 'Checkbox item', type: 'checkbox', selectable: true, selected: true }),
-        ],
-    },
-    groupsMenu: {
-        id: 'groupsMenu',
-        visible: true,
-        allowActiveGroupHeader: false,
-        items: [
-            getMenuItemProps({ id: 'noGroupItem1', title: 'No group item 1' }),
-            getMenuItemProps({
-                id: 'group1',
-                title: 'Group 1',
-                type: 'group',
-                items: [
-                    getMenuItemProps({ id: 'groupItem11', title: 'Group 1 item 1' }),
-                    getMenuItemProps({ id: 'groupItem12', title: 'Group 1 item 2' }),
-                    getMenuItemProps({ id: 'groupItem13', title: 'Group 1 item 3' }),
-                ],
-            }),
-            getMenuItemProps({ id: 'noGroupItem2', title: 'No group item 2' }),
-            getMenuItemProps({
-                id: 'group2',
-                title: 'Group 2',
-                type: 'group',
-                items: [
-                    getMenuItemProps({ id: 'groupItem21', title: 'Group 2 item 1' }),
-                ],
-            }),
-            getMenuItemProps({ id: 'noGroupItem3', title: 'No group item 3' }),
-        ],
-    },
-    checkboxGroupMenu: {
-        id: 'checkboxGroupMenu',
-        visible: true,
-        allowActiveGroupHeader: true,
-        items: [
-            getMenuItemProps({ id: 'noGroupItem1', title: 'No group item 1' }),
-            getMenuItemProps({
-                id: 'group1',
-                title: 'Group 1',
-                type: 'group',
-                items: [
-                    getMenuItemProps({ id: 'groupItem11', title: 'Group 1 item 1' }),
-                    getMenuItemProps({ id: 'groupItem12', title: 'Group 1 item 2', disabled: true }),
-                    getMenuItemProps({ id: 'groupItem13', title: 'Group 1 item 3' }),
-                ],
-            }),
-            getMenuItemProps({ id: 'noGroupItem2', title: 'No group item 2' }),
-            getMenuItemProps({
-                id: 'group2',
-                title: 'Group 2',
-                type: 'group',
-                disabled: true,
-                items: [
-                    getMenuItemProps({ id: 'groupItem21', title: 'Group 2 item 1' }),
-                ],
-            }),
-            getMenuItemProps({ id: 'noGroupItem3', title: 'No group item 3' }),
-        ],
-    },
-    collapsibleGroupMenu: {
-        id: 'collapsibleGroupMenu',
-        visible: true,
-        allowActiveGroupHeader: true,
-        items: [
-            getCollapsibleGroupMenuItemProps({ id: 'noGroupItem1', title: 'No group item 1' }),
-            getCollapsibleGroupMenuItemProps({
-                id: 'group1',
-                title: 'Group 1',
-                type: 'group',
-                expanded: false,
-                items: [
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem11', title: 'Group 1 item 1', visible: false }),
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem12', title: 'Group 1 item 2', disabled: true, visible: false }),
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem13', title: 'Group 1 item 3', visible: false }),
-                ],
-            }),
-            getCollapsibleGroupMenuItemProps({ id: 'noGroupItem2', title: 'No group item 2' }),
-            getCollapsibleGroupMenuItemProps({
-                id: 'group2',
-                title: 'Group 2',
-                type: 'group',
-                disabled: true,
-                expanded: false,
-                items: [
-                    getCollapsibleGroupMenuItemProps({ id: 'groupItem21', title: 'Group 2 item 1', visible: false }),
-                ],
-            }),
-            getMenuItemProps({ id: 'noGroupItem3', title: 'No group item 3' }),
-        ],
-    },
-};
 
 const menuIds = [
     'defaultMenu',
@@ -200,8 +28,11 @@ export class MenuPage {
     readonly page: Page;
 
     defaultMenu: Menu | null = null;
+
     checkboxSideMenu: Menu | null = null;
+
     checkboxGroupMenu: Menu | null = null;
+
     collapsibleGroupMenu: Menu | null = null;
 
     singleMenuId: string;
@@ -235,9 +66,7 @@ export class MenuPage {
         if (this.isSingleMenu()) {
             await this.assertMenuState(this.singleMenuId, state);
         } else {
-            for (const menuId of menuIds) {
-                await this.assertMenuState(menuId, state);
-            }
+            await asyncMap(menuIds, (menuId) => this.assertMenuState(menuId, state));
         }
     }
 
@@ -361,7 +190,12 @@ export class MenuPage {
                         const additionalProps = childItemIds[item.id] ?? {};
 
                         const res = (item.id === itemId)
-                            ? ({ ...item, selected: !item.selected, active: item.type !== 'group', ...additionalProps })
+                            ? ({
+                                ...item,
+                                selected: !item.selected,
+                                active: item.type !== 'group',
+                                ...additionalProps,
+                            })
                             : ({ ...item, active: false, ...additionalProps });
 
                         return res;
@@ -450,8 +284,8 @@ export class MenuPage {
         const expectedState = {
             ...this.state,
             ...(Object.fromEntries(
-                Object.entries(this.state).map(([menuId, value]) => ([
-                    menuId,
+                Object.entries(this.state).map(([id, value]) => ([
+                    id,
                     {
                         ...value,
                         items: mapItems(
