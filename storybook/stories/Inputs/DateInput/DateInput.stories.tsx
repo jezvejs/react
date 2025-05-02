@@ -5,6 +5,7 @@ import { DateInput } from '@jezvejs/react';
 import { useState } from 'react';
 import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
 import { LocaleSelect } from '../../../common/Components/LocaleSelect/LocaleSelect.tsx';
+import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
 
 const TempInputDecorator = (StoryComponent: StoryFn) => (
     <div>
@@ -100,6 +101,44 @@ export const Locales: Story = {
                     <LocaleSelect id="localeSelect" onChange={onChangeLocale} />
                 </SectionControls>
             </div>
+        );
+    },
+};
+
+export const Disabled: Story = {
+    args: {
+        id: 'disabledDateInput',
+        disabled: true,
+        value: '01/02/03',
+        locales: ['en-US'],
+    },
+    render: function Render(args) {
+        const [state, setState] = useState(args);
+
+        const onToggle = () => {
+            setState((prev) => ({ ...prev, disabled: !prev.disabled }));
+        };
+
+        const onChangeValue = () => {
+            setState((prev) => ({ ...prev, value: '02/01/00' }));
+        };
+
+        return (
+            <>
+                <DateInput {...state} />
+                <SectionControls>
+                    <ActionButton
+                        id="toggleEnableBtn"
+                        title={(state.disabled ? 'Enable' : 'Disable')}
+                        onClick={onToggle}
+                    />
+                    <ActionButton
+                        id="changeValueBtn"
+                        title="Change value"
+                        onClick={onChangeValue}
+                    />
+                </SectionControls>
+            </>
         );
     },
 };

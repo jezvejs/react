@@ -1,8 +1,10 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { useState } from 'react';
 import { DecimalInput, DecimalInputProps } from '@jezvejs/react';
 import '@jezvejs/react/style.scss';
 
+import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
 import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
 import { withInputState } from '../../../common/utils/withInputState.tsx';
 
@@ -89,4 +91,41 @@ export const LeadingZeros: Story = {
         allowMultipleLeadingZeros: true,
     },
     decorators: [TempInputDecorator],
+};
+
+export const Disabled: Story = {
+    args: {
+        id: 'disabledInput',
+        value: '-5678.90',
+        disabled: true,
+    },
+    render: function Render(args) {
+        const [state, setState] = useState(args);
+
+        const onToggle = () => {
+            setState((prev) => ({ ...prev, disabled: !prev.disabled }));
+        };
+
+        const onChangeValue = () => {
+            setState((prev) => ({ ...prev, value: '1000' }));
+        };
+
+        return (
+            <>
+                <InputWithState {...state} />
+                <SectionControls>
+                    <ActionButton
+                        id="toggleEnableBtn"
+                        title={(state.disabled ? 'Enable' : 'Disable')}
+                        onClick={onToggle}
+                    />
+                    <ActionButton
+                        id="changeValueBtn"
+                        title="Change value"
+                        onClick={onChangeValue}
+                    />
+                </SectionControls>
+            </>
+        );
+    },
 };

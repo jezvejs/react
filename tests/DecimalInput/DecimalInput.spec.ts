@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
     inputToEmpty,
     pasteToEmpty,
@@ -12,6 +12,74 @@ import {
     deleteSelection,
     cutSelection,
 } from '../utils/index.ts';
+
+export const navigateToDisabledStory = async ({ page }) => {
+    await page.goto('iframe.html?viewMode=story&id=input-decimalinput--disabled');
+
+    const inputLocator = page.locator('#disabledInput');
+    const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
+    const changeValueBtnLocator = page.locator('#changeValueBtn');
+
+    await inputLocator.waitFor({ state: 'visible' });
+    await toggleEnableBtnLocator.waitFor({ state: 'visible' });
+    await changeValueBtnLocator.waitFor({ state: 'visible' });
+
+    await expect(inputLocator).toHaveValue('-5678.90');
+    await expect(inputLocator).toBeDisabled();
+
+    await expect(toggleEnableBtnLocator).toHaveText('Enable');
+    await expect(toggleEnableBtnLocator).toBeEnabled();
+
+    await expect(changeValueBtnLocator).toHaveText('Change value');
+    await expect(changeValueBtnLocator).toBeEnabled();
+};
+
+export const toggleEnable = async ({ page }) => {
+    const inputLocator = page.locator('#disabledInput');
+    const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
+    const changeValueBtnLocator = page.locator('#changeValueBtn');
+
+    await inputLocator.waitFor({ state: 'visible' });
+    await toggleEnableBtnLocator.waitFor({ state: 'visible' });
+    await changeValueBtnLocator.waitFor({ state: 'visible' });
+
+    const enabled = await inputLocator.isEnabled();
+    const value = await inputLocator.inputValue();
+
+    await toggleEnableBtnLocator.click();
+
+    await expect(inputLocator).toHaveValue(value);
+    await expect(inputLocator).toBeEnabled({ enabled: !enabled });
+
+    await expect(toggleEnableBtnLocator).toHaveText((enabled) ? 'Enable' : 'Disable');
+    await expect(toggleEnableBtnLocator).toBeEnabled();
+
+    await expect(changeValueBtnLocator).toHaveText('Change value');
+    await expect(changeValueBtnLocator).toBeEnabled();
+};
+
+export const changeValue = async ({ page }) => {
+    const inputLocator = page.locator('#disabledInput');
+    const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
+    const changeValueBtnLocator = page.locator('#changeValueBtn');
+
+    await inputLocator.waitFor({ state: 'visible' });
+    await toggleEnableBtnLocator.waitFor({ state: 'visible' });
+    await changeValueBtnLocator.waitFor({ state: 'visible' });
+
+    const enabled = await inputLocator.isEnabled();
+
+    await changeValueBtnLocator.click();
+
+    await expect(inputLocator).toHaveValue('1000');
+    await expect(inputLocator).toBeEnabled({ enabled });
+
+    await expect(toggleEnableBtnLocator).toHaveText((enabled) ? 'Disable' : 'Enable');
+    await expect(toggleEnableBtnLocator).toBeEnabled();
+
+    await expect(changeValueBtnLocator).toHaveText('Change value');
+    await expect(changeValueBtnLocator).toBeEnabled();
+};
 
 test.describe('DecimalInput', () => {
     test('Type to empty input', async ({ page }) => {
@@ -663,5 +731,18 @@ test.describe('DecimalInput', () => {
         await cutSelection({ page }, 'defaultInput', '-123456', 4, 7, '-123');
         await cutSelection({ page }, 'defaultInput', '0.000123', 1, 3, '0.000123');
         await cutSelection({ page }, 'defaultInput', '-0.000123', 2, 4, '-0.000123');
+    });
+});
+
+test.describe('Disabled state', () => {
+    test('Handling \'disabled\' property', async ({ page }) => {
+        await navigateToDisabledStory({ page });
+
+        await toggleEnable({ page });
+        await toggleEnable({ page });
+
+        await changeValue({ page });
+
+        await toggleEnable({ page });
     });
 });
