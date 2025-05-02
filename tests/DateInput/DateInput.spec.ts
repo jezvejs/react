@@ -26,6 +26,73 @@ export const selectLocale = async ({ page }, value) => {
     expect(selected).toStrictEqual(valuesArray);
 };
 
+export const navigateToDisabledStory = async ({ page }) => {
+    await page.goto('iframe.html?viewMode=story&id=input-dateinput--disabled');
+
+    const inputLocator = page.locator('#disabledDateInput');
+    const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
+    const changeValueBtnLocator = page.locator('#changeValueBtn');
+
+    await inputLocator.waitFor({ state: 'visible' });
+    await toggleEnableBtnLocator.waitFor({ state: 'visible' });
+    await changeValueBtnLocator.waitFor({ state: 'visible' });
+
+    await expect(inputLocator).toHaveValue('01/02/03');
+    await expect(inputLocator).toBeDisabled();
+
+    await expect(toggleEnableBtnLocator).toHaveText('Enable');
+    await expect(toggleEnableBtnLocator).toBeEnabled();
+
+    await expect(changeValueBtnLocator).toHaveText('Change value');
+    await expect(changeValueBtnLocator).toBeEnabled();
+};
+
+export const toggleEnable = async ({ page }) => {
+    const inputLocator = page.locator('#disabledDateInput');
+    const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
+    const changeValueBtnLocator = page.locator('#changeValueBtn');
+
+    await inputLocator.waitFor({ state: 'visible' });
+    await toggleEnableBtnLocator.waitFor({ state: 'visible' });
+
+    const enabled = await inputLocator.isEnabled();
+    const value = await inputLocator.inputValue();
+
+    await toggleEnableBtnLocator.click();
+
+    await expect(inputLocator).toHaveValue(value);
+    await expect(inputLocator).toBeEnabled({ enabled: !enabled });
+
+    await expect(toggleEnableBtnLocator).toHaveText((enabled) ? 'Enable' : 'Disable');
+    await expect(toggleEnableBtnLocator).toBeEnabled();
+
+    await expect(changeValueBtnLocator).toHaveText('Change value');
+    await expect(changeValueBtnLocator).toBeEnabled();
+};
+
+export const changeValue = async ({ page }) => {
+    const inputLocator = page.locator('#disabledDateInput');
+    const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
+    const changeValueBtnLocator = page.locator('#changeValueBtn');
+
+    await inputLocator.waitFor({ state: 'visible' });
+    await toggleEnableBtnLocator.waitFor({ state: 'visible' });
+    await changeValueBtnLocator.waitFor({ state: 'visible' });
+
+    const enabled = await inputLocator.isEnabled();
+
+    await changeValueBtnLocator.click();
+
+    await expect(inputLocator).toHaveValue('02/01/00');
+    await expect(inputLocator).toBeEnabled({ enabled });
+
+    await expect(toggleEnableBtnLocator).toHaveText((enabled) ? 'Disable' : 'Enable');
+    await expect(toggleEnableBtnLocator).toBeEnabled();
+
+    await expect(changeValueBtnLocator).toHaveText('Change value');
+    await expect(changeValueBtnLocator).toBeEnabled();
+};
+
 test.describe('Type to empty input', () => {
     test('en-US locale', async ({ page }) => {
         await selectLocale({ page }, 'en-US');
@@ -735,5 +802,18 @@ test.describe('Cut selection', () => {
 
         await cutSelection({ page }, inputId, '22/11/33', 4, 7, '22/1_/_3');
         await cutSelection({ page }, inputId, '22/11/33', 0, 8, '');
+    });
+});
+
+test.describe('Disabled state', () => {
+    test('Handling \'disabled\' property', async ({ page }) => {
+        await navigateToDisabledStory({ page });
+
+        await toggleEnable({ page });
+        await toggleEnable({ page });
+
+        await changeValue({ page });
+
+        await toggleEnable({ page });
     });
 });

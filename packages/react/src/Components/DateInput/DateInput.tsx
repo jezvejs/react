@@ -45,6 +45,15 @@ export const DateInput: React.FC<DateInputProps> = (p) => {
         }));
     }, [props.locales]);
 
+    // Update value
+    useEffect(() => {
+        const expectedContent = replaceSelection(props.value ?? '', { replaceAll: true });
+        setState((prev) => ({
+            ...prev,
+            ...handleExpectedContent(expectedContent, prev, true),
+        }));
+    }, [props.value]);
+
     const deleteSelection = () => {
         const range = {
             start: state.cursorPos,
@@ -387,6 +396,8 @@ export const DateInput: React.FC<DateInputProps> = (p) => {
         onFocus: props.onFocus,
         onBlur: props.onBlur,
         onChange: props.onChange,
+        disabled: props.disabled,
+        value: props.value,
         id: props.id,
     };
 
