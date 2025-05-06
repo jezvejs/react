@@ -670,6 +670,18 @@ export const DropDownContainer = forwardRef<
         }
     };
 
+    const setInputDevice = (inputDevice: string | null) => {
+        menuStore.setState((prev) => ({
+            ...prev,
+            inputDevice,
+        }), null);
+    };
+
+    const getInputDevice = () => {
+        const st = menuStore.getState(null);
+        return st?.inputDevice;
+    };
+
     /** 'focus' event handler */
     const onFocus = (e: React.FocusEvent) => {
         e?.stopPropagation();
@@ -711,7 +723,7 @@ export const DropDownContainer = forwardRef<
 
         const closestElem = MenuHelpers.getClosestItemElement(target, '.menu-item');
         const itemId = closestElem?.dataset?.id ?? null;
-        if (itemId) {
+        if (itemId && getInputDevice() === 'keyboard') {
             scrollToItem();
         }
 
@@ -877,8 +889,24 @@ export const DropDownContainer = forwardRef<
         }
     };
 
+    /**
+     * Captured 'touchstart' event handler
+     */
+    const onTouchStart = () => {
+        setInputDevice('mouse');
+    };
+
+    /**
+     * Captured 'mousemove' event handler
+     */
+    const onMouseMove = () => {
+        setInputDevice('mouse');
+    };
+
     const onKey = (e: React.KeyboardEvent) => {
         e.stopPropagation();
+
+        setInputDevice('keyboard');
 
         const enableFilter = isEditable(state);
         const { multiple, showMultipleSelection, listAttach } = props;
@@ -1275,6 +1303,8 @@ export const DropDownContainer = forwardRef<
         onClick: () => focusInputIfNeeded(),
         onFocusCapture: onFocus,
         onBlurCapture: onBlur,
+        onTouchStartCapture: onTouchStart,
+        onMouseMoveCapture: onMouseMove,
         onKeyDownCapture: onKey,
         'data-value': selectedIds,
         style,
