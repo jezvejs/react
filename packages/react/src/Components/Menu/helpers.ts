@@ -305,43 +305,47 @@ export function forItems<T extends MenuItemProps = MenuItemProps>(
 /**
  * Returns list of menu items transformed with callback function
  * @param {T[]} items menu items array
- * @param {MenuItemCallback<T, T>} callback
+ * @param {MenuItemCallback<T, R>} callback
  * @param {MenuLoopParam<T>} options
- * @returns {T[]}
+ * @returns {R[]}
  */
-export function mapItems<T extends MenuItemProps = MenuItemProps>(
+export function mapItems<
+    T extends MenuItemProps = MenuItemProps,
+    R = T
+>(
     items: T[],
-    callback: MenuItemCallback<T, T>,
+    callback: MenuItemCallback<T, R>,
     options: MenuLoopParam<T> | null = null,
-): T[] {
+): R[] {
     if (!isFunction(callback)) {
         throw new Error('Invalid callback parameter');
     }
 
-    const res: T[] = [];
+    const res: R[] = [];
 
     for (let index = 0; index < items.length; index += 1) {
+        const group = options?.group ?? {};
         const item: T = {
             ...items[index],
-            group: options?.group?.id,
+            group: !!('id' in group) && group.id,
         };
 
         if (isChildItemsAvailable(item)) {
-            const group = shouldIncludeParentItem(item, options)
+            const groupItem = shouldIncludeParentItem(item, options as IncludeGroupItemsParam)
                 ? callback(item, index, items)
                 : item;
 
             res.push({
-                ...group,
-                items: mapItems<T>(
-                    (item.items ?? []) as T[],
+                ...groupItem,
+                items: mapItems<T, R>(
+                    ('items' in item) ? asArray(item.items) : [],
                     callback,
                     {
                         ...(options ?? {}),
-                        group,
+                        group: groupItem as T,
                     },
                 ),
-            });
+            } as R);
         } else {
             res.push(callback(item, index, items));
         }
