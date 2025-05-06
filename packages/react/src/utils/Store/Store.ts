@@ -21,7 +21,7 @@ export class Store<State extends StoreState = StoreState> {
 
     sendInitialState: boolean = true;
 
-    storeAPI: StoreActionAPI<State> | null = null;
+    storeAPI: StoreActionAPI<State>;
 
     constructor(reducer: StoreReducer<State>, options: StoreOptions<State> = {}) {
         if (typeof reducer !== 'function') {
@@ -48,7 +48,7 @@ export class Store<State extends StoreState = StoreState> {
         return this.state as State;
     }
 
-    dispatch(action: StoreAction | StoreActionFunction) {
+    dispatch(action: StoreAction<State> | StoreActionFunction<State>) {
         if (typeof action === 'function') {
             action(this.storeAPI);
             return;

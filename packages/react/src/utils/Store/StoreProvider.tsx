@@ -13,20 +13,18 @@ import type {
     StoreUpdater,
 } from './types.ts';
 
-const initialContext: StoreProviderContext = {
+const initialContext = {
     store: {},
     state: {},
     getState: () => ({}),
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    setState: (_: StoreUpdater) => { },
-    dispatch: (_: StoreAction) => { },
-    /* eslint-enable @typescript-eslint/no-unused-vars */
+    setState: () => { },
+    dispatch: () => { },
 };
 
 const StoreContext = createContext<StoreProviderContext>(initialContext);
 
 export function useStore<State extends StoreState = StoreState>() {
-    return useContext(StoreContext) as StoreProviderContext<State>;
+    return useContext(StoreContext) as unknown as StoreProviderContext<State>;
 }
 
 export function StoreProvider<State extends StoreState = StoreState>(
