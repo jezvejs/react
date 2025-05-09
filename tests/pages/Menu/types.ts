@@ -1,4 +1,14 @@
-import { MenuItemType, MenuState } from '@jezvejs/react-test';
+import { Menu, MenuItemType, MenuState } from '@jezvejs/react-test';
+
+export type MenuPageComponents = {
+    defaultMenu: Menu | null;
+    checkboxSideMenu: Menu | null;
+    groupsMenu: Menu | null;
+    checkboxGroupMenu: Menu | null;
+    collapsibleGroupMenu: Menu | null;
+};
+
+export type MenuId = keyof MenuPageComponents;
 
 export interface CollapsibleGroupsMenuItemState {
     id?: string;

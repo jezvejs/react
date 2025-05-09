@@ -1,10 +1,15 @@
-import { Menu } from '@jezvejs/react-test';
+import { Menu, MenuItemState, MenuState } from '@jezvejs/react-test';
 import { expect, type Page } from '@playwright/test';
 
 import { asyncMap } from '../../utils/index.ts';
 
 import { initialState } from './initialState.ts';
-import { CollapsibleGroupsMenuItemState, MenuPageState } from './types.ts';
+import {
+    CollapsibleGroupsMenuItemState,
+    MenuId,
+    MenuPageComponents,
+    MenuPageState,
+} from './types.ts';
 import {
     findLastMenuItem,
     findMenuItem,
@@ -15,42 +20,41 @@ import {
     isAvailableItem,
     mapItems,
 } from './utils.ts';
+import { initialComponents } from './defaultProps.ts';
 
-const menuIds = [
-    'defaultMenu',
-    'checkboxSideMenu',
-    'groupsMenu',
-    'checkboxGroupMenu',
-    'collapsibleGroupMenu',
-];
+const menuIds = Object.keys(initialComponents) as MenuId[];
 
-export class MenuPage {
+export class MenuPage implements MenuPageComponents {
     readonly page: Page;
 
     defaultMenu: Menu | null = null;
 
     checkboxSideMenu: Menu | null = null;
 
+    groupsMenu: Menu | null = null;
+
     checkboxGroupMenu: Menu | null = null;
 
     collapsibleGroupMenu: Menu | null = null;
 
-    singleMenuId: string;
+    // components: MenuPageComponents;
+
+    singleMenuId: MenuId | null;
 
     state: MenuPageState = initialState;
 
-    constructor(page: Page, singleMenuId = '') {
+    constructor(page: Page, singleMenuId: MenuId | null = null) {
         this.page = page;
         this.singleMenuId = singleMenuId;
 
-        if (menuIds.includes(singleMenuId)) {
+        if (singleMenuId && menuIds.includes(singleMenuId)) {
             this.createMenu(singleMenuId);
         } else {
             menuIds.forEach((menuId) => this.createMenu(menuId));
         }
     }
 
-    createMenu(menuId: string) {
+    createMenu(menuId: MenuId) {
         if (!menuIds.includes(menuId)) {
             return;
         }
@@ -58,39 +62,35 @@ export class MenuPage {
         this[menuId] = new Menu(this.page, this.page.locator(`#${menuId}`));
     }
 
-    isSingleMenu() {
-        return this.singleMenuId !== '' && menuIds.includes(this.singleMenuId);
-    }
-
     async assertState(state: MenuPageState) {
-        if (this.isSingleMenu()) {
+        if (this.singleMenuId && menuIds.includes(this.singleMenuId)) {
             await this.assertMenuState(this.singleMenuId, state);
         } else {
             await asyncMap(menuIds, (menuId) => this.assertMenuState(menuId, state));
         }
     }
 
-    isValidMenuId(menuId: string) {
+    isValidMenuId(menuId: MenuId) {
         return menuIds.includes(menuId) && !!this[menuId];
     }
 
-    async assertMenuState(menuId: string, state: MenuPageState) {
+    async assertMenuState(menuId: MenuId, state: MenuPageState) {
         if (!this.isValidMenuId(menuId)) {
             return;
         }
 
-        await this[menuId].assertState(state[menuId]);
+        await this[menuId]?.assertState(state[menuId] as MenuState);
     }
 
-    async waitForLoad(menuId = '') {
+    async waitForLoad(menuId: MenuId | null = null) {
         await this.page.waitForLoadState('networkidle');
 
-        if (menuId !== '' && this[menuId]) {
+        if (menuId && this[menuId]) {
             await this[menuId].rootLocator.waitFor({ state: 'visible' });
         }
     }
 
-    onClickMenuItem(menuId: string, itemId: string) {
+    onClickMenuItem(menuId: MenuId, itemId: string) {
         const menuState = this.state[menuId];
         const menuItems = menuState.items;
 
@@ -114,7 +114,7 @@ export class MenuPage {
         return expectedState;
     }
 
-    onClickCheckboxGroupMenuItem(menuId: string, itemId: string) {
+    onClickCheckboxGroupMenuItem(menuId: MenuId, itemId: string) {
         const menuState = this.state[menuId];
         const menuItems = menuState.items;
 
@@ -154,7 +154,7 @@ export class MenuPage {
         return expectedState;
     }
 
-    onClickCollapsibleGroupMenuItem(menuId: string, itemId: string) {
+    onClickCollapsibleGroupMenuItem(menuId: MenuId, itemId: string) {
         const menuState = this.state[menuId];
         const menuItems = menuState.items;
 
@@ -163,7 +163,7 @@ export class MenuPage {
             includeChildItems: true,
         };
 
-        const childItemIds = {};
+        const childItemIds: Record<string, object> = {};
 
         const expectedState = {
             ...this.state,
@@ -178,8 +178,10 @@ export class MenuPage {
                                 expanded: !item.expanded,
                                 items: mapItems(
                                     item.items ?? [],
-                                    (child) => {
-                                        childItemIds[child.id] = { visible: !item.expanded };
+                                    (child: MenuItemState) => {
+                                        if (child.id) {
+                                            childItemIds[child.id] = { visible: !item.expanded };
+                                        }
                                         return child;
                                     },
                                     options,
@@ -187,7 +189,7 @@ export class MenuPage {
                             };
                         }
 
-                        const additionalProps = childItemIds[item.id] ?? {};
+                        const additionalProps = (item.id && childItemIds[item.id]) ?? {};
 
                         const res = (item.id === itemId)
                             ? ({
@@ -208,12 +210,12 @@ export class MenuPage {
         return expectedState;
     }
 
-    async clickMenuItem(menuId: string, itemId: string) {
+    async clickMenuItem(menuId: MenuId, itemId: string) {
         expect(this.isValidMenuId(menuId)).toBeTruthy();
 
         const expectedState = this.onClickMenuItem(menuId, itemId);
 
-        await this[menuId].clickById(itemId);
+        await this[menuId]?.clickById(itemId);
         await this.assertState(expectedState);
 
         this.state = expectedState;
@@ -239,10 +241,10 @@ export class MenuPage {
 
         const expectedState = this.onClickCheckboxGroupMenuItem(menuId, itemId);
 
-        if (targetItem.type === 'group') {
-            await this[menuId].clickHeaderById(itemId);
+        if (targetItem?.type === 'group') {
+            await this[menuId]?.clickHeaderById(itemId);
         } else {
-            await this[menuId].clickById(itemId);
+            await this[menuId]?.clickById(itemId);
         }
 
         await this.assertState(expectedState);
@@ -262,10 +264,10 @@ export class MenuPage {
 
         const expectedState = this.onClickCollapsibleGroupMenuItem(menuId, itemId);
 
-        if (targetItem.type === 'group') {
-            await this[menuId].clickHeaderById(itemId);
+        if (targetItem?.type === 'group') {
+            await this[menuId]?.clickHeaderById(itemId);
         } else {
-            await this[menuId].clickById(itemId);
+            await this[menuId]?.clickById(itemId);
         }
 
         await this.assertState(expectedState);
@@ -273,7 +275,7 @@ export class MenuPage {
         this.state = expectedState;
     }
 
-    onFocusMenu(menuId) {
+    onFocusMenu(menuId: MenuId) {
         const menuState = this.state[menuId];
 
         const options = {
@@ -301,18 +303,18 @@ export class MenuPage {
         return expectedState;
     }
 
-    async focusMenu(menuId: string) {
+    async focusMenu(menuId: MenuId) {
         expect(this.isValidMenuId(menuId)).toBeTruthy();
 
         const expectedState = this.onFocusMenu(menuId);
 
-        await this[menuId].focus();
+        await this[menuId]?.focus();
         await this.assertState(expectedState);
 
         this.state = expectedState;
     }
 
-    activateMenuItemById(menuId: string, itemId: string | null) {
+    activateMenuItemById(menuId: MenuId, itemId: string | null) {
         expect(this.isValidMenuId(menuId)).toBeTruthy();
 
         const menuState = this.state[menuId];
@@ -334,11 +336,11 @@ export class MenuPage {
         };
     }
 
-    activateNextItem(menuId: string) {
-        const menuState = this.state[menuId];
+    activateNextItem(menuId: MenuId) {
+        const menuState = this.state[menuId] as MenuState;
         const menuItems = menuState.items;
 
-        const availCallback = (item) => isAvailableItem(item, menuState);
+        const availCallback = (item: MenuItemState) => isAvailableItem(item, menuState);
 
         const options = {
             includeGroupItems: menuState.allowActiveGroupHeader,
@@ -346,7 +348,7 @@ export class MenuPage {
         };
 
         const activeItem = getActiveItem(menuState);
-        let nextItem = (activeItem)
+        let nextItem = (activeItem?.id)
             ? getNextItem(activeItem.id, menuItems, availCallback, options)
             : findMenuItem(menuItems, availCallback, options);
 
@@ -354,14 +356,14 @@ export class MenuPage {
             nextItem = findMenuItem(menuItems, availCallback);
         }
 
-        return this.activateMenuItemById(menuId, nextItem?.id);
+        return this.activateMenuItemById(menuId, nextItem?.id ?? null);
     }
 
-    activatePreviousItem(menuId: string) {
-        const menuState = this.state[menuId];
+    activatePreviousItem(menuId: MenuId) {
+        const menuState = this.state[menuId] as MenuState;
         const menuItems = menuState.items;
 
-        const availCallback = (item) => isAvailableItem(item, menuState);
+        const availCallback = (item: MenuItemState) => isAvailableItem(item, menuState);
 
         const options = {
             includeGroupItems: menuState.allowActiveGroupHeader,
@@ -370,7 +372,7 @@ export class MenuPage {
 
         const activeItem = getActiveItem(menuState);
 
-        let nextItem = (activeItem)
+        let nextItem = (activeItem?.id)
             ? getPreviousItem(activeItem.id, menuItems, availCallback, options)
             : findLastMenuItem(menuItems, availCallback, options);
 
@@ -378,34 +380,34 @@ export class MenuPage {
             nextItem = findLastMenuItem(menuItems, availCallback);
         }
 
-        return this.activateMenuItemById(menuId, nextItem?.id);
+        return this.activateMenuItemById(menuId, nextItem?.id ?? null);
     }
 
-    onPressArrowDown(menuId: string) {
+    onPressArrowDown(menuId: MenuId) {
         return this.activateNextItem(menuId);
     }
 
-    onPressArrowUp(menuId: string) {
+    onPressArrowUp(menuId: MenuId) {
         return this.activatePreviousItem(menuId);
     }
 
-    onPressTab(menuId: string) {
-        const menuState = this.state[menuId];
+    onPressTab(menuId: MenuId) {
+        const menuState = this.state[menuId] as MenuState;
         const menuItems = menuState.items;
 
-        const availCallback = (item) => isAvailableItem(item, menuState);
+        const availCallback = (item: MenuItemState) => isAvailableItem(item, menuState);
 
         const activeItem = getActiveItem(menuState);
         const lastItem = findLastMenuItem(menuItems, availCallback);
 
-        if (activeItem && activeItem.id === lastItem.id) {
+        if (activeItem && lastItem && activeItem.id === lastItem.id) {
             return this.activateMenuItemById(menuId, null);
         }
 
         return this.activateNextItem(menuId);
     }
 
-    getKeyPressExpectedState(menuId: string, key: string) {
+    getKeyPressExpectedState(menuId: MenuId, key: string) {
         if (key === 'ArrowDown') {
             return this.onPressArrowDown(menuId);
         }
@@ -419,7 +421,7 @@ export class MenuPage {
         return this.state;
     }
 
-    async pressKey(menuId: string, key: string) {
+    async pressKey(menuId: MenuId, key: string) {
         expect(this.isValidMenuId(menuId)).toBeTruthy();
 
         const expectedState = this.getKeyPressExpectedState(menuId, key);

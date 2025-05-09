@@ -1,15 +1,16 @@
 import { test } from '@playwright/test';
 import { MenuPage } from '../pages/Menu/MenuPage.ts';
+import { Fixtures } from '../utils/types.ts';
 
-const loadStoryById = async ({ page }, storyId: string) => (
+const loadStoryById = async ({ page }: Fixtures, storyId: string) => (
     page.goto(`iframe.html?args=&globals=&id=menu-menu--${storyId}&viewMode=story`)
 );
 
-const loadDefault = async ({ page }) => loadStoryById({ page }, 'default');
-const loadCheckboxSide = async ({ page }) => loadStoryById({ page }, 'checkbox-side');
-const loadGroups = async ({ page }) => loadStoryById({ page }, 'groups');
-const loadCheckboxGroups = async ({ page }) => loadStoryById({ page }, 'checkbox-groups');
-const loadCollapsibleGroups = async ({ page }) => loadStoryById({ page }, 'collapsible-groups');
+const loadDefault = async ({ page }: Fixtures) => loadStoryById({ page }, 'default');
+const loadCheckboxSide = async ({ page }: Fixtures) => loadStoryById({ page }, 'checkbox-side');
+const loadGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'groups');
+const loadCheckboxGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'checkbox-groups');
+const loadCollapsibleGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'collapsible-groups');
 
 test.describe('Menu', () => {
     test('Click by checkbox item', async ({ page }) => {

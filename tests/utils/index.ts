@@ -1,7 +1,6 @@
 import { isFunction } from '@jezvejs/types';
-import { expect } from '@playwright/test';
-
-export type AsyncCallback<T> = (value: T, index: number, array: T[]) => unknown
+import { expect, Locator } from '@playwright/test';
+import { AsyncCallback, Fixtures } from './types.ts';
 
 /** Maps array using async callback function */
 export const asyncMap = async <T = unknown>(data: Array<T>, func: AsyncCallback<T>) => {
@@ -16,7 +15,12 @@ export const asyncMap = async <T = unknown>(data: Array<T>, func: AsyncCallback<
     return Promise.all(tasks);
 };
 
-export const inputToEmpty = async ({ page }, name, value, expected) => {
+export const inputToEmpty = async (
+    { page }: Fixtures,
+    name: string,
+    value: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -27,7 +31,12 @@ export const inputToEmpty = async ({ page }, name, value, expected) => {
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const pasteToEmpty = async ({ page }, name, value, expected) => {
+export const pasteToEmpty = async (
+    { page }: Fixtures,
+    name: string,
+    value: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -48,14 +57,14 @@ export const pasteToEmpty = async ({ page }, name, value, expected) => {
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const setCursorPos = async (locator, pos) => {
+export const setCursorPos = async (locator: Locator, pos: number) => {
     await locator.press('Home');
     for (let i = 0; i < pos; i++) {
         await locator.press('ArrowRight');
     }
 };
 
-export const setSelection = async (locator, start, end) => {
+export const setSelection = async (locator: Locator, start: number, end: number) => {
     await locator.press('Home');
 
     const min = Math.min(start, end);
@@ -72,7 +81,14 @@ export const setSelection = async (locator, start, end) => {
     await locator.page().keyboard.up('Shift');
 };
 
-export const pressKeyFromPos = async ({ page }, name, value, key, pos, expected) => {
+export const pressKeyFromPos = async (
+    { page }: Fixtures,
+    name: string,
+    value: string,
+    key: string,
+    pos: number,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -86,15 +102,34 @@ export const pressKeyFromPos = async ({ page }, name, value, key, pos, expected)
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const backspaceFromPos = ({ page }, name, value, pos, expected) => (
+export const backspaceFromPos = (
+    { page }: Fixtures,
+    name: string,
+    value: string,
+    pos: number,
+    expected: string,
+) => (
     pressKeyFromPos({ page }, name, value, 'Backspace', pos, expected)
 );
 
-export const deleteFromPos = ({ page }, name, value, pos, expected) => (
+export const deleteFromPos = (
+    { page }: Fixtures,
+    name: string,
+    value: string,
+    pos: number,
+    expected: string,
+) => (
     pressKeyFromPos({ page }, name, value, 'Delete', pos, expected)
 );
 
-export const inputFromPos = async ({ page }, name, initial, pos, value, expected) => {
+export const inputFromPos = async (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    pos: number,
+    value: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -108,7 +143,15 @@ export const inputFromPos = async ({ page }, name, initial, pos, value, expected
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const inputToSelection = async ({ page }, name, initial, start, end, value, expected) => {
+export const inputToSelection = async (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    start: number,
+    end: number,
+    value: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -122,7 +165,15 @@ export const inputToSelection = async ({ page }, name, initial, start, end, valu
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const pasteToSelection = async ({ page }, name, initial, start, end, value, expected) => {
+export const pasteToSelection = async (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    start: number,
+    end: number,
+    value: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -146,7 +197,14 @@ export const pasteToSelection = async ({ page }, name, initial, start, end, valu
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const pasteFromPos = async ({ page }, name, initial, pos, value, expected) => {
+export const pasteFromPos = async (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    pos: number,
+    value: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -170,7 +228,15 @@ export const pasteFromPos = async ({ page }, name, initial, pos, value, expected
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const pressKeyToSelection = async ({ page }, name, initial, start, end, key, expected) => {
+export const pressKeyToSelection = async (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    start: number,
+    end: number,
+    key: string,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 
@@ -184,15 +250,36 @@ export const pressKeyToSelection = async ({ page }, name, initial, start, end, k
     await expect(inputLocator).toHaveValue(expected);
 };
 
-export const backspaceSelection = ({ page }, name, initial, start, end, expected) => (
+export const backspaceSelection = (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    start: number,
+    end: number,
+    expected: string,
+) => (
     pressKeyToSelection({ page }, name, initial, start, end, 'Backspace', expected)
 );
 
-export const deleteSelection = ({ page }, name, initial, start, end, expected) => (
+export const deleteSelection = (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    start: number,
+    end: number,
+    expected: string,
+) => (
     pressKeyToSelection({ page }, name, initial, start, end, 'Delete', expected)
 );
 
-export const cutSelection = async ({ page }, name, initial, start, end, expected) => {
+export const cutSelection = async (
+    { page }: Fixtures,
+    name: string,
+    initial: string,
+    start: number,
+    end: number,
+    expected: string,
+) => {
     const inputLocator = page.locator(`#${name}`);
     await inputLocator.waitFor({ state: 'visible' });
 

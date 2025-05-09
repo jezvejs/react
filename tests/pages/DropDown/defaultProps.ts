@@ -1,4 +1,5 @@
 import { DropDownState, MenuItemState } from '@jezvejs/react-test';
+import { DropDownPageComponents } from './types.ts';
 
 export const defaultDropDownProps: DropDownState = {
     id: '',
@@ -11,6 +12,8 @@ export const defaultDropDownProps: DropDownState = {
     value: '',
     textValue: '',
     inputString: null,
+    filtered: false,
+    allowActiveGroupHeader: false,
     menu: {
         id: '',
         visible: false,
@@ -29,4 +32,21 @@ export const defaultDropDownMenuItemProps: MenuItemState = {
     active: false,
     selected: false,
     selectable: false,
+};
+
+export const initialComponents: DropDownPageComponents = {
+    inlineDropDown: null,
+    inlineDropDown2: null,
+    fullWidthDropDown: null,
+    fixedMenuDropDown: null,
+    groupsDropDown: null,
+    attachedToBlockDropDown: null,
+    attachedToInlineDropDown: null,
+    multipleSelectDropDown: null,
+    filterDropDown: null,
+    filterMultiDropDown: null,
+    attachedFilterDropDown: null,
+    attachedFilterMultipleDropDown: null,
+    filterGroupsDropDown: null,
+    filterGroupsMultiDropDown: null,
 };

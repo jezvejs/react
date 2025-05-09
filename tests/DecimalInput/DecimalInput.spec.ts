@@ -12,8 +12,9 @@ import {
     deleteSelection,
     cutSelection,
 } from '../utils/index.ts';
+import { Fixtures } from '../utils/types.ts';
 
-export const navigateToDisabledStory = async ({ page }) => {
+export const navigateToDisabledStory = async ({ page }: Fixtures) => {
     await page.goto('iframe.html?viewMode=story&id=input-decimalinput--disabled');
 
     const inputLocator = page.locator('#disabledInput');
@@ -34,7 +35,7 @@ export const navigateToDisabledStory = async ({ page }) => {
     await expect(changeValueBtnLocator).toBeEnabled();
 };
 
-export const toggleEnable = async ({ page }) => {
+export const toggleEnable = async ({ page }: Fixtures) => {
     const inputLocator = page.locator('#disabledInput');
     const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
     const changeValueBtnLocator = page.locator('#changeValueBtn');
@@ -58,7 +59,7 @@ export const toggleEnable = async ({ page }) => {
     await expect(changeValueBtnLocator).toBeEnabled();
 };
 
-export const changeValue = async ({ page }) => {
+export const changeValue = async ({ page }: Fixtures) => {
     const inputLocator = page.locator('#disabledInput');
     const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
     const changeValueBtnLocator = page.locator('#changeValueBtn');

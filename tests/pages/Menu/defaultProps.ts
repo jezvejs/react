@@ -1,5 +1,5 @@
 import { MenuItemState } from '@jezvejs/react-test';
-import { CollapsibleGroupsMenuItemState } from './types.ts';
+import { CollapsibleGroupsMenuItemState, MenuPageComponents } from './types.ts';
 
 export const defaultMenuItemProps: MenuItemState = {
     id: '',
@@ -23,4 +23,12 @@ export const defaultCollapsibleGroupMenuItemProps: CollapsibleGroupsMenuItemStat
     selected: false,
     expanded: false,
     items: [],
+};
+
+export const initialComponents: MenuPageComponents = {
+    defaultMenu: null,
+    checkboxSideMenu: null,
+    groupsMenu: null,
+    checkboxGroupMenu: null,
+    collapsibleGroupMenu: null,
 };
