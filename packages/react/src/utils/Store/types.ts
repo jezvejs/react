@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Store } from './Store.ts';
 
 export type StoreActionPayload = object | string | number | boolean | bigint | symbol | null;
@@ -58,7 +58,9 @@ export interface StoreActionAPI<State extends StoreState = StoreState> {
 
 export type StoreUpdaterFunction<State extends StoreState = StoreState> = (prev: State) => State;
 
-export type StoreUpdater<State extends StoreState = StoreState> = React.SetStateAction<State>;
+export type StoreUpdater<State extends StoreState = StoreState> =
+    | State
+    | StoreUpdaterFunction<State>;
 
 // StoreProvider
 

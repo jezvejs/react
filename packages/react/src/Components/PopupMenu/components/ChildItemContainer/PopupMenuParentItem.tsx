@@ -26,7 +26,7 @@ export const PopupMenuParentItem: PopupMenuParentItemComponent = (p: PopupMenuPa
         },
     };
 
-    const { setState } = useMenuStore(props);
+    const { setState } = useMenuStore<PopupMenuState>(props);
 
     const {
         id,

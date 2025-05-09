@@ -671,14 +671,14 @@ export const DropDownContainer = forwardRef<
     };
 
     const setInputDevice = (inputDevice: string | null) => {
-        menuStore.setState((prev) => ({
+        menuStore.setFullState((prev) => ({
             ...prev,
             inputDevice,
-        }), null);
+        }));
     };
 
     const getInputDevice = () => {
-        const st = menuStore.getState(null);
+        const st = menuStore.getFullState();
         return st?.inputDevice;
     };
 

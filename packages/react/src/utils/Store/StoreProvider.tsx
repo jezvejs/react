@@ -51,7 +51,7 @@ export function StoreProvider<State extends StoreState = StoreState>(
         state,
         getState: () => store.getState(),
         setState: (update: StoreUpdater<State>) => store.setState(update),
-        dispatch: (action: StoreAction) => store.dispatch(action),
+        dispatch: (action: StoreAction<State>) => store.dispatch(action),
     }), [state]);
 
     return (

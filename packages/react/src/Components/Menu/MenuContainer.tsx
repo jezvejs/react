@@ -63,7 +63,12 @@ const {
  * Menu container component
  */
 export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
-    const { getState, setState } = useMenuStore(props);
+    const {
+        getState,
+        setState,
+        getFullState,
+        setFullState,
+    } = useMenuStore(props);
 
     const innerRef = useRef<HTMLDivElement | null>(null);
     useImperativeHandle<MenuRef, MenuRef>(ref, () => innerRef?.current);
@@ -385,14 +390,14 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
     }, []);
 
     const setInputDevice = (inputDevice: string | null) => {
-        setState((prev) => ({
+        setFullState((prev) => ({
             ...prev,
             inputDevice,
-        }), null);
+        }));
     };
 
     const getInputDevice = () => {
-        const st = getState(null);
+        const st = getFullState();
         return st?.inputDevice;
     };
 
