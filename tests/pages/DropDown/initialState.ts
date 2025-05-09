@@ -22,6 +22,21 @@ export const initialState: DropDownPageState = {
             filteredItems: [],
         },
     }),
+    inlineDropDown2: getDropDownProps({
+        id: 'inlineDropDown2',
+        value: '1',
+        textValue: 'Long item test Lorem ipsum dolor sit amet 1',
+        menu: {
+            id: 'dropDownMenu_inlineDropDown2',
+            allowActiveGroupHeader: false,
+            visible: false,
+            items: (
+                initItems({ title: 'Long item test Lorem ipsum dolor sit amet' })
+                    .map((item) => getDropDownMenuItemProps(item))
+            ),
+            filteredItems: [],
+        },
+    }),
     fullWidthDropDown: getDropDownProps({
         id: 'fullWidthDropDown',
         value: '1',

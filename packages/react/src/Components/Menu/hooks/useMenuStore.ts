@@ -4,64 +4,67 @@ import { Store } from '../../../utils/Store/Store.ts';
 import { useStore } from '../../../utils/Store/StoreProvider.tsx';
 import {
     StoreAction,
-    StoreState,
     StoreUpdater,
 } from '../../../utils/Store/types.ts';
 import {
     MenuProps,
     MenuState,
-    MenuStore,
     MultiMenuState,
 } from '../types.ts';
 
-export interface MenuStoreProviderContext<State extends StoreState = StoreState> {
+export interface MenuStoreProviderContext<State extends MenuState = MenuState> {
     store: Store | object,
-    state: State,
+    state: MultiMenuState<State>,
     getState: (menuId?: string | null) => State,
-    setState: (state: StoreUpdater, menuId?: string | null) => void,
-    dispatch: (action: StoreAction) => void,
+    setState: (state: StoreUpdater<State>, menuId?: string | null) => void,
+    getFullState: () => MultiMenuState<State>,
+    setFullState: (state: StoreUpdater<MultiMenuState<State>>) => void,
+    dispatch: (action: StoreAction<State>) => void,
 }
 
 export function useMenuStore<
     T extends MenuState = MenuState,
     P extends MenuProps = MenuProps,
 >(props: P): MenuStoreProviderContext<T> {
-    const store = useStore<MenuStore<T>>();
+    const store = useStore<MultiMenuState<T>>();
 
-    const getState = useCallback((menuId?: string | null): T => {
+    const getFullState = useCallback(() => {
         const st = store.getState();
-        if (menuId === null) {
-            return st as T;
-        }
+        return st as MultiMenuState<T>;
+    }, [store.state]);
+
+    const getState = useCallback((menuId?: string): T | object => {
+        const st = store.getState();
 
         const id = menuId ?? props.id;
         if (!id) {
-            return st as T;
+            return {};
         }
 
         return (st as MultiMenuState<T>).menu?.[id] ?? {};
     }, [props.id, store.state]);
 
-    const setState = useCallback((updater: StoreUpdater, menuId?: string | null) => {
-        if (menuId === null) {
-            store.setState(updater);
-            return;
-        }
+    const setFullState = useCallback((updater: StoreUpdater<MultiMenuState<T>>) => {
+        store.setState(updater);
+    }, [store.state]);
 
+    const setState = useCallback((updater: StoreUpdater<T>, menuId?: string) => {
         const id = menuId ?? props.id;
         if (!id) {
             return;
         }
 
         store.setState((prev: MultiMenuState<T>) => {
+            const multiMenuState = prev?.menu;
+
             const itemState = (typeof updater === 'function')
-                ? updater(prev?.menu?.[id] ?? {})
+                ? updater(multiMenuState?.[id] ?? {})
                 : updater;
 
             const res = {
                 ...prev,
                 menu: {
-                    ...(prev?.menu ?? {}),
+                    ...(multiMenuState ?? {}),
                     [id]: itemState,
                 },
             };
@@ -72,11 +75,13 @@ export function useMenuStore<
 
     const res = useMemo(() => ({
         store,
-        state: store.state as T,
+        state: store.state,
         getState,
         setState,
-        dispatch: store.dispatch,
+        getFullState,
+        setFullState,
+        dispatch: (action: StoreAction) => store.dispatch(action),
     }), [store.state, props.id]);
 
-    return res;
+    return res as MenuStoreProviderContext<T>;
 }

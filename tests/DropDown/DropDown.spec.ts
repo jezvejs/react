@@ -1,25 +1,26 @@
 import { test } from '@playwright/test';
 import { DropDownPage } from '../pages/DropDown/DropDownPage.ts';
+import { Fixtures } from '../utils/types.ts';
 
-const loadStoryById = async ({ page }, storyId: string) => (
+const loadStoryById = async ({ page }: Fixtures, storyId: string) => (
     page.goto(`iframe.html?args=&globals=&id=menu-dropdown--${storyId}&viewMode=story`)
 );
 
-const loadInline = async ({ page }) => loadStoryById({ page }, 'inline');
-const loadFullWidth = async ({ page }) => loadStoryById({ page }, 'full-width');
-const loadFixedMenu = async ({ page }) => loadStoryById({ page }, 'fixed-menu');
-const loadGroups = async ({ page }) => loadStoryById({ page }, 'groups');
-const loadAttachedToBlock = async ({ page }) => loadStoryById({ page }, 'attach-to-block');
-const loadAttachedToInline = async ({ page }) => loadStoryById({ page }, 'attach-to-inline');
-const loadMultiSelect = async ({ page }) => loadStoryById({ page }, 'multiple-select');
-const loadFilterSingleSelect = async ({ page }) => loadStoryById({ page }, 'filter-single');
-const loadFilterMultiSelect = async ({ page }) => loadStoryById({ page }, 'filter-multiple');
-const loadFilterAttachedToBlock = async ({ page }) => loadStoryById({ page }, 'filter-attach-to-block');
-const loadFilterMultiAttachedToBlock = async ({ page }) => (
+const loadInline = async ({ page }: Fixtures) => loadStoryById({ page }, 'inline');
+const loadFullWidth = async ({ page }: Fixtures) => loadStoryById({ page }, 'full-width');
+const loadFixedMenu = async ({ page }: Fixtures) => loadStoryById({ page }, 'fixed-menu');
+const loadGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'groups');
+const loadAttachedToBlock = async ({ page }: Fixtures) => loadStoryById({ page }, 'attach-to-block');
+const loadAttachedToInline = async ({ page }: Fixtures) => loadStoryById({ page }, 'attach-to-inline');
+const loadMultiSelect = async ({ page }: Fixtures) => loadStoryById({ page }, 'multiple-select');
+const loadFilterSingleSelect = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-single');
+const loadFilterMultiSelect = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-multiple');
+const loadFilterAttachedToBlock = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-attach-to-block');
+const loadFilterMultiAttachedToBlock = async ({ page }: Fixtures) => (
     loadStoryById({ page }, 'filter-multi-attach-to-block')
 );
-const loadFilterGroups = async ({ page }) => loadStoryById({ page }, 'filter-groups');
-const loadFilterGroupsMultiSelect = async ({ page }) => (
+const loadFilterGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-groups');
+const loadFilterGroupsMultiSelect = async ({ page }: Fixtures) => (
     loadStoryById({ page }, 'filter-groups-multiple')
 );
 

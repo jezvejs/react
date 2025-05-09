@@ -336,8 +336,6 @@ export interface MultiMenuState<T extends MenuState = MenuState> {
     inputDevice: string | null;
 }
 
-export type MenuStore<T extends MenuState = MenuState> = T | MultiMenuState<T>;
-
 /**
  * Attributes of Menu component root element
  */

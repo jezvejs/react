@@ -409,7 +409,7 @@ export interface BaseChartState extends BaseChartStateBase {
     xAxisLabels: {
         firstGroupIndex: number;
         lastGroupIndex: number;
-        visibleGroups: BaseChartDataGroup;
+        visibleGroups: number;
         items: BaseChartXAxisLabelProps[];
     };
 

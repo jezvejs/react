@@ -12,10 +12,11 @@ import {
     deleteSelection,
     cutSelection,
 } from '../utils/index.ts';
+import { Fixtures } from '../utils/types.ts';
 
 const inputId = 'localeInput';
 
-export const selectLocale = async ({ page }, value) => {
+export const selectLocale = async ({ page }: Fixtures, value: string) => {
     await page.goto('iframe.html?viewMode=story&id=input-dateinput--locales');
 
     const selectLocator = page.locator('#localeSelect');
@@ -26,7 +27,7 @@ export const selectLocale = async ({ page }, value) => {
     expect(selected).toStrictEqual(valuesArray);
 };
 
-export const navigateToDisabledStory = async ({ page }) => {
+export const navigateToDisabledStory = async ({ page }: Fixtures) => {
     await page.goto('iframe.html?viewMode=story&id=input-dateinput--disabled');
 
     const inputLocator = page.locator('#disabledDateInput');
@@ -47,7 +48,7 @@ export const navigateToDisabledStory = async ({ page }) => {
     await expect(changeValueBtnLocator).toBeEnabled();
 };
 
-export const toggleEnable = async ({ page }) => {
+export const toggleEnable = async ({ page }: Fixtures) => {
     const inputLocator = page.locator('#disabledDateInput');
     const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
     const changeValueBtnLocator = page.locator('#changeValueBtn');
@@ -70,7 +71,7 @@ export const toggleEnable = async ({ page }) => {
     await expect(changeValueBtnLocator).toBeEnabled();
 };
 
-export const changeValue = async ({ page }) => {
+export const changeValue = async ({ page }: Fixtures) => {
     const inputLocator = page.locator('#disabledDateInput');
     const toggleEnableBtnLocator = page.locator('#toggleEnableBtn');
     const changeValueBtnLocator = page.locator('#changeValueBtn');

@@ -21,10 +21,14 @@ export const getDropDownProps = (
 ): DropDownState => ({
     ...defaultProps,
     ...props,
-    menu: {
-        ...(defaultProps.menu ?? {}),
-        ...props.menu,
-    },
+    menu: (
+        (props.menu)
+            ? {
+                ...(defaultProps.menu ?? {}),
+                ...props.menu,
+            }
+            : undefined
+    ),
 });
 
 export const getDropDownMenuItemProps = (
@@ -148,15 +152,15 @@ export const initGroupItems = () => ([
  * @returns {DropDownState}
  */
 export const toggleSelectItem = (state: DropDownState, itemId: string): DropDownState => {
-    if (!state.open) {
+    if (!state.open || !state.menu) {
         return state;
     }
 
     const { inputString } = state;
 
     const menuItems = (typeof inputString === 'string' && inputString.length > 0)
-        ? state.menu.filteredItems
-        : state.menu.items;
+        ? (state.menu.filteredItems ?? [])
+        : (state.menu.items ?? []);
 
     const options = {
         includeGroupItems: state.menu.allowActiveGroupHeader,
@@ -164,7 +168,7 @@ export const toggleSelectItem = (state: DropDownState, itemId: string): DropDown
     };
 
     const targetItem = getItemById(itemId, menuItems);
-    if (!targetItem || targetItem.disabled) {
+    if (!targetItem?.id || targetItem.disabled) {
         return state;
     }
 
@@ -213,11 +217,11 @@ export const toggleSelectItem = (state: DropDownState, itemId: string): DropDown
  * @returns {DropDownState}
  */
 export const filterDropDownItems = (state: DropDownState, value: string): DropDownState => {
-    if (!state.open) {
+    if (!state.open || !state.menu) {
         return state;
     }
 
-    const menuItems = state.menu.items;
+    const menuItems = state.menu.items ?? [];
     const lfstr = value.toLowerCase();
     let exactMatch = false;
 
@@ -253,7 +257,7 @@ export const isVisibleItem = (item: DropDownMenuItemProps, state: DropDownState)
 
 /** Returns array of visible items */
 export const getVisibleItems = (state: DropDownState | MenuItemState) => (
-    toFlatList<MenuItemState>(('items' in state) ? state?.items : [], {
+    toFlatList<MenuItemState>(('items' in state) ? (state?.items ?? []) : [], {
         includeGroupItems: (state as DropDownState).allowActiveGroupHeader,
     }).filter((item: MenuItemState): boolean => (
         (item.type === 'group' && getVisibleItems(item).length > 0)

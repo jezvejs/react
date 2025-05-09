@@ -7,32 +7,26 @@ import { mapItems, toFlatList } from '../Menu/utils.ts';
 
 import { initialState } from './initialState.ts';
 import { filterDropDownItems, toggleSelectItem } from './utils.ts';
-import { DropDownPageState } from './types.ts';
+import {
+    DropDownId,
+    DropDownPageComponents,
+    DropDownPageState,
+    SimpleDropDownId,
+    ToggleEnableDropDownId,
+} from './types.ts';
 import { ToggleEnableDropDown } from './components/ToggleEnableDropDown.ts';
+import { initialComponents } from './defaultProps.ts';
 
-const componentIds = [
-    'inlineDropDown',
-    'inlineDropDown2',
-    'fullWidthDropDown',
-    'fixedMenuDropDown',
-    'groupsDropDown',
-    'attachedToBlockDropDown',
-    'attachedToInlineDropDown',
-    'multipleSelectDropDown',
-    'filterDropDown',
-    'filterMultiDropDown',
-    'attachedFilterDropDown',
-    'attachedFilterMultipleDropDown',
-    'filterGroupsDropDown',
-    'filterGroupsMultiDropDown',
-];
+const componentIds = Object.keys(initialComponents) as DropDownId[];
 
 const toggleEnableButtonIds = {
     filterDropDown: 'toggleEnableBtn',
     filterMultiDropDown: 'toggleEnableFilterMultiBtn',
 };
 
-export class DropDownPage {
+const toggleEnableComponentIds = Object.keys(toggleEnableButtonIds) as DropDownId[];
+
+export class DropDownPage implements DropDownPageComponents {
     readonly page: Page;
 
     inlineDropDown: DropDown | null = null;
@@ -63,37 +57,37 @@ export class DropDownPage {
 
     filterGroupsMultiDropDown: DropDown | null = null;
 
-    singleComponentId: string;
+    singleComponentId: DropDownId | null;
 
     state: DropDownPageState = initialState;
 
-    constructor(page: Page, singleComponentId = '') {
+    constructor(page: Page, singleComponentId: DropDownId | null = null) {
         this.page = page;
         this.singleComponentId = singleComponentId;
 
-        if (componentIds.includes(singleComponentId)) {
+        if (singleComponentId && componentIds.includes(singleComponentId)) {
             this.createComponent(singleComponentId);
         } else {
             componentIds.forEach((menuId) => this.createComponent(menuId));
         }
     }
 
-    createComponent(id: string) {
-        const btnId = toggleEnableButtonIds[id];
-        if (btnId) {
-            this.createToggleEnableComponent(id);
+    createComponent(id: DropDownId) {
+        if (toggleEnableComponentIds.includes(id)) {
+            this.createToggleEnableComponent(id as ToggleEnableDropDownId);
             return;
         }
 
-        if (!componentIds.includes(id)) {
+        if (!componentIds.includes(id) || toggleEnableComponentIds.includes(id)) {
             return;
         }
 
-        this[id] = new DropDown(this.page, this.page.locator(`#${id}`));
+        const dropDownId = id as SimpleDropDownId;
+        this[dropDownId] = new DropDown(this.page, this.page.locator(`#${id}`));
     }
 
-    createToggleEnableComponent(id: string) {
-        const btnId = toggleEnableButtonIds[id];
+    createToggleEnableComponent(id: ToggleEnableDropDownId) {
+        const btnId = toggleEnableButtonIds[id] ?? null;
         if (!componentIds.includes(id) || !btnId) {
             return;
         }
@@ -105,46 +99,42 @@ export class DropDownPage {
         );
     }
 
-    isSingleComponent() {
-        return this.singleComponentId !== '' && componentIds.includes(this.singleComponentId);
-    }
-
     async assertState(state: DropDownPageState) {
-        if (this.isSingleComponent()) {
+        if (this.singleComponentId && componentIds.includes(this.singleComponentId)) {
             await this.assertDropDownState(this.singleComponentId, state);
         } else {
             await asyncMap(componentIds, (menuId) => this.assertDropDownState(menuId, state));
         }
     }
 
-    isValidComponentId(id: string) {
+    isValidComponentId(id: DropDownId) {
         return componentIds.includes(id) && !!this[id];
     }
 
-    async assertDropDownState(id: string, state: DropDownPageState) {
+    async assertDropDownState(id: DropDownId, state: DropDownPageState) {
         if (!this.isValidComponentId(id)) {
             return;
         }
 
-        await this[id].assertState(state[id]);
+        await this[id]?.assertState(state[id]);
     }
 
-    async waitForLoad(id = '') {
+    async waitForLoad(id: DropDownId | null = null) {
         await this.page.waitForLoadState('networkidle');
 
-        if (id !== '' && this[id]) {
+        if (id && this[id]) {
             await this[id].rootLocator.waitFor({ state: 'visible' });
         }
     }
 
-    async waitForItemsCount(state: DropDownPageState, id: string) {
+    async waitForItemsCount(state: DropDownPageState, id: DropDownId) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
         const componentState = state[id];
         const { inputString } = componentState;
         const items = (typeof inputString === 'string' && inputString.length > 0)
-            ? componentState.menu.filteredItems
-            : componentState.menu.items;
+            ? (componentState.menu?.filteredItems ?? [])
+            : (componentState.menu?.items ?? []);
 
         // Include group headers to the flat list results, because
         // Menu test component includes all items to the search results
@@ -156,12 +146,12 @@ export class DropDownPage {
         const flatList = toFlatList(items ?? [], options)
             .filter((item) => !!item && !item.hidden);
 
-        await this[id].waitForItemsCount(flatList.length);
+        await this[id]?.waitForItemsCount(flatList.length);
     }
 
-    onToggleMenu(id: string) {
+    onToggleMenu(id: DropDownId) {
         const componentState = this.state[id];
-        const menuItems = componentState.menu.items;
+        const menuItems = componentState.menu?.items ?? [];
 
         const options = {
             includeGroupItems: true,
@@ -186,7 +176,7 @@ export class DropDownPage {
         return expectedState;
     }
 
-    onClickItemById(id: string, itemId: string) {
+    onClickItemById(id: DropDownId, itemId: string) {
         const componentState = this.state[id];
         if (!componentState) {
             throw new Error(`Invalid component id: '${id}'`);
@@ -204,7 +194,7 @@ export class DropDownPage {
         return expectedState;
     }
 
-    onFilterItems(id: string, value: string) {
+    onFilterItems(id: DropDownId, value: string) {
         const componentState = this.state[id];
         if (!componentState) {
             throw new Error(`Invalid component id: '${id}'`);
@@ -222,7 +212,7 @@ export class DropDownPage {
         return expectedState;
     }
 
-    onToggleEnable(id: string) {
+    onToggleEnable(id: DropDownId) {
         const componentState = this.state[id];
         if (!componentState) {
             throw new Error(`Invalid component id: '${id}'`);
@@ -239,13 +229,13 @@ export class DropDownPage {
         return expectedState;
     }
 
-    async clickByToggleButton(id: string) {
+    async clickByToggleButton(id: DropDownId) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
         const expectedState = this.onToggleMenu(id);
 
-        await this[id].clickByToggleButton();
-        await this[id].waitForMenu(expectedState[id].open);
+        await this[id]?.clickByToggleButton();
+        await this[id]?.waitForMenu(expectedState[id].open);
         if (expectedState[id].open) {
             await this.waitForItemsCount(expectedState, id);
         }
@@ -254,41 +244,41 @@ export class DropDownPage {
         this.state = expectedState;
     }
 
-    async clickByContainer(id: string) {
+    async clickByContainer(id: DropDownId) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
         const expectedState = this.onToggleMenu(id);
 
-        await this[id].clickByContainer();
-        await this[id].waitForMenu(expectedState[id].open);
+        await this[id]?.clickByContainer();
+        await this[id]?.waitForMenu(expectedState[id].open);
         await this.assertState(expectedState);
 
         this.state = expectedState;
     }
 
-    async clickItemById(id: string, itemId: string) {
+    async clickItemById(id: DropDownId, itemId: string) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
         const expectedState = this.onClickItemById(id, itemId);
 
-        await this[id].clickItemById(itemId);
+        await this[id]?.clickItemById(itemId);
         if (expectedState[id].multiple) {
-            await this[id].waitForValue(expectedState[id].value);
+            await this[id]?.waitForValue(expectedState[id].value);
         } else {
-            await this[id].waitForMenu(expectedState[id].open);
+            await this[id]?.waitForMenu(expectedState[id].open);
         }
         await this.assertState(expectedState);
 
         this.state = expectedState;
     }
 
-    async filter(id: string, value: string) {
+    async filter(id: DropDownId, value: string) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
         const expectedState = this.onFilterItems(id, value);
 
-        await this[id].inputFilterValue(value);
-        await this[id].waitForInputValue(value);
+        await this[id]?.inputFilterValue(value);
+        await this[id]?.waitForInputValue(value);
         await this.waitForItemsCount(expectedState, id);
 
         await this.assertState(expectedState);
@@ -296,7 +286,7 @@ export class DropDownPage {
         this.state = expectedState;
     }
 
-    async toggleEnable(id: string) {
+    async toggleEnable(id: DropDownId) {
         expect(this.isValidComponentId(id)).toBeTruthy();
 
         const expectedState = this.onToggleEnable(id);

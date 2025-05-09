@@ -307,7 +307,7 @@ export const getInitialState = (
         xAxisLabels: {
             firstGroupIndex: -1,
             lastGroupIndex: -1,
-            visibleGroups: null,
+            visibleGroups: 0,
             items: [],
         },
         components: {

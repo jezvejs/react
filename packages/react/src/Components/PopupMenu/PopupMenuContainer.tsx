@@ -16,7 +16,7 @@ import {
 import { useEmptyClick } from '../../hooks/useEmptyClick/useEmptyClick.ts';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
 
-import { MenuItemProps, MenuListProps, MultiMenuState } from '../Menu/types.ts';
+import { MenuItemProps, MenuListProps } from '../Menu/types.ts';
 import { useMenuStore } from '../Menu/hooks/useMenuStore.ts';
 
 import { PopupMenuParentItem } from './components/ChildItemContainer/PopupMenuParentItem.tsx';
@@ -63,7 +63,11 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
         },
     };
 
-    const { getState, setState } = useMenuStore<PopupMenuState, PopupMenuProps>(props);
+    const {
+        getState,
+        setState,
+        setFullState,
+    } = useMenuStore<PopupMenuState, PopupMenuProps>(props);
     const state = getState();
 
     useEffect(() => {
@@ -71,7 +75,7 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
             return;
         }
 
-        setState({ ...props });
+        setState({ ...props } as PopupMenuState);
     }, []);
 
     const setActive = (itemId: string | null, parentId?: string | null) => {
@@ -87,10 +91,7 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
         }
 
         setState((prev: PopupMenuState) => PopupMenuHelpers.openItemMenu(prev, itemId));
-        setState(
-            (prev: MultiMenuState<PopupMenuState>) => MenuHelpers.openMenu(prev, itemId),
-            null,
-        );
+        setFullState((prev) => MenuHelpers.openMenu(prev, itemId));
     };
 
     const closeItemMenu = (itemId: string | null) => {
@@ -99,10 +100,7 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
         }
 
         setState((prev: PopupMenuState) => PopupMenuHelpers.closeItemMenu(prev, itemId));
-        setState(
-            (prev: MultiMenuState<PopupMenuState>) => MenuHelpers.closeMenu(prev, itemId),
-            null,
-        );
+        setFullState((prev) => MenuHelpers.closeMenu(prev, itemId));
     };
 
     const onToggle = () => {
