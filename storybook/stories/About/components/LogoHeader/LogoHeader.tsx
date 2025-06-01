@@ -1,3 +1,5 @@
+import packageJSON from '@jezvejs/react/package.json';
+
 import LogoIcon from '../../../../common/assets/images/logo.svg';
 
 import './LogoHeader.scss';
@@ -8,7 +10,7 @@ export const LogoHeader = () => (
             <LogoIcon className="logo-icon" />
             <div className="logo-description">
                 <p className="logo-title">Jezve<b>JS</b> React</p>
-                <p className="logo-subtitle">Components and utility library</p>
+                <p className="logo-subtitle">version {packageJSON.version}</p>
             </div>
         </div>
         <p className="description">Components and utilities to organize development of pet project.</p>
