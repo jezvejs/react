@@ -66,6 +66,13 @@ import { TabListStyled } from '../../common/Components/TabListStyled/TabListStyl
 
 // Local components
 import { CodeBlock } from './components/CodeBlock/CodeBlock.tsx';
+import { CodeBlockJSCodeword } from './components/CodeBlock/CodeBlockJSCodeword.tsx';
+import { CodeBlockJSParentesis } from './components/CodeBlock/CodeBlockJSParentesis.tsx';
+import { CodeBlockJSString } from './components/CodeBlock/CodeBlockJSString.tsx';
+import { CodeBlockJSVariable } from './components/CodeBlock/CodeBlockJSVariable.tsx';
+import { CodeBlockJSXComponent } from './components/CodeBlock/CodeBlockJSXComponent.tsx';
+import { CodeBlockJSXTag } from './components/CodeBlock/CodeBlockJSXTag.tsx';
+import { CodeBlockTerminalCommand } from './components/CodeBlock/CodeBlockTerminalCommand.tsx';
 import { CollapsibleDemo } from './components/CollapsibleDemo/CollapsibleDemo.tsx';
 import { ComponentCard } from './components/ComponentCard/ComponentCard.tsx';
 import { ComponentsSection } from './components/ComponentsSection/ComponentsSection.tsx';
@@ -73,6 +80,7 @@ import { ComponentsSectionHeader } from './components/ComponentsSectionHeader/Co
 import { ListContent } from './components/ListContent/ListContent.tsx';
 import { LogoHeader } from './components/LogoHeader/LogoHeader.tsx';
 import { MainText } from './components/MainText/MainText.tsx';
+
 import './About.stories.scss';
 
 const InputWithState = withInputState(Input);
@@ -89,16 +97,29 @@ const AboutComponent = () => (
 
         <h2 className="main-header">Installation and usage</h2>
         <MainText>Install using NPM</MainText>
-        <CodeBlock>npm install @jezvejs/react</CodeBlock>
+        <CodeBlock><CodeBlockTerminalCommand>{'npm'}</CodeBlockTerminalCommand>{' install @jezvejs/react'}</CodeBlock>
         <MainText>Import required component</MainText>
-        <CodeBlock>{'import { Button } from \'@jezvejs/react\';'}</CodeBlock>
-        <MainText>Use it in your application.</MainText>
-        <CodeBlock>{
-            `<div>
-    <Button icon={PlusIcon} type="link" url="#">Click me</Button>
-</div>`
-        }</CodeBlock>
-
+        <CodeBlock>
+            <CodeBlockJSCodeword>{'import'}</CodeBlockJSCodeword>
+            {' '}
+            <CodeBlockJSParentesis>{'{'}</CodeBlockJSParentesis>
+            {' '}
+            <CodeBlockJSVariable>{'Button'}</CodeBlockJSVariable>
+            {' '}
+            <CodeBlockJSParentesis>{'}'}</CodeBlockJSParentesis>
+            {' '}
+            <CodeBlockJSCodeword>{'from'}</CodeBlockJSCodeword>
+            {' '}
+            <CodeBlockJSString>{'\'@jezvejs/react\';'}</CodeBlockJSString>
+        </CodeBlock>
+        <MainText>Use it in your application:</MainText>
+        <CodeBlock>
+            <CodeBlockJSXTag>{'div'}</CodeBlockJSXTag>{`
+        `}<CodeBlockJSXComponent name="Button" props={[{ name: 'icon', value: '{PlusIcon}' }, { name: 'type', value: 'link' }]}>{'Click me'}</CodeBlockJSXComponent>
+            {`
+`}
+            <CodeBlockJSXTag>{'/div'}</CodeBlockJSXTag>
+        </CodeBlock>
         <h2 className="main-header">Components</h2>
         <ComponentsSection>
             <ComponentsSectionHeader>Common</ComponentsSectionHeader>

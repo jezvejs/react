@@ -52,9 +52,44 @@ main {
 
 .code-block {
   padding: 1rem;
-  background-color: #f6f8fa;
+  color: #ABB2BF;
+  background-color: #323232;
   border-radius: 0.4rem;
   overflow-x: auto;
+}
+
+/* Terminal */
+.code-block__terminal-command {
+  color: #F5F02C;
+}
+
+/* JS and JSX */
+.code-block__js-reserved-keywords {
+  color: #C66CAC;
+}
+
+.code-block__js-parentesis {
+  color: #F5F02C;
+}
+
+.code-block__js-variable {
+  color: #E06C75;
+}
+
+.code-block__js-string {
+  color: #98C379;
+}
+
+.code-block__jsx-tag {
+  color: #E06C75;
+}
+
+.code-block__jsx-component {
+  color: #F5F02C;
+}
+
+.code-block__jsx-component-property {
+  color: #D19A66;
 }
 
 /* Primary button */
