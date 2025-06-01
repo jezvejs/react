@@ -1,3 +1,8 @@
+:root {
+  /* Logo */
+  --logo-size: 64px;
+}
+
 .logo-header {
   display: flex;
   flex-flow: column nowrap;
@@ -17,6 +22,11 @@
   background-color: #fff515;
 }
 
+.logo-icon {
+  width: var(--logo-size);
+  height: var(--logo-size);
+}
+
 .logo-description {
   display: flex;
   flex-flow: column nowrap;
@@ -24,7 +34,7 @@
 }
 
 .logo-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 200;
   padding: 0;
 
@@ -46,11 +56,11 @@
 
 @media (min-width: 576px) {
   :root {
-    --logo-size: 128px;
+    --logo-size: 100px;
   }
 
   .logo-title {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 
   .logo-subtitle {
@@ -59,5 +69,15 @@
 
   .description {
     font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  :root {
+    --logo-size: 128px;
+  }
+
+  .logo-title {
+    font-size: 3rem;
   }
 }
