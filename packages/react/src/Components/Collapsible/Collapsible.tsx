@@ -9,6 +9,8 @@ import { CollapsibleProps, CollapsibleState } from './types.ts';
 
 import './Collapsible.scss';
 
+export * from './types.ts';
+
 export const defaultProps: CollapsibleState = {
     expanded: false,
     animated: false,
