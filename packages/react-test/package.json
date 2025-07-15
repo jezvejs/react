@@ -27,6 +27,6 @@
     },
     "dependencies": {
         "@jezvejs/types": "^1.1.0",
-        "@playwright/test": "^1.52.0"
+        "@playwright/test": "^1.54.1"
     }
 }
