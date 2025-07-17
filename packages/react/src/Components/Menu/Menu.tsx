@@ -85,12 +85,17 @@ export const Menu = forwardRef<MenuRef, MenuProps>((p, ref) => {
         },
     }), [initialState]);
 
-    const parentStore = useStore();
+    const parentStore = useStore<MultiMenuState>();
 
     useEffect(() => {
         const menuId = initialState.id;
         const { useParentContext } = initialState;
         if (!parentStore || !useParentContext || !menuId) {
+            return;
+        }
+
+        const parentState = parentStore.getState();
+        if (parentState.menu?.[menuId]) {
             return;
         }
 
