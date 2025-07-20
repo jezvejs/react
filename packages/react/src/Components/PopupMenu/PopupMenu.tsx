@@ -14,6 +14,7 @@ import {
     MenuHelpers,
 } from '../Menu/Menu.tsx';
 
+import { getInitialState } from './helpers.ts';
 import { PopupMenuContainer } from './PopupMenuContainer.tsx';
 import { PopupMenuProps } from './types.ts';
 
@@ -74,12 +75,9 @@ export const PopupMenu = forwardRef<PopupMenuRef, PopupMenuProps>((p, ref) => {
             : slice.reducer;
     }, [props.reducers]);
 
-    const initialState = useMemo(() => ({
-        ...props,
-        open: false,
-        listenScroll: false,
-        ignoreTouch: false,
-    }), [p]);
+    const initialState = useMemo(() => (
+        getInitialState(props, defProps)
+    ), [props]);
 
     const storeInitial = useMemo(() => ({
         menu: {
