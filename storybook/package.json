@@ -24,7 +24,7 @@
     "dependencies": {
         "@jezvejs/datetime": "^1.2.2",
         "@jezvejs/dom": "^1.2.2",
-        "@jezvejs/react": "^1.15.1",
+        "@jezvejs/react": "^1.15.2",
         "@jezvejs/types": "^1.1.0",
         "@vitejs/plugin-react": "^4.7.0",
         "classnames": "^2.5.1",
