@@ -72,7 +72,10 @@ export const DropDownContainer = forwardRef<
         setState,
     } = store;
 
-    const menuStore = useMenuStore(props as MenuProps);
+    const menuId = `dropDownMenu_${props.id}`;
+    const menuStore = useMenuStore({
+        id: menuId,
+    } as MenuProps);
 
     const copyMenuState = () => {
         const excludedProps = ['menu'];
@@ -85,14 +88,15 @@ export const DropDownContainer = forwardRef<
         menuStore.setState((prev) => ({
             ...prev,
             ...upd,
+            focusItemOnHover: true,
             items: [...(upd.items ?? [])],
-        }));
+        }), menuId);
     };
 
     const dispatch = useCallback((action: StoreAction) => {
         store.dispatch(action);
         copyMenuState();
-    }, [store.dispatch]);
+    }, [store.dispatch, menuStore]);
 
     const onResize = useCallback(updateListPosition, []);
     const resizeHandler = useDebounce(onResize, RESIZE_DEBOUNCE_TIMEOUT) as DebounceRunFunction;
@@ -615,8 +619,8 @@ export const DropDownContainer = forwardRef<
             }
 
             focusContainer();
-        } else if (props.enableFilter) {
-            if (st.filtered) {
+        } else {
+            if (props.enableFilter && st.filtered) {
                 const visibleItems = getVisibleItems(st);
                 if (
                     props.clearFilterOnMultiSelect
@@ -626,7 +630,12 @@ export const DropDownContainer = forwardRef<
                 }
             }
 
-            setTimeout(() => focusInputIfNeeded());
+            activateItem(item.id);
+            setActive(item.id);
+
+            if (props.enableFilter) {
+                setTimeout(() => focusInputIfNeeded());
+            }
         }
     };
 

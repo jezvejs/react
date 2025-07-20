@@ -13,6 +13,7 @@ export default {
     stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
 
     addons: [
+        getAbsolutePath('@storybook/addon-docs'),
         getAbsolutePath('@storybook/addon-links'),
     ],
 
