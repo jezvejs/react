@@ -99,6 +99,8 @@ export interface MenuItemProps {
     icon?: ComponentType;
     items?: MenuItemProps[];
 
+    onClick?: (id: string | null, e: React.MouseEvent | React.KeyboardEvent<Element>) => void;
+
     components?: MenuCommonComponents;
 }
 

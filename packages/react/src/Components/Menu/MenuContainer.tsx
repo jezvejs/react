@@ -386,7 +386,13 @@ export const MenuContainer = forwardRef<MenuRef, MenuProps>((props, ref) => {
             toggleItem(itemId);
         }
 
-        finishClick(() => props.onItemClick?.(clickedItem, e));
+        finishClick(() => {
+            props.onItemClick?.(clickedItem, e);
+
+            if (typeof clickedItem.onClick === 'function') {
+                clickedItem.onClick(clickedItem.id, e);
+            }
+        });
     }, []);
 
     const setInputDevice = (inputDevice: string | null) => {
