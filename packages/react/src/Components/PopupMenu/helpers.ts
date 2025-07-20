@@ -1,6 +1,6 @@
 import { MenuHelpers } from '../Menu/MenuContainer.tsx';
 import { MenuProps, MenuState } from '../Menu/types.ts';
-import { PopupMenuParentItemProps } from './types.ts';
+import { PopupMenuParentItemProps, PopupMenuProps, PopupMenuState } from './types.ts';
 
 /**
  * Reducer function. Closes or opens menu by specified id
@@ -63,3 +63,29 @@ export function closeItemMenu<T extends MenuProps = MenuState>(
 ): T {
     return setItemMenuOpen(state, itemId, false);
 }
+
+/**
+ * Returns initial state object for specified props
+ *
+ * @param {PopupMenuProps} props
+ * @param {PopupMenuProps} defProps
+ * @returns {PopupMenuState}
+ */
+export const getInitialState = (
+    props: Partial<PopupMenuProps>,
+    defProps: PopupMenuProps,
+): PopupMenuState => {
+    const res: PopupMenuState = {
+        ...(defProps ?? {}),
+        ...MenuHelpers.getInitialState(props, defProps),
+        open: false,
+        listenScroll: false,
+        ignoreTouch: false,
+        components: {
+            ...(defProps?.components ?? {}),
+            ...props.components,
+        },
+    };
+
+    return res;
+};

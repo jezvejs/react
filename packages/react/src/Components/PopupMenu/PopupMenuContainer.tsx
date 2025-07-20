@@ -240,8 +240,13 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
         props?.handleHideOnSelect?.();
     };
 
-    const onItemClick = useCallback((item: MenuItemProps) => {
+    const onItemClick = useCallback((
+        item: MenuItemProps,
+        e: React.MouseEvent | React.KeyboardEvent<Element>,
+    ) => {
         const itemId = item?.id;
+
+        props.onItemClick?.(item, e);
 
         handleHideOnSelect(item);
 
@@ -279,6 +284,8 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
 
     const containerProps = useMemo(() => ({
         useParentContext: true,
+
+        onItemClick,
 
         getItemComponent: (item: MenuItemProps) => {
             if (item.type === 'parent') {
@@ -343,7 +350,6 @@ export const PopupMenuContainer = forwardRef<PopupMenuRef, PopupMenuProps>((p, r
             {...state}
             {...containerProps}
             className="popup-menu-list"
-            onItemClick={onItemClick}
             ref={elementRef}
         />
     ), [state, containerProps]);
