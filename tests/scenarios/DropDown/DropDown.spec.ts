@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import { DropDownPage } from '../pages/DropDown/DropDownPage.ts';
-import { Fixtures } from '../utils/types.ts';
+import { DropDownPage } from '../../pages/DropDown/DropDownPage.ts';
+import { Fixtures } from '../../utils/types.ts';
 
 const loadStoryById = async ({ page }: Fixtures, storyId: string) => (
     page.goto(`iframe.html?args=&globals=&id=menu-dropdown--${storyId}&viewMode=story`)

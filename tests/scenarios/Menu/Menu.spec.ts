@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import { MenuPage } from '../pages/Menu/MenuPage.ts';
-import { Fixtures } from '../utils/types.ts';
+import { MenuPage } from '../../pages/Menu/MenuPage.ts';
+import { Fixtures } from '../../utils/types.ts';
 
 const loadStoryById = async ({ page }: Fixtures, storyId: string) => (
     page.goto(`iframe.html?args=&globals=&id=menu-menu--${storyId}&viewMode=story`)
