@@ -1,103 +1,91 @@
-import { test } from '@playwright/test';
+import { test as baseTest } from '@playwright/test';
 import { MenuPage } from '../../pages/Menu/MenuPage.ts';
-import { Fixtures } from '../../utils/types.ts';
 
-const loadStoryById = async ({ page }: Fixtures, storyId: string) => (
-    page.goto(`iframe.html?args=&globals=&id=menu-menu--${storyId}&viewMode=story`)
-);
+export interface MenuPageFixture {
+    menuPage: MenuPage;
+}
 
-const loadDefault = async ({ page }: Fixtures) => loadStoryById({ page }, 'default');
-const loadCheckboxSide = async ({ page }: Fixtures) => loadStoryById({ page }, 'checkbox-side');
-const loadGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'groups');
-const loadCheckboxGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'checkbox-groups');
-const loadCollapsibleGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'collapsible-groups');
+const test = baseTest.extend<MenuPageFixture>({
+    menuPage: async ({ page }, use) => {
+        const menuPage = new MenuPage(page);
+        await use(menuPage);
+    },
+});
 
 test.describe('Menu', () => {
-    test('Click by checkbox item', async ({ page }) => {
-        await loadDefault({ page });
+    test('Click by checkbox item', async ({ menuPage }) => {
+        await menuPage.loadDefault();
+        await menuPage.waitForLoad('defaultMenu');
 
-        let view = new MenuPage(page, 'defaultMenu');
-        await view.waitForLoad('defaultMenu');
+        await menuPage.clickDefaultMenuItem('checkboxItem');
+        await menuPage.clickDefaultMenuItem('checkboxItem');
 
-        await view.clickDefaultMenuItem('checkboxItem');
-        await view.clickDefaultMenuItem('checkboxItem');
+        await menuPage.loadCheckboxSide();
+        await menuPage.waitForLoad('checkboxSideMenu');
 
-        await loadCheckboxSide({ page });
-
-        view = new MenuPage(page, 'checkboxSideMenu');
-        await view.waitForLoad('checkboxSideMenu');
-
-        await view.clickCheckboxSideMenuItem('checkboxItem');
-        await view.clickCheckboxSideMenuItem('leftSideCheckboxItem');
-        await view.clickCheckboxSideMenuItem('checkboxItem');
+        await menuPage.clickCheckboxSideMenuItem('checkboxItem');
+        await menuPage.clickCheckboxSideMenuItem('leftSideCheckboxItem');
+        await menuPage.clickCheckboxSideMenuItem('checkboxItem');
     });
 
-    test('Keyboard navigation', async ({ page }) => {
-        await loadDefault({ page });
+    test('Keyboard navigation', async ({ menuPage }) => {
+        await menuPage.loadDefault();
+        await menuPage.waitForLoad('defaultMenu');
 
-        let view = new MenuPage(page, 'defaultMenu');
-        await view.waitForLoad('defaultMenu');
+        await menuPage.focusMenu('defaultMenu');
+        await menuPage.pressKey('defaultMenu', 'ArrowDown');
+        await menuPage.pressKey('defaultMenu', 'ArrowUp');
+        await menuPage.pressKey('defaultMenu', 'ArrowDown');
+        await menuPage.pressKey('defaultMenu', 'ArrowDown');
+        await menuPage.pressKey('defaultMenu', 'ArrowDown');
+        await menuPage.pressKey('defaultMenu', 'ArrowDown');
+        await menuPage.pressKey('defaultMenu', 'Tab');
 
-        await view.focusMenu('defaultMenu');
-        await view.pressKey('defaultMenu', 'ArrowDown');
-        await view.pressKey('defaultMenu', 'ArrowUp');
-        await view.pressKey('defaultMenu', 'ArrowDown');
-        await view.pressKey('defaultMenu', 'ArrowDown');
-        await view.pressKey('defaultMenu', 'ArrowDown');
-        await view.pressKey('defaultMenu', 'ArrowDown');
-        await view.pressKey('defaultMenu', 'Tab');
+        await menuPage.loadGroups();
+        await menuPage.waitForLoad('groupsMenu');
 
-        await loadGroups({ page });
-
-        view = new MenuPage(page, 'groupsMenu');
-        await view.waitForLoad('groupsMenu');
-
-        await view.focusMenu('groupsMenu');
-        await view.pressKey('groupsMenu', 'ArrowDown');
-        await view.focusMenu('groupsMenu');
-        await view.pressKey('groupsMenu', 'ArrowDown');
-        await view.pressKey('groupsMenu', 'ArrowDown');
-        await view.pressKey('groupsMenu', 'ArrowUp');
-        await view.pressKey('groupsMenu', 'Tab');
+        await menuPage.focusMenu('groupsMenu');
+        await menuPage.pressKey('groupsMenu', 'ArrowDown');
+        await menuPage.focusMenu('groupsMenu');
+        await menuPage.pressKey('groupsMenu', 'ArrowDown');
+        await menuPage.pressKey('groupsMenu', 'ArrowDown');
+        await menuPage.pressKey('groupsMenu', 'ArrowUp');
+        await menuPage.pressKey('groupsMenu', 'Tab');
     });
 
-    test('Checkbox group menu', async ({ page }) => {
-        await loadCheckboxGroups({ page });
+    test('Checkbox group menu', async ({ menuPage }) => {
+        await menuPage.loadCheckboxGroups();
+        await menuPage.waitForLoad('checkboxGroupMenu');
 
-        const view = new MenuPage(page, 'checkboxGroupMenu');
-        await view.waitForLoad('checkboxGroupMenu');
+        await menuPage.clickCheckboxGroupMenuItem('noGroupItem1');
+        await menuPage.clickCheckboxGroupMenuItem('noGroupItem1');
 
-        await view.clickCheckboxGroupMenuItem('noGroupItem1');
-        await view.clickCheckboxGroupMenuItem('noGroupItem1');
-
-        await view.clickCheckboxGroupMenuItem('group1');
-        await view.clickCheckboxGroupMenuItem('group1');
-        await view.clickCheckboxGroupMenuItem('groupItem13');
+        await menuPage.clickCheckboxGroupMenuItem('group1');
+        await menuPage.clickCheckboxGroupMenuItem('group1');
+        await menuPage.clickCheckboxGroupMenuItem('groupItem13');
     });
 
-    test('Collapsible group menu', async ({ page }) => {
-        await loadCollapsibleGroups({ page });
-
-        const view = new MenuPage(page, 'collapsibleGroupMenu');
-        await view.waitForLoad('collapsibleGroupMenu');
+    test('Collapsible group menu', async ({ menuPage }) => {
+        await menuPage.loadCollapsibleGroups();
+        await menuPage.waitForLoad('collapsibleGroupMenu');
 
         // Navigate over collapsed group
-        await view.focusMenu('collapsibleGroupMenu');
-        await view.pressKey('collapsibleGroupMenu', 'ArrowDown');
-        await view.pressKey('collapsibleGroupMenu', 'ArrowDown');
-        await view.pressKey('collapsibleGroupMenu', 'ArrowDown');
+        await menuPage.focusMenu('collapsibleGroupMenu');
+        await menuPage.pressKey('collapsibleGroupMenu', 'ArrowDown');
+        await menuPage.pressKey('collapsibleGroupMenu', 'ArrowDown');
+        await menuPage.pressKey('collapsibleGroupMenu', 'ArrowDown');
 
-        await view.clickCollapsibleGroupMenuItem('noGroupItem1');
+        await menuPage.clickCollapsibleGroupMenuItem('noGroupItem1');
 
-        await view.clickCollapsibleGroupMenuItem('group1');
-        await view.clickCollapsibleGroupMenuItem('groupItem13');
+        await menuPage.clickCollapsibleGroupMenuItem('group1');
+        await menuPage.clickCollapsibleGroupMenuItem('groupItem13');
 
         // Navigate through expanded group
-        await view.focusMenu('collapsibleGroupMenu');
-        await view.pressKey('collapsibleGroupMenu', 'ArrowDown');
-        await view.pressKey('collapsibleGroupMenu', 'ArrowDown');
-        await view.pressKey('collapsibleGroupMenu', 'ArrowDown');
+        await menuPage.focusMenu('collapsibleGroupMenu');
+        await menuPage.pressKey('collapsibleGroupMenu', 'ArrowDown');
+        await menuPage.pressKey('collapsibleGroupMenu', 'ArrowDown');
+        await menuPage.pressKey('collapsibleGroupMenu', 'ArrowDown');
 
-        await view.clickCollapsibleGroupMenuItem('group1');
+        await menuPage.clickCollapsibleGroupMenuItem('group1');
     });
 });

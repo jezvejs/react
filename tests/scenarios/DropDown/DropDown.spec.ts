@@ -1,196 +1,156 @@
-import { test } from '@playwright/test';
+import { test as baseTest } from '@playwright/test';
 import { DropDownPage } from '../../pages/DropDown/DropDownPage.ts';
-import { Fixtures } from '../../utils/types.ts';
 
-const loadStoryById = async ({ page }: Fixtures, storyId: string) => (
-    page.goto(`iframe.html?args=&globals=&id=menu-dropdown--${storyId}&viewMode=story`)
-);
+export interface DropDownPageFixture {
+    dropDownPage: DropDownPage;
+}
 
-const loadInline = async ({ page }: Fixtures) => loadStoryById({ page }, 'inline');
-const loadFullWidth = async ({ page }: Fixtures) => loadStoryById({ page }, 'full-width');
-const loadFixedMenu = async ({ page }: Fixtures) => loadStoryById({ page }, 'fixed-menu');
-const loadGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'groups');
-const loadAttachedToBlock = async ({ page }: Fixtures) => loadStoryById({ page }, 'attach-to-block');
-const loadAttachedToInline = async ({ page }: Fixtures) => loadStoryById({ page }, 'attach-to-inline');
-const loadMultiSelect = async ({ page }: Fixtures) => loadStoryById({ page }, 'multiple-select');
-const loadFilterSingleSelect = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-single');
-const loadFilterMultiSelect = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-multiple');
-const loadFilterAttachedToBlock = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-attach-to-block');
-const loadFilterMultiAttachedToBlock = async ({ page }: Fixtures) => (
-    loadStoryById({ page }, 'filter-multi-attach-to-block')
-);
-const loadFilterGroups = async ({ page }: Fixtures) => loadStoryById({ page }, 'filter-groups');
-const loadFilterGroupsMultiSelect = async ({ page }: Fixtures) => (
-    loadStoryById({ page }, 'filter-groups-multiple')
-);
+const test = baseTest.extend<DropDownPageFixture>({
+    dropDownPage: async ({ page }, use) => {
+        const dropDownPage = new DropDownPage(page);
+        await use(dropDownPage);
+    },
+});
 
 test.describe('DropDown', () => {
-    test('Toggle menu by click on toggle button', async ({ page }) => {
-        await loadInline({ page });
+    test('Toggle menu by click on toggle button', async ({ dropDownPage }) => {
+        await dropDownPage.loadInline();
+        await dropDownPage.waitForLoad('inlineDropDown');
 
-        const view = new DropDownPage(page, 'inlineDropDown');
-        await view.waitForLoad('inlineDropDown');
-
-        await view.clickByToggleButton('inlineDropDown');
-        await view.clickByToggleButton('inlineDropDown');
+        await dropDownPage.clickByToggleButton('inlineDropDown');
+        await dropDownPage.clickByToggleButton('inlineDropDown');
     });
 
-    test('Toggle menu by click on container', async ({ page }) => {
-        await loadFullWidth({ page });
+    test('Toggle menu by click on container', async ({ dropDownPage }) => {
+        await dropDownPage.loadFullWidth();
+        await dropDownPage.waitForLoad('fullWidthDropDown');
 
-        const view = new DropDownPage(page, 'fullWidthDropDown');
-        await view.waitForLoad('fullWidthDropDown');
-
-        await view.clickByToggleButton('fullWidthDropDown');
-        await view.clickByToggleButton('fullWidthDropDown');
+        await dropDownPage.clickByToggleButton('fullWidthDropDown');
+        await dropDownPage.clickByToggleButton('fullWidthDropDown');
     });
 
-    test('Toggle attached to block element', async ({ page }) => {
-        await loadAttachedToBlock({ page });
+    test('Toggle attached to block element', async ({ dropDownPage }) => {
+        await dropDownPage.loadAttachedToBlock();
+        await dropDownPage.waitForLoad('attachedToBlockDropDown');
 
-        const view = new DropDownPage(page, 'attachedToBlockDropDown');
-        await view.waitForLoad('attachedToBlockDropDown');
-
-        await view.clickByContainer('attachedToBlockDropDown');
-        await view.clickByContainer('attachedToBlockDropDown');
-        await view.clickByContainer('attachedToBlockDropDown');
+        await dropDownPage.clickByContainer('attachedToBlockDropDown');
+        await dropDownPage.clickByContainer('attachedToBlockDropDown');
+        await dropDownPage.clickByContainer('attachedToBlockDropDown');
     });
 
-    test('Toggle attached to inline element', async ({ page }) => {
-        await loadAttachedToInline({ page });
+    test('Toggle attached to inline element', async ({ dropDownPage }) => {
+        await dropDownPage.loadAttachedToInline();
+        await dropDownPage.waitForLoad('attachedToInlineDropDown');
 
-        const view = new DropDownPage(page, 'attachedToInlineDropDown');
-        await view.waitForLoad('attachedToInlineDropDown');
-
-        await view.clickByContainer('attachedToInlineDropDown');
-        await view.clickByContainer('attachedToInlineDropDown');
-        await view.clickByContainer('attachedToInlineDropDown');
+        await dropDownPage.clickByContainer('attachedToInlineDropDown');
+        await dropDownPage.clickByContainer('attachedToInlineDropDown');
+        await dropDownPage.clickByContainer('attachedToInlineDropDown');
     });
 
-    test('Select item by click', async ({ page }) => {
-        await loadInline({ page });
+    test('Select item by click', async ({ dropDownPage }) => {
+        await dropDownPage.loadInline();
+        await dropDownPage.waitForLoad('inlineDropDown');
 
-        const view = new DropDownPage(page, 'inlineDropDown');
-        await view.waitForLoad('inlineDropDown');
+        await dropDownPage.clickByToggleButton('inlineDropDown');
+        await dropDownPage.clickItemById('inlineDropDown', '4');
 
-        await view.clickByToggleButton('inlineDropDown');
-        await view.clickItemById('inlineDropDown', '4');
-
-        await view.clickByToggleButton('inlineDropDown');
-        await view.clickItemById('inlineDropDown', '6');
+        await dropDownPage.clickByToggleButton('inlineDropDown');
+        await dropDownPage.clickItemById('inlineDropDown', '6');
     });
 
-    test('Fixed menu popup', async ({ page }) => {
-        await loadFixedMenu({ page });
+    test('Fixed menu popup', async ({ dropDownPage }) => {
+        await dropDownPage.loadFixedMenu();
+        await dropDownPage.waitForLoad('fixedMenuDropDown');
 
-        const view = new DropDownPage(page, 'fixedMenuDropDown');
-        await view.waitForLoad('fixedMenuDropDown');
+        await dropDownPage.clickByToggleButton('fixedMenuDropDown');
+        await dropDownPage.clickItemById('fixedMenuDropDown', '2');
 
-        await view.clickByToggleButton('fixedMenuDropDown');
-        await view.clickItemById('fixedMenuDropDown', '2');
-
-        await view.clickByToggleButton('fixedMenuDropDown');
-        await view.clickItemById('fixedMenuDropDown', '3');
+        await dropDownPage.clickByToggleButton('fixedMenuDropDown');
+        await dropDownPage.clickItemById('fixedMenuDropDown', '3');
     });
 
-    test('Groups', async ({ page }) => {
-        await loadGroups({ page });
+    test('Groups', async ({ dropDownPage }) => {
+        await dropDownPage.loadGroups();
+        await dropDownPage.waitForLoad('groupsDropDown');
 
-        const view = new DropDownPage(page, 'groupsDropDown');
-        await view.waitForLoad('groupsDropDown');
+        await dropDownPage.clickByToggleButton('groupsDropDown');
+        await dropDownPage.clickItemById('groupsDropDown', 'groupItem12');
 
-        await view.clickByToggleButton('groupsDropDown');
-        await view.clickItemById('groupsDropDown', 'groupItem12');
-
-        await view.clickByToggleButton('groupsDropDown');
-        await view.clickItemById('groupsDropDown', 'groupItem26');
+        await dropDownPage.clickByToggleButton('groupsDropDown');
+        await dropDownPage.clickItemById('groupsDropDown', 'groupItem26');
     });
 
-    test('Multiple select', async ({ page }) => {
-        await loadMultiSelect({ page });
+    test('Multiple select', async ({ dropDownPage }) => {
+        await dropDownPage.loadMultiSelect();
+        await dropDownPage.waitForLoad('multipleSelectDropDown');
 
-        const view = new DropDownPage(page, 'multipleSelectDropDown');
-        await view.waitForLoad('multipleSelectDropDown');
-
-        await view.clickByToggleButton('multipleSelectDropDown');
-        await view.clickItemById('multipleSelectDropDown', '1');
-        await view.clickItemById('multipleSelectDropDown', '2');
-        await view.clickItemById('multipleSelectDropDown', '4');
-        await view.clickItemById('multipleSelectDropDown', '2');
-        await view.clickByToggleButton('multipleSelectDropDown');
+        await dropDownPage.clickByToggleButton('multipleSelectDropDown');
+        await dropDownPage.clickItemById('multipleSelectDropDown', '1');
+        await dropDownPage.clickItemById('multipleSelectDropDown', '2');
+        await dropDownPage.clickItemById('multipleSelectDropDown', '4');
+        await dropDownPage.clickItemById('multipleSelectDropDown', '2');
+        await dropDownPage.clickByToggleButton('multipleSelectDropDown');
     });
 
-    test('Filter items', async ({ page }) => {
-        await loadFilterSingleSelect({ page });
+    test('Filter items', async ({ dropDownPage }) => {
+        await dropDownPage.loadFilterSingleSelect();
+        await dropDownPage.waitForLoad('filterDropDown');
 
-        const view = new DropDownPage(page, 'filterDropDown');
-        await view.waitForLoad('filterDropDown');
-
-        await view.toggleEnable('filterDropDown');
-        await view.clickByToggleButton('filterDropDown');
-        await view.filter('filterDropDown', '1');
-        await view.filter('filterDropDown', '10');
-        await view.filter('filterDropDown', '100');
+        await dropDownPage.toggleEnable('filterDropDown');
+        await dropDownPage.clickByToggleButton('filterDropDown');
+        await dropDownPage.filter('filterDropDown', '1');
+        await dropDownPage.filter('filterDropDown', '10');
+        await dropDownPage.filter('filterDropDown', '100');
     });
 
-    test('Filter multiple items', async ({ page }) => {
-        await loadFilterMultiSelect({ page });
+    test('Filter multiple items', async ({ dropDownPage }) => {
+        await dropDownPage.loadFilterMultiSelect();
+        await dropDownPage.waitForLoad('filterMultiDropDown');
 
-        const view = new DropDownPage(page, 'filterMultiDropDown');
-        await view.waitForLoad('filterMultiDropDown');
-
-        await view.toggleEnable('filterMultiDropDown');
-        await view.clickByToggleButton('filterMultiDropDown');
-        await view.filter('filterMultiDropDown', '1');
-        await view.filter('filterMultiDropDown', '10');
-        await view.filter('filterMultiDropDown', '100');
+        await dropDownPage.toggleEnable('filterMultiDropDown');
+        await dropDownPage.clickByToggleButton('filterMultiDropDown');
+        await dropDownPage.filter('filterMultiDropDown', '1');
+        await dropDownPage.filter('filterMultiDropDown', '10');
+        await dropDownPage.filter('filterMultiDropDown', '100');
     });
 
-    test('Attached component with filter', async ({ page }) => {
-        await loadFilterAttachedToBlock({ page });
+    test('Attached component with filter', async ({ dropDownPage }) => {
+        await dropDownPage.loadFilterAttachedToBlock();
+        await dropDownPage.waitForLoad('attachedFilterDropDown');
 
-        const view = new DropDownPage(page, 'attachedFilterDropDown');
-        await view.waitForLoad('attachedFilterDropDown');
-
-        await view.clickByContainer('attachedFilterDropDown');
-        await view.filter('attachedFilterDropDown', '5');
-        await view.filter('attachedFilterDropDown', '55');
-        await view.filter('attachedFilterDropDown', '555');
+        await dropDownPage.clickByContainer('attachedFilterDropDown');
+        await dropDownPage.filter('attachedFilterDropDown', '5');
+        await dropDownPage.filter('attachedFilterDropDown', '55');
+        await dropDownPage.filter('attachedFilterDropDown', '555');
     });
 
-    test('Attached component with multi select filter', async ({ page }) => {
-        await loadFilterMultiAttachedToBlock({ page });
+    test('Attached component with multi select filter', async ({ dropDownPage }) => {
+        await dropDownPage.loadFilterMultiAttachedToBlock();
+        await dropDownPage.waitForLoad('attachedFilterMultipleDropDown');
 
-        const view = new DropDownPage(page, 'attachedFilterMultipleDropDown');
-        await view.waitForLoad('attachedFilterMultipleDropDown');
-
-        await view.clickByContainer('attachedFilterMultipleDropDown');
-        await view.filter('attachedFilterMultipleDropDown', '1');
-        await view.filter('attachedFilterMultipleDropDown', '10');
-        await view.filter('attachedFilterMultipleDropDown', '55');
+        await dropDownPage.clickByContainer('attachedFilterMultipleDropDown');
+        await dropDownPage.filter('attachedFilterMultipleDropDown', '1');
+        await dropDownPage.filter('attachedFilterMultipleDropDown', '10');
+        await dropDownPage.filter('attachedFilterMultipleDropDown', '55');
     });
 
-    test('Groups filter', async ({ page }) => {
-        await loadFilterGroups({ page });
+    test('Groups filter', async ({ dropDownPage }) => {
+        await dropDownPage.loadFilterGroups();
+        await dropDownPage.waitForLoad('filterGroupsDropDown');
 
-        const view = new DropDownPage(page, 'filterGroupsDropDown');
-        await view.waitForLoad('filterGroupsDropDown');
-
-        await view.clickByToggleButton('filterGroupsDropDown');
-        await view.filter('filterGroupsDropDown', '1');
-        await view.filter('filterGroupsDropDown', '10');
-        await view.filter('filterGroupsDropDown', '100');
+        await dropDownPage.clickByToggleButton('filterGroupsDropDown');
+        await dropDownPage.filter('filterGroupsDropDown', '1');
+        await dropDownPage.filter('filterGroupsDropDown', '10');
+        await dropDownPage.filter('filterGroupsDropDown', '100');
     });
 
-    test('Groups with multi select filter', async ({ page }) => {
-        await loadFilterGroupsMultiSelect({ page });
+    test('Groups with multi select filter', async ({ dropDownPage }) => {
+        await dropDownPage.loadFilterGroupsMultiSelect();
+        await dropDownPage.waitForLoad('filterGroupsMultiDropDown');
 
-        const view = new DropDownPage(page, 'filterGroupsMultiDropDown');
-        await view.waitForLoad('filterGroupsMultiDropDown');
-
-        await view.clickByToggleButton('filterGroupsMultiDropDown');
-        await view.filter('filterGroupsMultiDropDown', '1');
-        await view.filter('filterGroupsMultiDropDown', '10');
-        await view.filter('filterGroupsMultiDropDown', '100');
+        await dropDownPage.clickByToggleButton('filterGroupsMultiDropDown');
+        await dropDownPage.filter('filterGroupsMultiDropDown', '1');
+        await dropDownPage.filter('filterGroupsMultiDropDown', '10');
+        await dropDownPage.filter('filterGroupsMultiDropDown', '100');
     });
 });

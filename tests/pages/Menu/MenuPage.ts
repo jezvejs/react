@@ -8,6 +8,7 @@ import {
     CollapsibleGroupsMenuItemState,
     MenuId,
     MenuPageComponents,
+    MenuPageId,
     MenuPageState,
 } from './types.ts';
 import {
@@ -24,6 +25,8 @@ import { initialComponents } from './defaultProps.ts';
 
 const menuIds = Object.keys(initialComponents) as MenuId[];
 
+const PAGE_ID_PREFIX = 'menu-menu--';
+
 export class MenuPage implements MenuPageComponents {
     readonly page: Page;
 
@@ -39,19 +42,59 @@ export class MenuPage implements MenuPageComponents {
 
     // components: MenuPageComponents;
 
-    singleMenuId: MenuId | null;
+    pageId: MenuPageId | null;
 
     state: MenuPageState = initialState;
 
-    constructor(page: Page, singleMenuId: MenuId | null = null) {
+    constructor(page: Page) {
         this.page = page;
-        this.singleMenuId = singleMenuId;
+        this.pageId = this.getPageId();
 
-        if (singleMenuId && menuIds.includes(singleMenuId)) {
-            this.createMenu(singleMenuId);
-        } else {
+        this.init();
+    }
+
+    init() {
+        const pageId = this.pageId as MenuId;
+
+        if (pageId && menuIds.includes(pageId)) {
+            this.createMenu(pageId);
+        } else if (this.pageId === 'docs') {
             menuIds.forEach((menuId) => this.createMenu(menuId));
         }
+    }
+
+    getPageId() {
+        const url = new URL(this.page.url());
+        const id = url.searchParams.get('id');
+        if (!id?.startsWith(PAGE_ID_PREFIX)) {
+            return null;
+        }
+
+        return id.substring(PAGE_ID_PREFIX.length) as MenuPageId;
+    }
+
+    async loadStoryById(storyId: string) {
+        this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
+    }
+
+    async loadDefault() {
+        this.loadStoryById('default');
+    }
+
+    async loadCheckboxSide() {
+        this.loadStoryById('checkbox-side');
+    }
+
+    async loadGroups() {
+        this.loadStoryById('groups');
+    }
+
+    async loadCheckboxGroups() {
+        this.loadStoryById('checkbox-groups');
+    }
+
+    async loadCollapsibleGroups() {
+        this.loadStoryById('collapsible-groups');
     }
 
     createMenu(menuId: MenuId) {
@@ -63,8 +106,9 @@ export class MenuPage implements MenuPageComponents {
     }
 
     async assertState(state: MenuPageState) {
-        if (this.singleMenuId && menuIds.includes(this.singleMenuId)) {
-            await this.assertMenuState(this.singleMenuId, state);
+        const pageId = this.pageId as MenuId;
+        if (pageId && menuIds.includes(pageId)) {
+            await this.assertMenuState(pageId, state);
         } else {
             await asyncMap(menuIds, (menuId) => this.assertMenuState(menuId, state));
         }
@@ -88,6 +132,9 @@ export class MenuPage implements MenuPageComponents {
         if (menuId && this[menuId]) {
             await this[menuId].rootLocator.waitFor({ state: 'visible' });
         }
+        this.pageId = menuId;
+
+        this.init();
     }
 
     onClickMenuItem(menuId: MenuId, itemId: string) {

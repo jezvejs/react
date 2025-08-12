@@ -9,6 +9,7 @@ export type MenuPageComponents = {
 };
 
 export type MenuId = keyof MenuPageComponents;
+export type MenuPageId = MenuId | 'docs';
 
 export interface CollapsibleGroupsMenuItemState {
     id?: string;
