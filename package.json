@@ -7,10 +7,9 @@
     "module": "index.js",
     "main": "index.js",
     "scripts": {
-        "lint-src": "npx eslint --quiet ./packages/ ./storybook/",
+        "lint-src": "npx eslint --quiet ./packages/ ./scripts/ ./storybook/ ./tests/ ",
         "lint-style": "npx stylelint packages/**/*.scss storybook/**/*.scss",
-        "lint-tests": "npx eslint -c ./eslint.tests.ts --quiet ./tests/ ./packages/react-test/ ./scripts/",
-        "lint": "npm-run-all --parallel lint-src lint-style lint-tests",
+        "lint": "npm-run-all --parallel lint-src lint-style",
         "lint-ts": "npx tsc -b ./packages/react/ ./storybook/ ./tests/ ./packages/react-test/ --noEmit",
         "lint-all": "npm-run-all lint lint-ts",
         "prestart": "npm install",
@@ -43,7 +42,6 @@
         "@eslint/eslintrc": "^3.3.1",
         "@eslint/js": "^9.20.0",
         "@jezvejs/react-test": "^0.2.0",
-        "@jezvejs/release-tools": "^1.0.3",
         "@jezvejs/types": "^1.1.0",
         "@playwright/test": "^1.54.1",
         "@tsconfig/vite-react": "^3.4.0",
@@ -54,7 +52,6 @@
         "@typescript-eslint/parser": "^8.37.0",
         "browserslist": "^4.25.1",
         "commonjs-variables-for-esmodules": "^1.1.0",
-        "dotenv": "^16.6.1",
         "eslint": "^9.31.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-import-resolver-typescript": "^3.10.1",
@@ -73,5 +70,9 @@
         "stylelint-config-prettier-scss": "^1.0.0",
         "stylelint-config-standard-scss": "^13.1.0",
         "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "@jezvejs/release-tools": "^1.0.3",
+        "dotenv": "^17.2.1"
     }
 }

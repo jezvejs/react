@@ -1,4 +1,7 @@
 import { fixupConfigRules } from '@eslint/compat';
+
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import path from 'node:path';
@@ -21,15 +24,43 @@ export default [{
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/typescript',
-    'plugin:react/recommended',
-    'plugin:react/jsx-runtime',
-    'plugin:react-hooks/recommended',
     'plugin:storybook/recommended',
 )), {
     files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
 
+    settings: {
+        'import/parsers': {
+            '@typescript-eslint/parser': ['.ts', '.tsx'],
+        },
+
+        'import/resolver': {
+            typescript: true,
+            node: true,
+        },
+    },
+
+    rules: {
+        indent: ['error', 4],
+        'no-continue': ['warn'],
+        'no-console': ['error'],
+        'class-methods-use-this': ['warn'],
+        'import/no-cycle': ['warn'],
+        'import/prefer-default-export': ['warn'],
+        'import/extensions': ['error', 'ignorePackages'],
+        'no-plusplus': 'off',
+        'no-await-in-loop': 'off',
+        'no-use-before-define': 'off',
+    },
+}, {
+    files: [
+        'packages/react/**/*.{js,jsx,ts,tsx}',
+        'storybook/**/*.{js,jsx,ts,tsx}',
+    ],
+
     plugins: {
+        react,
         'react-refresh': reactRefresh,
+        'react-hooks': reactHooks,
     },
 
     languageOptions: {
@@ -54,33 +85,24 @@ export default [{
         react: {
             version: '18.2',
         },
-
-        'import/parsers': {
-            '@typescript-eslint/parser': ['.ts', '.tsx'],
-        },
-
-        'import/resolver': {
-            typescript: true,
-            node: true,
-        },
     },
 
     rules: {
-        indent: ['error', 4],
-        'no-continue': ['warn'],
-        'no-console': ['error'],
-        'class-methods-use-this': ['warn'],
-        'import/no-cycle': ['warn'],
-        'import/prefer-default-export': ['warn'],
-        'import/extensions': ['error', 'ignorePackages'],
-
         'react-refresh/only-export-components': ['warn', {
             allowConstantExport: true,
         }],
-
-        'no-plusplus': 'off',
-        'no-await-in-loop': 'off',
-        'no-use-before-define': 'off',
         'react/prop-types': 'off',
+    },
+}, {
+    files: [
+        'tests/**/*.{js,jsx,ts,tsx}',
+        'packages/react-test/**/*.{js,jsx,ts,tsx}',
+        'scripts/**/*.{js,jsx,ts,tsx}',
+    ],
+
+    languageOptions: {
+        globals: {
+            ...globals.node,
+        },
     },
 }];
