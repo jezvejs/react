@@ -1,7 +1,7 @@
 import { Menu, MenuItemState, MenuState } from '@jezvejs/react-test';
 import { expect, type Page } from '@playwright/test';
 
-import { asyncMap } from '../../utils/index.ts';
+import { asyncMap } from 'utils/index.ts';
 
 import { initialState } from './initialState.ts';
 import {

@@ -39,30 +39,30 @@ import {
 import '@jezvejs/react/style.scss';
 
 // Icons
-import SmallCloseIcon from '../../common/assets/icons/close-sm.svg';
-import MenuIcon from '../../common/assets/icons/menu.svg';
+import SmallCloseIcon from 'common/assets/icons/close-sm.svg';
+import MenuIcon from 'common/assets/icons/menu.svg';
 
 // Common data
-import { initGroupItems } from '../../common/assets/data/dropDownData.ts';
-import { chartMultiData, chartShortMultiData } from '../../common/assets/data/index.ts';
-import { getDefaultItems } from '../../common/assets/data/menuData.ts';
-import { getNestedMenuItems } from '../../common/assets/data/popupMenuData.ts';
+import { initGroupItems } from 'common/assets/data/dropDownData.ts';
+import { chartMultiData, chartShortMultiData } from 'common/assets/data/index.ts';
+import { getDefaultItems } from 'common/assets/data/menuData.ts';
+import { getNestedMenuItems } from 'common/assets/data/popupMenuData.ts';
 
 // Utils
-import { getSliderItems } from '../../common/utils/getSliderItems.tsx';
-import { getSortableItems } from '../../common/utils/getSortableItems.tsx';
-import { getTabListItems } from '../../common/utils/getTabListItems.tsx';
-import { withInputState } from '../../common/utils/withInputState.tsx';
+import { getSliderItems } from 'common/utils/getSliderItems.tsx';
+import { getSortableItems } from 'common/utils/getSortableItems.tsx';
+import { getTabListItems } from 'common/utils/getTabListItems.tsx';
+import { withInputState } from 'common/utils/withInputState.tsx';
 
 // Common components
-import { DragOriginalDemo } from '../../common/Components/DragnDrop/DragOriginalDemo.tsx';
-import { LaunchPopup } from '../../common/Components/LaunchPopup/LaunchPopup.tsx';
-import { OpenOffcanvas } from '../../common/Components/OpenOffcanvas/OpenOffcanvas.tsx';
-import { PopupMenuDemo } from '../../common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
-import { ProvidedSortable } from '../../common/Components/ProvidedSortable/ProvidedSortable.tsx';
-import { RangeSliderStyled } from '../../common/Components/RangeSliderStyled/RangeSliderStyled.tsx';
-import { SortableListItem } from '../../common/Components/SortableListItem/SortableListItem.tsx';
-import { TabListStyled } from '../../common/Components/TabListStyled/TabListStyled.tsx';
+import { DragOriginalDemo } from 'common/Components/DragnDrop/DragOriginalDemo.tsx';
+import { LaunchPopup } from 'common/Components/LaunchPopup/LaunchPopup.tsx';
+import { OpenOffcanvas } from 'common/Components/OpenOffcanvas/OpenOffcanvas.tsx';
+import { PopupMenuDemo } from 'common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
+import { ProvidedSortable } from 'common/Components/ProvidedSortable/ProvidedSortable.tsx';
+import { RangeSliderStyled } from 'common/Components/RangeSliderStyled/RangeSliderStyled.tsx';
+import { SortableListItem } from 'common/Components/SortableListItem/SortableListItem.tsx';
+import { TabListStyled } from 'common/Components/TabListStyled/TabListStyled.tsx';
 
 // Local components
 import { CodeBlock } from './components/CodeBlock/CodeBlock.tsx';

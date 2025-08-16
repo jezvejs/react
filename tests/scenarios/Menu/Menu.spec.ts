@@ -1,5 +1,5 @@
 import { test as baseTest } from '@playwright/test';
-import { MenuPage } from '../../pages/Menu/MenuPage.ts';
+import { MenuPage } from 'pages/Menu/MenuPage.ts';
 
 export interface MenuPageFixture {
     menuPage: MenuPage;

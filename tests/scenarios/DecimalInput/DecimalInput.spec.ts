@@ -11,8 +11,8 @@ import {
     backspaceSelection,
     deleteSelection,
     cutSelection,
-} from '../../utils/index.ts';
-import { Fixtures } from '../../utils/types.ts';
+} from 'utils/index.ts';
+import { Fixtures } from 'utils/types.ts';
 
 export const navigateToDisabledStory = async ({ page }: Fixtures) => {
     await page.goto('iframe.html?viewMode=story&id=input-decimalinput--disabled');

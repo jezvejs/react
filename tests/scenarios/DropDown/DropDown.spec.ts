@@ -1,5 +1,5 @@
 import { test as baseTest } from '@playwright/test';
-import { DropDownPage } from '../../pages/DropDown/DropDownPage.ts';
+import { DropDownPage } from 'pages/DropDown/DropDownPage.ts';
 
 export interface DropDownPageFixture {
     dropDownPage: DropDownPage;
