@@ -1,0 +1,18 @@
+{
+    "name": "jezvejs-react-tests",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "description": "Automated tests for JezveJS React",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@jezvejs/react-test": "^0.2.0",
+        "@jezvejs/types": "^1.1.0",
+        "@playwright/test": "^1.54.2"
+    }
+}

@@ -4,12 +4,12 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 const customAliasPaths = [
-  'common',
-  'stories',
+    'common',
+    'stories',
 ];
 
 export default defineConfig({
@@ -17,7 +17,7 @@ export default defineConfig({
     resolve: {
         alias: {
             ...Object.fromEntries(customAliasPaths.map((item) => ([
-                item, path.resolve(__dirname, `./src/${item}`),
+                item, path.resolve(dirname, `./${item}`),
             ]))),
         },
     },

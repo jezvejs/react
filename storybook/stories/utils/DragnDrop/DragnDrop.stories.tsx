@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import '@jezvejs/react/style.scss';
 import {
     Button,
     DragZone,
@@ -12,19 +11,20 @@ import {
     px,
     useDragnDrop,
 } from '@jezvejs/react';
-import React, { forwardRef, useCallback } from 'react';
+import '@jezvejs/react/style.scss';
+import { CSSProperties, forwardRef, useCallback } from 'react';
 
-import MenuIcon from '../../../common/assets/icons/menu.svg';
+import MenuIcon from 'common/assets/icons/menu.svg';
 
 // Common components
-import { DragOriginalDemo } from '../../../common/Components/DragnDrop/DragOriginalDemo.tsx';
+import { DefaultDragZone } from 'common/Components/DragnDrop/DefaultDragZone.tsx';
+import { DragOriginalDemo } from 'common/Components/DragnDrop/DragOriginalDemo.tsx';
+import { OriginalDropTarget } from 'common/Components/DragnDrop/OriginalDropTarget.tsx';
 
 // Local components
-import { DefaultDragZone } from '../../../common/Components/DragnDrop/DefaultDragZone.tsx';
 import { DefaultDropTarget } from './components/DefaultDropTarget.tsx';
-import { OriginalDropTarget } from '../../../common/Components/DragnDrop/OriginalDropTarget.tsx';
-import { XAxisDropTarget } from './components/XAxisDropTarget.tsx';
 import { XAxisDragZone } from './components/XAxisDragZone.tsx';
+import { XAxisDropTarget } from './components/XAxisDropTarget.tsx';
 
 import './DragnDrop.stories.scss';
 
@@ -214,7 +214,7 @@ const SimpleDragItem = forwardRef<
         && state.draggingId === handleItem1.id
     );
 
-    const style: React.CSSProperties = {
+    const style: CSSProperties = {
         left: px((isDragging) ? state.left : handleItem1.left),
         top: px((isDragging) ? state.top : handleItem1.top),
     };
@@ -248,7 +248,7 @@ const HandleDragItem = forwardRef<
         && state.draggingId === handleItem2.id
     );
 
-    const style: React.CSSProperties = {
+    const style: CSSProperties = {
         left: px((isDragging) ? state.left : handleItem2.left),
         top: px((isDragging) ? state.top : handleItem2.top),
     };
@@ -283,7 +283,7 @@ const DoubleHandleDragItem = forwardRef<
         && state.draggingId === handleItem3.id
     );
 
-    const style: React.CSSProperties = {
+    const style: CSSProperties = {
         left: px((isDragging) ? state.left : handleItem3.left),
         top: px((isDragging) ? state.top : handleItem3.top),
     };
