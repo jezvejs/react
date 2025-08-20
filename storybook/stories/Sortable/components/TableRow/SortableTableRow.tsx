@@ -2,7 +2,7 @@ import { SortableAvatarColumn } from '@jezvejs/react';
 import { forwardRef } from 'react';
 import classNames from 'classnames';
 
-import { SortableElementProps } from '../../../../common/Components/SortableListItem/SortableListItem.tsx';
+import { SortableElementProps } from 'common/Components/SortableListItem/SortableListItem.tsx';
 
 import { WithSelector } from '../../types.ts';
 

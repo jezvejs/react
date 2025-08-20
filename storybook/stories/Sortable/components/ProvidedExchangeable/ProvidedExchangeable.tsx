@@ -5,7 +5,7 @@ import {
     sortableReducer,
 } from '@jezvejs/react';
 
-import { usePortalElement } from '../../../../common/hooks/usePortalElement.tsx';
+import { usePortalElement } from 'common/hooks/usePortalElement.tsx';
 import { useUniqueDragZoneId } from '../../hooks/useUniqueDragZoneId.ts';
 
 export type ExchangeableProps = Partial<SortableProps> & {

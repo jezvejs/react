@@ -12,16 +12,16 @@ import {
 import '@jezvejs/react/style.scss';
 
 // Icons
-import SmallCloseIcon from '../../../common/assets/icons/close-sm.svg';
-import SearchIcon from '../../../common/assets/icons/search.svg';
+import SmallCloseIcon from 'common/assets/icons/close-sm.svg';
+import SearchIcon from 'common/assets/icons/search.svg';
 
 // Hooks
-import { useInputState } from '../../../common/hooks/useInputState.ts';
-import { withInputState } from '../../../common/utils/withInputState.tsx';
+import { useInputState } from 'common/hooks/useInputState.ts';
+import { withInputState } from 'common/utils/withInputState.tsx';
 
 // Common components
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
 
 import './InputGroup.stories.scss';
 

@@ -1,5 +1,5 @@
 import { DropDown, DropDownProps } from '@jezvejs/react';
-import { usePortalElement } from '../../../../../common/hooks/usePortalElement.tsx';
+import { usePortalElement } from 'common/hooks/usePortalElement.tsx';
 import { BlueBox } from '../BlueBox/BlueBox.tsx';
 
 export interface AttachedToBlockProps extends DropDownProps {

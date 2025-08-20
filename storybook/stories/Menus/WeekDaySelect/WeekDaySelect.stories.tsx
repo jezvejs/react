@@ -4,8 +4,8 @@ import '@jezvejs/react/style.scss';
 import { useState } from 'react';
 import { WeekDaySelect } from '@jezvejs/react';
 
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
-import { LocaleSelect } from '../../../common/Components/LocaleSelect/LocaleSelect.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
+import { LocaleSelect } from 'common/Components/LocaleSelect/LocaleSelect.tsx';
 
 import './WeekDaySelect.stories.scss';
 

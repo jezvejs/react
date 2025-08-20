@@ -1,8 +1,8 @@
 import { MenuGroupHeaderComponent } from '@jezvejs/react';
 import classNames from 'classnames';
 
-import PlusIcon from '../../../../../../common/assets/icons/plus.svg';
-import MinusIcon from '../../../../../../common/assets/icons/minus.svg';
+import PlusIcon from 'common/assets/icons/plus.svg';
+import MinusIcon from 'common/assets/icons/minus.svg';
 
 import { CollapsibleMenuItemProps } from '../types.ts';
 

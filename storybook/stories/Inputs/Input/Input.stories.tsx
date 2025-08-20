@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { Input } from '@jezvejs/react';
 
-import { withInputState } from '../../../common/utils/withInputState.tsx';
+import { withInputState } from 'common/utils/withInputState.tsx';
 
 import './Input.stories.scss';
 

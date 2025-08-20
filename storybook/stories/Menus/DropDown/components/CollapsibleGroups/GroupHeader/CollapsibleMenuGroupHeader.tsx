@@ -1,7 +1,7 @@
 import { DropDownGroupHeaderComponent } from '@jezvejs/react';
 
-import PlusIcon from '../../../../../../common/assets/icons/plus.svg';
-import MinusIcon from '../../../../../../common/assets/icons/minus.svg';
+import PlusIcon from 'common/assets/icons/plus.svg';
+import MinusIcon from 'common/assets/icons/minus.svg';
 
 import './CollapsibleMenuGroupHeader.scss';
 

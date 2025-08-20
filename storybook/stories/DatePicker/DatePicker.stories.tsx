@@ -11,9 +11,9 @@ import {
     Input,
 } from '@jezvejs/react';
 
-import { ActionButton } from '../../common/Components/ActionButton/ActionButton.tsx';
-import { LocaleSelect } from '../../common/Components/LocaleSelect/LocaleSelect.tsx';
-import { SectionControls } from '../../common/Components/SectionControls/SectionControls.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { LocaleSelect } from 'common/Components/LocaleSelect/LocaleSelect.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
 
 import { CustomDatePickerFooter } from './components/CustomFooter/CustomDatePickerFooter.tsx';
 import { DateInputGroup } from './components/DateInputGroup/DateInputGroup.tsx';

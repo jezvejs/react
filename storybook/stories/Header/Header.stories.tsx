@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { Button, Header } from '@jezvejs/react';
 
-import MenuIcon from '../../common/assets/icons/menu.svg';
+import MenuIcon from 'common/assets/icons/menu.svg';
 
 import './Header.stories.scss';
 

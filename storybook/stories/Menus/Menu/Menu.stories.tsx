@@ -1,25 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import '@jezvejs/react/style.scss';
 import { Menu } from '@jezvejs/react';
+import '@jezvejs/react/style.scss';
 import { useState } from 'react';
 
-import { initItems } from '../../../common/utils/utils.ts';
+import {
+    checkboxGroupItems,
+    collapsibleGroupItems,
+    getDefaultItems,
+    getHorizontalItems,
+    groupItems,
+} from 'common/assets/data/menuData.ts';
+import { initItems } from 'common/utils/utils.ts';
 
 // Local components
 import { CheckboxGroupsMenu } from './components/CheckboxGroups/CheckboxGroupsMenu.tsx';
 import { CollapsibleGroupsMenu, CollapsibleGroupsMenuProps } from './components/CollapsibleGroups/CollapsibleGroupsMenu.tsx';
-import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.tsx';
 import { CustomMenuFooter } from './components/CustomFooter/CustomMenuFooter.tsx';
+import { CustomMenuHeader } from './components/CustomHeader/CustomMenuHeader.tsx';
 import { LoadingPlaceholder } from './components/LoadingPlaceholder/LoadingPlaceholder.tsx';
 
-import {
-    getDefaultItems,
-    getHorizontalItems,
-    groupItems,
-    checkboxGroupItems,
-    collapsibleGroupItems,
-} from '../../../common/assets/data/menuData.ts';
 import './Menu.stories.scss';
 
 export type Story = StoryObj<typeof Menu>;

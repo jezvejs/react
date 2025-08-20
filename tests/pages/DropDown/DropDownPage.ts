@@ -5,8 +5,10 @@ import { asyncMap } from 'utils/index.ts';
 
 import { mapItems, toFlatList } from 'pages/Menu/utils.ts';
 
+import { ToggleEnableDropDown } from './components/ToggleEnableDropDown.ts';
+
+import { initialComponents } from './defaultProps.ts';
 import { initialState } from './initialState.ts';
-import { filterDropDownItems, toggleSelectItem } from './utils.ts';
 import {
     DropDownId,
     DropDownPageComponents,
@@ -14,8 +16,7 @@ import {
     SimpleDropDownId,
     ToggleEnableDropDownId,
 } from './types.ts';
-import { ToggleEnableDropDown } from './components/ToggleEnableDropDown.ts';
-import { initialComponents } from './defaultProps.ts';
+import { filterDropDownItems, toggleSelectItem } from './utils.ts';
 
 const componentIds = Object.keys(initialComponents) as DropDownId[];
 

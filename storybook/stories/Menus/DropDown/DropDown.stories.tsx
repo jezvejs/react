@@ -11,9 +11,9 @@ import {
 } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { groupsItems, initGroupItems } from '../../../common/assets/data/dropDownData.ts';
-import { usePortalElement } from '../../../common/hooks/usePortalElement.tsx';
-import { initItems } from '../../../common/utils/utils.ts';
+import { groupsItems, initGroupItems } from 'common/assets/data/dropDownData.ts';
+import { usePortalElement } from 'common/hooks/usePortalElement.tsx';
+import { initItems } from 'common/utils/utils.ts';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.tsx';

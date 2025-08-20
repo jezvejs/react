@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
 import { RangeScrollChart } from '@jezvejs/react';
-import { chartData, chartMultiData } from '../../../common/assets/data/index.ts';
+import { chartData, chartMultiData } from 'common/assets/data/index.ts';
 import './RangeScrollChart.stories.scss';
 
 type Story = StoryObj<typeof RangeScrollChart>;

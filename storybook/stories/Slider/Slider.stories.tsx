@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
 
-import { getSliderItems } from '../../common/utils/getSliderItems.tsx';
+import { getSliderItems } from 'common/utils/getSliderItems.tsx';
 
 import { ControlledSlider } from './components/ControlledSlider/ControlledSlider.tsx';
 

@@ -1,7 +1,7 @@
 import { Button, ButtonProps, Collapsible } from '@jezvejs/react';
 
-import EditIcon from '../../../../common/assets/icons/edit.svg';
-import DeleteIcon from '../../../../common/assets/icons/del.svg';
+import EditIcon from 'common/assets/icons/edit.svg';
+import DeleteIcon from 'common/assets/icons/del.svg';
 
 import { CommonProps } from '../../types.ts';
 

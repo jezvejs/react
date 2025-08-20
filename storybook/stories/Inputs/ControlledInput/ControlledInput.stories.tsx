@@ -4,12 +4,12 @@ import '@jezvejs/react/style.scss';
 import { ControlledInput, ControlledInputProps } from '@jezvejs/react';
 
 // Hooks
-import { useInputState } from '../../../common/hooks/useInputState.ts';
-import { withInputState } from '../../../common/utils/withInputState.tsx';
+import { useInputState } from 'common/hooks/useInputState.ts';
+import { withInputState } from 'common/utils/withInputState.tsx';
 
 // Common components
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
 
 const InputWithState = withInputState<ControlledInputProps>(ControlledInput);
 

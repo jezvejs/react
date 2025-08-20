@@ -4,8 +4,8 @@ import { Sortable, SortableListItemComponent } from '@jezvejs/react';
 import '@jezvejs/react/style.scss';
 
 // Global components
-import { ProvidedSortable } from '../../common/Components/ProvidedSortable/ProvidedSortable.tsx';
-import { SortableListItem } from '../../common/Components/SortableListItem/SortableListItem.tsx';
+import { ProvidedSortable } from 'common/Components/ProvidedSortable/ProvidedSortable.tsx';
+import { SortableListItem } from 'common/Components/SortableListItem/SortableListItem.tsx';
 
 // Local components
 import { ListItemWithHandle } from './components/ListItemWithHandle/ListItemWithHandle.tsx';

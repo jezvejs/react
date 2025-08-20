@@ -7,7 +7,7 @@ import {
 } from '@jezvejs/react';
 import classNames from 'classnames';
 
-import { MenuButton } from '../../../../../common/Components/MenuButton/MenuButton.tsx';
+import { MenuButton } from 'common/Components/MenuButton/MenuButton.tsx';
 
 import { CustomComboBoxControls } from './ComboBoxControls/CustomComboBoxControls.tsx';
 import { actions, reducer } from './reducer.ts';

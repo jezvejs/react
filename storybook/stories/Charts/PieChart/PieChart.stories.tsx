@@ -8,9 +8,9 @@ import {
 } from '@jezvejs/react';
 
 // Common components
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
-import { SelectablePieChart, SelectablePieChartDataState, toPieChartDataItem } from '../../../common/Components/SelectablePieChart/SelectablePieChart.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
+import { SelectablePieChart, SelectablePieChartDataState, toPieChartDataItem } from 'common/Components/SelectablePieChart/SelectablePieChart.tsx';
 
 import './PieChart.stories.scss';
 

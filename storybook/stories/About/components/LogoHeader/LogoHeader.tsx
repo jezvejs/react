@@ -1,6 +1,6 @@
 import packageJSON from '@jezvejs/react/package.json';
 
-import LogoIcon from '../../../../common/assets/images/logo.svg';
+import LogoIcon from 'common/assets/images/logo.svg';
 
 import './LogoHeader.scss';
 

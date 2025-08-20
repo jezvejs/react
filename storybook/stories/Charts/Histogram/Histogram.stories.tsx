@@ -26,17 +26,17 @@ import {
     negPosData,
     posData,
     singleNegData,
-} from '../../../common/assets/data/index.ts';
-import { largeData } from '../../../common/assets/data/largeData.ts';
+} from 'common/assets/data/index.ts';
+import { largeData } from 'common/assets/data/largeData.ts';
 
 // Global components
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
-import { ChartCategoriesPopup } from '../../../common/Components/ChartCategoriesPopup/ChartCategoriesPopup.tsx';
-import { ChartCustomLegend } from '../../../common/Components/ChartCustomLegend/ChartCustomLegend.tsx';
-import { ChartMultiColumnPopup } from '../../../common/Components/ChartMultiColumnPopup/ChartMultiColumnPopup.tsx';
-import { RadioFieldset } from '../../../common/Components/RadioFieldset/RadioFieldset.tsx';
-import { RangeInputField } from '../../../common/Components/RangeInputField/RangeInputField.tsx';
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { ChartCategoriesPopup } from 'common/Components/ChartCategoriesPopup/ChartCategoriesPopup.tsx';
+import { ChartCustomLegend } from 'common/Components/ChartCustomLegend/ChartCustomLegend.tsx';
+import { ChartMultiColumnPopup } from 'common/Components/ChartMultiColumnPopup/ChartMultiColumnPopup.tsx';
+import { RadioFieldset } from 'common/Components/RadioFieldset/RadioFieldset.tsx';
+import { RangeInputField } from 'common/Components/RangeInputField/RangeInputField.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
 
 // Local components
 import { CustomActiveGroup } from './components/CustomActiveGroup/CustomActiveGroup.tsx';

@@ -7,7 +7,7 @@ import {
     StyledHTMLAttributes,
 } from '@jezvejs/react';
 
-import { SortableElementProps } from '../../../../common/Components/SortableListItem/SortableListItem.tsx';
+import { SortableElementProps } from 'common/Components/SortableListItem/SortableListItem.tsx';
 
 import './SortableTreeItem.scss';
 

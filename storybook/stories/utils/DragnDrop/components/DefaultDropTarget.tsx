@@ -1,8 +1,8 @@
 import { DragMaster, DropTarget, OnDragEndParams } from '@jezvejs/react';
 import { useEffect, useRef } from 'react';
 
-import { DefaultDragZone } from '../../../../common/Components/DragnDrop/DefaultDragZone.tsx';
-import { BoxProps } from '../../../../common/Components/DragnDrop/Box.tsx';
+import { DefaultDragZone } from 'common/Components/DragnDrop/DefaultDragZone.tsx';
+import { BoxProps } from 'common/Components/DragnDrop/Box.tsx';
 
 export type DefaultDropTargetProps = DropTarget & {
     id: string;
