@@ -11,7 +11,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@jezvejs/react-test": "^0.2.0",
+        "@jezvejs/react-test": "^0.2.1",
         "@jezvejs/types": "^1.1.0",
         "@playwright/test": "^1.55.0"
     }

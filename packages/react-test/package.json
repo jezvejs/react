@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react-test",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "JezveJS React library test components",
     "type": "module",
     "module": "./src/index.ts",
