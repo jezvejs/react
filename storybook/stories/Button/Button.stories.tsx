@@ -3,10 +3,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { Button } from '@jezvejs/react';
 
-import PlusIcon from '../../common/assets/icons/plus.svg';
-import EditIcon from '../../common/assets/icons/edit.svg';
-import DeleteIcon from '../../common/assets/icons/del.svg';
-import CalendarIcon from '../../common/assets/icons/calendar.svg';
+import PlusIcon from 'common/assets/icons/plus.svg';
+import EditIcon from 'common/assets/icons/edit.svg';
+import DeleteIcon from 'common/assets/icons/del.svg';
+import CalendarIcon from 'common/assets/icons/calendar.svg';
 
 import './Button.stories.scss';
 

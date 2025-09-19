@@ -5,7 +5,8 @@ import {
     useStore,
 } from '@jezvejs/react';
 
-import { MenuButton } from '../../../../../../common/Components/MenuButton/MenuButton.tsx';
+import { MenuButton } from 'common/Components/MenuButton/MenuButton.tsx';
+
 import { CustomDropDownState } from '../types.ts';
 
 const defaultProps = {

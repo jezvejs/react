@@ -1,4 +1,4 @@
-import type { Meta, StoryFn, StoryObj } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import { asArray } from '@jezvejs/types';
 import '@jezvejs/react/style.scss';
@@ -11,9 +11,9 @@ import {
 } from '@jezvejs/react';
 import { useState } from 'react';
 
-import { groupsItems, initGroupItems } from '../../../common/assets/data/dropDownData.ts';
-import { usePortalElement } from '../../../common/hooks/usePortalElement.tsx';
-import { initItems } from '../../../common/utils/utils.ts';
+import { groupsItems, initGroupItems } from 'common/assets/data/dropDownData.ts';
+import { usePortalElement } from 'common/hooks/usePortalElement.tsx';
+import { initItems } from 'common/utils/utils.ts';
 
 // Local components
 import { AttachedToBlock } from './components/AttachedToBlock/AttachedToBlock.tsx';
@@ -23,7 +23,12 @@ import { CustomListItem } from './components/CustomListItem/CustomListItem.tsx';
 import { CustomSelectionItem } from './components/CustomSelectionItem/CustomSelectionItem.tsx';
 import { ToggleEnable } from './components/ToggleEnable/ToggleEnable.tsx';
 
-import { DropDownStory, ToggleEnableDropDownStory } from './types.ts';
+import {
+    AttachedToBlockStory,
+    DropDownStory,
+    MultipleSelectionTagsState,
+    ToggleEnableDropDownStory,
+} from './types.ts';
 import './DropDown.stories.scss';
 
 const heightDecorator = (StoryComponent: StoryFn) => (
@@ -54,6 +59,9 @@ const meta: Meta<typeof DropDown> = {
 };
 export default meta;
 
+/**
+ * Basic inline drop down component
+ */
 export const Inline: DropDownStory = {
     args: {
     },
@@ -92,6 +100,9 @@ export const Inline: DropDownStory = {
     },
 };
 
+/**
+ * Example of width: 100% style applied to the component
+ */
 export const FullWidth: DropDownStory = {
     args: {
         id: 'fullWidthDropDown',
@@ -102,6 +113,9 @@ export const FullWidth: DropDownStory = {
     decorators: [heightDecorator],
 };
 
+/**
+ * Use 'fixedMenu' to apply fixed positioning for drop down menu
+ */
 export const FixedMenu: DropDownStory = {
     args: {
         id: 'fixedMenuDropDown',
@@ -119,6 +133,10 @@ export const FixedMenu: DropDownStory = {
     },
 };
 
+/**
+ * Effect of 'disabled' option on menu items.
+ * Disabled items rendered with dimmed style and not available to focus and select.
+ */
 export const DisabledItems: DropDownStory = {
     args: {
         id: 'disabledItemsDropDown',
@@ -131,6 +149,10 @@ export const DisabledItems: DropDownStory = {
     decorators: [heightDecorator],
 };
 
+/**
+ * Grouped menu items example.
+ * Use menu item with properties 'type'='group' and 'items' containing array of grouped items
+ */
 export const Groups: DropDownStory = {
     args: {
         id: 'groupsDropDown',
@@ -138,8 +160,6 @@ export const Groups: DropDownStory = {
     },
     decorators: [heightDecorator],
 };
-
-type AttachedToBlockStory = StoryObj<typeof AttachedToBlock>;
 
 /**
  * Attach drop down menu to the block element.
@@ -158,6 +178,10 @@ export const AttachToBlock: AttachedToBlockStory = {
     },
 };
 
+/**
+ * Attach drop down menu to the inline element.
+ * Popup menu should be positioned next to wrapped text.
+ */
 export const AttachToInline: DropDownStory = {
     args: {
         id: 'attachedToInlineDropDown',
@@ -181,6 +205,10 @@ export const AttachToInline: DropDownStory = {
     },
 };
 
+/**
+ * Use 'static' property to avoid clipping drop down menu.
+ * Or as alternative you can use 'fixedMenu'
+ */
 export const Clipping: DropDownStory = {
     args: {
     },
@@ -207,6 +235,9 @@ export const Clipping: DropDownStory = {
     },
 };
 
+/**
+ * Use property 'multiple' to enable selection of multiple items
+ */
 export const MultipleSelect: DropDownStory = {
     args: {
         id: 'multipleSelectDropDown',
@@ -221,6 +252,11 @@ export const MultipleSelect: DropDownStory = {
     decorators: [textDecorator],
 };
 
+/**
+ * Use 'disabled' property to control availability of component interactions
+ * Disabled component renders with dimmed style, not available to focus, select items and excluded
+ * from parent form.
+ */
 export const DisabledSingle: DropDownStory = {
     args: {
         className: 'dd_stretch',
@@ -236,6 +272,11 @@ export const DisabledSingle: DropDownStory = {
     render: ToggleEnable,
 };
 
+/**
+ * Use 'disabled' property to control availability of component interactions
+ * Disabled component renders with dimmed style, not available to focus, select items and excluded
+ * from parent form.
+ */
 export const DisabledMultiple: DropDownStory = {
     args: {
         className: 'dd_stretch',
@@ -252,6 +293,9 @@ export const DisabledMultiple: DropDownStory = {
     render: ToggleEnable,
 };
 
+/**
+ * Use 'enableFilter' property to enable filering items on type
+ */
 export const FilterSingle: ToggleEnableDropDownStory = {
     args: {
         id: 'filterDropDown',
@@ -266,6 +310,9 @@ export const FilterSingle: ToggleEnableDropDownStory = {
     render: ToggleEnable,
 };
 
+/**
+ * Use 'enableFilter' property to enable filering items on type
+ */
 export const FilterMultiple: ToggleEnableDropDownStory = {
     args: {
         id: 'filterMultiDropDown',
@@ -282,7 +329,8 @@ export const FilterMultiple: ToggleEnableDropDownStory = {
 };
 
 /**
- * With 'openOnFocus' option enabled
+ * With 'openOnFocus' option enabled drop down menu will be automaticaly opened when component
+ * receives focus
  */
 export const FilterGroups: ToggleEnableDropDownStory = {
     args: {
@@ -299,7 +347,8 @@ export const FilterGroups: ToggleEnableDropDownStory = {
 };
 
 /**
- * With 'openOnFocus' option enabled
+ * With 'openOnFocus' option enabled drop down menu will be automaticaly opened when component
+ * receives focus
  */
 export const FilterGroupsMultiple: DropDownStory = {
     args: {
@@ -347,15 +396,10 @@ export const ClearFilterOnSelect: DropDownStory = {
     decorators: [textDecorator],
 };
 
-export type MultipleSelectionTag = {
-    id: string;
-    title: string;
-};
-
-export type MultipleSelectionTagsState = {
-    items: MultipleSelectionTag[];
-};
-
+/**
+ * Use 'showMultipleSelection' property to control visibility of built-in multiple selection inside
+ * combo box component
+ */
 export const ShowMultipleSelection: DropDownStory = {
     name: '\'showMultipleSelection\' option',
     args: {
@@ -396,6 +440,10 @@ export const ShowMultipleSelection: DropDownStory = {
     },
 };
 
+/**
+ * Use 'showClearButton' property to control visibility of 'Clear' button inside
+ * combo box component
+ */
 export const ShowClearButton: DropDownStory = {
     name: '\'showClearButton\' option',
     args: {
@@ -410,6 +458,10 @@ export const ShowClearButton: DropDownStory = {
     decorators: [textDecorator],
 };
 
+/**
+ * Use 'showToggleButton' property to control visibility of 'Toggle' button inside
+ * combo box component
+ */
 export const ShowToggleButton: DropDownStory = {
     name: '\'showToggleButton\' option',
     args: {
@@ -424,6 +476,13 @@ export const ShowToggleButton: DropDownStory = {
     decorators: [textDecorator],
 };
 
+/**
+ * Use 'allowCreate' property in addition to 'enableFilter' to enable creation new menu item from
+ * user input.
+ * Special menu item is added to the end of menu list when no item exactly matching user input
+ * is found.
+ * To create custom message use 'addItemMessage' callback.
+ */
 export const AllowCreate: DropDownStory = {
     name: '\'allowCreate\' option',
     args: {
@@ -439,7 +498,10 @@ export const AllowCreate: DropDownStory = {
 };
 
 /**
- * With disabled \'useSingleSelectionAsPlaceholder\' option
+ * When 'enableFilter' combined with 'listAttach' option input field will be created inside
+ * drop down menu.
+ * With disabled \'useSingleSelectionAsPlaceholder\' option the 'placeholder' property will be used
+ * for placeholder of input field inside drop down menu.
  */
 export const FilterAttachToBlock: AttachedToBlockStory = {
     name: 'Filter attached to block element',
@@ -459,6 +521,10 @@ export const FilterAttachToBlock: AttachedToBlockStory = {
     },
 };
 
+/**
+ * When 'enableFilter' combined with 'listAttach' option input field will be created inside
+ * drop down menu.
+ */
 export const FilterMultiAttachToBlock: AttachedToBlockStory = {
     name: 'Filter with multiple select attached',
     args: {
@@ -477,6 +543,10 @@ export const FilterMultiAttachToBlock: AttachedToBlockStory = {
     },
 };
 
+/**
+ * Use 'components' property object to set custom child components.
+ * Example for custom 'ListItem' and 'MultiSelectionItem' components.
+ */
 export const CustomComponents: DropDownStory = {
     args: {
         className: 'dd__custom dd_stretch',
@@ -494,6 +564,10 @@ export const CustomComponents: DropDownStory = {
     decorators: [textDecorator],
 };
 
+/**
+ * Use 'components' property object to set custom child components.
+ * Example for custom 'ComboBoxControls' and additional 'Loading' and 'ComboMenuButton' components.
+ */
 export const CustomComboBoxComponents: DropDownStory = {
     args: {
         className: 'dd_stretch',
@@ -510,6 +584,9 @@ export const CustomComboBoxComponents: DropDownStory = {
     },
 };
 
+/**
+ * Custom setup with collapsible menu groups.
+ */
 export const CollapsibleGroups: DropDownStory = {
     args: {
         className: 'dd_stretch',
@@ -528,6 +605,9 @@ export const CollapsibleGroups: DropDownStory = {
     },
 };
 
+/**
+ * Use 'useNativeSelect' property to show native select menu on click on component.
+ */
 export const NativeSelect: DropDownStory = {
     name: '\'useNativeSelect\' option',
     args: {
@@ -539,6 +619,10 @@ export const NativeSelect: DropDownStory = {
     decorators: [textDecorator],
 };
 
+/**
+ * Use 'useNativeSelect' property to show native select menu on click on component.
+ * Combination with 'multiple' option is also supported.
+ */
 export const NativeSelectMultiple: DropDownStory = {
     name: '\'useNativeSelect\' option multiple',
     args: {
@@ -551,6 +635,9 @@ export const NativeSelectMultiple: DropDownStory = {
     decorators: [textDecorator],
 };
 
+/**
+ * Use 'fullScreen' property to enable rendering full screen menu instead of drop down menu.
+ */
 export const FullScreen: DropDownStory = {
     args: {
         placeholder: 'Full screen',
@@ -568,6 +655,10 @@ export const FullScreen: DropDownStory = {
     },
 };
 
+/**
+ * Use 'fullScreen' property to enable rendering full screen menu instead of drop down menu.
+ * Combination with 'multiple' option is also supported.
+ */
 export const FullScreenFilterMultiple: DropDownStory = {
     args: {
         placeholder: 'Type to filter',

@@ -53,5 +53,6 @@ export * from './hooks/useDebounce/useDebounce.ts';
 export * from './hooks/useEmptyClick/useEmptyClick.ts';
 export * from './hooks/usePopupPosition/PopupPosition.ts';
 export * from './hooks/usePopupPosition/usePopupPosition.ts';
+export * from './hooks/useResizeObserver/useResizeObserver.ts';
 export * from './hooks/useScrollLock/useScrollLock.ts';
 export * from './hooks/useSlidable/useSlidable.tsx';

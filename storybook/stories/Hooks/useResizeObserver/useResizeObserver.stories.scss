@@ -1,0 +1,47 @@
+.resize-demo {
+  position: relative;
+  gap: 1rem;
+  padding: 2rem;
+  width: 100%;
+  height: 100vh;
+}
+
+.full-screen-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #ffffff;
+}
+
+.full-height-block {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #08721688;
+}
+
+.half-width-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #df0c7688;
+}

@@ -1,12 +1,14 @@
 import { DropDown } from '@jezvejs/react-test';
 import { expect, type Page } from '@playwright/test';
 
-import { asyncMap } from '../../utils/index.ts';
+import { asyncMap } from 'utils/index.ts';
 
-import { mapItems, toFlatList } from '../Menu/utils.ts';
+import { mapItems, toFlatList } from 'pages/Menu/utils.ts';
 
+import { ToggleEnableDropDown } from './components/ToggleEnableDropDown.ts';
+
+import { initialComponents } from './defaultProps.ts';
 import { initialState } from './initialState.ts';
-import { filterDropDownItems, toggleSelectItem } from './utils.ts';
 import {
     DropDownId,
     DropDownPageComponents,
@@ -14,8 +16,7 @@ import {
     SimpleDropDownId,
     ToggleEnableDropDownId,
 } from './types.ts';
-import { ToggleEnableDropDown } from './components/ToggleEnableDropDown.ts';
-import { initialComponents } from './defaultProps.ts';
+import { filterDropDownItems, toggleSelectItem } from './utils.ts';
 
 const componentIds = Object.keys(initialComponents) as DropDownId[];
 
@@ -25,6 +26,8 @@ const toggleEnableButtonIds = {
 };
 
 const toggleEnableComponentIds = Object.keys(toggleEnableButtonIds) as DropDownId[];
+
+const PAGE_ID_PREFIX = 'menu-dropdown--';
 
 export class DropDownPage implements DropDownPageComponents {
     readonly page: Page;
@@ -57,19 +60,91 @@ export class DropDownPage implements DropDownPageComponents {
 
     filterGroupsMultiDropDown: DropDown | null = null;
 
-    singleComponentId: DropDownId | null;
+    pageId: DropDownId | null;
 
     state: DropDownPageState = initialState;
 
-    constructor(page: Page, singleComponentId: DropDownId | null = null) {
+    constructor(page: Page) {
         this.page = page;
-        this.singleComponentId = singleComponentId;
+        this.pageId = this.getPageId();
 
-        if (singleComponentId && componentIds.includes(singleComponentId)) {
-            this.createComponent(singleComponentId);
+        this.init();
+    }
+
+    init() {
+        const pageId = this.pageId as DropDownId;
+
+        if (pageId && componentIds.includes(pageId)) {
+            this.createComponent(pageId);
         } else {
             componentIds.forEach((menuId) => this.createComponent(menuId));
         }
+    }
+
+    getPageId() {
+        const url = new URL(this.page.url());
+        const id = url.searchParams.get('id');
+        if (!id?.startsWith(PAGE_ID_PREFIX)) {
+            return null;
+        }
+
+        return id.substring(PAGE_ID_PREFIX.length) as DropDownId;
+    }
+
+    async loadStoryById(storyId: string) {
+        this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
+    }
+
+    async loadInline() {
+        this.loadStoryById('inline');
+    }
+
+    async loadFullWidth() {
+        this.loadStoryById('full-width');
+    }
+
+    async loadFixedMenu() {
+        this.loadStoryById('fixed-menu');
+    }
+
+    async loadGroups() {
+        this.loadStoryById('groups');
+    }
+
+    async loadAttachedToBlock() {
+        this.loadStoryById('attach-to-block');
+    }
+
+    async loadAttachedToInline() {
+        this.loadStoryById('attach-to-inline');
+    }
+
+    async loadMultiSelect() {
+        this.loadStoryById('multiple-select');
+    }
+
+    async loadFilterSingleSelect() {
+        this.loadStoryById('filter-single');
+    }
+
+    async loadFilterMultiSelect() {
+        this.loadStoryById('filter-multiple');
+    }
+
+    async loadFilterAttachedToBlock() {
+        this.loadStoryById('filter-attach-to-block');
+    }
+
+    async loadFilterMultiAttachedToBlock() {
+        this.loadStoryById('filter-multi-attach-to-block');
+    }
+
+    async loadFilterGroups() {
+        this.loadStoryById('filter-groups');
+    }
+
+    async loadFilterGroupsMultiSelect() {
+        this.loadStoryById('filter-groups-multiple');
     }
 
     createComponent(id: DropDownId) {
@@ -100,8 +175,9 @@ export class DropDownPage implements DropDownPageComponents {
     }
 
     async assertState(state: DropDownPageState) {
-        if (this.singleComponentId && componentIds.includes(this.singleComponentId)) {
-            await this.assertDropDownState(this.singleComponentId, state);
+        const pageId = this.pageId as DropDownId;
+        if (pageId && componentIds.includes(pageId)) {
+            await this.assertDropDownState(pageId, state);
         } else {
             await asyncMap(componentIds, (menuId) => this.assertDropDownState(menuId, state));
         }
@@ -125,6 +201,9 @@ export class DropDownPage implements DropDownPageComponents {
         if (id && this[id]) {
             await this[id].rootLocator.waitFor({ state: 'visible' });
         }
+        this.pageId = id;
+
+        this.init();
     }
 
     async waitForItemsCount(state: DropDownPageState, id: DropDownId) {

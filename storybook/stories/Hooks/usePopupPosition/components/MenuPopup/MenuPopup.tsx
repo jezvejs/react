@@ -1,6 +1,6 @@
 import { usePopupPosition, UsePopupPositionProps } from '@jezvejs/react';
 import { useState } from 'react';
-import { MenuButton } from '../../../../../common/Components/MenuButton/MenuButton.tsx';
+import { MenuButton } from 'common/Components/MenuButton/MenuButton.tsx';
 import { PopupContainer } from '../PopupContainer/PopupContainer.tsx';
 
 export const MenuPopup: React.FC<UsePopupPositionProps> = (props) => {

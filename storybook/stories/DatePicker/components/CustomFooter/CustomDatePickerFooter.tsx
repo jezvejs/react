@@ -1,4 +1,4 @@
-import { ActionButton } from '../../../../common/Components/ActionButton/ActionButton.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
 import './CustomDatePickerFooter.scss';
 
 export type CustomDatePickerFooterProps = {

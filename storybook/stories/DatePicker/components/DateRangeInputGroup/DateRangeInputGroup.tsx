@@ -6,7 +6,7 @@ import {
     InputGroupText,
 } from '@jezvejs/react';
 
-import CalendarIcon from '../../../../common/assets/icons/calendar.svg';
+import CalendarIcon from 'common/assets/icons/calendar.svg';
 
 import './DateRangeInputGroup.scss';
 

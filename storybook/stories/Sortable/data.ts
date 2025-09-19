@@ -1,6 +1,6 @@
 import { SortableProps } from '@jezvejs/react';
-import TileCardIcon from '../../common/assets/icons/tile-card.svg';
-import { initItems } from '../../common/utils/utils.ts';
+import TileCardIcon from 'common/assets/icons/tile-card.svg';
+import { initItems } from 'common/utils/utils.ts';
 
 export type SortableTableRow = (string | number)[];
 

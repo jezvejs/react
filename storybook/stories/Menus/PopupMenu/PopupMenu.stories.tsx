@@ -3,9 +3,9 @@ import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { PopupMenu } from '@jezvejs/react';
 
-import { getDefaultItems, getNestedMenuItems } from '../../../common/assets/data/popupMenuData.ts';
+import { getDefaultItems, getNestedMenuItems } from 'common/assets/data/popupMenuData.ts';
 
-import { PopupMenuDemo } from '../../../common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
+import { PopupMenuDemo } from 'common/Components/PopupMenuDemo/PopupMenuDemo.tsx';
 
 import './PopupMenu.stories.scss';
 

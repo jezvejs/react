@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { TabList } from '@jezvejs/react';
 
-import { getTabListItems } from '../../common/utils/getTabListItems.tsx';
-import { TabListStyled } from '../../common/Components/TabListStyled/TabListStyled.tsx';
+import { getTabListItems } from 'common/utils/getTabListItems.tsx';
+import { TabListStyled } from 'common/Components/TabListStyled/TabListStyled.tsx';
 
 import './TabList.stories.scss';
 

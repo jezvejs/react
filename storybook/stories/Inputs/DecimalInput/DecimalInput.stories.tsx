@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { DecimalInput, DecimalInputProps } from '@jezvejs/react';
 import '@jezvejs/react/style.scss';
 
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
-import { withInputState } from '../../../common/utils/withInputState.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
+import { withInputState } from 'common/utils/withInputState.tsx';
 
 const TempInputDecorator = (StoryComponent: StoryFn) => (
     <div>

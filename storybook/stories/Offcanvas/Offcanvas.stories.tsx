@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { Offcanvas } from '@jezvejs/react';
 
-import { OpenOffcanvas } from '../../common/Components/OpenOffcanvas/OpenOffcanvas.tsx';
+import { OpenOffcanvas } from 'common/Components/OpenOffcanvas/OpenOffcanvas.tsx';
 
 import './Offcanvas.stories.scss';
 

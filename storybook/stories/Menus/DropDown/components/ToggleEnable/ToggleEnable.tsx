@@ -1,7 +1,8 @@
-import { useState } from 'react';
 import { DropDown, DropDownProps } from '@jezvejs/react';
-import { ActionButton } from '../../../../../common/Components/ActionButton/ActionButton.tsx';
-import { SectionControls } from '../../../../../common/Components/SectionControls/SectionControls.tsx';
+import { useState } from 'react';
+
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
 
 export type ToggleEnableProps = Partial<DropDownProps> & {
     btnId?: string;

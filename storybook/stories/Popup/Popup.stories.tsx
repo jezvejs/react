@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import '@jezvejs/react/style.scss';
 import { Popup, PopupProps } from '@jezvejs/react';
+import '@jezvejs/react/style.scss';
 import { useState } from 'react';
 
-import { usePortalElement } from '../../common/hooks/usePortalElement.tsx';
+import { usePortalElement } from 'common/hooks/usePortalElement.tsx';
 
-import { ActionButton } from '../../common/Components/ActionButton/ActionButton.tsx';
-import { OkBtn } from '../../common/Components/ActionButton/OkBtn.tsx';
-import { CancelBtn } from '../../common/Components/ActionButton/CancelBtn.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { CancelBtn } from 'common/Components/ActionButton/CancelBtn.tsx';
+import { OkBtn } from 'common/Components/ActionButton/OkBtn.tsx';
+import { LaunchPopup } from 'common/Components/LaunchPopup/LaunchPopup.tsx';
 
 import './Popup.stories.scss';
-import { LaunchPopup } from '../../common/Components/LaunchPopup/LaunchPopup.tsx';
 
 export type Story = StoryObj<typeof Popup>;
 

@@ -5,7 +5,7 @@ import { useEmptyClick } from '@jezvejs/react';
 import { useRef, useState } from 'react';
 import classNames from 'classnames';
 
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
 
 import './useEmptyClick.stories.scss';
 

@@ -3,9 +3,9 @@ import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 import '@jezvejs/react/style.scss';
 import { DateInput } from '@jezvejs/react';
 import { useState } from 'react';
-import { SectionControls } from '../../../common/Components/SectionControls/SectionControls.tsx';
-import { LocaleSelect } from '../../../common/Components/LocaleSelect/LocaleSelect.tsx';
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
+import { SectionControls } from 'common/Components/SectionControls/SectionControls.tsx';
+import { LocaleSelect } from 'common/Components/LocaleSelect/LocaleSelect.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
 
 const TempInputDecorator = (StoryComponent: StoryFn) => (
     <div>

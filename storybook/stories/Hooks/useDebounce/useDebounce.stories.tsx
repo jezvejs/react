@@ -4,7 +4,7 @@ import '@jezvejs/react/style.scss';
 import { DebounceOptions, useDebounce } from '@jezvejs/react';
 import { useCallback, useState } from 'react';
 
-import { ActionButton } from '../../../common/Components/ActionButton/ActionButton.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
 
 import './useDebounce.stories.scss';
 

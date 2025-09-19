@@ -4,8 +4,8 @@ import '@jezvejs/react/style.scss';
 import { useState } from 'react';
 import { RangeSlider, RangeSliderProps, RangeSliderValue } from '@jezvejs/react';
 
-import { ActionButton } from '../../common/Components/ActionButton/ActionButton.tsx';
-import { RangeSliderStyled } from '../../common/Components/RangeSliderStyled/RangeSliderStyled.tsx';
+import { ActionButton } from 'common/Components/ActionButton/ActionButton.tsx';
+import { RangeSliderStyled } from 'common/Components/RangeSliderStyled/RangeSliderStyled.tsx';
 
 import './RangeSlider.stories.scss';
 
