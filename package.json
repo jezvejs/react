@@ -13,6 +13,7 @@
         "lint-ts": "npx tsc -b ./packages/react/ ./storybook/ ./tests/ ./packages/react-test/ --noEmit",
         "lint-all": "npm-run-all lint lint-ts",
         "prestart": "npm install",
+        "pretest": "npx playwright install",
         "test": "npx playwright test",
         "start": "npm run dev -w jezvejs-react-storybook",
         "build": "npm run build -w @jezvejs/react",
