@@ -479,7 +479,8 @@ export const ShowToggleButton: DropDownStory = {
 /**
  * Use 'allowCreate' property in addition to 'enableFilter' to enable creation new menu item from
  * user input.
- * Special menu item is added to the end of menu list when no item exactly matching user input is found.
+ * Special menu item is added to the end of menu list when no item exactly matching user input
+ * is found.
  * To create custom message use 'addItemMessage' callback.
  */
 export const AllowCreate: DropDownStory = {
