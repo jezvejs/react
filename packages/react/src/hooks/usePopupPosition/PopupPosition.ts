@@ -539,7 +539,11 @@ export class PopupPosition {
 
         if (this.state.useRefWidth) {
             style.minWidth = px(reference.width);
-            style.width = '';
+            if (this.state.fixedElement) {
+                style.width = px(reference.width);
+            } else {
+                style.width = '';
+            }
             current.left = getInitialLeftPosition(this.state);
             this.renderPosition();
         }
