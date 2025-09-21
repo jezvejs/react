@@ -115,7 +115,7 @@ const AboutComponent = () => (
         <MainText>Use it in your application:</MainText>
         <CodeBlock>
             <CodeBlockJSXTag>{'div'}</CodeBlockJSXTag>{`
-        `}<CodeBlockJSXComponent name="Button" props={[{ name: 'icon', value: '{PlusIcon}' }, { name: 'type', value: '\"link\"' }]}>{'Click me'}</CodeBlockJSXComponent>
+        `}<CodeBlockJSXComponent name="Button" props={[{ name: 'icon', value: '{PlusIcon}' }, { name: 'type', value: '"link"' }]}>{'Click me'}</CodeBlockJSXComponent>
             {`
 `}
             <CodeBlockJSXTag>{'/div'}</CodeBlockJSXTag>
