@@ -1,7 +1,7 @@
 import { DropDown } from '@jezvejs/react-test';
 import { expect, type Page } from '@playwright/test';
 
-import { asyncMap } from 'utils/index.ts';
+import { asyncMap } from 'shared/utils.ts';
 
 import { mapItems, toFlatList } from 'pages/Menu/utils.ts';
 

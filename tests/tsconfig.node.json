@@ -17,14 +17,14 @@
             "scenarios/*": [
                 "./scenarios/*"
             ],
-            "utils/*": [
-                "./utils/*"
+            "shared/*": [
+                "shared/*"
             ]
         }
     },
     "include": [
         "pages/**/*.ts",
         "scenarios/**/*.ts",
-        "utils/**/*.ts"
+        "shared/**/*.ts"
     ]
 }

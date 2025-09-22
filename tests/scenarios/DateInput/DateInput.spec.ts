@@ -11,8 +11,8 @@ import {
     backspaceSelection,
     deleteSelection,
     cutSelection,
-} from 'utils/index.ts';
-import { Fixtures } from 'utils/types.ts';
+} from 'shared/utils.ts';
+import { Fixtures } from 'shared/types.ts';
 
 const inputId = 'localeInput';
 
