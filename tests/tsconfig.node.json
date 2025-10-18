@@ -11,20 +11,24 @@
         "noEmit": true,
         "baseUrl": ".",
         "paths": {
+            "fixtures/*": [
+                "./fixtures/*"
+            ],
             "pages/*": [
                 "./pages/*"
             ],
             "scenarios/*": [
                 "./scenarios/*"
             ],
-            "utils/*": [
-                "./utils/*"
+            "shared/*": [
+                "shared/*"
             ]
         }
     },
     "include": [
+        "fixtures/**/*.ts",
         "pages/**/*.ts",
         "scenarios/**/*.ts",
-        "utils/**/*.ts"
+        "shared/**/*.ts"
     ]
 }

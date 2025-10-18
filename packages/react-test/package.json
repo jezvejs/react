@@ -1,6 +1,6 @@
 {
     "name": "@jezvejs/react-test",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "JezveJS React library test components",
     "type": "module",
     "module": "./src/index.ts",
@@ -27,6 +27,6 @@
     },
     "dependencies": {
         "@jezvejs/types": "^1.1.0",
-        "@playwright/test": "^1.55.0"
+        "@playwright/test": "^1.56.1"
     }
 }
