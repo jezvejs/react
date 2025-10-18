@@ -30,6 +30,7 @@ export default meta;
 
 export const Default: Story = {
     args: {
+        id: 'defaultInput',
         value: '01.02.3456',
     },
     render: function Render(args) {
@@ -70,6 +71,7 @@ export const Default: Story = {
 
 export const Placeholder: Story = {
     args: {
+        id: 'placeholderInput',
         placeholder: 'Input date',
     },
 };
