@@ -47,11 +47,11 @@ export class Menu {
     async assertState(expectedState: MenuState) {
         const { visible, items } = expectedState;
 
-        await expect(this.locator).toBeVisible({ visible });
-
         if (!visible) {
             return;
         }
+
+        await expect(this.locator).toBeVisible({ visible });
 
         const options = {
             includeGroupItems: true,
