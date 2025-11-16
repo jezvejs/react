@@ -14,18 +14,18 @@ export const itemDisabledClassName = 'tag_disabled';
 export class DropDownMultiSelectionItem {
     readonly page: Page;
 
-    readonly rootLocator: Locator;
+    readonly locator: Locator;
 
     readonly titleLocator: Locator;
 
     readonly closeBtnLocator: Locator;
 
-    constructor(page: Page, rootLocator: Locator) {
+    constructor(page: Page, locator: Locator) {
         this.page = page;
-        this.rootLocator = rootLocator;
+        this.locator = locator;
 
-        this.titleLocator = this.rootLocator.locator('.tag__title');
-        this.closeBtnLocator = this.rootLocator.locator('.close-btn');
+        this.titleLocator = this.locator.locator('.tag__title');
+        this.closeBtnLocator = this.locator.locator('.close-btn');
     }
 
     async assertState(expectedState: DropDownMultiSelectionItemState) {
@@ -39,7 +39,7 @@ export class DropDownMultiSelectionItem {
         } = expectedState;
 
         if (id) {
-            await expect(this.rootLocator).toHaveAttribute('data-id', id);
+            await expect(this.locator).toHaveAttribute('data-id', id);
         }
 
         // Title
@@ -47,26 +47,26 @@ export class DropDownMultiSelectionItem {
 
         // Type
         const classRegExp = classNameRegExp(itemClassName);
-        await expect(this.rootLocator).toHaveClass(classRegExp);
+        await expect(this.locator).toHaveClass(classRegExp);
 
         // Visible
-        await expect(this.rootLocator).toBeVisible({ visible });
+        await expect(this.locator).toBeVisible({ visible });
 
         // Active
-        await expectToHaveClass(this.rootLocator, itemActiveClassName, active);
+        await expectToHaveClass(this.locator, itemActiveClassName, active);
 
         // Disabled
         if (multiple) {
-            await expectToHaveClass(this.rootLocator, itemDisabledClassName, disabled);
+            await expectToHaveClass(this.locator, itemDisabledClassName, disabled);
         }
     }
 
     async press(value: string) {
-        return this.rootLocator.press(value);
+        return this.locator.press(value);
     }
 
     async click() {
-        return this.rootLocator.click();
+        return this.locator.click();
     }
 
     async close() {
@@ -74,10 +74,10 @@ export class DropDownMultiSelectionItem {
     }
 
     async focus() {
-        return this.rootLocator.focus();
+        return this.locator.focus();
     }
 
     async blur() {
-        return this.rootLocator.blur();
+        return this.locator.blur();
     }
 }

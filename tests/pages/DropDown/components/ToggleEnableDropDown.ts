@@ -7,8 +7,8 @@ import { DropDown } from '@jezvejs/react-test';
 export class ToggleEnableDropDown extends DropDown {
     readonly toggleEnableBtnLocator: Locator;
 
-    constructor(page: Page, rootLocator: Locator, toggleEnableBtnLocator: Locator) {
-        super(page, rootLocator);
+    constructor(page: Page, locator: Locator, toggleEnableBtnLocator: Locator) {
+        super(page, locator);
 
         this.toggleEnableBtnLocator = toggleEnableBtnLocator;
     }

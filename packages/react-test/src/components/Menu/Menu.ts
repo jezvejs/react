@@ -18,7 +18,7 @@ export const defaultItemSelector = '.menu-list > .menu-item';
 export class Menu {
     readonly page: Page;
 
-    readonly rootLocator: Locator;
+    readonly locator: Locator;
 
     readonly itemsLocator: Locator;
 
@@ -26,16 +26,16 @@ export class Menu {
 
     itemsCount: number = 0;
 
-    constructor(page: Page, rootLocator: Locator, itemSelector: string = defaultItemSelector) {
+    constructor(page: Page, locator: Locator, itemSelector: string = defaultItemSelector) {
         this.page = page;
-        this.rootLocator = rootLocator;
+        this.locator = locator;
         this.itemSelector = itemSelector;
 
-        this.itemsLocator = this.rootLocator.locator(itemSelector);
+        this.itemsLocator = this.locator.locator(itemSelector);
     }
 
     async parseContent() {
-        const element = await this.rootLocator.evaluate((el, itemSelector) => ({
+        const element = await this.locator.evaluate((el, itemSelector) => ({
             itemsCount: Array.from(el?.querySelectorAll(itemSelector) ?? []).length,
             itemsIds: (Array.from(el?.querySelectorAll(itemSelector) ?? [])
                 .map((item: Element) => (item as HTMLElement)?.dataset?.id)),
@@ -47,7 +47,11 @@ export class Menu {
     async assertState(expectedState: MenuState) {
         const { visible, items } = expectedState;
 
-        await expect(this.rootLocator).toBeVisible({ visible });
+        await expect(this.locator).toBeVisible({ visible });
+
+        if (!visible) {
+            return;
+        }
 
         const options = {
             includeGroupItems: true,
@@ -81,7 +85,7 @@ export class Menu {
     }
 
     getItemLocator(itemId: string) {
-        return this.rootLocator.locator(`.menu-list > .menu-item[data-id="${itemId}"]`);
+        return this.locator.locator(`.menu-list > .menu-item[data-id="${itemId}"]`);
     }
 
     async clickById(itemId: string) {
@@ -97,14 +101,14 @@ export class Menu {
     }
 
     async press(value: string) {
-        return this.rootLocator.press(value);
+        return this.locator.press(value);
     }
 
     async focus() {
-        return this.rootLocator.focus();
+        return this.locator.focus();
     }
 
     async blur() {
-        return this.rootLocator.blur();
+        return this.locator.blur();
     }
 }

@@ -92,59 +92,59 @@ export class DropDownPage implements DropDownPageComponents {
     }
 
     async loadStoryById(storyId: string) {
-        this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
+        return this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
     }
 
     async loadInline() {
-        this.loadStoryById('inline');
+        return this.loadStoryById('inline');
     }
 
     async loadFullWidth() {
-        this.loadStoryById('full-width');
+        return this.loadStoryById('full-width');
     }
 
     async loadFixedMenu() {
-        this.loadStoryById('fixed-menu');
+        return this.loadStoryById('fixed-menu');
     }
 
     async loadGroups() {
-        this.loadStoryById('groups');
+        return this.loadStoryById('groups');
     }
 
     async loadAttachedToBlock() {
-        this.loadStoryById('attach-to-block');
+        return this.loadStoryById('attach-to-block');
     }
 
     async loadAttachedToInline() {
-        this.loadStoryById('attach-to-inline');
+        return this.loadStoryById('attach-to-inline');
     }
 
     async loadMultiSelect() {
-        this.loadStoryById('multiple-select');
+        return this.loadStoryById('multiple-select');
     }
 
     async loadFilterSingleSelect() {
-        this.loadStoryById('filter-single');
+        return this.loadStoryById('filter-single');
     }
 
     async loadFilterMultiSelect() {
-        this.loadStoryById('filter-multiple');
+        return this.loadStoryById('filter-multiple');
     }
 
     async loadFilterAttachedToBlock() {
-        this.loadStoryById('filter-attach-to-block');
+        return this.loadStoryById('filter-attach-to-block');
     }
 
     async loadFilterMultiAttachedToBlock() {
-        this.loadStoryById('filter-multi-attach-to-block');
+        return this.loadStoryById('filter-multi-attach-to-block');
     }
 
     async loadFilterGroups() {
-        this.loadStoryById('filter-groups');
+        return this.loadStoryById('filter-groups');
     }
 
     async loadFilterGroupsMultiSelect() {
-        this.loadStoryById('filter-groups-multiple');
+        return this.loadStoryById('filter-groups-multiple');
     }
 
     createComponent(id: DropDownId) {
@@ -199,7 +199,7 @@ export class DropDownPage implements DropDownPageComponents {
         await this.page.waitForLoadState('networkidle');
 
         if (id && this[id]) {
-            await this[id].rootLocator.waitFor({ state: 'visible' });
+            await this[id].locator.waitFor({ state: 'visible' });
         }
         this.pageId = id;
 
