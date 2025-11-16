@@ -13,7 +13,8 @@ import {
 } from '../Menu/utils.ts';
 
 import { defaultDropDownMenuItemProps, defaultDropDownProps } from './defaultProps.ts';
-import { InitItemsParams } from './types.ts';
+import { DropDownId, DropDownPageId, InitItemsParams } from './types.ts';
+import { dropDownPageIds } from './constants.ts';
 
 export const getDropDownProps = (
     props: Partial<DropDownState>,
@@ -264,3 +265,10 @@ export const getVisibleItems = (state: DropDownState | MenuItemState) => (
         || (item.type !== 'group' && isVisibleItem(item, state as DropDownState))
     ))
 );
+
+export const getDropDownIdByPage = (
+    pageId: DropDownPageId | null | undefined,
+): DropDownId | null => {
+    const entry = Object.entries(dropDownPageIds).find(([, value]) => (value === pageId));
+    return (entry?.[0] as DropDownId) ?? null;
+};
