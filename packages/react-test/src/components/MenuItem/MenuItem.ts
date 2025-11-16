@@ -41,7 +41,7 @@ export interface MenuItemState {
 export class MenuItem {
     readonly page: Page;
 
-    readonly rootLocator: Locator;
+    readonly locator: Locator;
 
     readonly contentLocator: Locator;
 
@@ -51,20 +51,20 @@ export class MenuItem {
 
     readonly itemSelector: string;
 
-    constructor(page: Page, rootLocator: Locator, itemSelector: string = defaultItemSelector) {
+    constructor(page: Page, locator: Locator, itemSelector: string = defaultItemSelector) {
         this.page = page;
-        this.rootLocator = rootLocator;
+        this.locator = locator;
 
-        if (!this.rootLocator) {
+        if (!this.locator) {
             throw new Error('Invalid locator');
         }
 
-        this.contentLocator = this.rootLocator.locator('.menu-item__content');
+        this.contentLocator = this.locator.locator('.menu-item__content');
 
-        this.groupHeaderLocator = this.rootLocator.locator('.menu-group__header');
+        this.groupHeaderLocator = this.locator.locator('.menu-group__header');
 
         this.itemSelector = itemSelector;
-        this.itemsLocator = this.rootLocator.locator(itemSelector);
+        this.itemsLocator = this.locator.locator(itemSelector);
     }
 
     async assertState(expectedState: MenuItemState) {
@@ -79,7 +79,7 @@ export class MenuItem {
         const items = expectedState.items ?? [];
 
         if (id) {
-            await expect(this.rootLocator).toHaveAttribute('data-id', id);
+            await expect(this.locator).toHaveAttribute('data-id', id);
         }
 
         // Title
@@ -89,19 +89,19 @@ export class MenuItem {
         // Type
         const itemClassName = menuItemTypeClassNames[type] ?? '';
         const classRegExp = classNameRegExp(itemClassName);
-        await expect(this.rootLocator).toHaveClass(classRegExp);
+        await expect(this.locator).toHaveClass(classRegExp);
 
         // Visible
-        await expect(this.rootLocator).toBeVisible({ visible });
+        await expect(this.locator).toBeVisible({ visible });
 
         // Active
         if (type !== 'group') {
-            await expectToHaveClass(this.rootLocator, menuItemActiveClassName, active);
+            await expectToHaveClass(this.locator, menuItemActiveClassName, active);
         }
 
         // Selected
         if (type === 'checkbox') {
-            await expectToHaveClass(this.rootLocator, menuItemSelectedClassName, selected);
+            await expectToHaveClass(this.locator, menuItemSelectedClassName, selected);
         }
 
         // Child items
@@ -120,11 +120,11 @@ export class MenuItem {
     }
 
     async press(value: string) {
-        return this.rootLocator.press(value);
+        return this.locator.press(value);
     }
 
     async click() {
-        return this.rootLocator.click();
+        return this.locator.click();
     }
 
     async clickHeader() {
@@ -132,10 +132,10 @@ export class MenuItem {
     }
 
     async focus() {
-        return this.rootLocator.focus();
+        return this.locator.focus();
     }
 
     async blur() {
-        return this.rootLocator.blur();
+        return this.locator.blur();
     }
 }

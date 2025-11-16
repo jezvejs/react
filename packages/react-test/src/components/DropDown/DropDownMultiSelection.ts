@@ -9,21 +9,21 @@ import { DropDownMultiSelectionState } from './DropDown.types.ts';
 export class DropDownMultipleSelection {
     readonly page: Page;
 
-    readonly rootLocator: Locator;
+    readonly locator: Locator;
 
     readonly itemsLocator: Locator;
 
-    constructor(page: Page, rootLocator: Locator) {
+    constructor(page: Page, locator: Locator) {
         this.page = page;
-        this.rootLocator = rootLocator;
+        this.locator = locator;
 
-        this.itemsLocator = this.rootLocator.locator('.dd__selection-item');
+        this.itemsLocator = this.locator.locator('.dd__selection-item');
     }
 
     async assertState(expectedState: DropDownMultiSelectionState) {
         const { visible, items } = expectedState;
 
-        await expect(this.rootLocator).toBeVisible({ visible });
+        await expect(this.locator).toBeVisible({ visible });
 
         await expect(this.itemsLocator).toHaveCount(items.length);
         const allItems = await this.itemsLocator.all();
@@ -46,7 +46,7 @@ export class DropDownMultipleSelection {
     }
 
     getItemLocator(itemId: string) {
-        return this.rootLocator.locator(`.dd__selection-item[data-id="${itemId}"]`);
+        return this.locator.locator(`.dd__selection-item[data-id="${itemId}"]`);
     }
 
     async clickById(itemId: string) {
@@ -56,14 +56,14 @@ export class DropDownMultipleSelection {
     }
 
     async press(value: string) {
-        return this.rootLocator.press(value);
+        return this.locator.press(value);
     }
 
     async focus() {
-        return this.rootLocator.focus();
+        return this.locator.focus();
     }
 
     async blur() {
-        return this.rootLocator.blur();
+        return this.locator.blur();
     }
 }

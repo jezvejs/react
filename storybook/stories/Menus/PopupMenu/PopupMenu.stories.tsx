@@ -1,7 +1,6 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 import '@jezvejs/react/style.scss';
-import { PopupMenu } from '@jezvejs/react';
 
 import { getDefaultItems, getNestedMenuItems } from 'common/assets/data/popupMenuData.ts';
 
@@ -9,11 +8,11 @@ import { PopupMenuDemo } from 'common/Components/PopupMenuDemo/PopupMenuDemo.tsx
 
 import './PopupMenu.stories.scss';
 
-export type Story = StoryObj<typeof PopupMenu>;
+export type Story = StoryObj<typeof PopupMenuDemo>;
 
-const meta: Meta<typeof PopupMenu> = {
+const meta: Meta<typeof PopupMenuDemo> = {
     title: 'Menu/PopupMenu',
-    component: PopupMenu,
+    component: PopupMenuDemo,
     parameters: {
         layout: 'centered',
     },
@@ -29,46 +28,50 @@ const heightDecorator = (StoryComponent: StoryFn) => (
 
 export const Default: Story = {
     args: {
-        id: 'default',
+        id: 'defaultPopupMenu',
+        buttonProps: { id: 'defaultMenuButton' },
         items: getDefaultItems(),
         multiple: true,
     },
-    render: PopupMenuDemo,
 };
 
 export const AbsolutePosition: Story = {
     args: {
+        id: 'absPositionPopupMenu',
+        buttonProps: { id: 'absPositionMenuButton' },
         items: getDefaultItems(),
         multiple: true,
         fixed: false,
     },
     decorators: [heightDecorator],
-    render: PopupMenuDemo,
 };
 
 export const HideOnScroll: Story = {
     args: {
+        id: 'hideOnScrollPopupMenu',
+        buttonProps: { id: 'hideOnScrollMenuButton' },
         items: getDefaultItems(),
         multiple: true,
         hideOnScroll: false,
     },
     decorators: [heightDecorator],
-    render: PopupMenuDemo,
 };
 
 export const HideOnSelect: Story = {
     args: {
+        id: 'hideOnSelectPopupMenu',
+        buttonProps: { id: 'hideOnSelectMenuButton' },
         items: getDefaultItems(),
         multiple: true,
         hideOnSelect: false,
     },
     decorators: [heightDecorator],
-    render: PopupMenuDemo,
 };
 
 export const NestedMenus: Story = {
     args: {
-        id: 'nestedParentMenu',
+        id: 'nestedParentPopupMenu',
+        buttonProps: { id: 'nestedParentMenuButton' },
         items: getNestedMenuItems(),
         multiple: true,
         hideOnScroll: false,
@@ -78,5 +81,4 @@ export const NestedMenus: Story = {
         },
     },
     decorators: [heightDecorator],
-    render: PopupMenuDemo,
 };

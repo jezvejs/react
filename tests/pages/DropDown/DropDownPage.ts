@@ -12,11 +12,13 @@ import { initialState } from './initialState.ts';
 import {
     DropDownId,
     DropDownPageComponents,
+    DropDownPageId,
     DropDownPageState,
     SimpleDropDownId,
     ToggleEnableDropDownId,
 } from './types.ts';
-import { filterDropDownItems, toggleSelectItem } from './utils.ts';
+import { filterDropDownItems, getDropDownIdByPage, toggleSelectItem } from './utils.ts';
+import { dropDownPageIds } from './constants.ts';
 
 const componentIds = Object.keys(initialComponents) as DropDownId[];
 
@@ -60,7 +62,7 @@ export class DropDownPage implements DropDownPageComponents {
 
     filterGroupsMultiDropDown: DropDown | null = null;
 
-    pageId: DropDownId | null;
+    pageId: DropDownPageId | null;
 
     state: DropDownPageState = initialState;
 
@@ -72,10 +74,10 @@ export class DropDownPage implements DropDownPageComponents {
     }
 
     init() {
-        const pageId = this.pageId as DropDownId;
+        const componentId = getDropDownIdByPage(this.pageId);
 
-        if (pageId && componentIds.includes(pageId)) {
-            this.createComponent(pageId);
+        if (componentId && componentIds.includes(componentId)) {
+            this.createComponent(componentId);
         } else {
             componentIds.forEach((menuId) => this.createComponent(menuId));
         }
@@ -88,63 +90,66 @@ export class DropDownPage implements DropDownPageComponents {
             return null;
         }
 
-        return id.substring(PAGE_ID_PREFIX.length) as DropDownId;
+        return id.substring(PAGE_ID_PREFIX.length) as DropDownPageId;
     }
 
-    async loadStoryById(storyId: string) {
-        this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
+    async loadStoryById(storyId: DropDownPageId) {
+        await this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
+
+        this.pageId = storyId;
+        this.init();
     }
 
     async loadInline() {
-        this.loadStoryById('inline');
+        return this.loadStoryById('inline');
     }
 
     async loadFullWidth() {
-        this.loadStoryById('full-width');
+        return this.loadStoryById('full-width');
     }
 
     async loadFixedMenu() {
-        this.loadStoryById('fixed-menu');
+        return this.loadStoryById('fixed-menu');
     }
 
     async loadGroups() {
-        this.loadStoryById('groups');
+        return this.loadStoryById('groups');
     }
 
     async loadAttachedToBlock() {
-        this.loadStoryById('attach-to-block');
+        return this.loadStoryById('attach-to-block');
     }
 
     async loadAttachedToInline() {
-        this.loadStoryById('attach-to-inline');
+        return this.loadStoryById('attach-to-inline');
     }
 
     async loadMultiSelect() {
-        this.loadStoryById('multiple-select');
+        return this.loadStoryById('multiple-select');
     }
 
     async loadFilterSingleSelect() {
-        this.loadStoryById('filter-single');
+        return this.loadStoryById('filter-single');
     }
 
     async loadFilterMultiSelect() {
-        this.loadStoryById('filter-multiple');
+        return this.loadStoryById('filter-multiple');
     }
 
     async loadFilterAttachedToBlock() {
-        this.loadStoryById('filter-attach-to-block');
+        return this.loadStoryById('filter-attach-to-block');
     }
 
     async loadFilterMultiAttachedToBlock() {
-        this.loadStoryById('filter-multi-attach-to-block');
+        return this.loadStoryById('filter-multi-attach-to-block');
     }
 
     async loadFilterGroups() {
-        this.loadStoryById('filter-groups');
+        return this.loadStoryById('filter-groups');
     }
 
     async loadFilterGroupsMultiSelect() {
-        this.loadStoryById('filter-groups-multiple');
+        return this.loadStoryById('filter-groups-multiple');
     }
 
     createComponent(id: DropDownId) {
@@ -175,9 +180,10 @@ export class DropDownPage implements DropDownPageComponents {
     }
 
     async assertState(state: DropDownPageState) {
-        const pageId = this.pageId as DropDownId;
-        if (pageId && componentIds.includes(pageId)) {
-            await this.assertDropDownState(pageId, state);
+        const componentId = this.pageId && getDropDownIdByPage(this.pageId);
+
+        if (componentId && componentIds.includes(componentId)) {
+            await this.assertDropDownState(componentId, state);
         } else {
             await asyncMap(componentIds, (menuId) => this.assertDropDownState(menuId, state));
         }
@@ -198,12 +204,16 @@ export class DropDownPage implements DropDownPageComponents {
     async waitForLoad(id: DropDownId | null = null) {
         await this.page.waitForLoadState('networkidle');
 
-        if (id && this[id]) {
-            await this[id].rootLocator.waitFor({ state: 'visible' });
+        if (id) {
+            const pageId = dropDownPageIds[id];
+            this.pageId = pageId;
         }
-        this.pageId = id;
 
         this.init();
+
+        if (id && this[id]) {
+            await this[id].locator.waitFor({ state: 'visible' });
+        }
     }
 
     async waitForItemsCount(state: DropDownPageState, id: DropDownId) {

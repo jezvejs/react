@@ -24,7 +24,7 @@ export const attachedClass = 'dd__container_attached';
 export class DropDown {
     readonly page: Page;
 
-    readonly rootLocator: Locator;
+    readonly locator: Locator;
 
     readonly singleSelectionLocator: Locator;
 
@@ -52,15 +52,15 @@ export class DropDown {
 
     inputString: string | null = null;
 
-    constructor(page: Page, rootLocator: Locator) {
+    constructor(page: Page, locator: Locator) {
         this.page = page;
-        this.rootLocator = rootLocator;
+        this.locator = locator;
 
-        this.singleSelectionLocator = this.rootLocator.locator(singleValueSelector);
-        this.multipleSelectionLocator = this.rootLocator.locator(multipleValueSelector);
-        this.toggleBtnLocator = this.rootLocator.locator(toggleBtnSelector);
-        this.inputLocator = this.rootLocator.locator(inputSelector);
-        this.menuInputLocator = this.rootLocator.locator(menuInputSelector);
+        this.singleSelectionLocator = this.locator.locator(singleValueSelector);
+        this.multipleSelectionLocator = this.locator.locator(multipleValueSelector);
+        this.toggleBtnLocator = this.locator.locator(toggleBtnSelector);
+        this.inputLocator = this.locator.locator(inputSelector);
+        this.menuInputLocator = this.locator.locator(menuInputSelector);
     }
 
     getInputLocator() {
@@ -72,7 +72,7 @@ export class DropDown {
     }
 
     async parseContent() {
-        const element = await this.rootLocator.evaluate((el, cls) => ({
+        const element = await this.locator.evaluate((el, cls) => ({
             id: el.id,
             value: el.dataset.value ?? '',
             disabled: el.classList.contains(cls.disabledClass),
@@ -128,11 +128,11 @@ export class DropDown {
 
         const strValue = asArray(value).join(',');
 
-        await expectToHaveClass(this.rootLocator, 'dd__container', !attached);
-        await expectToHaveClass(this.rootLocator, attachedClass, attached);
+        await expectToHaveClass(this.locator, 'dd__container', !attached);
+        await expectToHaveClass(this.locator, attachedClass, attached);
 
-        await expect(this.rootLocator).toBeVisible({ visible });
-        await expect(this.rootLocator).toHaveAttribute('data-value', strValue);
+        await expect(this.locator).toBeVisible({ visible });
+        await expect(this.locator).toHaveAttribute('data-value', strValue);
 
         // Single selection
         const showSingleSelection = (
@@ -245,19 +245,19 @@ export class DropDown {
     }
 
     async press(value: string) {
-        return this.rootLocator.press(value);
+        return this.locator.press(value);
     }
 
     async focus() {
-        return this.rootLocator.focus();
+        return this.locator.focus();
     }
 
     async blur() {
-        return this.rootLocator.blur();
+        return this.locator.blur();
     }
 
     async clickByContainer() {
-        return this.rootLocator.click();
+        return this.locator.click();
     }
 
     async clickByToggleButton() {

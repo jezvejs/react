@@ -16,6 +16,22 @@ export type DropDownComponents = {
     filterGroupsMultiDropDown: DropDown | null;
 };
 
+export type DropDownPageId =
+    | 'inline'
+    | 'full-width'
+    | 'fixed-menu'
+    | 'groups'
+    | 'attach-to-block'
+    | 'attach-to-inline'
+    | 'multiple-select'
+    | 'filter-single'
+    | 'filter-multiple'
+    | 'attached-filter'
+    | 'filter-attach-to-block'
+    | 'filter-multi-attach-to-block'
+    | 'filter-groups'
+    | 'filter-groups-multiple';
+
 export type ToggleEnableDropDownComponents = {
     filterDropDown: ToggleEnableDropDown | null;
     filterMultiDropDown: ToggleEnableDropDown | null;

@@ -74,27 +74,27 @@ export class MenuPage implements MenuPageComponents {
     }
 
     async loadStoryById(storyId: string) {
-        this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
+        return this.page.goto(`iframe.html?args=&globals=&id=${PAGE_ID_PREFIX}${storyId}&viewMode=story`);
     }
 
     async loadDefault() {
-        this.loadStoryById('default');
+        return this.loadStoryById('default');
     }
 
     async loadCheckboxSide() {
-        this.loadStoryById('checkbox-side');
+        return this.loadStoryById('checkbox-side');
     }
 
     async loadGroups() {
-        this.loadStoryById('groups');
+        return this.loadStoryById('groups');
     }
 
     async loadCheckboxGroups() {
-        this.loadStoryById('checkbox-groups');
+        return this.loadStoryById('checkbox-groups');
     }
 
     async loadCollapsibleGroups() {
-        this.loadStoryById('collapsible-groups');
+        return this.loadStoryById('collapsible-groups');
     }
 
     createMenu(menuId: MenuId) {
@@ -130,7 +130,7 @@ export class MenuPage implements MenuPageComponents {
         await this.page.waitForLoadState('networkidle');
 
         if (menuId && this[menuId]) {
-            await this[menuId].rootLocator.waitFor({ state: 'visible' });
+            await this[menuId].locator.waitFor({ state: 'visible' });
         }
         this.pageId = menuId;
 

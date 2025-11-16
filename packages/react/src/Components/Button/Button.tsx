@@ -106,6 +106,7 @@ export const Button = forwardRef<ButtonRef, ButtonProps>((p, ref) => {
             <a
                 {...commonProps}
                 href={url}
+                ref={ref as React.Ref<HTMLAnchorElement>}
             >
                 {content}
             </a>
