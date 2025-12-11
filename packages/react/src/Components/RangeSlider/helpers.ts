@@ -1,5 +1,4 @@
 import { minmax } from '../../utils/common.ts';
-import { RangeSliderAxisType } from './types.ts';
 
 export const valueToPosition = (
     value: number,
@@ -50,21 +49,6 @@ export const stepValue = (value: number, step: number, prec: number): number => 
         ? roundToPrecision(Math.round(value / step) * step, prec)
         : value
 );
-
-export const getMaxPos = (
-    slider: HTMLElement | null,
-    axis: RangeSliderAxisType,
-): number => {
-    if (!slider?.offsetParent) {
-        return 0;
-    }
-
-    const rect = slider.getBoundingClientRect();
-    const offset = slider.offsetParent.getBoundingClientRect();
-    return (axis === 'x')
-        ? (offset.width - rect.width)
-        : (offset.height - rect.height);
-};
 
 /**
  * Returns new identifier for slider
