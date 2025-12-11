@@ -21,6 +21,10 @@
   --rs-slider-border-radius: 0;
   --rs-slider-background: #000000;
 
+  /* Ruler */
+  --rs-ruler-margin: 5px;
+  --rs-ruler-line-color: #000000;
+
   /* Selected range */
   --rs-selected-background: #00ccbb;
   --rs-selected-border-color: var(--rs-area-border-color);
@@ -117,8 +121,10 @@
 
   /* x axis */
   &.range-slider_x-axis {
+    display: flex;
+    flex-flow: column nowrap;
     max-width: var(--rs-max-length);
-    height: var(--rs-area-size);
+    min-height: var(--rs-area-size);
 
     .range-slider__area {
       height: var(--rs-area-size);
@@ -156,8 +162,10 @@
 
   /* y axis */
   &.range-slider_y-axis {
+    display: flex;
+    flex-flow: row nowrap;
     height: var(--rs-max-length);
-    width: var(--rs-area-size);
+    min-width: var(--rs-area-size);
 
     .range-slider__area {
       height: var(--rs-max-length);

@@ -12,5 +12,7 @@ export const defaultProps = {
     range: false,
     beforeArea: false,
     afterArea: false,
+    showRuler: false,
+    rulerSize: 5,
     scrollOnClickOutsideRange: false,
 };

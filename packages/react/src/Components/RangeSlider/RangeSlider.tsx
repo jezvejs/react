@@ -84,6 +84,10 @@ export const RangeSlider = forwardRef<RangeSliderRef, Partial<RangeSliderProps>>
         dragging: false,
         offset: {},
         rect: {},
+        width: 0,
+        height: 0,
+        sliderWidth: 0,
+        sliderHeight: 0,
         maxPos: 0,
         precision: getStepPrecision(step),
     };

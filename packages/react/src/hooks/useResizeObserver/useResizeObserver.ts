@@ -24,7 +24,7 @@ const getResizeObserver = () => {
 };
 
 export function useResizeObserver<
-    T extends Element,
+    T extends Element | null,
 >(
     handler: ResizeHandler,
 ) {

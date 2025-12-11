@@ -1,0 +1,15 @@
+.range-slider__ruler {
+  .range-slider__ruler-line {
+    stroke-width: 1px;
+    fill: none;
+    stroke: var(--rs-ruler-line-color);
+  }
+}
+
+.range-slider.range-slider_x-axis .range-slider__ruler {
+  margin-top: var(--rs-ruler-margin);
+}
+
+.range-slider.range-slider_y-axis .range-slider__ruler {
+  margin-left: var(--rs-ruler-margin);
+}

@@ -6,6 +6,7 @@ import {
 } from 'react';
 
 // Utils
+import { useResizeObserver } from '../../../hooks/useResizeObserver/useResizeObserver.ts';
 import { minmax } from '../../../utils/common.ts';
 import { DragMaster } from '../../../utils/DragnDrop/DragMaster.ts';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
@@ -20,7 +21,6 @@ import {
 import { RangeSliderSelectedArea } from './RangeSliderSelectedArea.tsx';
 import { RangeSliderValueSlider } from './RangeSliderValueSlider.tsx';
 
-import { getMaxPos } from '../helpers.ts';
 import {
     RangeSliderDragZoneProps,
     RangeSliderDragZoneRef,
@@ -40,7 +40,25 @@ export const RangeSliderDragZone = forwardRef<
     } = props;
     const sliderId = type as RangeSliderType;
 
-    const innerRef = useRef<RangeSliderDragZoneRef>(null);
+    const innerRef = useResizeObserver<RangeSliderDragZoneRef>((entry) => {
+        if (sliderId !== 'startSlider') {
+            return;
+        }
+
+        const state = getState();
+        const { width: sliderWidth, height: sliderHeight } = entry.target.getBoundingClientRect();
+        if (state.sliderWidth === sliderWidth && state.sliderHeight === sliderHeight) {
+            return;
+        }
+
+        setState((prev) => ({
+            ...prev,
+            sliderWidth,
+            sliderHeight,
+            maxPos: (prev.axis === 'x') ? (prev.width - sliderWidth) : (prev.height - sliderHeight),
+        }));
+    });
+
     useImperativeHandle<
         RangeSliderDragZoneRef,
         RangeSliderDragZoneRef
@@ -182,33 +200,6 @@ export const RangeSliderDragZone = forwardRef<
 
         DragMaster.makeDraggable(dragZoneProps);
     }, [innerRef]);
-
-    const onResize = () => {
-        if (sliderId !== 'startSlider') {
-            return;
-        }
-
-        setState((prev) => ({
-            ...prev,
-            maxPos: getMaxPos(innerRef.current, props.axis),
-        }));
-    };
-
-    useEffect(() => {
-        if (!innerRef?.current) {
-            return undefined;
-        }
-
-        const observer = new ResizeObserver(onResize);
-        observer.observe(innerRef.current);
-        if (innerRef.current?.offsetParent) {
-            observer.observe(innerRef.current.offsetParent);
-        }
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [innerRef.current, innerRef.current?.offsetParent]);
 
     if (type === 'selectedArea') {
         const selectedAreaProps: RangeSliderSelectedAreaProps = {

@@ -9,7 +9,7 @@ import React, {
 import classNames from 'classnames';
 
 // Utils
-import { debounce, DebounceCancelFunction, DebounceCancellableReturnResult } from '../../utils/common.ts';
+import { debounce, DebounceCancelFunction } from '../../utils/common.ts';
 import { useStore } from '../../utils/Store/StoreProvider.tsx';
 import { usePopupPosition } from '../../hooks/usePopupPosition/usePopupPosition.ts';
 
@@ -365,7 +365,7 @@ export const BaseChartContainer = forwardRef<
             () => onResize(),
             state.resizeTimeout,
             { cancellable: true },
-        ) as DebounceCancellableReturnResult;
+        );
         const handler = (typeof debouncedHandler === 'function')
             ? debouncedHandler
             : debouncedHandler.run;
