@@ -99,6 +99,17 @@ export const BeforeAndAfterAreas: Story = {
     },
 };
 
+export const Ruler: Story = {
+    args: {
+        className: 'styled',
+        value: 0,
+        step: 5,
+        min: -10,
+        max: 10,
+        showRuler: true,
+    },
+};
+
 /**
  * 'step' property is set to 0.02
  */

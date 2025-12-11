@@ -123,6 +123,8 @@ export interface RangeSliderProps {
     range?: boolean;
     beforeArea?: boolean;
     afterArea?: boolean;
+    showRuler?: boolean;
+    rulerSize?: number;
     scrollOnClickOutsideRange?: boolean;
 
     onClick?: (e: React.MouseEvent<Element, MouseEvent>) => void;
@@ -144,12 +146,16 @@ export interface RangeSliderProps {
 }
 
 export interface RangeSliderState extends Required<RangeSliderProps> {
-    precision: number | null,
-    startSlider: RangeSliderAreaProps,
-    endSlider: RangeSliderAreaProps,
-    selectedArea: RangeSliderAreaProps,
-    dragging: boolean,
-    offset: object,
-    rect: object,
-    maxPos: number,
+    precision: number | null;
+    startSlider: RangeSliderAreaProps;
+    endSlider: RangeSliderAreaProps;
+    selectedArea: RangeSliderAreaProps;
+    dragging: boolean;
+    offset: object;
+    rect: object;
+    maxPos: number;
+    width: number;
+    height: number;
+    sliderWidth: number;
+    sliderHeight: number;
 }

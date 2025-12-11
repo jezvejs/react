@@ -8,7 +8,7 @@ import {
 import { px } from '../../../utils/common.ts';
 import { useDragnDrop } from '../../../utils/DragnDrop/DragnDropProvider.tsx';
 
-import { getMaxPos, valueToPosition } from '../helpers.ts';
+import { valueToPosition } from '../helpers.ts';
 import { RangeSliderState, RangeSliderValueSliderProps } from '../types.ts';
 
 interface SliderProps {
@@ -37,10 +37,9 @@ export const RangeSliderValueSlider = forwardRef<
     const { getState } = useDragnDrop<RangeSliderState>();
     const state = getState();
 
-    const maxPos = getMaxPos(innerRef?.current, axis);
     const rangeValue = (type === 'endSlider') ? state.end : state.start;
     const sliderValue = state.range ? rangeValue : state.value;
-    const pos = valueToPosition(sliderValue, state.min, state.max, maxPos);
+    const pos = valueToPosition(sliderValue, state.min, state.max, state.maxPos);
 
     const sliderProps: SliderProps = {
         id: props.id,

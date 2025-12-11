@@ -24,19 +24,16 @@ import {
     RangeSliderState,
     RangeSliderValue,
 } from './types.ts';
+import { RangeSliderRuler } from './components/Ruler/RangeSliderRuler.tsx';
+import { useResizeObserver } from '../../hooks/useResizeObserver/useResizeObserver.ts';
 
-type RangeSliderContainerProps = Partial<RangeSliderProps> & { id: string };
+type RangeSliderContainerProps = Partial<RangeSliderProps> & { id: string; };
 type RangeSliderContainerRef = HTMLDivElement | null;
 
 export const RangeSliderContainer = forwardRef<
     RangeSliderContainerRef,
     RangeSliderContainerProps
 >((props, ref) => {
-    const innerRef = useRef<HTMLDivElement>(null);
-    useImperativeHandle<RangeSliderContainerRef, RangeSliderContainerRef>(ref, () => (
-        innerRef?.current
-    ));
-
     const { getState, setState } = useDragnDrop<RangeSliderState>();
 
     const sliderRef = useRef<HTMLDivElement>(null);
@@ -45,6 +42,28 @@ export const RangeSliderContainer = forwardRef<
     const beforeAreaRef = useRef<HTMLDivElement>(null);
     const afterAreaRef = useRef<HTMLDivElement>(null);
     const selectedAreaRef = useRef<HTMLDivElement>(null);
+
+    const innerRef = useResizeObserver<HTMLDivElement>((entry) => {
+        const state = getState();
+        const { width, height } = entry.target.getBoundingClientRect();
+        if (state.width === width && state.height === height) {
+            return;
+        }
+
+        setState((prev) => ({
+            ...prev,
+            width,
+            height,
+            maxPos: (
+                (prev.axis === 'x')
+                    ? (width - prev.sliderWidth)
+                    : (height - prev.sliderHeight)
+            ),
+        }));
+    });
+    useImperativeHandle<RangeSliderContainerRef, RangeSliderContainerRef>(ref, () => (
+        innerRef?.current
+    ));
 
     const getValue = (): RangeSliderValue => {
         const state = getState();
@@ -346,6 +365,10 @@ export const RangeSliderContainer = forwardRef<
         />
     );
 
+    const ruler = !!props.showRuler && (
+        <RangeSliderRuler />
+    );
+
     const slider = (
         <RangeSliderDragZone
             {...commonProps}
@@ -378,6 +401,7 @@ export const RangeSliderContainer = forwardRef<
                 {sliderAfterArea}
                 {sliderSelectedArea}
             </div>
+            {ruler}
             {slider}
             {endSlider}
         </RangeSliderDropTarget>
